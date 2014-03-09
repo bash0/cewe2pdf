@@ -18,6 +18,11 @@ Feel free to improve!
 
 The script was tested to run with A4 books from CEWE programmversion 5001003
 
+documentations:
+-reportlab: www.reportlab.com/software/opensource/
+-lxml: http://lxml.de/tutorial.html
+-PIL: http://effbot.org/imagingbook/image.htm
+
 --
 
 This program is free software: you can redistribute it and/or modify
