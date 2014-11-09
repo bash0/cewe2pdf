@@ -4,6 +4,7 @@
 
 '''
 Create pdf files from CEWE .mcf photo books (cewe-fotobuch)
+version 0.1 (Nov. 2014)
 
 This script reads CEWE .mcf files using the lxml library
 and compiles a pdf file using the reportlab python pdf library.
@@ -121,147 +122,161 @@ pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
 pagenum = int(fotobook.get('normalpages')) + 2
 imagedir = fotobook.get('imagedir')
 
+
 for n in range(pagenum):
-    if (n == 0) or (n == pagenum - 1):
-        pn = 0
-        page = [i for i in
-            fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']")
-            if (i.find("./area") != None)][0]
-        oddpage = (n == 0)
-        pagetype = 'cover'
-    elif n == 1:
-        pn = 1
-        page = [i for i in
-            fotobook.findall("./page[@pagenr='0'][@type='EMPTY']")
-            if (i.find("./area") != None)][0]
-        oddpage = True
-        pagetype = 'singleside'
-    else:
-        pn = n
-        page = fotobook.find("./page[@pagenr='{}']".format(2 * (pn / 2)))
-        oddpage = (pn % 2) == 1
-        pagetype = 'normal'
+    try:
+        if (n == 0) or (n == pagenum - 1):
+            pn = 0
+            page = [i for i in
+                fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']") +
+                fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
+                if (i.find("./area") != None)][0]
+            oddpage = (n == 0)
+            pagetype = 'cover'
+        elif n == 1:
+            pn = 1
+            page = [i for i in
+                fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") + 
+                fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
+                if (i.find("./area") != None)][0]
+            oddpage = True
+            pagetype = 'singleside'
+        else:
+            pn = n
+            page = fotobook.find("./page[@pagenr='{}']".format(2 * (pn / 2)))
+            oddpage = (pn % 2) == 1
+            pagetype = 'normal'
+
+        if (page != None):
+            print 'parsing page', page.get('pagenr')
+            
+            pw = float(page.find("./bundlesize").get('width')) / 2.0
+            ph = float(page.find("./bundlesize").get('height'))
+            pdf.setPageSize((f * pw, f * ph))
+            
+            for area in page.findall('area'):
+                aleft = float(area.get('left').replace(',', '.'))
+                if pagetype != 'singleside' or len(area.findall('imagebackground')) == 0:
+                    if oddpage:
+                        # shift double-page content from other page
+                        aleft -= pw
+                atop = float(area.get('top').replace(',', '.'))
+                aw = float(area.get('width').replace(',', '.'))
+                ah = float(area.get('height').replace(',', '.'))
+                arot = float(area.get('rotation'))
+                
+                cx = aleft + 0.5 * aw
+                cy = ph - (atop + 0.5 * ah)
+                                
+                transx = f * cx
+                transy = f * cy
+                
+                
+                # process images
+                for image in area.findall('imagebackground') + area.findall('image'):
+                    # open raw image file
+                    if image.get('filename') == None:
+                        continue
+                    imagepath = os.path.join(os.getcwd(),
+                        imagedir, image.get('filename'))
+                    im = PIL.Image.open(imagepath)
+                    
+                    
+                    # correct for exif rotation
+                    im = autorot(im)
+                    
+                    imleft = float(image.get('left').replace(',', '.'))
+                    imtop = float(image.get('top').replace(',', '.'))
+                    imw, imh = im.size
+                    imsc = float(image.get('scale'))
+                    
+                    
+                    # crop image
+                    im = im.crop((int(0.5 - imleft),
+                        int(0.5 - imtop),
+                        int(0.5 - imleft + aw / imsc),
+                        int(0.5 - imtop + ah / imsc)))
+                    
+                    
+                    # scale image
+                    if image.tag == 'imagebackground' and pagetype != 'cover':
+                        res = bg_res
+                    else:
+                        res = image_res
+                    new_w = int(0.5 + aw * res / 254.)
+                    new_h = int(0.5 + ah * res / 254.)
+                    factor = sqrt(new_w * new_h / float(im.size[0] * im.size[1]))
+                    if factor <= 0.8:
+                        im = im.resize((new_w, new_h), PIL.Image.ANTIALIAS)
+                    im.load()
+                    
+                    
+                    # compress image
+                    jpeg = tempfile.NamedTemporaryFile()
+                    im.save(jpeg.name, "JPEG", quality=image_quality)
+                    
+                    
+                    # place image                
+                    print 'image', image.get('filename')
+                    pdf.translate(transx, transy)
+                    pdf.rotate(-arot)
+                    pdf.drawImage(ImageReader(jpeg.name),
+                        f * -0.5 * aw, f * -0.5 * ah,
+                        width=f * aw, height=f * ah)
+                    pdf.rotate(arot)
+                    pdf.translate(-transx, -transy)
+                
+                
+                # process text
+                for text in area.findall('text'):
+                    # note: it would be better to use proper html processing here
+                    html = etree.XML(text.text)
+                    body = html.find('.//body')
+                    bstyle = dict([kv.split(':') for kv in
+                        body.get('style').lstrip(' ').rstrip(';').split('; ')])
+                    family = bstyle['font-family'].strip("'")
+                    font = 'Helvetica'
+                    fs = 20
+                    if family in pdf.getAvailableFonts():
+                        font = family
+                    color = '#000000'
+                    
+                    pdf.translate(transx, transy)
+                    pdf.rotate(-arot)
+                    y_p = 0
+                    for p in body.findall(".//p"):
+                        for span in p.findall(".//span"):
+                            style = dict([kv.split(':') for kv in
+                                span.get('style').lstrip(' ').rstrip(';').split('; ')])
+                            print 'text:', span.text
+                            if 'font-size' in style:
+                                fs = int(style['font-size'].strip()[:-2])
+                                if 'color' in style:
+                                    color = style['color']
+                                pdf.setFont(font, fs)
+                            pdf.setFillColor(color)
+                            if p.get('align') == 'center':
+                                pdf.drawCentredString(0,
+                                    0.5 * f * ah + y_p -1.3*fs, span.text)
+                            elif p.get('align') == 'right':
+                                pdf.drawRightString(0.5 * f * aw,
+                                    0.5 * f * ah + y_p -1.3*fs, span.text)
+                            else:
+                                pdf.drawString(-0.5 * f * aw,
+                                    0.5 * f * ah + y_p -1.3*fs, span.text)
+                        y_p -= 1.3*fs
+                    pdf.rotate(arot)
+                    pdf.translate(-transx, -transy)
+
+        # finish the page
+        pdf.showPage()
     
-    if (page != None):
-        print 'parsing page', page.get('pagenr')
-        
-        pw = float(page.find("./bundlesize").get('width')) / 2.0
-        ph = float(page.find("./bundlesize").get('height'))
-        pdf.setPageSize((f * pw, f * ph))
-        
-        for area in page.findall('area'):
-            aleft = float(area.get('left').replace(',', '.'))
-            if pagetype != 'singleside' or len(area.findall('imagebackground')) == 0:
-                if oddpage:
-                    # shift double-page content from other page
-                    aleft -= pw
-            atop = float(area.get('top').replace(',', '.'))
-            aw = float(area.get('width').replace(',', '.'))
-            ah = float(area.get('height').replace(',', '.'))
-            arot = float(area.get('rotation'))
-            
-            cx = aleft + 0.5 * aw
-            cy = ph - (atop + 0.5 * ah)
-                            
-            transx = f * cx
-            transy = f * cy
-            
-            
-            # process images
-            for image in area.findall('imagebackground') + area.findall('image'):
-                # open raw image file
-                imagepath = filename = os.path.join(os.getcwd(),
-                    imagedir, image.get('filename'))
-                im = PIL.Image.open(imagepath)
-                
-                
-                # correct for exif rotation
-                im = autorot(im)
-                
-                imleft = float(image.get('left').replace(',', '.'))
-                imtop = float(image.get('top').replace(',', '.'))
-                imw, imh = im.size
-                imsc = float(image.get('scale'))
-                
-                
-                # crop image
-                im = im.crop((int(0.5 - imleft),
-                    int(0.5 - imtop),
-                    int(0.5 - imleft + aw / imsc),
-                    int(0.5 - imtop + ah / imsc)))
-                
-                
-                # scale image
-                if image.tag == 'imagebackground' and pagetype != 'cover':
-                    res = bg_res
-                else:
-                    res = image_res
-                new_w = int(0.5 + aw * res / 254.)
-                new_h = int(0.5 + ah * res / 254.)
-                factor = sqrt(new_w * new_h / float(im.size[0] * im.size[1]))
-                if factor <= 0.8:
-                    im = im.resize((new_w, new_h), PIL.Image.ANTIALIAS)
-                im.load()
-                
-                
-                # compress image
-                jpeg = tempfile.NamedTemporaryFile()
-                im.save(jpeg.name, "JPEG", quality=image_quality)
-                
-                
-                # place image                
-                print 'image', image.get('filename')
-                pdf.translate(transx, transy)
-                pdf.rotate(-arot)
-                pdf.drawImage(ImageReader(jpeg.name),
-                    f * -0.5 * aw, f * -0.5 * ah,
-                    width=f * aw, height=f * ah)
-                pdf.rotate(arot)
-                pdf.translate(-transx, -transy)
-            
-            
-            # process text
-            for text in area.findall('text'):
-                # note: it would be better to use proper html processing here
-                html = etree.XML(text.text)
-                body = html.find('.//body')
-                bstyle = dict([kv.split(':') for kv in
-                    body.get('style').lstrip(' ').rstrip(';').split('; ')])
-                family = bstyle['font-family'].strip("'")
-                font = 'Helvetica'
-                fs = 20
-                if family in pdf.getAvailableFonts():
-                    font = family
-                color = '#000000'
-                
-                pdf.translate(transx, transy)
-                pdf.rotate(-arot)
-                y_p = 0
-                for p in body.findall(".//p"):
-                    for span in p.findall(".//span"):
-                        style = dict([kv.split(':') for kv in
-                            span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                        print 'text:', span.text
-                        fs = int(style['font-size'].strip()[:-2])
-                        if 'color' in style:
-                            color = style['color']
-                        pdf.setFont(font, fs)
-                        pdf.setFillColor(color)
-                        if p.get('align') == 'center':
-                            pdf.drawCentredString(0,
-                                0.5 * f * ah + y_p -1.3*fs, span.text)
-                        elif p.get('align') == 'right':
-                            pdf.drawRightString(0.5 * f * aw,
-                                0.5 * f * ah + y_p -1.3*fs, span.text)
-                        else:
-                            pdf.drawString(-0.5 * f * aw,
-                                0.5 * f * ah + y_p -1.3*fs, span.text)
-                    y_p -= 1.3*fs
-                pdf.rotate(arot)
-                pdf.translate(-transx, -transy)
-    
-    # finish the page
-    pdf.showPage()
+    except Exception as ex:
+        # if one page fails: continue with next one
+        print 'error on page %i:' % (n, )
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '', (exc_type, fname, exc_tb.tb_lineno)
 
 # save final output pdf
 pdf.save()
