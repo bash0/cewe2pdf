@@ -112,11 +112,23 @@ if fotobook.tag != 'fotobook':
     sys.exit(1)
 
 
+# find cewe folder
+try:
+    cewe_file = open('cewe_folder.txt', 'r')
+    cewe_folder = cewe_file.read().strip()
+    cewe_file.close()
+except:
+    print 'cannot find cewe installation folder in cewe_folder.txt'
+    cewe_folder = None
+bg_notfound = set([])
+
+
 # create pdf
 pagesize = reportlab.lib.pagesizes.A4
 if formats.has_key(fotobook.get('productname')):
     pagesize = formats[fotobook.get('productname')]
 pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
+
 
 # extract properties
 pagenum = int(fotobook.get('normalpages')) + 2
@@ -153,6 +165,32 @@ for n in range(pagenum):
             pw = float(page.find("./bundlesize").get('width')) / 2.0
             ph = float(page.find("./bundlesize").get('height'))
             pdf.setPageSize((f * pw, f * ph))
+            
+            
+            # process background
+            designElementIDs = page.findall('designElementIDs')
+            if designElementIDs != None and len(designElementIDs) > 0:
+                designElementID = designElementIDs[0]
+                if (designElementID != None and
+                        designElementID.get('background') != None):
+                    bg = designElementID.get('background')
+                    bgpath = os.path.join(cewe_folder, 'Resources', 'photofun',
+                        'backgrounds', bg + '.jpg')
+                    if os.path.exists(bgpath):
+                        aw = float(page.find('bundlesize').get('width'))
+                        ah = float(page.find('bundlesize').get('height'))
+                        if pagetype != 'singleside' and oddpage:
+                            ax = -aw / 2.
+                        else:
+                            ax = 0
+                        #im = PIL.Image.open(bgpath)
+                        pdf.drawImage(ImageReader(bgpath),
+                            f * ax, 0, width=f * aw, height=f * ah)
+                    else:
+                        if bgpath not in bg_notfound:
+                            print 'cannot find background', bgpath
+                        bg_notfound.add(bgpath)
+            
             
             for area in page.findall('area'):
                 aleft = float(area.get('left').replace(',', '.'))
@@ -236,7 +274,10 @@ for n in range(pagenum):
                         body.get('style').lstrip(' ').rstrip(';').split('; ')])
                     family = bstyle['font-family'].strip("'")
                     font = 'Helvetica'
-                    fs = 20
+                    try:
+                        fs = int(bstyle['font-size'].strip("pt"))
+                    except:
+                        fs = 20
                     if family in pdf.getAvailableFonts():
                         font = family
                     color = '#000000'
@@ -248,12 +289,11 @@ for n in range(pagenum):
                         for span in p.findall(".//span"):
                             style = dict([kv.split(':') for kv in
                                 span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                            print 'text:', span.text
                             if 'font-size' in style:
                                 fs = int(style['font-size'].strip()[:-2])
                                 if 'color' in style:
                                     color = style['color']
-                                pdf.setFont(font, fs)
+                            pdf.setFont(font, fs)
                             pdf.setFillColor(color)
                             if p.get('align') == 'center':
                                 pdf.drawCentredString(0,
@@ -280,3 +320,4 @@ for n in range(pagenum):
 
 # save final output pdf
 pdf.save()
+
