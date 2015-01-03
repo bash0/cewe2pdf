@@ -171,7 +171,7 @@ for n in range(pagenum):
             designElementIDs = page.findall('designElementIDs')
             if designElementIDs != None and len(designElementIDs) > 0:
                 designElementID = designElementIDs[0]
-                if (designElementID != None and
+                if (designElementID != None and cewe_folder != None and
                         designElementID.get('background') != None):
                     bg = designElementID.get('background')
                     bgpath = os.path.join(cewe_folder, 'Resources', 'photofun',
