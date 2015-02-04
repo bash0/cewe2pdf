@@ -67,6 +67,8 @@ f = 72. / 254. # convert from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
 
 def autorot(im):
+    if im.format != 'JPEG':
+        return im
     exifdict = im._getexif()
     if exifdict != None and 274 in exifdict.keys():
         orientation = exifdict[274]
@@ -251,7 +253,10 @@ for n in range(pagenum):
                     
                     # compress image
                     jpeg = tempfile.NamedTemporaryFile()
-                    im.save(jpeg.name, "JPEG", quality=image_quality)
+		    if im.mode == 'RGBA':
+                    	im.save(recompressed.name, "PNG")
+                    else:
+                        im.save(jpeg.name, "JPEG", quality=image_quality)
                     
                     
                     # place image                
@@ -260,7 +265,7 @@ for n in range(pagenum):
                     pdf.rotate(-arot)
                     pdf.drawImage(ImageReader(jpeg.name),
                         f * -0.5 * aw, f * -0.5 * ah,
-                        width=f * aw, height=f * ah)
+                        width=f * aw, height=f * ah, mask='auto')
                     pdf.rotate(arot)
                     pdf.translate(-transx, -transy)
                 
