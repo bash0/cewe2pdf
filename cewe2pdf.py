@@ -162,8 +162,14 @@ for n in range(pagenum):
         if (page != None):
             print 'parsing page', page.get('pagenr')
             
-            pw = float(page.find("./bundlesize").get('width')) / 2.0
-            ph = float(page.find("./bundlesize").get('height'))
+	    bundlesize = page.find("./bundlesize")
+	    if (bundlesize != None):
+                pw = float(bundlesize.get('width')) / 2.0
+                ph = float(bundlesize.get('height'))
+            else:
+                # Assume A4 page size
+	        pw = 2100
+	        ph = 2970
             pdf.setPageSize((f * pw, f * ph))
             
             
