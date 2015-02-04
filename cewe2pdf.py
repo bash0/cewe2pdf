@@ -183,8 +183,8 @@ for n in range(pagenum):
                     bgpath = os.path.join(cewe_folder, 'Resources', 'photofun',
                         'backgrounds', bg + '.jpg')
                     if os.path.exists(bgpath):
-                        aw = float(page.find('bundlesize').get('width'))
-                        ah = float(page.find('bundlesize').get('height'))
+                        aw = pw*2
+                        ah = ph
                         if pagetype != 'singleside' and oddpage:
                             ax = -aw / 2.
                         else:
