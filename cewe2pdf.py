@@ -219,6 +219,11 @@ for n in range(pagenum):
                         imagedir, image.get('filename'))
                     im = PIL.Image.open(imagepath)
                     
+		    if image.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
+		        # display on the right page
+		        img_transx = transx + f * pw
+		    else:
+		        img_transx = transx
                     
                     # correct for exif rotation
                     im = autorot(im)
@@ -256,13 +261,13 @@ for n in range(pagenum):
                     
                     # place image                
                     print 'image', image.get('filename')
-                    pdf.translate(transx, transy)
+                    pdf.translate(img_transx, transy)
                     pdf.rotate(-arot)
                     pdf.drawImage(ImageReader(jpeg.name),
                         f * -0.5 * aw, f * -0.5 * ah,
                         width=f * aw, height=f * ah)
                     pdf.rotate(arot)
-                    pdf.translate(-transx, -transy)
+                    pdf.translate(-img_transx, -transy)
                 
                 
                 # process text
