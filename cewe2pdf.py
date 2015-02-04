@@ -164,8 +164,14 @@ for n in range(pagenum):
         if (page != None):
             print 'parsing page', page.get('pagenr')
             
-            pw = float(page.find("./bundlesize").get('width')) / 2.0
-            ph = float(page.find("./bundlesize").get('height'))
+	    bundlesize = page.find("./bundlesize")
+	    if (bundlesize != None):
+                pw = float(bundlesize.get('width')) / 2.0
+                ph = float(bundlesize.get('height'))
+            else:
+                # Assume A4 page size
+	        pw = 2100
+	        ph = 2970
             pdf.setPageSize((f * pw, f * ph))
             
             
@@ -179,8 +185,8 @@ for n in range(pagenum):
                     bgpath = os.path.join(cewe_folder, 'Resources', 'photofun',
                         'backgrounds', bg + '.jpg')
                     if os.path.exists(bgpath):
-                        aw = float(page.find('bundlesize').get('width'))
-                        ah = float(page.find('bundlesize').get('height'))
+                        aw = pw*2
+                        ah = ph
                         if pagetype != 'singleside' and oddpage:
                             ax = -aw / 2.
                         else:
