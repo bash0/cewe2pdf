@@ -41,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
-import os
+import os, os.path
 import sys
 from lxml import etree
 import tempfile
@@ -91,6 +91,14 @@ def autorot(im):
             im = im.transpose(PIL.Image.ROTATE_90)
     return im
 
+def findFileInDirs(filename, paths):
+    for p in paths:
+        testPath = os.path.join(p, filename)
+        if os.path.exists(testPath):
+            return testPath
+
+    print 'Could not find %s in %s paths' % (filename, ', '.join(paths))
+    raise ValueError('Could not find %s in %s paths' % (filename, ', '.join(paths)))
 
 # determine filename
 if len(sys.argv) > 1:
@@ -182,9 +190,11 @@ for n in range(pagenum):
                 if (designElementID != None and cewe_folder != None and
                         designElementID.get('background') != None):
                     bg = designElementID.get('background')
-                    bgpath = os.path.join(cewe_folder, 'Resources', 'photofun',
-                        'backgrounds', bg + '.jpg')
-                    if os.path.exists(bgpath):
+                    try:
+                        bgpath = findFileInDirs(bg + '.jpg', (
+                            os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
+                            os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
+                            ))
                         aw = pw*2
                         ah = ph
                         if pagetype != 'singleside' and oddpage:
@@ -194,7 +204,7 @@ for n in range(pagenum):
                         #im = PIL.Image.open(bgpath)
                         pdf.drawImage(ImageReader(bgpath),
                             f * ax, 0, width=f * aw, height=f * ah)
-                    else:
+                    except:
                         if bgpath not in bg_notfound:
                             print 'cannot find background', bgpath
                         bg_notfound.add(bgpath)
