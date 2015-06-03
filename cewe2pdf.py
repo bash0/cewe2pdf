@@ -303,13 +303,19 @@ for n in range(pagenum):
                     y_p = 0
                     for p in body.findall(".//p"):
                         for span in p.findall(".//span"):
+                            spanfont = font
                             style = dict([kv.split(':') for kv in
                                 span.get('style').lstrip(' ').rstrip(';').split('; ')])
+                            if 'font-family' in style:
+                                spanfamily = style['font-family'].strip("'")
+                                if spanfamily in pdf.getAvailableFonts():
+                                  spanfont = spanfamily
+
                             if 'font-size' in style:
                                 fs = int(style['font-size'].strip()[:-2])
                                 if 'color' in style:
                                     color = style['color']
-                            pdf.setFont(font, fs)
+                            pdf.setFont(spanfont, fs)
                             pdf.setFillColor(color)
                             if p.get('align') == 'center':
                                 pdf.drawCentredString(0,
