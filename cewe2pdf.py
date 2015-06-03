@@ -194,6 +194,7 @@ for n in range(pagenum):
                         bgpath = findFileInDirs(bg + '.jpg', (
                             os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
                             os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
+                            os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
                             ))
                         aw = pw*2
                         ah = ph
