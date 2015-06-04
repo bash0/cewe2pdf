@@ -50,6 +50,8 @@ from math import *
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 import PIL
 from PIL.ExifTags import TAGS
 
@@ -124,12 +126,34 @@ except:
     cewe_folder = None
 bg_notfound = set([])
 
+# Load additionnal fonts
+additionnal_fonts = {}
+try:
+    with open('additionnal_fonts.txt', 'r') as fp:
+        for line in fp:
+            p = line.split(" = ", 1)
+            additionnal_fonts[p[0]] = p[1].strip()
+        fp.close()
+except:
+    print 'cannot find additionnal fonts (define them in additionnal_fonts.txt)'
+    print 'Content example:'
+    print 'Vera = /tmp/vera.ttf'
+    print 'Separator is " = " (space equal space)'
+
 
 # create pdf
 pagesize = reportlab.lib.pagesizes.A4
 if formats.has_key(fotobook.get('productname')):
     pagesize = formats[fotobook.get('productname')]
 pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
+
+# Add additionnal fonts
+for n in additionnal_fonts:
+    try:
+        pdfmetrics.registerFont(TTFont(n, additionnal_fonts[n]))
+        print "Successfully registered '%s' from '%s'" % (n, additionnal_fonts[n])
+    except:
+        print "Failed to register font '%s' (from %s)" % (n, additionnal_fonts[n])
 
 
 # extract properties
@@ -296,6 +320,8 @@ for n in range(pagenum):
                         fs = 20
                     if family in pdf.getAvailableFonts():
                         font = family
+                    elif family in additionnal_fonts:
+                        font = family
                     color = '#000000'
                     
                     pdf.translate(transx, transy)
@@ -303,13 +329,23 @@ for n in range(pagenum):
                     y_p = 0
                     for p in body.findall(".//p"):
                         for span in p.findall(".//span"):
+                            spanfont = font
                             style = dict([kv.split(':') for kv in
                                 span.get('style').lstrip(' ').rstrip(';').split('; ')])
+                            if 'font-family' in style:
+                                spanfamily = style['font-family'].strip("'")
+                                if spanfamily in pdf.getAvailableFonts():
+                                    spanfont = spanfamily
+                                elif spanfamily in additionnal_fonts:
+                                    spanfont = spanfamily
+
                             if 'font-size' in style:
                                 fs = int(style['font-size'].strip()[:-2])
                                 if 'color' in style:
                                     color = style['color']
-                            pdf.setFont(font, fs)
+                            if spanfamily != spanfont:
+                                print "Using font family = '%s' (wanted %s)" % (spanfont, spanfamily)
+                            pdf.setFont(spanfont, fs)
                             pdf.setFillColor(color)
                             if p.get('align') == 'center':
                                 pdf.drawCentredString(0,
