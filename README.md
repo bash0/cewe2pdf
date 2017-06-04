@@ -17,14 +17,16 @@ On Fedora :
 sudo dnf install python2-lxml python2-reportlab
 ```
 
-Define the CEWE path (the directory where your CEWE album software is - you can recognize it with the many `.so` files and some subdirs like `Resources`) :
+Define the CEWE path (the directory where your CEWE album software is - you can recognize it with the many `.so` files and some subdirs like `Resources`). Put it into a file named `cewe_folder.txt`.
 
+Example with my CEWE software in /opt/CEWE :
 ```
-echo "<the path>" > cewe_folder.txt
+echo "/opt/CEWE" > cewe_folder.txt
 ```
 
-Define some additionnal fonts (`name = /path/to/file.ttf`) :
+Define some additionnal fonts (`name = /path/to/file.ttf`) into a file named `additionnal_fonts.txt`
 
+This will create an empty file :
 ```
 touch additionnal_fonts.txt
 ```
