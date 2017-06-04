@@ -349,13 +349,13 @@ for n in range(pagenum):
                                     spanfont = spanfamily
                                 elif spanfamily in additionnal_fonts:
                                     spanfont = spanfamily
+                                if spanfamily != spanfont:
+                                    print "Using font family = '%s' (wanted %s)" % (spanfont, spanfamily)
 
                             if 'font-size' in style:
                                 fs = int(style['font-size'].strip()[:-2])
                                 if 'color' in style:
                                     color = style['color']
-                            if spanfamily != spanfont:
-                                print "Using font family = '%s' (wanted %s)" % (spanfont, spanfamily)
                             pdf.setFont(spanfont, fs)
                             pdf.setFillColor(color)
                             if p.get('align') == 'center':
