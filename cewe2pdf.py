@@ -71,6 +71,7 @@ formats = {"ALB82": reportlab.lib.pagesizes.A4,
            "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm)} # add other page sizes here
 f = 72. / 254. # convert from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
+tempFileList =[]    #we need to remove all this temporary files at the end
 
 def autorot(im):
     if im.format != 'JPEG' and im.format != 'MPO':      #some cameras return JPEG in MPO container format. Just use the first image.
@@ -345,7 +346,10 @@ def convertMcf(mcfname):
                             width = f * areaWidth, height = f * areaHeight, mask='auto')
                         pdf.rotate(areaRot)
                         pdf.translate(-img_transx, -transy)
-                        #Does not work, because file is opened by pdf library
+
+                        #we now have temporary file, that we need to delete after pdf creation
+                        tempFileList.append(jpeg.name)
+                        #we can not delete now, because file is opened by pdf library
                         ##try to delete the temporary file again. Needed for Windows
                         #if os.path.exists(jpeg.name):
                         #    os.remove(jpeg.name)                
@@ -417,6 +421,11 @@ def convertMcf(mcfname):
     
     # save final output pdf
     pdf.save()
+
+    #clean up temp files
+    for tmpFileName in tempFileList:
+        if os.path.exists(tmpFileName):
+            os.remove(tmpFileName)
     return True
 
 if __name__ == '__main__':
