@@ -1,7 +1,11 @@
 cewe2pdf
 ========
 
-A python script to turn cewe photobooks into pdf documents. The CEWE pdf export is achieved by interpreting the mcf xml-files and compiling a pdf document which looks exactly like the cewe photo book.
+A python script to turn cewe photobooks into pdf documents.
+The CEWE pdf export is achieved by interpreting the mcf xml-files 
+and compiling a pdf document which looks like the cewe photo book.
+
+There are many unsupported options, so an exact conversion cannot be guaranteed.
 
 tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf exportieren, cewe Fotobuch pdf, mcf in pdf umwandeln, aus CEW-Fotobuch ein pdf machen, cewe Fotobuch pdf
 
@@ -26,7 +30,7 @@ C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
 ```
 Save the file and close it.
 
-Create a nother text file called ``additionnal_fonts.txt``, but leave it empty.
+Create a nother text file called ``additional_fonts.txt``, but leave it empty.
 
 Install - Linux
 ---------------
