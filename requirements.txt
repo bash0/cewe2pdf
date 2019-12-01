@@ -1,0 +1,3 @@
+reportlab>=3.5.23
+lxml>=4.4.1
+pillow>=5.4.1
