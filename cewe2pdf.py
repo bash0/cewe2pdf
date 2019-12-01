@@ -4,7 +4,7 @@
 
 '''
 Create pdf files from CEWE .mcf photo books (cewe-fotobuch)
-version 0.1 (Nov. 2014)
+version 0.11 (Dec 2019)
 
 This script reads CEWE .mcf files using the lxml library
 and compiles a pdf file using the reportlab python pdf library.
@@ -17,7 +17,9 @@ This script doesn't work according to the original format
 specification but according to estimated meaning.
 Feel free to improve!
 
-The script was tested to run with A4 books from CEWE programmversion 5001003
+The script was tested to run with A4 books from CEWE
+tested
+dm-Fotowelt: compatibilityVersion="6.4.2" programversion="7.0.1" programversionBuild="20191025"
 
 documentations:
 -reportlab: www.reportlab.com/software/opensource/
@@ -56,13 +58,14 @@ import PIL
 from PIL.ExifTags import TAGS
 from io import BytesIO
 from pathlib import Path
+import argparse     #to parse arguments
 
 
 #### settings ####
 image_quality = 86 # 0=worst, 100=best
 image_res = 150 # dpi
 bg_res = 100 # dpi      
-##################
+###########
 
 #.mcf units are 0.1 mm
 
@@ -430,16 +433,42 @@ def convertMcf(mcfname):
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
+    #we need trick to have both: default and fixed formats.
+    class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
+        pass
 
-    # determine filename
-    if len(sys.argv) > 1:
-        mcfname = sys.argv[1]
-    else:
+    parser = argparse.ArgumentParser(description='Convert a foto-book from .mcf file format to .pdf',
+                                     epilog="Example:\n   python cewe2pdf.py c:\\path\\to\\my\\files\\my_nice_fotobook.mcf",
+                                     formatter_class=CustomArgFormatter)
+    #parser.add_argument('--keepDoublePages', dest='keepDoublePages', action='store_const',
+    #                    const=True, default=False,
+    #                    help='Each page in the .pdf will be a double-sided page, instead of a normal single page.')
+    parser.add_argument('inputFile', type=str, nargs='?',
+                        help='the mcf input file. If not given, the first .mcf in the current directory is used.')
+    
+    args = parser.parse_args()
+
+    ## determine filename
+    #if len(sys.argv) > 1:
+    #    mcfname = sys.argv[1]
+    #else:
+    #    fnames = [i for i in os.listdir('.') if i.endswith('.mcf')]
+    #    if len(fnames) > 0:
+    #        mcfname = fnames[0]
+    #    else:
+    #        print("No .mcf file found or specified. Please call this progam as follows.")
+    #        sys.exit(1)
+
+    # if no file name was given, search for the first .mcf file in the current directory
+    if args.inputFile is None:
         fnames = [i for i in os.listdir('.') if i.endswith('.mcf')]
         if len(fnames) > 0:
-            mcfname = fnames[0]
-        else:
-            print("No .mcf file found or specified. Please call this progam as follows.\nExample:\n   python cewe2pdf.py c:\\path\\to\\my\\files\\my_nice_fotobook.mcf")
-            sys.exit(1)
+            args.inputFile = fnames[0]
 
-    resultFlag = convertMcf(mcfname)
+    #if inputFile name is still empty, we have to throw an error
+    if args.inputFile is None:
+        parser.parse_args(['-h'])
+        sys.exit(1)
+
+    #if we have a file name, let's convert it
+    resultFlag = convertMcf(args.inputFile)
