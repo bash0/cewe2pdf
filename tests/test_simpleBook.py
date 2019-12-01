@@ -11,7 +11,8 @@ from cewe2pdf import convertMcf
 def test_simpleBook():
     inFile = str(Path(Path.cwd(), 'tests', 'unittest_fotobook.mcf'))
     outFile = str(Path(Path.cwd(), 'tests', 'unittest_fotobook.mcf.pdf'))
-    os.remove(outFile)
+    if os.path.exists(outFile) == True:
+        os.remove(outFile)
     assert os.path.exists(outFile) == False
     convertMcf(inFile)
     assert Path(outFile).exists() == True
