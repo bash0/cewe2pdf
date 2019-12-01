@@ -439,7 +439,7 @@ if __name__ == '__main__':
         if len(fnames) > 0:
             mcfname = fnames[0]
         else:
-            print("no mcf file found or specified")
+            print("No .mcf file found or specified. Please call this progam as follows.\nExample:\n   python cewe2pdf.py c:\\path\\to\\my\\files\\my_nice_fotobook.mcf")
             sys.exit(1)
 
     resultFlag = convertMcf(mcfname)
