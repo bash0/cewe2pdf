@@ -1,6 +1,6 @@
 name: build pyinstaller Python package
 
-on: [release]
+on: [deployment, release]
 
 jobs:
   build:
