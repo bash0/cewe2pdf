@@ -6,8 +6,8 @@ def test_webp_loading():
     #know problem in 2019 for pillow from Anaconda conda 4.7.12
     #see readme
     from PIL import Image
-    image = Image.open("tests/test.webp") 
-    with Image.open(filepath) as img:
+    filename = "tests/test.webp"
+    with Image.open(filename) as img:
         width, height = img.size
     #check if image has correct dimensions
     assert width == 47
