@@ -234,12 +234,36 @@ def convertMcf(mcfname, keepDoublePages):
                 pdf.setPageSize((f * pw, f * ph))
                             
                 # process background
-                designElementIDs = page.findall('designElementIDs')
-                if designElementIDs != None and len(designElementIDs) > 0:
-                    designElementID = designElementIDs[0]
-                    if (designElementID != None and cewe_folder != None and
-                            designElementID.get('background') != None):
-                        bg = designElementID.get('background')
+                # look for all "<background...> tags.
+                # the preceeding designElementIDs tag only match the same number for the background attribute if it is a original stock image, without filters.
+                backgroundTags = page.findall('background')
+                if backgroundTags != None and len(backgroundTags) > 0:
+                    #look for a tag that has an alignment attribute
+                    for curTag in backgroundTags:
+                        if curTag.get('alignment') != None:
+                            backgroundTag = curTag
+                            break
+
+                    if (backgroundTag != None and cewe_folder != None and
+                            backgroundTag.get('designElementId') != None):
+                        bg = backgroundTag.get('designElementId')
+                        #example: fading="0" hue="270" rotation="0" type="1"
+                        backgroundFading = 0
+                        if "fading" in backgroundTag.attrib:
+                            if float(backgroundTag.get('fading')) != 0:
+                                print('value of background attribute not supported: fading = %s' % backgroundTag.get('fading'))
+                        backgroundHue = 0
+                        if "hue" in backgroundTag.attrib:
+                            if float(backgroundTag.get('hue')) != 0:
+                               print('value of background attribute not supported: hue =  %s' % backgroundTag.get('hue'))
+                        backgroundRotation = 0
+                        if "rotation" in backgroundTag.attrib:
+                            if float(backgroundTag.get('rotation')) != 0:
+                               print('value of background attribute not supported: rotation =  %s' % backgroundTag.get('rotation'))
+                        backgroundType= 1
+                        if "type" in backgroundTag.attrib:
+                            if int(backgroundTag.get('type')) != 1:
+                               print('value of background attribute not supported: type =  %s' % backgroundTag.get('type'))
                         try:
                             bgpath = findFileByExtInDirs(bg, ('.webp', '.jpg', '.bmp'), (
                                 os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
