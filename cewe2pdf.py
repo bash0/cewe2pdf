@@ -101,14 +101,27 @@ def autorot(im):
             im = im.transpose(PIL.Image.ROTATE_90)
     return im
 
+def findFileByExtInDirs(filebase, extList, paths):
+    for p in paths:
+        for ext in extList:
+            testPath = os.path.join(p, filebase + ext)
+            if os.path.exists(testPath):
+                return testPath
+
+    prtStr = 'Could not find %s [%s] in paths %s' % (filebase, ' '.join(extList), ', '.join(paths))
+    print(prtStr)
+    raise ValueError(prtStr)
+
 def findFileInDirs(filename, paths):
     for p in paths:
         testPath = os.path.join(p, filename)
         if os.path.exists(testPath):
             return testPath
 
-    print('Could not find %s in %s paths' % (filename, ', '.join(paths)))
-    raise ValueError('Could not find %s in %s paths' % (filename, ', '.join(paths)))
+    prtStr = 'Could not find %s in %s paths %s' % (filename, ', '.join(paths))
+    print(prtStr)
+    raise ValueError(prtStr)
+
 
 def convertMcf(mcfname, keepDoublePages):
 #Get the folder in which the .mcf file is
@@ -131,7 +144,7 @@ def convertMcf(mcfname, keepDoublePages):
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
     except:
-        print('cannot find cewe installation folder in cewe_folder.txt')
+        print('Cannot find cewe installation folder in cewe_folder.txt. Stock backgrounds will not be unavailable.')
         cewe_folder = None
     bg_notfound = set([])
     
@@ -190,7 +203,11 @@ def convertMcf(mcfname, keepDoublePages):
                 page = [i for i in
                     fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") + 
                     fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
-                    if (i.find("./area") != None)][0]
+                    if (i.find("./area") != None)]
+                if (len(page) >= 1):
+                    page = page[0]
+                else:
+                    page = None
                 oddpage = True
                 pagetype = 'singleside'
             else:
@@ -224,7 +241,7 @@ def convertMcf(mcfname, keepDoublePages):
                             designElementID.get('background') != None):
                         bg = designElementID.get('background')
                         try:
-                            bgpath = findFileInDirs(bg + '.bmp', (
+                            bgpath = findFileByExtInDirs(bg, ('.webp', '.jpg', '.bmp'), (
                                 os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
                                 os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
                                 os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),

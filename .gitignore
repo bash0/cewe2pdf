@@ -36,3 +36,4 @@ nosetests.xml
 .pydevproject
 /.vs
 /cewe2pdf.spec
+/cewe_folder.txt
