@@ -109,6 +109,17 @@ def autorot(im):
             im = im.transpose(PIL.Image.ROTATE_90)
     return im
 
+def findFileByExtInDirs(filebase, extList, paths):
+    for p in paths:
+        for ext in extList:
+            testPath = os.path.join(p, filebase + ext)
+            if os.path.exists(testPath):
+                return testPath
+
+    prtStr = 'Could not find %s [%s] in paths %s' % (filebase, ' '.join(extList), ', '.join(paths))
+    print(prtStr)
+    raise ValueError(prtStr)
+
 def findFileInDirs(filenames, paths):
     if  not isinstance(filenames, list): filenames = [filenames]
     for f in filenames:
@@ -225,7 +236,11 @@ def convertMcf(mcfname, keepDoublePages):
                 page = [i for i in
                     fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
                     fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
-                    if (i.find("./area") != None)][0]
+                    if (i.find("./area") != None)]
+                if (len(page) >= 1):
+                    page = page[0]
+                else:
+                    page = None
                 oddpage = True
                 pagetype = 'singleside'
             else:
