@@ -12,15 +12,30 @@ tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf ex
 
 Install - Windows
 -----------------
-Install a Anaconda Python with the newest Python 3 version.
+The easiest way to start this Python script, is to install the latest pyhthon version.
+Then from the start-menu open your pyhthon promt and install the dependencies
+```
+pip install lxml reportlab pillow
+```
+
+If you have installed the Anaconda Pyhton distribution, there is one catch:
+Currently, there is a problem with the pillow image library in Anaconda, that prevents it from loading .webp images on Windows.
+This will give the error:
+`"image file could not be identified because WEBP support not installed"`.
+
+To fix this, you can do the following steps.
 
 Press Windows Start button and start the "Anaconda prompt"
 
 Make sure you have all the dependencies installed by executing:
 ```
-conda install lxml reportlab pillow
+conda install lxml
+conda uninstall reportlab pillow
+pip install reportlab pillow
 ```
 
+Install - Windows (continued)
+-----------------------------
 Go to the directory where cewe2pdf is installed and create a text file there with filname ``cewe_folder.txt``
 and use a text editor to write the installation directory of the CEWE software into the text file.
 Example
