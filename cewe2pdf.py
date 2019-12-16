@@ -64,7 +64,7 @@ import argparse     #to parse arguments
 #### settings ####
 image_quality = 86 # 0=worst, 100=best
 image_res = 150 # dpi
-bg_res = 100 # dpi      
+bg_res = 100 # dpi
 ###########
 
 #.mcf units are 0.1 mm
@@ -82,7 +82,7 @@ def autorot(im):
     exifdict = im._getexif()
     if exifdict != None and 274 in list(exifdict.keys()):
         orientation = exifdict[274]
-        
+
         if orientation == 2:
             im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
         elif orientation == 3:
@@ -101,20 +101,22 @@ def autorot(im):
             im = im.transpose(PIL.Image.ROTATE_90)
     return im
 
-def findFileInDirs(filename, paths):
-    for p in paths:
-        testPath = os.path.join(p, filename)
-        if os.path.exists(testPath):
-            return testPath
+def findFileInDirs(filenames, paths):
+    if  not isinstance(filenames, list): filenames = [filenames]
+    for f in filenames:
+        for p in paths:
+            testPath = os.path.join(p, f)
+            if os.path.exists(testPath):
+                return testPath
 
-    print('Could not find %s in %s paths' % (filename, ', '.join(paths)))
-    raise ValueError('Could not find %s in %s paths' % (filename, ', '.join(paths)))
+    print('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
+    raise ValueError('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
 
 def convertMcf(mcfname, keepDoublePages):
 #Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
     mcfBaseFolder = mcfPathObj.parent
-    
+
     # parse the input mcf xml file
     mcffile = open(mcfname, 'rb')   #read file as binary, so UTF-8 encoding is preserved for xml-parser
     mcf = etree.parse(mcffile)
@@ -123,7 +125,7 @@ def convertMcf(mcfname, keepDoublePages):
     if fotobook.tag != 'fotobook':
         print(mcfname + 'is not a valid mcf file. Exiting.')
         sys.exit(1)
-     
+
     # find cewe folder
     try:
         configFolderFileName = findFileInDirs('cewe_folder.txt', (mcfBaseFolder,  os.path.curdir))
@@ -134,7 +136,7 @@ def convertMcf(mcfname, keepDoublePages):
         print('cannot find cewe installation folder in cewe_folder.txt')
         cewe_folder = None
     bg_notfound = set([])
-    
+
     # Load additionnal fonts
     additionnal_fonts = {}
     try:
@@ -149,14 +151,14 @@ def convertMcf(mcfname, keepDoublePages):
         print('Content example:')
         print('Vera = /tmp/vera.ttf')
         print('Separator is " = " (space equal space)')
-    
-    
+
+
     # create pdf
     pagesize = reportlab.lib.pagesizes.A4
     if fotobook.get('productname') in formats:
         pagesize = formats[fotobook.get('productname')]
     pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
-    
+
     # Add additionnal fonts
     for n in additionnal_fonts:
         try:
@@ -164,17 +166,17 @@ def convertMcf(mcfname, keepDoublePages):
             print("Successfully registered '%s' from '%s'" % (n, additionnal_fonts[n]))
         except:
             print("Failed to register font '%s' (from %s)" % (n, additionnal_fonts[n]))
-    
-    
+
+
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
     pagenum = int(articleConfigElement.get('normalpages')) + 2
     imagedir = fotobook.get('imagedir')
-    
-    
+
+
     def getPageElementForPageNumber(pageNumber):
         return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)),'d'))
-    
+
     for n in range(pagenum):
         try:
             if (n == 0) or (n == pagenum - 1):
@@ -188,7 +190,7 @@ def convertMcf(mcfname, keepDoublePages):
             elif n == 1:
                 pn = 1
                 page = [i for i in
-                    fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") + 
+                    fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
                     fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
                     if (i.find("./area") != None)][0]
                 oddpage = True
@@ -198,10 +200,10 @@ def convertMcf(mcfname, keepDoublePages):
                 oddpage = (pn % 2) == 1
                 page = getPageElementForPageNumber(n)
                 pagetype = 'normal'
-    
+
             if (page != None):
                 print('parsing page', page.get('pagenr'),' of ', pagenum)
-                
+
                 bundlesize = page.find("./bundlesize")
                 if (bundlesize != None):
                     pw = float(bundlesize.get('width'))
@@ -215,7 +217,7 @@ def convertMcf(mcfname, keepDoublePages):
                     pw = 2100
                     ph = 2970
                 pdf.setPageSize((f * pw, f * ph))
-                            
+
                 # process background
                 designElementIDs = page.findall('designElementIDs')
                 if designElementIDs != None and len(designElementIDs) > 0:
@@ -224,10 +226,11 @@ def convertMcf(mcfname, keepDoublePages):
                             designElementID.get('background') != None):
                         bg = designElementID.get('background')
                         try:
-                            bgpath = findFileInDirs(bg + '.bmp', (
+                            bgpath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], (
                                 os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
                                 os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
                                 os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
+                                os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
                                 ))
                             areaWidth = pw*2
                             if keepDoublePages:
@@ -244,7 +247,7 @@ def convertMcf(mcfname, keepDoublePages):
                             imObj = imObj.convert("RGB")
                             imObj.save(memFileHandle,'jpeg')
                             memFileHandle.seek(0)
-    
+
                             #im = imread(bgpath) #does not work with 1-bit images
                             pdf.drawImage(ImageReader(memFileHandle), f * ax, 0, width=f * areaWidth, height=f * areaHeight)
                             #pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
@@ -255,7 +258,7 @@ def convertMcf(mcfname, keepDoublePages):
                                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                                 print('', (exc_type, fname, exc_tb.tb_lineno))
                             bg_notfound.add(bgpath)
-                
+
                 #all elements (images, text,..) for even and odd pages are defined on the even page element!
                 if keepDoublePages and oddpage == 1 and pagetype =='normal':
                     continue    #if we are in double-page mode, all the images are already drawn by the even pages.
@@ -263,7 +266,7 @@ def convertMcf(mcfname, keepDoublePages):
                     #switch pack to the page element for the even page to get the elements
                     if pagetype=='normal' and oddpage == 1:
                         page = getPageElementForPageNumber(2*floor(pn/2))
-    
+
                     for area in page.findall('area'):
                         areaPos = area.find('position')
                         areaLeft = float(areaPos.get('left').replace(',', '.'))
@@ -276,7 +279,7 @@ def convertMcf(mcfname, keepDoublePages):
                         areaWidth = float(areaPos.get('width').replace(',', '.'))
                         areaHeight = float(areaPos.get('height').replace(',', '.'))
                         areaRot = float(areaPos.get('rotation'))
-    
+
                         #check if the image is on current page at all
                         if pagetype=='normal' and not keepDoublePages:
                             if oddpage:
@@ -289,10 +292,10 @@ def convertMcf(mcfname, keepDoublePages):
                         #center positions
                         cx = areaLeft + 0.5 * areaWidth
                         cy = ph - (areaTop + 0.5 * areaHeight)
-                                    
+
                         transx = f * cx
                         transy = f * cy
-                                     
+
                         # process images
                         for image in area.findall('imagebackground') + area.findall('image'):
                             # open raw image file
@@ -302,7 +305,7 @@ def convertMcf(mcfname, keepDoublePages):
                             #the layout software copies the images to another collection folder
                             imagepath=imagepath.replace('safecontainer:/','')
                             im = PIL.Image.open(imagepath)
-                        
+
                             if image.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
                                 # display on the right page
                                 if keepDoublePages:
@@ -311,25 +314,25 @@ def convertMcf(mcfname, keepDoublePages):
                                     img_transx = transx + f * pw
                             else:
                                 img_transx = transx
-                        
+
                             # correct for exif rotation
                             im = autorot(im)
                             #get the cutout position and scale
                             imleft = float(image.find('cutout').get('left').replace(',', '.'))
                             imtop = float(image.find('cutout').get('top').replace(',', '.'))
-                            imageWidth_px, imageHeight_px = im.size  
+                            imageWidth_px, imageHeight_px = im.size
                             imsc = float(image.find('cutout').get('scale'))
-    
+
                             #without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
                             #to get from .mcf units are divided by the scale factor to get to image pixel units.
-                                            
+
                             # crop image
                             im = im.crop((int(0.5 - imleft/imsc),
                                 int(0.5 - imtop/imsc),
                                 int(0.5 - imleft/imsc + areaWidth / imsc),
                                 int(0.5 - imtop/imsc + areaHeight / imsc)))
-                        
-                        
+
+
                             # scale image
                             # re-scale the image if it is much bigger than final resolution in PDF
                             #set desired DPI based on where the image is used. The background gets a lower DPI.
@@ -343,8 +346,8 @@ def convertMcf(mcfname, keepDoublePages):
                             if factor <= 0.8:
                                 im = im.resize((new_w, new_h), PIL.Image.ANTIALIAS)
                             im.load()
-                        
-                        
+
+
                             # re-compress image
                             jpeg = tempfile.NamedTemporaryFile()
                             jpeg.close()    # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
@@ -352,8 +355,8 @@ def convertMcf(mcfname, keepDoublePages):
                                 im.save(jpeg.name, "PNG")
                             else:
                                 im.save(jpeg.name, "JPEG", quality=image_quality)
-                                         
-                            # place image                
+
+                            # place image
                             print('image', image.get('filename'))
                             pdf.translate(img_transx, transy)
                             pdf.rotate(-areaRot)
@@ -368,8 +371,8 @@ def convertMcf(mcfname, keepDoublePages):
                             #we can not delete now, because file is opened by pdf library
                             ##try to delete the temporary file again. Needed for Windows
                             #if os.path.exists(jpeg.name):
-                            #    os.remove(jpeg.name)                
-                    
+                            #    os.remove(jpeg.name)
+
                         # process text
                         for text in area.findall('text'):
                             # note: it would be better to use proper html processing here
@@ -388,7 +391,7 @@ def convertMcf(mcfname, keepDoublePages):
                             elif family in additionnal_fonts:
                                 font = family
                             color = '#000000'
-                        
+
                             pdf.translate(transx, transy)
                             pdf.rotate(-areaRot)
                             y_p = 0
@@ -405,7 +408,7 @@ def convertMcf(mcfname, keepDoublePages):
                                             spanfont = spanfamily
                                         if spanfamily != spanfont:
                                             print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
-    
+
                                     if 'font-size' in style:
                                         fs = int(style['font-size'].strip()[:-2])
                                         if 'color' in style:
@@ -424,22 +427,22 @@ def convertMcf(mcfname, keepDoublePages):
                                 y_p -= 1.3*fs
                             pdf.rotate(areaRot)
                             pdf.translate(-transx, -transy)
-    
+
             # finish the page
             pdf.showPage()
-        
+
         except Exception as ex:
             # if one page fails: continue with next one
             print('error on page %i:' % (n, ),'\n', ex.args[0])
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print('', (exc_type, fname, exc_tb.tb_lineno))
-    
+
     # save final output pdf
     pdf.save()
-    
+
     pdf = []
-    
+
     #clean up temp files
     for tmpFileName in tempFileList:
         if os.path.exists(tmpFileName):
@@ -460,7 +463,7 @@ if __name__ == '__main__':
                         help='Each page in the .pdf will be a double-sided page, instead of a normal single page.')
     parser.add_argument('inputFile', type=str, nargs='?',
                         help='the mcf input file. If not given, the first .mcf in the current directory is used.')
-    
+
     args = parser.parse_args()
 
     # if no file name was given, search for the first .mcf file in the current directory
