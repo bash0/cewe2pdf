@@ -44,10 +44,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 import os, os.path
+import logging
 import sys
 from lxml import etree
 import tempfile
-from math import *
+from math import sqrt, floor
 
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
@@ -60,6 +61,7 @@ from io import BytesIO
 from pathlib import Path
 import argparse     #to parse arguments
 
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 #### settings ####
 image_quality = 86 # 0=worst, 100=best
@@ -68,6 +70,9 @@ bg_res = 100 # dpi
 ###########
 
 #.mcf units are 0.1 mm
+# Tabs seem to be in 8mm pitch
+tab_pitch = 80
+line_scale = 1.2
 
 # definitions
 formats = {"ALB82": reportlab.lib.pagesizes.A4,
@@ -376,6 +381,8 @@ def convertMcf(mcfname, keepDoublePages):
                         # process text
                         for text in area.findall('text'):
                             # note: it would be better to use proper html processing here
+                            # Replace linefeeds
+                            text.text = text.text.replace('<br />', '\n')
                             html = etree.XML(text.text)
                             body = html.find('.//body')
                             bstyle = dict([kv.split(':') for kv in
@@ -383,9 +390,9 @@ def convertMcf(mcfname, keepDoublePages):
                             family = bstyle['font-family'].strip("'")
                             font = 'Helvetica'
                             try:
-                                fs = int(bstyle['font-size'].strip("pt"))
+                                fs_body = int(bstyle['font-size'].strip("pt"))
                             except:
-                                fs = 20
+                                fs_body = 20
                             if family in pdf.getAvailableFonts():
                                 font = family
                             elif family in additionnal_fonts:
@@ -394,8 +401,23 @@ def convertMcf(mcfname, keepDoublePages):
 
                             pdf.translate(transx, transy)
                             pdf.rotate(-areaRot)
-                            y_p = 0
+                            y_p = 0.0
                             for p in body.findall(".//p"):
+                                # Pre-analyze fontsizes
+                                fs_max = 0
+                                for span in p.findall(".//span"):
+                                    style = dict([kv.split(':') for kv in
+                                        span.get('style').lstrip(' ').rstrip(';').split('; ')])
+                                    fs = fs_body
+                                    if 'font-size' in style:
+                                        fs = int(style['font-size'].strip("pt"))
+                                    if fs_max < fs:
+                                        fs_max = fs
+
+                                # Do the writing
+                                x_span = 0.0
+                                y_span = 0.0
+                                lines_span = 0
                                 for span in p.findall(".//span"):
                                     spanfont = font
                                     style = dict([kv.split(':') for kv in
@@ -408,23 +430,50 @@ def convertMcf(mcfname, keepDoublePages):
                                             spanfont = spanfamily
                                         if spanfamily != spanfont:
                                             print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
-
+                                    fs = fs_body
                                     if 'font-size' in style:
-                                        fs = int(style['font-size'].strip()[:-2])
+                                        fs = int(style['font-size'].strip("pt"))
                                         if 'color' in style:
                                             color = style['color']
                                     pdf.setFont(spanfont, fs)
                                     pdf.setFillColor(color)
-                                    if p.get('align') == 'center':
-                                        pdf.drawCentredString(0,
-                                            0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                                    elif p.get('align') == 'right':
-                                        pdf.drawRightString(0.5 * f * areaWidth,
-                                            0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                                    else:
-                                        pdf.drawString(-0.5 * f * areaWidth,
-                                            0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                                y_p -= 1.3*fs
+                                    lines = span.text.split('\n')
+                                    lines_cnt = len(lines)
+                                    lines_span += lines_cnt-1
+                                    x_line = 0.0
+                                    for line_no, line in enumerate(lines):
+                                        x_line = x_span
+                                        y_line = -line_scale*fs_max*(line_no+1) + y_p + y_span
+                                        logging.debug("Line %d/%d: |%s|" % (line_no+1, lines_cnt, line))
+                                        texts = line.split('\t')
+                                        if p.get('align') == 'center':
+                                            pdf.drawCentredString(0,
+                                                0.5 * f * areaHeight + y_line, line)
+                                        elif p.get('align') == 'right':
+                                            for text in reversed(texts):
+                                                logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
+                                                    (x_line, y_line, x_span, y_span, y_p, fs, fs_max, text ))
+                                                pdf.drawRightString(0.5 * f * areaWidth - x_line,
+                                                    0.5 * f * areaHeight + y_line, text)
+                                                if text == '':
+                                                    x_line += tab_pitch*f
+                                                else:
+                                                    x_line += (floor((len(text)*0.55*fs/f)/tab_pitch)+1)*tab_pitch*f
+                                        else:   # left aligned
+                                            for text in texts:
+                                                logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
+                                                    (x_line, y_line, x_span, y_span, y_p, fs, fs_max, text ))
+                                                pdf.drawString(-0.5 * f * areaWidth + x_line,
+                                                    0.5 * f * areaHeight + y_line, text)
+                                                if text == '':
+                                                    x_line += tab_pitch*f
+                                                else:
+                                                    x_line += (floor((len(text)*0.55*fs/f)/tab_pitch)+1)*tab_pitch*f
+                                    x_span = x_line
+                                    if lines_cnt > 1:
+                                        x_span = 0.0
+                                        y_span -= line_scale*fs_max*(lines_cnt-1)
+                                y_p -= line_scale*fs_max*(lines_span+1)
                             pdf.rotate(areaRot)
                             pdf.translate(-transx, -transy)
 
