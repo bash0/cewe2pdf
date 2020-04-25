@@ -55,11 +55,15 @@ import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph, Frame
+from reportlab.lib.styles import ParagraphStyle
+
 import PIL
 from PIL.ExifTags import TAGS
 from io import BytesIO
 from pathlib import Path
-import argparse     #to parse arguments
+import argparse  # to parse arguments
 
 import configparser # to read config file, see https://docs.python.org/3/library/configparser.html
 
@@ -79,13 +83,20 @@ line_scale = 1.2
 
 # definitions
 formats = {"ALB82": reportlab.lib.pagesizes.A4,
-           "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm)} # add other page sizes here
-f = 72. / 254. # convert from mcf (unit=0.1mm) to reportlab (unit=inch/72)
+           "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm)}  # add other page sizes here
+f = 72. / 254.  # convert from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
-tempFileList =[]    #we need to remove all this temporary files at the end
+tempFileList = []  # we need to remove all this temporary files at the end
+
+# reportlab defaults
+pdf_styles = getSampleStyleSheet()
+pdf_styleN = pdf_styles['Normal']
+pdf_story = []
+
 
 def autorot(im):
-    if im.format != 'JPEG' and im.format != 'MPO':      #some cameras return JPEG in MPO container format. Just use the first image.
+    # some cameras return JPEG in MPO container format. Just use the first image.
+    if im.format != 'JPEG' and im.format != 'MPO':
         return im
     exifdict = im._getexif()
     if exifdict != None and 274 in list(exifdict.keys()):
@@ -109,6 +120,7 @@ def autorot(im):
             im = im.transpose(PIL.Image.ROTATE_90)
     return im
 
+
 def findFileByExtInDirs(filebase, extList, paths):
     for p in paths:
         for ext in extList:
@@ -116,7 +128,8 @@ def findFileByExtInDirs(filebase, extList, paths):
             if os.path.exists(testPath):
                 return testPath
 
-    prtStr = 'Could not find %s [%s] in paths %s' % (filebase, ' '.join(extList), ', '.join(paths))
+    prtStr = 'Could not find %s [%s] in paths %s' % (
+        filebase, ' '.join(extList), ', '.join(paths))
     print(prtStr)
     raise ValueError(prtStr)
 
@@ -142,12 +155,13 @@ def getBaseBackgroundLocations(basefolder):
     return baseBackgroundLocations
 
 def convertMcf(mcfname, keepDoublePages):
-#Get the folder in which the .mcf file is
+    # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
     mcfBaseFolder = mcfPathObj.parent
 
     # parse the input mcf xml file
-    mcffile = open(mcfname, 'rb')   #read file as binary, so UTF-8 encoding is preserved for xml-parser
+    # read file as binary, so UTF-8 encoding is preserved for xml-parser
+    mcffile = open(mcfname, 'rb')
     mcf = etree.parse(mcffile)
     mcffile.close()
     fotobook = mcf.getroot()
@@ -157,7 +171,8 @@ def convertMcf(mcfname, keepDoublePages):
 
     # find cewe folder using the original cewe_folder.txt file
     try:
-        configFolderFileName = findFileInDirs('cewe_folder.txt', (mcfBaseFolder,  os.path.curdir))
+        configFolderFileName = findFileInDirs(
+            'cewe_folder.txt', (mcfBaseFolder,  os.path.curdir))
         cewe_file = open(configFolderFileName, 'r')
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
@@ -184,7 +199,8 @@ def convertMcf(mcfname, keepDoublePages):
     # Load additionnal fonts
     additionnal_fonts = {}
     try:
-        configFontFileName = findFileInDirs('additional_fonts.txt', (mcfBaseFolder,  os.path.curdir))
+        configFontFileName = findFileInDirs(
+            'additional_fonts.txt', (mcfBaseFolder,  os.path.curdir))
         with open(configFontFileName, 'r') as fp:
             for line in fp:
                 p = line.split(" = ", 1)
@@ -207,7 +223,8 @@ def convertMcf(mcfname, keepDoublePages):
     for n in additionnal_fonts:
         try:
             pdfmetrics.registerFont(TTFont(n, additionnal_fonts[n]))
-            print("Successfully registered '%s' from '%s'" % (n, additionnal_fonts[n]))
+            print("Successfully registered '%s' from '%s'" %
+                  (n, additionnal_fonts[n]))
         except:
             print("Failed to register font '%s' (from %s)" % (n, additionnal_fonts[n]))
 
@@ -226,19 +243,30 @@ def convertMcf(mcfname, keepDoublePages):
             if (n == 0) or (n == pagenum - 1):
                 pn = 0
                 page = [i for i in
-                    fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']") +
-                    fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
-                    if (i.find("./area") != None)][0]
+                        fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']") +
+                        fotobook.findall(
+                            "./page[@pagenr='0'][@type='fullcover']")
+                        if (i.find("./area") is not None)][0]
                 oddpage = (n == 0)
                 pagetype = 'cover'
             elif n == 1:
+
                 pn = 1
                 page = [i for i in
-                    fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
-                    fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
-                    if (i.find("./area") != None)]
+                        fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
+                        fotobook.findall(
+                            "./page[@pagenr='0'][@type='emptypage']")
+                        if (i.find("./area") is not None)]
                 if (len(page) >= 1):
                     page = page[0]
+                    # there is a bug here: if on page 1 is only text, the area-tag is on page 0.
+                    #  So this will either include the text (which is put in page 0),
+                    #  or the packground which is put in page 1.
+                    # Probably need to rewrite the whole loop to fix this.
+                    if (len(fotobook.findall("./page[@pagenr='1'][@type='normalpage']")) > 0):
+                        print(
+                            "Warning: can't process structure of first page. There will be missing details on first page.")
+
                 else:
                     page = None
                 oddpage = True
@@ -250,14 +278,15 @@ def convertMcf(mcfname, keepDoublePages):
                 pagetype = 'normal'
 
             if (page != None):
-                print('parsing page', page.get('pagenr'),' of ', pagenum)
+                print('parsing page', page.get('pagenr'), ' of ', pagenum)
 
                 bundlesize = page.find("./bundlesize")
-                if (bundlesize != None):
+                if (bundlesize is not None):
                     pw = float(bundlesize.get('width'))
                     ph = float(bundlesize.get('height'))
 
-                    #reduce the page width to a single page width, if we want to have single pages.
+                    # reduce the page width to a single page width,
+                    # if we want to have single pages.
                     if not keepDoublePages:
                         pw = pw / 2
                 else:
@@ -268,10 +297,12 @@ def convertMcf(mcfname, keepDoublePages):
 
                 # process background
                 # look for all "<background...> tags.
-                # the preceeding designElementIDs tag only match the same number for the background attribute if it is a original stock image, without filters.
+                # the preceeding designElementIDs tag only match the same
+                #  number for the background attribute if it is a original
+                #  stock image, without filters.
                 backgroundTags = page.findall('background')
                 if backgroundTags != None and len(backgroundTags) > 0:
-                    #look for a tag that has an alignment attribute
+                    # look for a tag that has an alignment attribute
                     for curTag in backgroundTags:
                         if curTag.get('alignment') != None:
                             backgroundTag = curTag
@@ -280,23 +311,27 @@ def convertMcf(mcfname, keepDoublePages):
                     if (backgroundTag != None and cewe_folder != None and
                             backgroundTag.get('designElementId') != None):
                         bg = backgroundTag.get('designElementId')
-                        #example: fading="0" hue="270" rotation="0" type="1"
+                        # example: fading="0" hue="270" rotation="0" type="1"
                         backgroundFading = 0
                         if "fading" in backgroundTag.attrib:
                             if float(backgroundTag.get('fading')) != 0:
-                                print('value of background attribute not supported: fading = %s' % backgroundTag.get('fading'))
+                                print('value of background attribute not supported: fading = %s' % backgroundTag.get(
+                                    'fading'))
                         backgroundHue = 0
                         if "hue" in backgroundTag.attrib:
                             if float(backgroundTag.get('hue')) != 0:
-                               print('value of background attribute not supported: hue =  %s' % backgroundTag.get('hue'))
+                                print(
+                                    'value of background attribute not supported: hue =  %s' % backgroundTag.get('hue'))
                         backgroundRotation = 0
                         if "rotation" in backgroundTag.attrib:
                             if float(backgroundTag.get('rotation')) != 0:
-                               print('value of background attribute not supported: rotation =  %s' % backgroundTag.get('rotation'))
-                        backgroundType= 1
+                                print('value of background attribute not supported: rotation =  %s' % backgroundTag.get(
+                                    'rotation'))
+                        backgroundType = 1
                         if "type" in backgroundTag.attrib:
                             if int(backgroundTag.get('type')) != 1:
-                               print('value of background attribute not supported: type =  %s' % backgroundTag.get('type'))
+                                print(
+                                    'value of background attribute not supported: type =  %s' % backgroundTag.get('type'))
                         try:
                             bgpath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
                             areaWidth = pw*2
@@ -307,12 +342,13 @@ def convertMcf(mcfname, keepDoublePages):
                                 ax = -areaWidth / 2.
                             else:
                                 ax = 0
-                            imObj = PIL.Image.open(bgpath) # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
-                            #create a in-memory byte array of the image file
+                            # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
+                            imObj = PIL.Image.open(bgpath)
+                            # create a in-memory byte array of the image file
                             im = bytes()
                             memFileHandle = BytesIO(im)
                             imObj = imObj.convert("RGB")
-                            imObj.save(memFileHandle,'jpeg')
+                            imObj.save(memFileHandle, 'jpeg')
                             memFileHandle.seek(0)
 
                             #im = imread(bgpath) #does not work with 1-bit images
@@ -320,43 +356,49 @@ def convertMcf(mcfname, keepDoublePages):
                             #pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
                         except Exception as ex:
                             if bgpath not in bg_notfound:
-                                print('cannot find background or error when adding to pdf', bgpath, '\n', ex.args[0])
+                                print(
+                                    'cannot find background or error when adding to pdf', bgpath, '\n', ex.args[0])
                                 exc_type, exc_obj, exc_tb = sys.exc_info()
-                                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                                fname = os.path.split(
+                                    exc_tb.tb_frame.f_code.co_filename)[1]
                                 print('', (exc_type, fname, exc_tb.tb_lineno))
                             bg_notfound.add(bgpath)
 
-                #all elements (images, text,..) for even and odd pages are defined on the even page element!
-                if keepDoublePages and oddpage == 1 and pagetype =='normal':
-                    continue    #if we are in double-page mode, all the images are already drawn by the even pages.
+                # all elements (images, text,..) for even and odd pages are defined on the even page element!
+                if keepDoublePages and oddpage == 1 and pagetype == 'normal':
+                    # if we are in double-page mode, all the images are already drawn by the even pages.
+                    continue
                 else:
-                    #switch pack to the page element for the even page to get the elements
-                    if pagetype=='normal' and oddpage == 1:
+                    # switch pack to the page element for the even page to get the elements
+                    if pagetype == 'normal' and oddpage == 1:
                         page = getPageElementForPageNumber(2*floor(pn/2))
 
                     for area in page.findall('area'):
                         areaPos = area.find('position')
                         areaLeft = float(areaPos.get('left').replace(',', '.'))
-                        #old python 2 code: aleft = float(area.get('left').replace(',', '.'))
+                        # old python 2 code: aleft = float(area.get('left').replace(',', '.'))
                         if pagetype != 'singleside' or len(area.findall('imagebackground')) == 0:
                             if oddpage and not keepDoublePages:
                                 # shift double-page content from other page
                                 areaLeft -= pw
                         areaTop = float(areaPos.get('top').replace(',', '.'))
-                        areaWidth = float(areaPos.get('width').replace(',', '.'))
-                        areaHeight = float(areaPos.get('height').replace(',', '.'))
+                        areaWidth = float(areaPos.get(
+                            'width').replace(',', '.'))
+                        areaHeight = float(areaPos.get(
+                            'height').replace(',', '.'))
                         areaRot = float(areaPos.get('rotation'))
 
-                        #check if the image is on current page at all
-                        if pagetype=='normal' and not keepDoublePages:
+                        # check if the image is on current page at all
+                        if pagetype == 'normal' and not keepDoublePages:
                             if oddpage:
-                                if (areaLeft+areaWidth) < 0:  #the right edge of image is beyond the left page border
+                                # the right edge of image is beyond the left page border
+                                if (areaLeft+areaWidth) < 0:
                                     continue
                             else:
-                                if areaLeft > pw:   #the left image edge is beyond the right page border.
+                                if areaLeft > pw:  # the left image edge is beyond the right page border.
                                     continue
 
-                        #center positions
+                        # center positions
                         cx = areaLeft + 0.5 * areaWidth
                         cy = ph - (areaTop + 0.5 * areaHeight)
 
@@ -368,9 +410,11 @@ def convertMcf(mcfname, keepDoublePages):
                             # open raw image file
                             if image.get('filename') == None:
                                 continue
-                            imagepath = os.path.join(mcfBaseFolder, imagedir, image.get('filename'))
-                            #the layout software copies the images to another collection folder
-                            imagepath=imagepath.replace('safecontainer:/','')
+                            imagepath = os.path.join(
+                                mcfBaseFolder, imagedir, image.get('filename'))
+                            # the layout software copies the images to another collection folder
+                            imagepath = imagepath.replace(
+                                'safecontainer:/', '')
                             im = PIL.Image.open(imagepath)
 
                             if image.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
@@ -402,22 +446,26 @@ def convertMcf(mcfname, keepDoublePages):
 
                             # scale image
                             # re-scale the image if it is much bigger than final resolution in PDF
-                            #set desired DPI based on where the image is used. The background gets a lower DPI.
+                            # set desired DPI based on where the image is used. The background gets a lower DPI.
                             if image.tag == 'imagebackground' and pagetype != 'cover':
                                 res = bg_res
                             else:
                                 res = image_res
-                            new_w = int(0.5 + areaWidth * res / 254.)           #254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
+                            # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
+                            new_w = int(0.5 + areaWidth * res / 254.)
                             new_h = int(0.5 + areaHeight * res / 254.)
-                            factor = sqrt(new_w * new_h / float(im.size[0] * im.size[1]))
+                            factor = sqrt(new_w * new_h /
+                                          float(im.size[0] * im.size[1]))
                             if factor <= 0.8:
-                                im = im.resize((new_w, new_h), PIL.Image.ANTIALIAS)
+                                im = im.resize(
+                                    (new_w, new_h), PIL.Image.ANTIALIAS)
                             im.load()
 
 
                             # re-compress image
                             jpeg = tempfile.NamedTemporaryFile()
-                            jpeg.close()    # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
+                            # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
+                            jpeg.close()
                             if im.mode == 'RGBA' or im.mode == 'P':
                                 im.save(jpeg.name, "PNG")
                             else:
@@ -428,16 +476,16 @@ def convertMcf(mcfname, keepDoublePages):
                             pdf.translate(img_transx, transy)
                             pdf.rotate(-areaRot)
                             pdf.drawImage(ImageReader(jpeg.name),
-                                f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-                                width = f * areaWidth, height = f * areaHeight, mask='auto')
+                                          f * -0.5 * areaWidth, f * -0.5 * areaHeight,
+                                          width=f * areaWidth, height=f * areaHeight, mask='auto')
                             pdf.rotate(areaRot)
                             pdf.translate(-img_transx, -transy)
 
-                            #we now have temporary file, that we need to delete after pdf creation
+                            # we now have temporary file, that we need to delete after pdf creation
                             tempFileList.append(jpeg.name)
-                            #we can not delete now, because file is opened by pdf library
-                            ##try to delete the temporary file again. Needed for Windows
-                            #if os.path.exists(jpeg.name):
+                            # we can not delete now, because file is opened by pdf library
+                            # try to delete the temporary file again. Needed for Windows
+                            # if os.path.exists(jpeg.name):
                             #    os.remove(jpeg.name)
 
                         # process text
@@ -448,7 +496,7 @@ def convertMcf(mcfname, keepDoublePages):
                             html = etree.XML(text.text)
                             body = html.find('.//body')
                             bstyle = dict([kv.split(':') for kv in
-                                body.get('style').lstrip(' ').rstrip(';').split('; ')])
+                                           body.get('style').lstrip(' ').rstrip(';').split('; ')])
                             family = bstyle['font-family'].strip("'")
                             font = 'Helvetica'
                             try:
@@ -483,9 +531,10 @@ def convertMcf(mcfname, keepDoublePages):
                                 for span in p.findall(".//span"):
                                     spanfont = font
                                     style = dict([kv.split(':') for kv in
-                                        span.get('style').lstrip(' ').rstrip(';').split('; ')])
+                                                  span.get('style').lstrip(' ').rstrip(';').split('; ')])
                                     if 'font-family' in style:
-                                        spanfamily = style['font-family'].strip("'")
+                                        spanfamily = style['font-family'].strip(
+                                            "'")
                                         if spanfamily in pdf.getAvailableFonts():
                                             spanfont = spanfamily
                                         elif spanfamily in additionnal_fonts:
@@ -497,54 +546,64 @@ def convertMcf(mcfname, keepDoublePages):
                                         fs = int(style['font-size'].strip("pt"))
                                         if 'color' in style:
                                             color = style['color']
-                                    pdf.setFont(spanfont, fs)
-                                    pdf.setFillColor(color)
-                                    lines = span.text.split('\n')
-                                    lines_cnt = len(lines)
-                                    lines_span += lines_cnt-1
-                                    x_line = 0.0
-                                    for line_no, line in enumerate(lines):
-                                        x_line = x_span
-                                        y_line = -line_scale*fs_max*(line_no+1) + y_p + y_span
-                                        logging.debug("Line %d/%d: |%s|" % (line_no+1, lines_cnt, line))
-                                        texts = line.split('\t')
-                                        if p.get('align') == 'center':
-                                            pdf.drawCentredString(0,
-                                                0.5 * f * areaHeight + y_line, line)
-                                        elif p.get('align') == 'right':
-                                            for text in reversed(texts):
-                                                logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
-                                                    (x_line, y_line, x_span, y_span, y_p, fs, fs_max, text ))
-                                                pdf.drawRightString(0.5 * f * areaWidth - x_line,
-                                                    0.5 * f * areaHeight + y_line, text)
-                                                if text == '':
-                                                    x_line += tab_pitch*f
-                                                else:
-                                                    x_line += (floor((len(text)*0.55*fs/f)/tab_pitch)+1)*tab_pitch*f
-                                        else:   # left aligned
-                                            for text in texts:
-                                                logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
-                                                    (x_line, y_line, x_span, y_span, y_p, fs, fs_max, text ))
-                                                pdf.drawString(-0.5 * f * areaWidth + x_line,
-                                                    0.5 * f * areaHeight + y_line, text)
-                                                if text == '':
-                                                    x_line += tab_pitch*f
-                                                else:
-                                                    x_line += (floor((len(text)*0.55*fs/f)/tab_pitch)+1)*tab_pitch*f
-                                    x_span = x_line
-                                    if lines_cnt > 1:
-                                        x_span = 0.0
-                                        y_span -= line_scale*fs_max*(lines_cnt-1)
-                                y_p -= line_scale*fs_max*(lines_span+1)
+                                    # pdf.setFont(spanfont, fs) # from old code with drawCentredString
+                                    # pdf.setFillColor(color) # from old code with drawCentredString
+                                    pdf_styleN = ParagraphStyle(None, None,
+                                                                alignment=reportlab.lib.enums.TA_LEFT,
+                                                                fontSize=fs,
+                                                                fontName=spanfont,
+                                                                leading=fs*1.2,  # line spacing
+                                                                borderPadding=0,
+                                                                borderWidth=0,
+                                                                leftIndent=0,
+                                                                rightIndent=0,
+                                                                textColor=reportlab.lib.colors.HexColor(
+                                                                    color)
+                                                                )
+                                    if p.get('align') == 'center':
+                                        #    pdf.drawCentredString(0,
+                                        #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
+                                        pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
+                                    elif p.get('align') == 'right':
+                                        #    pdf.drawRightString(0.5 * f * areaWidth,
+                                        #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
+                                        pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
+                                    else:
+                                        #    pdf.drawString(-0.5 * f * areaWidth,
+                                        #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
+                                        pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
+                                    # add some flowables
+                                    # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
+
+                                    newString = '<para autoLeading="max">' + span.text + '</para>'
+                                    pdf_story.append(
+                                        Paragraph(newString, pdf_styleN))
+
+                                y_p -= 1.3*fs
+                            newFrame = Frame(-0.5 * f * areaWidth, -0.5 * f * areaHeight,
+                                             f * areaWidth, f * areaHeight,
+                                             leftPadding=0, bottomPadding=0,
+                                             rightPadding=0, topPadding=0,
+                                             showBoundary=1  # for debugging useful
+                                             )
+                            newFrame.addFromList(pdf_story, pdf)
+
                             pdf.rotate(areaRot)
                             pdf.translate(-transx, -transy)
+                        
+                        #Clip-Art
+                        #In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
+                        # We are using the <clipart> element here
+                        for clipartElement in area.findall('clipart'):                            
+                            clipartID = int( clipartElement.get('designElementId'))
+                            print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
 
             # finish the page
             pdf.showPage()
 
         except Exception as ex:
             # if one page fails: continue with next one
-            print('error on page %i:' % (n, ),'\n', ex.args[0])
+            print('error on page %i:' % (n, ), '\n', ex.args[0])
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print('', (exc_type, fname, exc_tb.tb_lineno))
@@ -554,15 +613,16 @@ def convertMcf(mcfname, keepDoublePages):
 
     pdf = []
 
-    #clean up temp files
+    # clean up temp files
     for tmpFileName in tempFileList:
         if os.path.exists(tmpFileName):
-           os.remove(tmpFileName)
+            os.remove(tmpFileName)
     return True
 
+
 if __name__ == '__main__':
-    #only executed when this file is run directly.
-    #we need trick to have both: default and fixed formats.
+    # only executed when this file is run directly.
+    # we need trick to have both: default and fixed formats.
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
         pass
 
@@ -583,10 +643,10 @@ if __name__ == '__main__':
         if len(fnames) > 0:
             args.inputFile = fnames[0]
 
-    #if inputFile name is still empty, we have to throw an error
+    # if inputFile name is still empty, we have to throw an error
     if args.inputFile is None:
         parser.parse_args(['-h'])
         sys.exit(1)
 
-    #if we have a file name, let's convert it
+    # if we have a file name, let's convert it
     resultFlag = convertMcf(args.inputFile, args.keepDoublePages)

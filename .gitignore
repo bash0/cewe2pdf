@@ -40,3 +40,5 @@ nosetests.xml
 /.pytest_cache/v/cache
 /.vscode
 /TestResults
+/.vscode/launch.json
+/.vscode/settings.json
