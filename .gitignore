@@ -39,3 +39,5 @@ nosetests.xml
 /cewe_folder.txt
 /.pytest_cache/v/cache
 /TestResults
+/.vscode/launch.json
+/.vscode/settings.json
