@@ -599,8 +599,10 @@ def convertMcf(mcfname, keepDoublePages:bool):
             if (page != None):
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
 
-            # finish the page
-            pdf.showPage()
+            # finish the page and start a new one.
+            # If "keepDoublePages" was active, we only start a new page, after the odd pages.
+            if ((keepDoublePages == False) or not (keepDoublePages==True and oddpage==True and pagetype =='normal')):
+                pdf.showPage()
 
         except Exception as ex:
             # if one page fails: continue with next one
