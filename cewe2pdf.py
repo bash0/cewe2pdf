@@ -140,37 +140,14 @@ def findFileInDirs(filename, paths):
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)), 'd'))
 
-def parseInputPage(fotobook, cewe_folder, pdf, page, pn, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
-    print('parsing page', page.get('pagenr'), ' of ', pageCount)
-
-    bundlesize = page.find("./bundlesize")
-    if (bundlesize is not None):
-        pw = float(bundlesize.get('width'))
-        ph = float(bundlesize.get('height'))
-
-        # reduce the page width to a single page width,
-        # if we want to have single pages.
-        if not keepDoublePages:
-            pw = pw / 2
-    else:
-        # Assume A4 page size
-        pw = 2100
-        ph = 2970
-    pdf.setPageSize((f * pw, f * ph))
-
-    # process background
-    # look for all "<background...> tags.
-    # the preceeding designElementIDs tag only match the same
-    #  number for the background attribute if it is a original
-    #  stock image, without filters.
-    backgroundTags = page.findall('background')
+def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
     if backgroundTags != None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
         for curTag in backgroundTags:
             if curTag.get('alignment') != None:
                 backgroundTag = curTag
                 break
-
+    
         if (backgroundTag != None and cewe_folder != None and
                 backgroundTag.get('designElementId') != None):
             bg = backgroundTag.get('designElementId')
@@ -220,20 +197,46 @@ def parseInputPage(fotobook, cewe_folder, pdf, page, pn, pageCount, pagetype, ke
                 imObj = imObj.convert("RGB")
                 imObj.save(memFileHandle, 'jpeg')
                 memFileHandle.seek(0)
-
+    
                 # im = imread(bgpath) #does not work with 1-bit images
                 pdf.drawImage(ImageReader(
                     memFileHandle), f * ax, 0, width=f * areaWidth, height=f * areaHeight)
                 #pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
             except Exception as ex:
                 if bgpath not in bg_notFoundDirList:
-                    print(
-                        'cannot find background or error when adding to pdf', bgpath, '\n', ex.args[0])
+                    print('cannot find background or error when adding to pdf', bgpath, '\n', ex.args[0])
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     fname = os.path.split(
                         exc_tb.tb_frame.f_code.co_filename)[1]
                     print('', (exc_type, fname, exc_tb.tb_lineno))
                 bg_notFoundDirList.add(bgpath)
+    return
+
+def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
+    print('parsing page', page.get('pagenr'), ' of ', pageCount)
+
+    bundlesize = page.find("./bundlesize")
+    if (bundlesize is not None):
+        pw = float(bundlesize.get('width'))
+        ph = float(bundlesize.get('height'))
+
+        # reduce the page width to a single page width,
+        # if we want to have single pages.
+        if not keepDoublePages:
+            pw = pw / 2
+    else:
+        # Assume A4 page size
+        pw = 2100
+        ph = 2970
+    pdf.setPageSize((f * pw, f * ph))
+
+    # process background
+    # look for all "<background...> tags.
+    # the preceeding designElementIDs tag only match the same
+    #  number for the background attribute if it is a original
+    #  stock image, without filters.
+    backgroundTags = page.findall('background')
+    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoublePages, oddpage, pagetype, pdf, ph, pw)
 
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
     if keepDoublePages and oddpage == 1 and pagetype == 'normal':
@@ -242,7 +245,7 @@ def parseInputPage(fotobook, cewe_folder, pdf, page, pn, pageCount, pagetype, ke
     else:
         # switch pack to the page element for the even page to get the elements
         if pagetype == 'normal' and oddpage == 1:
-            page = getPageElementForPageNumber(fotobook, 2*floor(pn/2))
+            page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
 
         for area in page.findall('area'):
             areaPos = area.find('position')
@@ -284,8 +287,7 @@ def parseInputPage(fotobook, cewe_folder, pdf, page, pn, pageCount, pagetype, ke
                 imagepath = os.path.join(
                     mcfBaseFolder, imagedir, image.get('filename'))
                 # the layout software copies the images to another collection folder
-                imagepath = imagepath.replace(
-                    'safecontainer:/', '')
+                imagepath = imagepath.replace('safecontainer:/', '')
                 im = PIL.Image.open(imagepath)
 
                 if image.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
@@ -382,7 +384,7 @@ def parseInputPage(fotobook, cewe_folder, pdf, page, pn, pageCount, pagetype, ke
 
                 pdf.translate(transx, transy)
                 pdf.rotate(-areaRot)
-                y_p = 0
+                #y_p = 0    #keep track of y-position for multi-line text using DrawString
                 for p in body.findall(".//p"):
                     for span in p.findall(".//span"):
                         spanfont = font
@@ -437,7 +439,8 @@ def parseInputPage(fotobook, cewe_folder, pdf, page, pn, pageCount, pagetype, ke
                         pdf_story.append(
                             Paragraph(newString, pdf_styleN))
 
-                    y_p -= 1.3*fs
+                    #y_p -= 1.3*fs
+                #Add a frame object that can contain multiple paragraphs
                 newFrame = Frame(-0.5 * f * areaWidth, -0.5 * f * areaHeight,
                                     f * areaWidth, f * areaHeight,
                                     leftPadding=0, bottomPadding=0,
@@ -524,21 +527,18 @@ def convertMcf(mcfname, keepDoublePages:bool):
     for n in range(pageCount):
         try:
             if (n == 0) or (n == pageCount - 1):
-                pn = 0
+                pageNumber = 0
                 page = [i for i in
                         fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']") +
-                        fotobook.findall(
-                            "./page[@pagenr='0'][@type='fullcover']")
+                        fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
                         if (i.find("./area") is not None)][0]
                 oddpage = (n == 0)
                 pagetype = 'cover'
             elif n == 1:
-
-                pn = 1
+                pageNumber = 1
                 page = [i for i in
                         fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
-                        fotobook.findall(
-                            "./page[@pagenr='0'][@type='emptypage']")
+                        fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
                         if (i.find("./area") is not None)]
                 if (len(page) >= 1):
                     page = page[0]
@@ -554,13 +554,13 @@ def convertMcf(mcfname, keepDoublePages:bool):
                 oddpage = True
                 pagetype = 'singleside'
             else:
-                pn = n
-                oddpage = (pn % 2) == 1
+                pageNumber = n
+                oddpage = (pageNumber % 2) == 1
                 page = getPageElementForPageNumber(fotobook, n)
                 pagetype = 'normal'
 
             if (page != None):
-                parseInputPage(fotobook, cewe_folder, pdf, page, pn, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
+                parseInputPage(fotobook, cewe_folder, mcfBaseFolder, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
 
             # finish the page
             pdf.showPage()
