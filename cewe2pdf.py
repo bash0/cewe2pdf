@@ -324,6 +324,13 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     color = '#000000'                                
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
+    
+    #Get the background color. It is stored in an extra element.
+    backgroundColor= None
+    backgroundColorAttrib = area.get('backgroundcolor')
+    if (backgroundColorAttrib is not None):
+        backgroundColor = reportlab.lib.colors.HexColor(backgroundColorAttrib)
+    
     #y_p = 0    #keep track of y-position for multi-line text using DrawString
     for p in body.findall(".//p"):
         for span in p.findall(".//span"):
@@ -355,8 +362,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                                         borderWidth=0,
                                         leftIndent=0,
                                         rightIndent=0,
-                                        textColor=reportlab.lib.colors.HexColor(
-                                            color)
+                                        textColor=reportlab.lib.colors.HexColor(color),
+                                        backColor=backgroundColor
                                         )
             if p.get('align') == 'center':
                 #    pdf.drawCentredString(0,
@@ -392,12 +399,11 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             neededWidth, neededHeight = pdf_flowableList[j].wrap(frameWidth, frameHeight)
             frameHeight = max( frameHeight, neededHeight)   # increase the height
 
-
     newFrame = Frame(frameBottomLeft_x, frameBottomLeft_y,
                         frameWidth, frameHeight,
                         leftPadding=0, bottomPadding=0,
                         rightPadding=0, topPadding=0,
-                        showBoundary=1  # for debugging useful
+                        showBoundary=0  # for debugging useful
                         )
 
     #This call should produce an exception, if any of the flowables do not fit inside the frame.
@@ -432,10 +438,8 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
                     # shift double-page content from other page
                     areaLeft -= pw
             areaTop = float(areaPos.get('top').replace(',', '.'))
-            areaWidth = float(areaPos.get(
-                'width').replace(',', '.'))
-            areaHeight = float(areaPos.get(
-                'height').replace(',', '.'))
+            areaWidth = float(areaPos.get('width').replace(',', '.'))
+            areaHeight = float(areaPos.get('height').replace(',', '.'))
             areaRot = float(areaPos.get('rotation'))
     
             # check if the image is on current page at all
@@ -545,8 +549,7 @@ def convertMcf(mcfname, keepDoublePages:bool):
     # Load additionnal fonts
     additionnal_fonts = {}
     try:
-        configFontFileName = findFileInDirs(
-            'additional_fonts.txt', (mcfBaseFolder,  os.path.curdir))
+        configFontFileName = findFileInDirs('additional_fonts.txt', (mcfBaseFolder,  os.path.curdir))
         with open(configFontFileName, 'r') as fp:
             for line in fp:
                 p = line.split(" = ", 1)
