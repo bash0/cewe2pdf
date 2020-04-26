@@ -222,33 +222,90 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoubl
                 bg_notFoundDirList.add(bgpath)
     return
 
-def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
-    print('parsing page', page.get('pagenr'), ' of ', pageCount)
+def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy):
+        # open raw image file
+        if imageTag.get('filename') == None:
+            return
+        imagePath = os.path.join(
+            mcfBaseFolder, imagedir, imageTag.get('filename'))
+        # the layout software copies the images to another collection folder
+        imagePath = imagePath.replace('safecontainer:/', '')
+        im = PIL.Image.open(imagePath)
+    
+        if imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
+            # display on the right page
+            if keepDoublePages:
+                img_transx = transx + f * pw/2
+            else:
+                img_transx = transx + f * pw
+        else:
+            img_transx = transx
+    
+        # correct for exif rotation
+        im = autorot(im)
+        # get the cutout position and scale
+        imleft = float(imageTag.find('cutout').get(
+            'left').replace(',', '.'))
+        imtop = float(imageTag.find('cutout').get(
+            'top').replace(',', '.'))
+        imageWidth_px, imageHeight_px = im.size
+        imsc = float(imageTag.find('cutout').get('scale'))
+    
+        # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
+        # to get from .mcf units are divided by the scale factor to get to image pixel units.
+    
+        # crop image
+        im = im.crop((int(0.5 - imleft/imsc),
+                        int(0.5 - imtop/imsc),
+                        int(0.5 - imleft/imsc +
+                            areaWidth / imsc),
+                        int(0.5 - imtop/imsc + areaHeight / imsc)))
+    
+        # scale image
+        # re-scale the image if it is much bigger than final resolution in PDF
+        # set desired DPI based on where the image is used. The background gets a lower DPI.
+        if imageTag.tag == 'imagebackground' and pagetype != 'cover':
+            res = bg_res
+        else:
+            res = image_res
+        # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
+        new_w = int(0.5 + areaWidth * res / 254.)
+        new_h = int(0.5 + areaHeight * res / 254.)
+        factor = sqrt(new_w * new_h /
+                        float(im.size[0] * im.size[1]))
+        if factor <= 0.8:
+            im = im.resize(
+                (new_w, new_h), PIL.Image.ANTIALIAS)
+        im.load()
+    
+        # re-compress image
+        jpeg = tempfile.NamedTemporaryFile()
+        # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
+        jpeg.close()
+        if im.mode == 'RGBA' or im.mode == 'P':
+            im.save(jpeg.name, "PNG")
+        else:
+            im.save(jpeg.name, "JPEG",
+                    quality=image_quality)
+    
+        # place image
+        print('image', imageTag.get('filename'))
+        pdf.translate(img_transx, transy)
+        pdf.rotate(-areaRot)
+        pdf.drawImage(ImageReader(jpeg.name),
+                        f * -0.5 * areaWidth, f * -0.5 * areaHeight,
+                        width=f * areaWidth, height=f * areaHeight, mask='auto')
+        pdf.rotate(areaRot)
+        pdf.translate(-img_transx, -transy)
+    
+        # we now have temporary file, that we need to delete after pdf creation
+        tempFileList.append(jpeg.name)
+        # we can not delete now, because file is opened by pdf library
+        # try to delete the temporary file again. Needed for Windows
+        # if os.path.exists(jpeg.name):
+        #    os.remove(jpeg.name)
 
-    bundlesize = page.find("./bundlesize")
-    if (bundlesize is not None):
-        pw = float(bundlesize.get('width'))
-        ph = float(bundlesize.get('height'))
-
-        # reduce the page width to a single page width,
-        # if we want to have single pages.
-        if not keepDoublePages:
-            pw = pw / 2
-    else:
-        # Assume A4 page size
-        pw = 2100
-        ph = 2970
-    pdf.setPageSize((f * pw, f * ph))
-
-    # process background
-    # look for all "<background...> tags.
-    # the preceeding designElementIDs tag only match the same
-    #  number for the background attribute if it is a original
-    #  stock image, without filters.
-    backgroundTags = page.findall('background')
-    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoublePages, oddpage, pagetype, pdf, ph, pw)
-
-    # all elements (images, text,..) for even and odd pages are defined on the even page element!
+def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw):
     if keepDoublePages and oddpage == 1 and pagetype == 'normal':
         # if we are in double-page mode, all the images are already drawn by the even pages.
         return
@@ -256,7 +313,7 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
         # switch pack to the page element for the even page to get the elements
         if pagetype == 'normal' and oddpage == 1:
             page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
-
+    
         for area in page.findall('area'):
             areaPos = area.find('position')
             areaLeft = float(areaPos.get('left').replace(',', '.'))
@@ -271,7 +328,7 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
             areaHeight = float(areaPos.get(
                 'height').replace(',', '.'))
             areaRot = float(areaPos.get('rotation'))
-
+    
             # check if the image is on current page at all
             if pagetype == 'normal' and not keepDoublePages:
                 if oddpage:
@@ -281,96 +338,19 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
                 else:
                     if areaLeft > pw:  # the left image edge is beyond the right page border.
                         continue
-
+    
             # center positions
             cx = areaLeft + 0.5 * areaWidth
             cy = ph - (areaTop + 0.5 * areaHeight)
-
+    
             transx = f * cx
             transy = f * cy
-
+    
             # process images
-            for image in area.findall('imagebackground') + area.findall('image'):
-                # open raw image file
-                if image.get('filename') == None:
-                    continue
-                imagepath = os.path.join(
-                    mcfBaseFolder, imagedir, image.get('filename'))
-                # the layout software copies the images to another collection folder
-                imagepath = imagepath.replace('safecontainer:/', '')
-                im = PIL.Image.open(imagepath)
+            for imageTag in area.findall('imagebackground') + area.findall('image'):
+                processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy)
 
-                if image.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
-                    # display on the right page
-                    if keepDoublePages:
-                        img_transx = transx + f * pw/2
-                    else:
-                        img_transx = transx + f * pw
-                else:
-                    img_transx = transx
-
-                            # correct for exif rotation
-                            im = autorot(im)
-                            #get the cutout position and scale
-                            imleft = float(image.find('cutout').get('left').replace(',', '.'))
-                            imtop = float(image.find('cutout').get('top').replace(',', '.'))
-                            imageWidth_px, imageHeight_px = im.size
-                            imsc = float(image.find('cutout').get('scale'))
-
-                            #without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
-                            #to get from .mcf units are divided by the scale factor to get to image pixel units.
-
-                            # crop image
-                            im = im.crop((int(0.5 - imleft/imsc),
-                                int(0.5 - imtop/imsc),
-                                int(0.5 - imleft/imsc + areaWidth / imsc),
-                                int(0.5 - imtop/imsc + areaHeight / imsc)))
-
-
-                            # scale image
-                            # re-scale the image if it is much bigger than final resolution in PDF
-                            # set desired DPI based on where the image is used. The background gets a lower DPI.
-                            if image.tag == 'imagebackground' and pagetype != 'cover':
-                                res = bg_res
-                            else:
-                                res = image_res
-                            # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
-                            new_w = int(0.5 + areaWidth * res / 254.)
-                            new_h = int(0.5 + areaHeight * res / 254.)
-                            factor = sqrt(new_w * new_h /
-                                          float(im.size[0] * im.size[1]))
-                            if factor <= 0.8:
-                                im = im.resize(
-                                    (new_w, new_h), PIL.Image.ANTIALIAS)
-                            im.load()
-
-
-                            # re-compress image
-                            jpeg = tempfile.NamedTemporaryFile()
-                            # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
-                            jpeg.close()
-                            if im.mode == 'RGBA' or im.mode == 'P':
-                                im.save(jpeg.name, "PNG")
-                            else:
-                                im.save(jpeg.name, "JPEG", quality=image_quality)
-
-                # place image
-                print('image', image.get('filename'))
-                pdf.translate(img_transx, transy)
-                pdf.rotate(-areaRot)
-                pdf.drawImage(ImageReader(jpeg.name),
-                                f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-                                width=f * areaWidth, height=f * areaHeight, mask='auto')
-                pdf.rotate(areaRot)
-                pdf.translate(-img_transx, -transy)
-
-                # we now have temporary file, that we need to delete after pdf creation
-                tempFileList.append(jpeg.name)
-                # we can not delete now, because file is opened by pdf library
-                # try to delete the temporary file again. Needed for Windows
-                # if os.path.exists(jpeg.name):
-                #    os.remove(jpeg.name)
-
+    
             # process text
             for text in area.findall('text'):
                 # note: it would be better to use proper html processing here
@@ -389,7 +369,7 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
                 elif family in additionnal_fonts:
                     font = family
                 color = '#000000'
-
+    
                 pdf.translate(transx, transy)
                 pdf.rotate(-areaRot)
                 #y_p = 0    #keep track of y-position for multi-line text using DrawString
@@ -419,7 +399,7 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
                             if spanfamily != spanfont:
                                 print("Using font family = '%s' (wanted %s)" % (
                                     spanfont, spanfamily))
-
+    
                         if 'font-size' in style:
                             fs = int(
                                 style['font-size'].strip()[:-2])
@@ -453,11 +433,11 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
                             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
                         # add some flowables
                         # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
-
+    
                         newString = '<para autoLeading="max">' + span.text + '</para>'
                         pdf_story.append(
                             Paragraph(newString, pdf_styleN))
-
+    
                     #y_p -= 1.3*fs
                 #Add a frame object that can contain multiple paragraphs
                 newFrame = Frame(-0.5 * f * areaWidth, -0.5 * f * areaHeight,
@@ -467,7 +447,7 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
                                     showBoundary=1  # for debugging useful
                                     )
                 newFrame.addFromList(pdf_story, pdf)
-
+    
                 pdf.rotate(areaRot)
                 pdf.translate(-transx, -transy)
                         
@@ -477,6 +457,36 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
             for clipartElement in area.findall('clipart'):                            
                 clipartID = int( clipartElement.get('designElementId'))
                 print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
+    return
+
+def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
+    print('parsing page', page.get('pagenr'), ' of ', pageCount)
+
+    bundlesize = page.find("./bundlesize")
+    if (bundlesize is not None):
+        pw = float(bundlesize.get('width'))
+        ph = float(bundlesize.get('height'))
+
+        # reduce the page width to a single page width,
+        # if we want to have single pages.
+        if not keepDoublePages:
+            pw = pw / 2
+    else:
+        # Assume A4 page size
+        pw = 2100
+        ph = 2970
+    pdf.setPageSize((f * pw, f * ph))
+
+    # process background
+    # look for all "<background...> tags.
+    # the preceeding designElementIDs tag only match the same
+    #  number for the background attribute if it is a original
+    #  stock image, without filters.
+    backgroundTags = page.findall('background')
+    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoublePages, oddpage, pagetype, pdf, ph, pw)
+
+    # all elements (images, text,..) for even and odd pages are defined on the even page element!
+    processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw)
 
 
 def convertMcf(mcfname, keepDoublePages:bool):
