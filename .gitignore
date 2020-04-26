@@ -42,3 +42,4 @@ nosetests.xml
 /TestResults
 /.vscode/launch.json
 /.vscode/settings.json
+/tests/unittest_fotobook_mcf-Dateien/folderid.xml

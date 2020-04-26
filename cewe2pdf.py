@@ -392,12 +392,15 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     frameHeight = f * areaHeight
 
     #Go through all flowables and test if the fit in the frame. If not increase the frame height.
-    #ToDo: This will not solve the problem, that if each paragraph will fit indivdually, but not all together.
+    #To solve the problem, that if each paragraph will fit indivdually, and also all together,
+    # we need to keep track of the total summed height+
+    totalMaxHeight = 0
     for j in range(len(pdf_flowableList)):
-        if (len(pdf_flowableList[j].split(frameWidth,frameHeight)) != 1):
-            print('Warning: a paragraph with text ',pdf_flowableList[j].text,'would not fit inside it''s frame. Frame height will be increased to prevent loss of this text.\n')
-            neededWidth, neededHeight = pdf_flowableList[j].wrap(frameWidth, frameHeight)
-            frameHeight = max( frameHeight, neededHeight)   # increase the height
+        neededWidth, neededHeight = pdf_flowableList[j].wrap(frameWidth, frameHeight)
+        totalMaxHeight += neededHeight
+    if (totalMaxHeight > frameHeight):
+        print('Warning: A set of paragraphs would not fit inside its frame. Frame height will be increased to prevent loss of text.\n')
+    frameHeight = max( frameHeight, totalMaxHeight)   # increase the height
 
     newFrame = Frame(frameBottomLeft_x, frameBottomLeft_y,
                         frameWidth, frameHeight,
