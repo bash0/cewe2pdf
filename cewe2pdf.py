@@ -153,278 +153,159 @@ def getBaseBackgroundLocations(basefolder):
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
     )
     return baseBackgroundLocations
+def getPageElementForPageNumber(fotobook, pageNumber):
+    return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)), 'd'))
 
-def convertMcf(mcfname, keepDoublePages):
-    # Get the folder in which the .mcf file is
-    mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
-    mcfBaseFolder = mcfPathObj.parent
+def parseInputPage(fotobook, cewe_folder, pdf, page, pn, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
+    print('parsing page', page.get('pagenr'), ' of ', pageCount)
 
-    # parse the input mcf xml file
-    # read file as binary, so UTF-8 encoding is preserved for xml-parser
-    mcffile = open(mcfname, 'rb')
-    mcf = etree.parse(mcffile)
-    mcffile.close()
-    fotobook = mcf.getroot()
-    if fotobook.tag != 'fotobook':
-        print(mcfname + 'is not a valid mcf file. Exiting.')
-        sys.exit(1)
+    bundlesize = page.find("./bundlesize")
+    if (bundlesize is not None):
+        pw = float(bundlesize.get('width'))
+        ph = float(bundlesize.get('height'))
 
-    # find cewe folder using the original cewe_folder.txt file
-    try:
-        configFolderFileName = findFileInDirs(
-            'cewe_folder.txt', (mcfBaseFolder,  os.path.curdir))
-        cewe_file = open(configFolderFileName, 'r')
-        cewe_folder = cewe_file.read().strip()
-        cewe_file.close()
-        baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
-        backgroundLocations = baseBackgroundLocations;
-    except:
-        print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini')
-        configuration = configparser.ConfigParser()
-        filesread = configuration.read('cewe2pdf.ini')
-        if len(filesread) < 1: 
-            print('cannot find cewe installation folder cewe_folder in cewe2pdf.ini')
-            cewe_folder = None
-        else:
-            defaultConfigSection = configuration['DEFAULT']
-            # find cewe folder from ini file
-            cewe_folder = defaultConfigSection['cewe_folder'].strip()
-            baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
-            # add any extra background folders
-            xbg = defaultConfigSection.get('extraBackgroundFolders','').strip() # comma separated list of folders
-            backgroundLocations = baseBackgroundLocations + tuple(xbg.split(","))
+        # reduce the page width to a single page width,
+        # if we want to have single pages.
+        if not keepDoublePages:
+            pw = pw / 2
+    else:
+        # Assume A4 page size
+        pw = 2100
+        ph = 2970
+    pdf.setPageSize((f * pw, f * ph))
 
-    bg_notfound = set([])
+    # process background
+    # look for all "<background...> tags.
+    # the preceeding designElementIDs tag only match the same
+    #  number for the background attribute if it is a original
+    #  stock image, without filters.
+    backgroundTags = page.findall('background')
+    if backgroundTags != None and len(backgroundTags) > 0:
+        # look for a tag that has an alignment attribute
+        for curTag in backgroundTags:
+            if curTag.get('alignment') != None:
+                backgroundTag = curTag
+                break
 
-    # Load additionnal fonts
-    additionnal_fonts = {}
-    try:
-        configFontFileName = findFileInDirs(
-            'additional_fonts.txt', (mcfBaseFolder,  os.path.curdir))
-        with open(configFontFileName, 'r') as fp:
-            for line in fp:
-                p = line.split(" = ", 1)
-                additionnal_fonts[p[0]] = p[1].strip()
-            fp.close()
-    except:
-        print('cannot find additionnal fonts (define them in additional_fonts.txt)')
-        print('Content example:')
-        print('Vera = /tmp/vera.ttf')
-        print('Separator is " = " (space equal space)')
+        if (backgroundTag != None and cewe_folder != None and
+                backgroundTag.get('designElementId') != None):
+            bg = backgroundTag.get('designElementId')
+            # example: fading="0" hue="270" rotation="0" type="1"
+            backgroundFading = 0
+            if "fading" in backgroundTag.attrib:
+                if float(backgroundTag.get('fading')) != 0:
+                    print('value of background attribute not supported: fading = %s' % backgroundTag.get(
+                        'fading'))
+            backgroundHue = 0
+            if "hue" in backgroundTag.attrib:
+                if float(backgroundTag.get('hue')) != 0:
+                    print(
+                        'value of background attribute not supported: hue =  %s' % backgroundTag.get('hue'))
+            backgroundRotation = 0
+            if "rotation" in backgroundTag.attrib:
+                if float(backgroundTag.get('rotation')) != 0:
+                    print('value of background attribute not supported: rotation =  %s' % backgroundTag.get(
+                        'rotation'))
+            backgroundType = 1
+            if "type" in backgroundTag.attrib:
+                if int(backgroundTag.get('type')) != 1:
+                    print(
+                        'value of background attribute not supported: type =  %s' % backgroundTag.get('type'))
+            try:
+                    bgpath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
 
-
-    # create pdf
-    pagesize = reportlab.lib.pagesizes.A4
-    if fotobook.get('productname') in formats:
-        pagesize = formats[fotobook.get('productname')]
-    pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
-
-    # Add additionnal fonts
-    for n in additionnal_fonts:
-        try:
-            pdfmetrics.registerFont(TTFont(n, additionnal_fonts[n]))
-            print("Successfully registered '%s' from '%s'" %
-                  (n, additionnal_fonts[n]))
-        except:
-            print("Failed to register font '%s' (from %s)" % (n, additionnal_fonts[n]))
-
-
-    # extract properties
-    articleConfigElement = fotobook.find('articleConfig')
-    pagenum = int(articleConfigElement.get('normalpages')) + 2
-    imagedir = fotobook.get('imagedir')
-
-
-    def getPageElementForPageNumber(pageNumber):
-        return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)),'d'))
-
-    for n in range(pagenum):
-        try:
-            if (n == 0) or (n == pagenum - 1):
-                pn = 0
-                page = [i for i in
-                        fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']") +
-                        fotobook.findall(
-                            "./page[@pagenr='0'][@type='fullcover']")
-                        if (i.find("./area") is not None)][0]
-                oddpage = (n == 0)
-                pagetype = 'cover'
-            elif n == 1:
-
-                pn = 1
-                page = [i for i in
-                        fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
-                        fotobook.findall(
-                            "./page[@pagenr='0'][@type='emptypage']")
-                        if (i.find("./area") is not None)]
-                if (len(page) >= 1):
-                    page = page[0]
-                    # there is a bug here: if on page 1 is only text, the area-tag is on page 0.
-                    #  So this will either include the text (which is put in page 0),
-                    #  or the packground which is put in page 1.
-                    # Probably need to rewrite the whole loop to fix this.
-                    if (len(fotobook.findall("./page[@pagenr='1'][@type='normalpage']")) > 0):
-                        print(
-                            "Warning: can't process structure of first page. There will be missing details on first page.")
-
+                areaWidth = pw*2
+                if keepDoublePages:
+                    areaWidth = pw
+                areaHeight = ph
+                if pagetype != 'singleside' and oddpage and not keepDoublePages:
+                    ax = -areaWidth / 2.
                 else:
-                    page = None
-                oddpage = True
-                pagetype = 'singleside'
-            else:
-                pn = n
-                oddpage = (pn % 2) == 1
-                page = getPageElementForPageNumber(n)
-                pagetype = 'normal'
+                    ax = 0
+                # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
+                imObj = PIL.Image.open(bgpath)
+                # create a in-memory byte array of the image file
+                im = bytes()
+                memFileHandle = BytesIO(im)
+                imObj = imObj.convert("RGB")
+                imObj.save(memFileHandle, 'jpeg')
+                memFileHandle.seek(0)
 
-            if (page != None):
-                print('parsing page', page.get('pagenr'), ' of ', pagenum)
+                # im = imread(bgpath) #does not work with 1-bit images
+                pdf.drawImage(ImageReader(
+                    memFileHandle), f * ax, 0, width=f * areaWidth, height=f * areaHeight)
+                #pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
+            except Exception as ex:
+                if bgpath not in bg_notFoundDirList:
+                    print(
+                        'cannot find background or error when adding to pdf', bgpath, '\n', ex.args[0])
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(
+                        exc_tb.tb_frame.f_code.co_filename)[1]
+                    print('', (exc_type, fname, exc_tb.tb_lineno))
+                bg_notFoundDirList.add(bgpath)
 
-                bundlesize = page.find("./bundlesize")
-                if (bundlesize is not None):
-                    pw = float(bundlesize.get('width'))
-                    ph = float(bundlesize.get('height'))
+    # all elements (images, text,..) for even and odd pages are defined on the even page element!
+    if keepDoublePages and oddpage == 1 and pagetype == 'normal':
+        # if we are in double-page mode, all the images are already drawn by the even pages.
+        return
+    else:
+        # switch pack to the page element for the even page to get the elements
+        if pagetype == 'normal' and oddpage == 1:
+            page = getPageElementForPageNumber(fotobook, 2*floor(pn/2))
 
-                    # reduce the page width to a single page width,
-                    # if we want to have single pages.
-                    if not keepDoublePages:
-                        pw = pw / 2
+        for area in page.findall('area'):
+            areaPos = area.find('position')
+            areaLeft = float(areaPos.get('left').replace(',', '.'))
+            # old python 2 code: aleft = float(area.get('left').replace(',', '.'))
+            if pagetype != 'singleside' or len(area.findall('imagebackground')) == 0:
+                if oddpage and not keepDoublePages:
+                    # shift double-page content from other page
+                    areaLeft -= pw
+            areaTop = float(areaPos.get('top').replace(',', '.'))
+            areaWidth = float(areaPos.get(
+                'width').replace(',', '.'))
+            areaHeight = float(areaPos.get(
+                'height').replace(',', '.'))
+            areaRot = float(areaPos.get('rotation'))
+
+            # check if the image is on current page at all
+            if pagetype == 'normal' and not keepDoublePages:
+                if oddpage:
+                    # the right edge of image is beyond the left page border
+                    if (areaLeft+areaWidth) < 0:
+                        continue
                 else:
-                    # Assume A4 page size
-                    pw = 2100
-                    ph = 2970
-                pdf.setPageSize((f * pw, f * ph))
+                    if areaLeft > pw:  # the left image edge is beyond the right page border.
+                        continue
 
-                # process background
-                # look for all "<background...> tags.
-                # the preceeding designElementIDs tag only match the same
-                #  number for the background attribute if it is a original
-                #  stock image, without filters.
-                backgroundTags = page.findall('background')
-                if backgroundTags != None and len(backgroundTags) > 0:
-                    # look for a tag that has an alignment attribute
-                    for curTag in backgroundTags:
-                        if curTag.get('alignment') != None:
-                            backgroundTag = curTag
-                            break
+            # center positions
+            cx = areaLeft + 0.5 * areaWidth
+            cy = ph - (areaTop + 0.5 * areaHeight)
 
-                    if (backgroundTag != None and cewe_folder != None and
-                            backgroundTag.get('designElementId') != None):
-                        bg = backgroundTag.get('designElementId')
-                        # example: fading="0" hue="270" rotation="0" type="1"
-                        backgroundFading = 0
-                        if "fading" in backgroundTag.attrib:
-                            if float(backgroundTag.get('fading')) != 0:
-                                print('value of background attribute not supported: fading = %s' % backgroundTag.get(
-                                    'fading'))
-                        backgroundHue = 0
-                        if "hue" in backgroundTag.attrib:
-                            if float(backgroundTag.get('hue')) != 0:
-                                print(
-                                    'value of background attribute not supported: hue =  %s' % backgroundTag.get('hue'))
-                        backgroundRotation = 0
-                        if "rotation" in backgroundTag.attrib:
-                            if float(backgroundTag.get('rotation')) != 0:
-                                print('value of background attribute not supported: rotation =  %s' % backgroundTag.get(
-                                    'rotation'))
-                        backgroundType = 1
-                        if "type" in backgroundTag.attrib:
-                            if int(backgroundTag.get('type')) != 1:
-                                print(
-                                    'value of background attribute not supported: type =  %s' % backgroundTag.get('type'))
-                        try:
-                            bgpath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
-                            areaWidth = pw*2
-                            if keepDoublePages:
-                                areaWidth = pw
-                            areaHeight = ph
-                            if pagetype != 'singleside' and oddpage and not keepDoublePages:
-                                ax = -areaWidth / 2.
-                            else:
-                                ax = 0
-                            # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
-                            imObj = PIL.Image.open(bgpath)
-                            # create a in-memory byte array of the image file
-                            im = bytes()
-                            memFileHandle = BytesIO(im)
-                            imObj = imObj.convert("RGB")
-                            imObj.save(memFileHandle, 'jpeg')
-                            memFileHandle.seek(0)
+            transx = f * cx
+            transy = f * cy
 
-                            #im = imread(bgpath) #does not work with 1-bit images
-                            pdf.drawImage(ImageReader(memFileHandle), f * ax, 0, width=f * areaWidth, height=f * areaHeight)
-                            #pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
-                        except Exception as ex:
-                            if bgpath not in bg_notfound:
-                                print(
-                                    'cannot find background or error when adding to pdf', bgpath, '\n', ex.args[0])
-                                exc_type, exc_obj, exc_tb = sys.exc_info()
-                                fname = os.path.split(
-                                    exc_tb.tb_frame.f_code.co_filename)[1]
-                                print('', (exc_type, fname, exc_tb.tb_lineno))
-                            bg_notfound.add(bgpath)
-
-                # all elements (images, text,..) for even and odd pages are defined on the even page element!
-                if keepDoublePages and oddpage == 1 and pagetype == 'normal':
-                    # if we are in double-page mode, all the images are already drawn by the even pages.
+            # process images
+            for image in area.findall('imagebackground') + area.findall('image'):
+                # open raw image file
+                if image.get('filename') == None:
                     continue
+                imagepath = os.path.join(
+                    mcfBaseFolder, imagedir, image.get('filename'))
+                # the layout software copies the images to another collection folder
+                imagepath = imagepath.replace(
+                    'safecontainer:/', '')
+                im = PIL.Image.open(imagepath)
+
+                if image.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
+                    # display on the right page
+                    if keepDoublePages:
+                        img_transx = transx + f * pw/2
+                    else:
+                        img_transx = transx + f * pw
                 else:
-                    # switch pack to the page element for the even page to get the elements
-                    if pagetype == 'normal' and oddpage == 1:
-                        page = getPageElementForPageNumber(2*floor(pn/2))
-
-                    for area in page.findall('area'):
-                        areaPos = area.find('position')
-                        areaLeft = float(areaPos.get('left').replace(',', '.'))
-                        # old python 2 code: aleft = float(area.get('left').replace(',', '.'))
-                        if pagetype != 'singleside' or len(area.findall('imagebackground')) == 0:
-                            if oddpage and not keepDoublePages:
-                                # shift double-page content from other page
-                                areaLeft -= pw
-                        areaTop = float(areaPos.get('top').replace(',', '.'))
-                        areaWidth = float(areaPos.get(
-                            'width').replace(',', '.'))
-                        areaHeight = float(areaPos.get(
-                            'height').replace(',', '.'))
-                        areaRot = float(areaPos.get('rotation'))
-
-                        # check if the image is on current page at all
-                        if pagetype == 'normal' and not keepDoublePages:
-                            if oddpage:
-                                # the right edge of image is beyond the left page border
-                                if (areaLeft+areaWidth) < 0:
-                                    continue
-                            else:
-                                if areaLeft > pw:  # the left image edge is beyond the right page border.
-                                    continue
-
-                        # center positions
-                        cx = areaLeft + 0.5 * areaWidth
-                        cy = ph - (areaTop + 0.5 * areaHeight)
-
-                        transx = f * cx
-                        transy = f * cy
-
-                        # process images
-                        for image in area.findall('imagebackground') + area.findall('image'):
-                            # open raw image file
-                            if image.get('filename') == None:
-                                continue
-                            imagepath = os.path.join(
-                                mcfBaseFolder, imagedir, image.get('filename'))
-                            # the layout software copies the images to another collection folder
-                            imagepath = imagepath.replace(
-                                'safecontainer:/', '')
-                            im = PIL.Image.open(imagepath)
-
-                            if image.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
-                                # display on the right page
-                                if keepDoublePages:
-                                    img_transx = transx + f * pw/2
-                                else:
-                                    img_transx = transx + f * pw
-                            else:
-                                img_transx = transx
+                    img_transx = transx
 
                             # correct for exif rotation
                             im = autorot(im)
@@ -471,43 +352,41 @@ def convertMcf(mcfname, keepDoublePages):
                             else:
                                 im.save(jpeg.name, "JPEG", quality=image_quality)
 
-                            # place image
-                            print('image', image.get('filename'))
-                            pdf.translate(img_transx, transy)
-                            pdf.rotate(-areaRot)
-                            pdf.drawImage(ImageReader(jpeg.name),
-                                          f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-                                          width=f * areaWidth, height=f * areaHeight, mask='auto')
-                            pdf.rotate(areaRot)
-                            pdf.translate(-img_transx, -transy)
+                # place image
+                print('image', image.get('filename'))
+                pdf.translate(img_transx, transy)
+                pdf.rotate(-areaRot)
+                pdf.drawImage(ImageReader(jpeg.name),
+                                f * -0.5 * areaWidth, f * -0.5 * areaHeight,
+                                width=f * areaWidth, height=f * areaHeight, mask='auto')
+                pdf.rotate(areaRot)
+                pdf.translate(-img_transx, -transy)
 
-                            # we now have temporary file, that we need to delete after pdf creation
-                            tempFileList.append(jpeg.name)
-                            # we can not delete now, because file is opened by pdf library
-                            # try to delete the temporary file again. Needed for Windows
-                            # if os.path.exists(jpeg.name):
-                            #    os.remove(jpeg.name)
+                # we now have temporary file, that we need to delete after pdf creation
+                tempFileList.append(jpeg.name)
+                # we can not delete now, because file is opened by pdf library
+                # try to delete the temporary file again. Needed for Windows
+                # if os.path.exists(jpeg.name):
+                #    os.remove(jpeg.name)
 
-                        # process text
-                        for text in area.findall('text'):
-                            # note: it would be better to use proper html processing here
-                            # Replace linefeeds
-                            text.text = text.text.replace('<br />', '\n')
-                            html = etree.XML(text.text)
-                            body = html.find('.//body')
-                            bstyle = dict([kv.split(':') for kv in
-                                           body.get('style').lstrip(' ').rstrip(';').split('; ')])
-                            family = bstyle['font-family'].strip("'")
-                            font = 'Helvetica'
-                            try:
-                                fs_body = int(bstyle['font-size'].strip("pt"))
-                            except:
-                                fs_body = 20
-                            if family in pdf.getAvailableFonts():
-                                font = family
-                            elif family in additionnal_fonts:
-                                font = family
-                            color = '#000000'
+            # process text
+            for text in area.findall('text'):
+                # note: it would be better to use proper html processing here
+                html = etree.XML(text.text)
+                body = html.find('.//body')
+                bstyle = dict([kv.split(':') for kv in
+                                body.get('style').lstrip(' ').rstrip(';').split('; ')])
+                family = bstyle['font-family'].strip("'")
+                font = 'Helvetica'
+                try:
+                    fs = int(bstyle['font-size'].strip("pt"))
+                except:
+                    fs = 20
+                if family in pdf.getAvailableFonts():
+                    font = family
+                elif family in additionnal_fonts:
+                    font = family
+                color = '#000000'
 
                             pdf.translate(transx, transy)
                             pdf.rotate(-areaRot)
@@ -575,28 +454,148 @@ def convertMcf(mcfname, keepDoublePages):
                                     # add some flowables
                                     # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
 
-                                    newString = '<para autoLeading="max">' + span.text + '</para>'
-                                    pdf_story.append(
-                                        Paragraph(newString, pdf_styleN))
+                        newString = '<para autoLeading="max">' + span.text + '</para>'
+                        pdf_story.append(
+                            Paragraph(newString, pdf_styleN))
 
-                                y_p -= 1.3*fs
-                            newFrame = Frame(-0.5 * f * areaWidth, -0.5 * f * areaHeight,
-                                             f * areaWidth, f * areaHeight,
-                                             leftPadding=0, bottomPadding=0,
-                                             rightPadding=0, topPadding=0,
-                                             showBoundary=1  # for debugging useful
-                                             )
-                            newFrame.addFromList(pdf_story, pdf)
+                    y_p -= 1.3*fs
+                newFrame = Frame(-0.5 * f * areaWidth, -0.5 * f * areaHeight,
+                                    f * areaWidth, f * areaHeight,
+                                    leftPadding=0, bottomPadding=0,
+                                    rightPadding=0, topPadding=0,
+                                    showBoundary=1  # for debugging useful
+                                    )
+                newFrame.addFromList(pdf_story, pdf)
 
-                            pdf.rotate(areaRot)
-                            pdf.translate(-transx, -transy)
+                pdf.rotate(areaRot)
+                pdf.translate(-transx, -transy)
                         
-                        #Clip-Art
-                        #In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
-                        # We are using the <clipart> element here
-                        for clipartElement in area.findall('clipart'):                            
-                            clipartID = int( clipartElement.get('designElementId'))
-                            print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
+            #Clip-Art
+            #In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
+            # We are using the <clipart> element here
+            for clipartElement in area.findall('clipart'):                            
+                clipartID = int( clipartElement.get('designElementId'))
+                print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
+
+
+def convertMcf(mcfname, keepDoublePages:bool):
+    # Get the folder in which the .mcf file is
+    mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
+    mcfBaseFolder = mcfPathObj.parent
+
+    # parse the input mcf xml file
+    # read file as binary, so UTF-8 encoding is preserved for xml-parser
+    mcffile = open(mcfname, 'rb')
+    mcf = etree.parse(mcffile)
+    mcffile.close()
+    fotobook = mcf.getroot()
+    if fotobook.tag != 'fotobook':
+        print(mcfname + 'is not a valid mcf file. Exiting.')
+        sys.exit(1)
+
+    # find cewe folder using the original cewe_folder.txt file
+    try:
+        configFolderFileName = findFileInDirs(
+            'cewe_folder.txt', (mcfBaseFolder,  os.path.curdir))
+        cewe_file = open(configFolderFileName, 'r')
+        cewe_folder = cewe_file.read().strip()
+        cewe_file.close()
+        baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
+        backgroundLocations = baseBackgroundLocations;
+    except:
+        print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini')
+        configuration = configparser.ConfigParser()
+        filesread = configuration.read('cewe2pdf.ini')
+        if len(filesread) < 1: 
+            print('cannot find cewe installation folder cewe_folder in cewe2pdf.ini')
+            cewe_folder = None
+        else:
+            defaultConfigSection = configuration['DEFAULT']
+            # find cewe folder from ini file
+            cewe_folder = defaultConfigSection['cewe_folder'].strip()
+            baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
+            # add any extra background folders
+            xbg = defaultConfigSection.get('extraBackgroundFolders','').strip() # comma separated list of folders
+            backgroundLocations = baseBackgroundLocations + tuple(xbg.split(","))
+    bg_notFoundDirList = set([])   #keep a list with background folders that not found, to prevent multiple errors for the same cause.
+
+    # Load additionnal fonts
+    additionnal_fonts = {}
+    try:
+        configFontFileName = findFileInDirs(
+            'additional_fonts.txt', (mcfBaseFolder,  os.path.curdir))
+        with open(configFontFileName, 'r') as fp:
+            for line in fp:
+                p = line.split(" = ", 1)
+                additionnal_fonts[p[0]] = p[1].strip()
+            fp.close()
+    except:
+        print('cannot find additionnal fonts (define them in additional_fonts.txt)')
+        print('Content example:')
+        print('Vera = /tmp/vera.ttf')
+        print('Separator is " = " (space equal space)')
+
+    # create pdf
+    pagesize = reportlab.lib.pagesizes.A4
+    if fotobook.get('productname') in formats:
+        pagesize = formats[fotobook.get('productname')]
+    pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
+
+    # Add additionnal fonts
+    for n in additionnal_fonts:
+        try:
+            pdfmetrics.registerFont(TTFont(n, additionnal_fonts[n]))
+            print("Successfully registered '%s' from '%s'" %
+                  (n, additionnal_fonts[n]))
+        except:
+            print("Failed to register font '%s' (from %s)" %
+                  (n, additionnal_fonts[n]))
+
+    # extract properties
+    articleConfigElement = fotobook.find('articleConfig')
+    pageCount = int(articleConfigElement.get('normalpages')) + 2    #maximum number of pages
+    imagedir = fotobook.get('imagedir')
+
+    for n in range(pageCount):
+        try:
+            if (n == 0) or (n == pageCount - 1):
+                pn = 0
+                page = [i for i in
+                        fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']") +
+                        fotobook.findall(
+                            "./page[@pagenr='0'][@type='fullcover']")
+                        if (i.find("./area") is not None)][0]
+                oddpage = (n == 0)
+                pagetype = 'cover'
+            elif n == 1:
+
+                pn = 1
+                page = [i for i in
+                        fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
+                        fotobook.findall(
+                            "./page[@pagenr='0'][@type='emptypage']")
+                        if (i.find("./area") is not None)]
+                if (len(page) >= 1):
+                    page = page[0]
+                    # there is a bug here: if on page 1 is only text, the area-tag is on page 0.
+                    #  So this will either include the text (which is put in page 0),
+                    #  or the packground which is put in page 1.
+                    # Probably need to rewrite the whole loop to fix this.
+                    if (len(fotobook.findall("./page[@pagenr='1'][@type='normalpage']")) > 0):
+                        print(
+                            "Warning: can't process structure of first page. There will be missing details on first page.")
+                else:
+                    page = None
+                oddpage = True
+                pagetype = 'singleside'
+            else:
+                pn = n
+                oddpage = (pn % 2) == 1
+                page = getPageElementForPageNumber(fotobook, n)
+                pagetype = 'normal'
+
+            if (page != None):
+                parseInputPage(fotobook, cewe_folder, pdf, page, pn, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
 
             # finish the page
             pdf.showPage()
@@ -618,7 +617,6 @@ def convertMcf(mcfname, keepDoublePages):
         if os.path.exists(tmpFileName):
             os.remove(tmpFileName)
     return True
-
 
 if __name__ == '__main__':
     # only executed when this file is run directly.
