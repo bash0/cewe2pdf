@@ -295,6 +295,96 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         # if os.path.exists(jpeg.name):
         #    os.remove(jpeg.name)
 
+def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
+    # note: it would be better to use proper html processing here
+    html = etree.XML(textTag.text)
+    body = html.find('.//body')
+    bstyle = dict([kv.split(':') for kv in
+                    body.get('style').lstrip(' ').rstrip(';').split('; ')])
+    family = bstyle['font-family'].strip("'")
+    font = 'Helvetica'
+    try:
+        fs = int(bstyle['font-size'].strip("pt"))
+    except:
+        fs = 20
+    if family in pdf.getAvailableFonts():
+        font = family
+    elif family in additionnal_fonts:
+        font = family
+    color = '#000000'                                
+    pdf.translate(transx, transy)
+    pdf.rotate(-areaRot)
+    #y_p = 0    #keep track of y-position for multi-line text using DrawString
+    for p in body.findall(".//p"):
+        for span in p.findall(".//span"):
+            spanfont = font
+            style = dict([kv.split(':') for kv in
+                            span.get('style').lstrip(' ').rstrip(';').split('; ')])
+            if 'font-family' in style:
+                spanfamily = style['font-family'].strip(
+                    "'")
+                if spanfamily in pdf.getAvailableFonts():
+                    spanfont = spanfamily
+                elif spanfamily in additionnal_fonts:
+                    spanfont = spanfamily
+                if spanfamily != spanfont:
+                    print("Using font family = '%s' (wanted %s)" % (
+                        spanfont, spanfamily))
+            if 'font-size' in style:
+                fs = int(
+                    style['font-size'].strip()[:-2])
+                if 'color' in style:
+                    color = style['color']
+            # pdf.setFont(spanfont, fs) # from old code with drawCentredString
+            # pdf.setFillColor(color) # from old code with drawCentredString
+            pdf_styleN = ParagraphStyle(None, None,
+                                        alignment=reportlab.lib.enums.TA_LEFT,
+                                        fontSize=fs,
+                                        fontName=spanfont,
+                                        leading=fs*1.2,  # line spacing
+                                        borderPadding=0,
+                                        borderWidth=0,
+                                        leftIndent=0,
+                                        rightIndent=0,
+                                        textColor=reportlab.lib.colors.HexColor(
+                                            color)
+                                        )
+            if p.get('align') == 'center':
+                #    pdf.drawCentredString(0,
+                #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
+                pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
+            elif p.get('align') == 'right':
+                #    pdf.drawRightString(0.5 * f * areaWidth,
+                #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
+                pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
+            else:
+                #    pdf.drawString(-0.5 * f * areaWidth,
+                #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
+                pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
+            # add some flowables
+            # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
+                
+            newString = '<para autoLeading="max">' + span.text + '</para>'
+            pdf_story.append(
+                Paragraph(newString, pdf_styleN))
+    
+        #y_p -= 1.3*fs
+    #Add a frame object that can contain multiple paragraphs
+    newFrame = Frame(-0.5 * f * areaWidth, -0.5 * f * areaHeight,
+                        f * areaWidth, f * areaHeight,
+                        leftPadding=0, bottomPadding=0,
+                        rightPadding=0, topPadding=0,
+                        showBoundary=1  # for debugging useful
+                        )
+    newFrame.addFromList(pdf_story, pdf)
+    pdf.rotate(areaRot)
+    pdf.translate(-transx, -transy)
+    return
+
+def processAreaClipartTag(clipartElement):
+    clipartID = int( clipartElement.get('designElementId'))
+    print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
+
 def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw):
     if keepDoublePages and oddpage == 1 and pagetype == 'normal':
         # if we are in double-page mode, all the images are already drawn by the even pages.
@@ -340,102 +430,16 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
             for imageTag in area.findall('imagebackground') + area.findall('image'):
                 processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy)
 
-    
             # process text
-            for text in area.findall('text'):
-                # note: it would be better to use proper html processing here
-                html = etree.XML(text.text)
-                body = html.find('.//body')
-                bstyle = dict([kv.split(':') for kv in
-                                body.get('style').lstrip(' ').rstrip(';').split('; ')])
-                family = bstyle['font-family'].strip("'")
-                font = 'Helvetica'
-                try:
-                    fs = int(bstyle['font-size'].strip("pt"))
-                except:
-                    fs = 20
-                if family in pdf.getAvailableFonts():
-                    font = family
-                elif family in additionnal_fonts:
-                    font = family
-                color = '#000000'
-    
-                pdf.translate(transx, transy)
-                pdf.rotate(-areaRot)
-                #y_p = 0    #keep track of y-position for multi-line text using DrawString
-                for p in body.findall(".//p"):
-                    for span in p.findall(".//span"):
-                        spanfont = font
-                        style = dict([kv.split(':') for kv in
-                                        span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                        if 'font-family' in style:
-                            spanfamily = style['font-family'].strip(
-                                "'")
-                            if spanfamily in pdf.getAvailableFonts():
-                                spanfont = spanfamily
-                            elif spanfamily in additionnal_fonts:
-                                spanfont = spanfamily
-                            if spanfamily != spanfont:
-                                print("Using font family = '%s' (wanted %s)" % (
-                                    spanfont, spanfamily))
-    
-                        if 'font-size' in style:
-                            fs = int(
-                                style['font-size'].strip()[:-2])
-                            if 'color' in style:
-                                color = style['color']
-                        # pdf.setFont(spanfont, fs) # from old code with drawCentredString
-                        # pdf.setFillColor(color) # from old code with drawCentredString
-                        pdf_styleN = ParagraphStyle(None, None,
-                                                    alignment=reportlab.lib.enums.TA_LEFT,
-                                                    fontSize=fs,
-                                                    fontName=spanfont,
-                                                    leading=fs*1.2,  # line spacing
-                                                    borderPadding=0,
-                                                    borderWidth=0,
-                                                    leftIndent=0,
-                                                    rightIndent=0,
-                                                    textColor=reportlab.lib.colors.HexColor(
-                                                        color)
-                                                    )
-                        if p.get('align') == 'center':
-                            #    pdf.drawCentredString(0,
-                            #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                            pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
-                        elif p.get('align') == 'right':
-                            #    pdf.drawRightString(0.5 * f * areaWidth,
-                            #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                            pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
-                        else:
-                            #    pdf.drawString(-0.5 * f * areaWidth,
-                            #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                            pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
-                        # add some flowables
-                        # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
-    
-                        newString = '<para autoLeading="max">' + span.text + '</para>'
-                        pdf_story.append(
-                            Paragraph(newString, pdf_styleN))
-    
-                    #y_p -= 1.3*fs
-                #Add a frame object that can contain multiple paragraphs
-                newFrame = Frame(-0.5 * f * areaWidth, -0.5 * f * areaHeight,
-                                    f * areaWidth, f * areaHeight,
-                                    leftPadding=0, bottomPadding=0,
-                                    rightPadding=0, topPadding=0,
-                                    showBoundary=1  # for debugging useful
-                                    )
-                newFrame.addFromList(pdf_story, pdf)
-    
-                pdf.rotate(areaRot)
-                pdf.translate(-transx, -transy)
+            for textTag in area.findall('text'):
+                processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
                         
             #Clip-Art
             #In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
             # We are using the <clipart> element here
             for clipartElement in area.findall('clipart'):                            
-                clipartID = int( clipartElement.get('designElementId'))
-                print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
+                processAreaClipartTag(clipartElement)
+
     return
 
 def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
