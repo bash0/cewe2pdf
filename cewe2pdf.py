@@ -84,7 +84,7 @@ tempFileList = []  # we need to remove all this temporary files at the end
 # reportlab defaults
 pdf_styles = getSampleStyleSheet()
 pdf_styleN = pdf_styles['Normal']
-pdf_story = []
+pdf_flowableList = []
 
 
 def autorot(im):
@@ -141,6 +141,8 @@ def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)), 'd'))
 
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
+    if (pagetype=="emptypage"): #don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
+        return
     if backgroundTags != None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
         for curTag in backgroundTags:
@@ -173,13 +175,10 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoubl
                     print(
                         'value of background attribute not supported: type =  %s' % backgroundTag.get('type'))
             try:
-                bgpath = findFileByExtInDirs(bg, ('.webp', '.jpg', '.bmp'), (
-                    os.path.join(cewe_folder, 'Resources',
-                                    'photofun', 'backgrounds'),
-                    os.path.join(
-                        cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
-                    os.path.join(
-                        cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
+                bgPath = findFileByExtInDirs(bg, ('.webp', '.jpg', '.bmp'), (
+                    os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
+                    os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
+                    os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
                 ))
                 areaWidth = pw*2
                 if keepDoublePages:
@@ -189,8 +188,9 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoubl
                     ax = -areaWidth / 2.
                 else:
                     ax = 0
+                print("Reading background file: {}".format(bgPath))
                 # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
-                imObj = PIL.Image.open(bgpath)
+                imObj = PIL.Image.open(bgPath)
                 # create a in-memory byte array of the image file
                 im = bytes()
                 memFileHandle = BytesIO(im)
@@ -203,13 +203,13 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoubl
                     memFileHandle), f * ax, 0, width=f * areaWidth, height=f * areaHeight)
                 #pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
             except Exception as ex:
-                if bgpath not in bg_notFoundDirList:
-                    print('cannot find background or error when adding to pdf', bgpath, '\n', ex.args[0])
+                if bgPath not in bg_notFoundDirList:
+                    print('cannot find background or error when adding to pdf', bgPath, '\n', ex.args[0])
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     fname = os.path.split(
                         exc_tb.tb_frame.f_code.co_filename)[1]
                     print('', (exc_type, fname, exc_tb.tb_lineno))
-                bg_notFoundDirList.add(bgpath)
+                bg_notFoundDirList.add(bgPath)
     return
 
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy):
@@ -291,9 +291,6 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         # we now have temporary file, that we need to delete after pdf creation
         tempFileList.append(jpeg.name)
         # we can not delete now, because file is opened by pdf library
-        # try to delete the temporary file again. Needed for Windows
-        # if os.path.exists(jpeg.name):
-        #    os.remove(jpeg.name)
 
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     # note: it would be better to use proper html processing here
@@ -331,8 +328,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     print("Using font family = '%s' (wanted %s)" % (
                         spanfont, spanfamily))
             if 'font-size' in style:
-                fs = int(
-                    style['font-size'].strip()[:-2])
+                fs = int(style['font-size'].strip()[:-2])
                 if 'color' in style:
                     color = style['color']
             # pdf.setFont(spanfont, fs) # from old code with drawCentredString
@@ -365,18 +361,38 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
                 
             newString = '<para autoLeading="max">' + span.text + '</para>'
-            pdf_story.append(
+            pdf_flowableList.append(
                 Paragraph(newString, pdf_styleN))
     
         #y_p -= 1.3*fs
     #Add a frame object that can contain multiple paragraphs
-    newFrame = Frame(-0.5 * f * areaWidth, -0.5 * f * areaHeight,
-                        f * areaWidth, f * areaHeight,
+    frameBottomLeft_x = -0.5 * f * areaWidth
+    frameBottomLeft_y = -0.5 * f * areaHeight
+    frameWidth = f * areaWidth
+    frameHeight = f * areaHeight
+
+    #Go through all flowables and test if the fit in the frame. If not increase the frame height.
+    #ToDo: This will not solve the problem, that if each paragraph will fit indivdually, but not all together.
+    for j in range(len(pdf_flowableList)):
+        if (len(pdf_flowableList[j].split(frameWidth,frameHeight)) != 1):
+            print('Warning: a paragraph with text ',pdf_flowableList[j].text,'would not fit inside it''s frame. Frame height will be increased to prevent loss of this text.\n')
+            neededWidth, neededHeight = pdf_flowableList[j].wrap(frameWidth, frameHeight)
+            frameHeight = max( frameHeight, neededHeight)   # increase the height
+
+
+    newFrame = Frame(frameBottomLeft_x, frameBottomLeft_y,
+                        frameWidth, frameHeight,
                         leftPadding=0, bottomPadding=0,
                         rightPadding=0, topPadding=0,
                         showBoundary=1  # for debugging useful
                         )
-    newFrame.addFromList(pdf_story, pdf)
+
+    #This call should produce an exception, if any of the flowables do not fit inside the frame.
+    #But there seems to be a bug, and no exception is triggered.
+    #We took care of this by making the frame so large, that it always can fit the flowables.
+    #maybe should switch to res=newFrame.split(flowable, pdf) and check the result manually.
+    newFrame.addFromList(pdf_flowableList, pdf)
+
     pdf.rotate(areaRot)
     pdf.translate(-transx, -transy)
     return
@@ -548,23 +564,26 @@ def convertMcf(mcfname, keepDoublePages:bool):
                 pagetype = 'cover'
             elif n == 1:
                 pageNumber = 1
+                oddpage = True
+                #Look for an empty page 0 that still contains an area element
                 page = [i for i in
                         fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
                         fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
                         if (i.find("./area") is not None)]
-                if (len(page) >= 1):
+                if (len(page) >= 1):                
                     page = page[0]
-                    # there is a bug here: if on page 1 is only text, the area-tag is on page 0.
+                    #If there is on page 1 only text, the area-tag is still on page 0.
                     #  So this will either include the text (which is put in page 0),
                     #  or the packground which is put in page 1.
-                    # Probably need to rewrite the whole loop to fix this.
-                    if (len(fotobook.findall("./page[@pagenr='1'][@type='normalpage']")) > 0):
-                        print(
-                            "Warning: can't process structure of first page. There will be missing details on first page.")
-                else:
-                    page = None
-                oddpage = True
-                pagetype = 'singleside'
+
+                #Look for the the frist page and set it up for processing
+                realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
+                if (len(realFirstPageList) > 0):
+                     # we need to do run parseInputPage twico for one output page in the PDF.
+                     #The background needs to be drawn first, or it would obscure any other other elements.
+                    pagetype = 'singleside'
+                    parseInputPage(fotobook, cewe_folder, mcfBaseFolder, imagedir, pdf, realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
+                pagetype = 'emptypage'
             else:
                 pageNumber = n
                 oddpage = (pageNumber % 2) == 1
