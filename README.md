@@ -100,3 +100,9 @@ To create a stand-alone compiled package, you can use
 pip install pyinstaller
 pyinstaller cewe2pdf.py --onefile
 ```
+
+To run the unit-test you also need to install
+```
+pip install pytest pdfrw
+```
+You can then call pytest from the working directory or use the runAllTests.py file.
