@@ -93,7 +93,6 @@ pdf_styles = getSampleStyleSheet()
 pdf_styleN = pdf_styles['Normal']
 pdf_flowableList = []
 
-
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
     if im.format != 'JPEG' and im.format != 'MPO':
@@ -150,7 +149,7 @@ def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)), 'd'))
 
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
-def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
+def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
     if (pagetype=="emptypage"): #don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
         return
     if backgroundTags != None and len(backgroundTags) > 0:
@@ -185,11 +184,8 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoubl
                     print(
                         'value of background attribute not supported: type =  %s' % backgroundTag.get('type'))
             try:
-                bgPath = findFileByExtInDirs(bg, ('.webp', '.jpg', '.bmp'), (
-                    os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
-                    os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
-                    os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
-                ))
+                bgPath = ""
+                bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
                 areaWidth = pw*2
                 if keepDoublePages:
                     areaWidth = pw
@@ -216,8 +212,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoubl
                 if bgPath not in bg_notFoundDirList:
                     print('cannot find background or error when adding to pdf', bgPath, '\n', ex.args[0])
                     exc_type, exc_obj, exc_tb = sys.exc_info()
-                    fname = os.path.split(
-                        exc_tb.tb_frame.f_code.co_filename)[1]
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                     print('', (exc_type, fname, exc_tb.tb_lineno))
                 bg_notFoundDirList.add(bgPath)
     return
@@ -475,7 +470,7 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
 
     return
 
-def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
+def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
     print('parsing page', page.get('pagenr'), ' of ', pageCount)
 
     bundlesize = page.find("./bundlesize")
@@ -499,7 +494,7 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
     #  number for the background attribute if it is a original
     #  stock image, without filters.
     backgroundTags = page.findall('background')
-    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoublePages, oddpage, pagetype, pdf, ph, pw)
+    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw)
 
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
     processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw)
@@ -624,7 +619,7 @@ def convertMcf(mcfname, keepDoublePages:bool):
                      # we need to do run parseInputPage twico for one output page in the PDF.
                      #The background needs to be drawn first, or it would obscure any other other elements.
                     pagetype = 'singleside'
-                    parseInputPage(fotobook, cewe_folder, mcfBaseFolder, imagedir, pdf, realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
+                    parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
                 pagetype = 'emptypage'
             else:
                 pageNumber = n
@@ -633,7 +628,7 @@ def convertMcf(mcfname, keepDoublePages:bool):
                 pagetype = 'normal'
 
             if (page != None):
-                parseInputPage(fotobook, cewe_folder, mcfBaseFolder, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
+                parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
 
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
