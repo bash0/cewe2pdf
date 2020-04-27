@@ -156,6 +156,7 @@ def getBaseBackgroundLocations(basefolder):
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)), 'd'))
 
+# This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
     if (pagetype=="emptypage"): #don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
         return
@@ -399,7 +400,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         neededWidth, neededHeight = pdf_flowableList[j].wrap(frameWidth, frameHeight)
         totalMaxHeight += neededHeight
     if (totalMaxHeight > frameHeight):
-        print('Warning: A set of paragraphs would not fit inside its frame. Frame height will be increased to prevent loss of text.\n')
+        print('Warning: A set of paragraphs would not fit inside its frame. Frame height will be increased to prevent loss of text.')
     frameHeight = max( frameHeight, totalMaxHeight)   # increase the height
 
     newFrame = Frame(frameBottomLeft_x, frameBottomLeft_y,
@@ -595,6 +596,9 @@ def convertMcf(mcfname, keepDoublePages:bool):
                         if (i.find("./area") is not None)][0]
                 oddpage = (n == 0)
                 pagetype = 'cover'
+                 #for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
+                if ((keepDoublePages == True) and  (n == (pageCount - 1))):
+                    page = None
             elif n == 1:
                 pageNumber = 1
                 oddpage = True
@@ -628,7 +632,11 @@ def convertMcf(mcfname, keepDoublePages:bool):
 
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
-            if ((keepDoublePages == False) or not (keepDoublePages==True and oddpage==True and pagetype =='normal')):
+            if ( (keepDoublePages == False)
+               or (
+                    (not (keepDoublePages==True and oddpage==True and pagetype =='normal'))
+                and (not (keepDoublePages==True and n == (pageCount - 1) and pagetype =='cover'))
+               )):
                 pdf.showPage()
 
         except Exception as ex:
@@ -655,7 +663,7 @@ if __name__ == '__main__':
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
         pass
 
-    parser = argparse.ArgumentParser(description='Convert a foto-book from .mcf file format to .pdf',
+    parser = argparse.ArgumentParser(description='nConvert a foto-book from .mcf file format to .pdf',
                                      epilog="Example:\n   python cewe2pdf.py c:\\path\\to\\my\\files\\my_nice_fotobook.mcf",
                                      formatter_class=CustomArgFormatter)
     parser.add_argument('--keepDoublePages', dest='keepDoublePages', action='store_const',
