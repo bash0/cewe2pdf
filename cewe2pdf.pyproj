@@ -23,7 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="additional_fonts.txt" />
-    <Content Include="cewe_folder.txt" />
+    <Content Include="cewe2pdf.ini" />
     <Content Include="requirements.txt" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img.png" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img2.png" />
