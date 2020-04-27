@@ -50,6 +50,11 @@ from lxml import etree
 import tempfile
 from math import sqrt, floor
 
+from reportlab.rl_config import canvas_basefontname as _baseFontName
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import Paragraph
+from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
@@ -64,7 +69,7 @@ import argparse     #to parse arguments
 import configparser # to read config file, see https://docs.python.org/3/library/configparser.html
 
 
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG) # INFO
 
 #### settings ####
 image_quality = 86 # 0=worst, 100=best
@@ -129,6 +134,146 @@ def getBaseBackgroundLocations(basefolder):
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
     )
     return baseBackgroundLocations
+
+#def textobject_demo(my_canvas, x, y):
+#    # Create textobject
+#    textobject = my_canvas.beginText()
+#    # Set text location (x, y)
+#    textobject.setTextOrigin(x, y)
+#    # Set font face and size
+#    textobject.setFont('Times-Roman', 16)
+#    # Change text color
+#    textobject.setFillColor(colors.red)
+#    # Write red text
+#    textobject.textLine(text='Python rocks in red!')
+#    # Write text to the canvas
+#    my_canvas.drawText(textobject)
+
+#def paragraph_demo(my_canvas, x, y):
+#    styles = getSampleStyleSheet()
+#    ptext = """
+#        The document you are holding is a set of requirements for your next mission, should you
+#        choose to accept it. In any event, this document will self-destruct <b>%s</b> seconds after you
+#        read it. Yes, <b>%s</b> can tell when you're done...usually.
+#        """ % (10, "we")
+#    p = Paragraph(ptext, styles["Normal"])
+#    p.wrapOn(my_canvas, 200, 100)
+#    p.drawOn(my_canvas, x, y)
+
+def AdjustXLine(current_x_line, fs, text):
+    x_line = current_x_line
+    if text == '':
+        x_line += tab_pitch*f
+    else:
+        x_line += (floor((len(text)*0.55*fs/f)/tab_pitch)+1)*tab_pitch*f
+    return x_line
+
+def DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line):
+    p = Paragraph(text, paragraphStyle)
+    p.wrapOn(pdf, f * areaWidth, f * areaHeight)
+    p.drawOn(pdf, -0.5 * f * areaWidth + x_line, -0.5 * f * areaHeight + y_line)
+    return AdjustXLine(x_line, paragraphStyle.fontSize, text)
+
+def PreanalyzeFontSizes(fs_body, htmlpara):
+    fs_max = 0
+    for span in htmlpara.findall(".//span"):
+        spanstyle = dict([kv.split(':') for kv in
+            span.get('style').lstrip(' ').rstrip(';').split('; ')])
+        fs = fs_body
+        if 'font-size' in spanstyle:
+            fs = int(spanstyle['font-size'].strip("pt"))
+        if fs_max < fs:
+            fs_max = fs
+    return fs_max
+
+def DrawText(pdf, text, areaHeight, areaWidth, additionnal_fonts):
+    # note: it would be better to use proper html processing here
+    # Replace linefeeds
+    text.text = text.text.replace('<br />', '\n')
+    html = etree.XML(text.text)
+    body = html.find('.//body')
+    bodystyle = dict([kv.split(':') for kv in
+        body.get('style').lstrip(' ').rstrip(';').split('; ')])
+    family = bodystyle['font-family'].strip("'")
+    parafont = 'Helvetica'
+    try:
+        bodyfs = int(bodystyle['font-size'].strip("pt"))
+    except:
+        bodyfs = 20
+    if family in pdf.getAvailableFonts():
+        parafont = family
+    elif family in additionnal_fonts:
+        parafont = family
+    color = '#000000'
+    y_para = 0.0
+    for htmlpara in body.findall(".//p"):
+        # Pre-analyze fontsizes
+        fs_max = PreanalyzeFontSizes(bodyfs, htmlpara)
+    
+        # Do the writing
+        x_span = 0.0
+        y_span = 0.0
+        lines_span = 0
+        for span in htmlpara.findall(".//span"): # each span in the html para
+            spanfont = parafont
+            spanstyle = dict([kv.split(':') for kv in
+                span.get('style').lstrip(' ').rstrip(';').split('; ')])
+            if 'font-family' in spanstyle:
+                spanfamily = spanstyle['font-family'].strip("'")
+                if spanfamily in pdf.getAvailableFonts():
+                    spanfont = spanfamily
+                elif spanfamily in additionnal_fonts:
+                    spanfont = spanfamily
+                if spanfamily != spanfont:
+                    print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
+            spanfs = bodyfs
+            if 'font-size' in spanstyle:
+                spanfs = int(spanstyle['font-size'].strip("pt"))
+            pdf.setFont(spanfont, spanfs)
+            
+            if 'color' in spanstyle:
+                color = spanstyle['color']
+            pdf.setFillColor(color)
+
+            lines = span.text.split('\n') # split the span on what used to be <br>
+            lines_cnt = len(lines)
+            lines_span += lines_cnt-1
+            x_line = 0.0
+            for line_no, line in enumerate(lines): # each line in the html span
+                x_line = x_span
+                y_line = -line_scale*fs_max*(line_no+1) + y_para + y_span
+                logging.debug("Line %d/%d: |%s|" % (line_no+1, lines_cnt, line))
+                texts = line.split('\t')
+                paragraphStyle = ParagraphStyle(
+                    name = 'Normal',
+                    textColor = color,
+                    fontName = spanfont, 
+                    fontSize = spanfs, 
+                    leading = spanfs * line_scale, 
+                    alignment = TA_LEFT)
+                if htmlpara.get('align') == 'center':
+                    paragraphStyle.alignment = TA_CENTER
+                    for text in texts:
+                        #pdf.drawCentredString(0, 0.5 * f * areaHeight + y_line, line)
+                        x_line = DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line)
+                elif htmlpara.get('align') == 'right':
+                    paragraphStyle.alignment = TA_RIGHT
+                    for text in reversed(texts):
+                        logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
+                            (x_line, y_line, x_span, y_span, y_para, spanfs, fs_max, text ))
+                        #pdf.drawRightString(0.5 * f * areaWidth - x_line, 0.5 * f * areaHeight + y_line, text)
+                        x_line = DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line)
+                else:   # left aligned
+                    for text in texts:
+                        logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
+                            (x_line, y_line, x_span, y_span, y_para, spanfs, fs_max, text ))
+                        #pdf.drawString(-0.5 * f * areaWidth + x_line, 0.5 * f * areaHeight + y_line, text)
+                        x_line = DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line)
+            x_span = x_line
+            if lines_cnt > 1:
+                x_span = 0.0
+                y_span -= line_scale*fs_max*(lines_cnt-1)
+        y_para -= line_scale*fs_max*(lines_span+1)
 
 def convertMcf(mcfname, keepDoublePages):
 #Get the folder in which the .mcf file is
@@ -403,100 +548,9 @@ def convertMcf(mcfname, keepDoublePages):
 
                         # process text
                         for text in area.findall('text'):
-                            # note: it would be better to use proper html processing here
-                            # Replace linefeeds
-                            text.text = text.text.replace('<br />', '\n')
-                            html = etree.XML(text.text)
-                            body = html.find('.//body')
-                            bstyle = dict([kv.split(':') for kv in
-                                body.get('style').lstrip(' ').rstrip(';').split('; ')])
-                            family = bstyle['font-family'].strip("'")
-                            font = 'Helvetica'
-                            try:
-                                fs_body = int(bstyle['font-size'].strip("pt"))
-                            except:
-                                fs_body = 20
-                            if family in pdf.getAvailableFonts():
-                                font = family
-                            elif family in additionnal_fonts:
-                                font = family
-                            color = '#000000'
-
                             pdf.translate(transx, transy)
                             pdf.rotate(-areaRot)
-                            y_p = 0.0
-                            for p in body.findall(".//p"):
-                                # Pre-analyze fontsizes
-                                fs_max = 0
-                                for span in p.findall(".//span"):
-                                    style = dict([kv.split(':') for kv in
-                                        span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                                    fs = fs_body
-                                    if 'font-size' in style:
-                                        fs = int(style['font-size'].strip("pt"))
-                                    if fs_max < fs:
-                                        fs_max = fs
-
-                                # Do the writing
-                                x_span = 0.0
-                                y_span = 0.0
-                                lines_span = 0
-                                for span in p.findall(".//span"):
-                                    spanfont = font
-                                    style = dict([kv.split(':') for kv in
-                                        span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                                    if 'font-family' in style:
-                                        spanfamily = style['font-family'].strip("'")
-                                        if spanfamily in pdf.getAvailableFonts():
-                                            spanfont = spanfamily
-                                        elif spanfamily in additionnal_fonts:
-                                            spanfont = spanfamily
-                                        if spanfamily != spanfont:
-                                            print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
-                                    fs = fs_body
-                                    if 'font-size' in style:
-                                        fs = int(style['font-size'].strip("pt"))
-                                        if 'color' in style:
-                                            color = style['color']
-                                    pdf.setFont(spanfont, fs)
-                                    pdf.setFillColor(color)
-                                    lines = span.text.split('\n')
-                                    lines_cnt = len(lines)
-                                    lines_span += lines_cnt-1
-                                    x_line = 0.0
-                                    for line_no, line in enumerate(lines):
-                                        x_line = x_span
-                                        y_line = -line_scale*fs_max*(line_no+1) + y_p + y_span
-                                        logging.debug("Line %d/%d: |%s|" % (line_no+1, lines_cnt, line))
-                                        texts = line.split('\t')
-                                        if p.get('align') == 'center':
-                                            pdf.drawCentredString(0,
-                                                0.5 * f * areaHeight + y_line, line)
-                                        elif p.get('align') == 'right':
-                                            for text in reversed(texts):
-                                                logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
-                                                    (x_line, y_line, x_span, y_span, y_p, fs, fs_max, text ))
-                                                pdf.drawRightString(0.5 * f * areaWidth - x_line,
-                                                    0.5 * f * areaHeight + y_line, text)
-                                                if text == '':
-                                                    x_line += tab_pitch*f
-                                                else:
-                                                    x_line += (floor((len(text)*0.55*fs/f)/tab_pitch)+1)*tab_pitch*f
-                                        else:   # left aligned
-                                            for text in texts:
-                                                logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
-                                                    (x_line, y_line, x_span, y_span, y_p, fs, fs_max, text ))
-                                                pdf.drawString(-0.5 * f * areaWidth + x_line,
-                                                    0.5 * f * areaHeight + y_line, text)
-                                                if text == '':
-                                                    x_line += tab_pitch*f
-                                                else:
-                                                    x_line += (floor((len(text)*0.55*fs/f)/tab_pitch)+1)*tab_pitch*f
-                                    x_span = x_line
-                                    if lines_cnt > 1:
-                                        x_span = 0.0
-                                        y_span -= line_scale*fs_max*(lines_cnt-1)
-                                y_p -= line_scale*fs_max*(lines_span+1)
+                            DrawText(pdf, text, areaHeight, areaWidth, additionnal_fonts)
                             pdf.rotate(areaRot)
                             pdf.translate(-transx, -transy)
 
