@@ -504,6 +504,15 @@ def parseInputPage(fotobook, cewe_folder,  mcfBaseFolder, imagedir, pdf, page, p
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
     processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw)
 
+def getBaseBackgroundLocations(basefolder):
+    # create a tuple of places (folders) where background resources would be found by default
+    baseBackgroundLocations = (
+        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds'),
+        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
+        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
+        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
+    )
+    return baseBackgroundLocations
 
 def convertMcf(mcfname, keepDoublePages:bool):
     # Get the folder in which the .mcf file is
