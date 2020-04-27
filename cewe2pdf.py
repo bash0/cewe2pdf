@@ -69,7 +69,7 @@ import argparse     #to parse arguments
 import configparser # to read config file, see https://docs.python.org/3/library/configparser.html
 
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG) # INFO
+logging.basicConfig(stream=sys.stderr, level=logging.INFO) # DEBUG, INFO
 
 #### settings ####
 image_quality = 86 # 0=worst, 100=best
@@ -241,7 +241,7 @@ def DrawText(pdf, text, areaHeight, areaWidth, additionnal_fonts):
             x_line = 0.0
             for line_no, line in enumerate(lines): # each line in the html span
                 x_line = x_span
-                y_line = -line_scale*fs_max*(line_no+1) + y_para + y_span
+                y_line = -line_scale*fs_max*(line_no) + y_para + y_span
                 logging.debug("Line %d/%d: |%s|" % (line_no+1, lines_cnt, line))
                 texts = line.split('\t')
                 paragraphStyle = ParagraphStyle(
