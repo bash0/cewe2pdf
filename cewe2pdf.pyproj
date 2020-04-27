@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>cewe2pdf.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>CondaEnv|CondaEnv|anaconda3</InterpreterId>
+    <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
+    <CommandLineArguments>D:\temp\TrialForHomeProduction.mcf</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="additional_fonts.txt" />
+    <Content Include="cewe2pdf.ini" />
+    <Content Include="requirements.txt" />
+    <Content Include="tests\unittest_fotobook_mcf-Dateien\img.png" />
+    <Content Include="tests\unittest_fotobook_mcf-Dateien\img2.png" />
+    <Content Include="tests\unittest_fotobook_mcf-Dateien\img3.png" />
+    <Content Include="tests\unittest_fotobook_mcf-Dateien\img4.png" />
+    <Content Include="tests\unittest_fotobook_mcf-Dateien\img5.png" />
+    <Content Include="tests\unittest_fotobook_mcf-Dateien\img6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="cewe2pdf.py" />
+    <Compile Include="tests\test_simpleBook.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="tests" />
+    <Folder Include="tests\unittest_fotobook_mcf-Dateien" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="CondaEnv|CondaEnv|anaconda3" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>

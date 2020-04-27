@@ -61,6 +61,9 @@ from io import BytesIO
 from pathlib import Path
 import argparse     #to parse arguments
 
+import configparser # to read config file, see https://docs.python.org/3/library/configparser.html
+
+
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 #### settings ####
@@ -131,15 +134,26 @@ def convertMcf(mcfname, keepDoublePages):
         print(mcfname + 'is not a valid mcf file. Exiting.')
         sys.exit(1)
 
-    # find cewe folder
     try:
-        configFolderFileName = findFileInDirs('cewe_folder.txt', (mcfBaseFolder,  os.path.curdir))
-        cewe_file = open(configFolderFileName, 'r')
-        cewe_folder = cewe_file.read().strip()
-        cewe_file.close()
+        configuration = configparser.ConfigParser()
+        configuration.read('cewe2pdf.ini')
+        defaultConfigSection = configuration['DEFAULT']
+        # find cewe folder from ini file
+        cewe_folder = defaultConfigSection['cewe_folder']
     except:
-        print('cannot find cewe installation folder in cewe_folder.txt')
+        print('cannot find cewe installation folder cewe_folder in cewe2pdf.ini')
         cewe_folder = None
+
+    # create a tuple of places (folders) where background resources might be found
+    baseBackgroundLocations = (
+        os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
+        os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
+        os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
+        os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
+    )
+    xbg = defaultConfigSection.get('extraBackgroundFolders','') # comma separated list of folders
+    backgroundLocations = baseBackgroundLocations + tuple(xbg.split(","))
+
     bg_notfound = set([])
 
     # Load additionnal fonts
@@ -231,12 +245,7 @@ def convertMcf(mcfname, keepDoublePages):
                             designElementID.get('background') != None):
                         bg = designElementID.get('background')
                         try:
-                            bgpath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], (
-                                os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
-                                os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
-                                os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
-                                os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
-                                ))
+                            bgpath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
                             areaWidth = pw*2
                             if keepDoublePages:
                                 areaWidth = pw
