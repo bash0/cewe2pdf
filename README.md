@@ -12,6 +12,8 @@ tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf ex
 
 Install - Windows
 -----------------
+Download or clone this cewe2pdf repository into a folder of your choice.
+
 The easiest way to start this Python script, is to install the latest pyhthon version.
 Then from the start-menu open your pyhthon promt and install the dependencies
 ```
@@ -39,7 +41,7 @@ Install - Windows (continued)
 Go to the directory where cewe2pdf is installed and create a text file there with filname ``cewe_folder.txt``
 and use a text editor to write the installation directory of the CEWE software into the text file.
 Example
-if you have the software branded for the company DM, called "dm-Fotowelt", then this path will be:
+if you have the software branded for the company DM, called "dm-Fotowelt", then the file ``cewe_folder.txt`` should contain:
 ```
 C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
 ```
@@ -59,7 +61,12 @@ On Fedora :
 sudo dnf install python2-lxml python2-reportlab
 ```
 
-Define the CEWE path (the directory where your CEWE album software is - you can recognize it with the many `.so` files and some subdirs like `Resources`). Put it into a file named `cewe_folder.txt`.
+Define the CEWE path (the directory where your CEWE album software is installed. You can recognize it by the many `.so` files and some subdirs like `Resources`). Put this directory name into a file named `cewe_folder.txt`.
+
+Example with my CEWE FOTOWELT is installed in /home/username/CEWE/CEWE FOTOWELT/ :
+```
+echo "/home/username/CEWE/CEWE FOTOWELT/" > cewe_folder.txt
+```
 
 Example with my CEWE software in /opt/CEWE :
 ```
@@ -93,6 +100,32 @@ Example:
 ```
    python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
 ```
+
+Options
+-------
+currently cewe2pdf supports the following options. They are shown if you run
+
+``` python cewe2pdf.py --help```
+```
+usage: cewe2pdf [-h] [--keepDoublePages] [inputFile]
+
+Convert a foto-book from .mcf file format to .pdf
+
+positional arguments:
+  inputFile          the mcf input file. If not given, the first .mcf in the
+                     current directory is used. (default: None)
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --keepDoublePages  Each page in the .pdf will be a double-sided page,
+                     instead of a normal single page. (default: False)
+
+Example:
+   python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
+
+```
+
+
 Development
 -----------
 To create a stand-alone compiled package, you can use

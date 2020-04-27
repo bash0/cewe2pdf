@@ -23,7 +23,7 @@ def tryToBuildBook(keepDoublePages):
     readerObj = PdfReader(outFile)
     numPages =  len(readerObj.pages)
     if keepDoublePages:
-        assert numPages == 16
+        assert numPages == 15
     else:
         assert numPages == 28
 
