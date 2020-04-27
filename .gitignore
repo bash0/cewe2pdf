@@ -36,3 +36,10 @@ nosetests.xml
 .pydevproject
 /.vs
 /cewe2pdf.spec
+/cewe_folder.txt
+/.pytest_cache/v/cache
+/.vscode
+/TestResults
+/.vscode/launch.json
+/.vscode/settings.json
+/tests/unittest_fotobook_mcf-Dateien/folderid.xml
