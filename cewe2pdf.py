@@ -120,6 +120,16 @@ def findFileInDirs(filenames, paths):
     print('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
     raise ValueError('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
 
+def getBaseBackgroundLocations(basefolder):
+    # create a tuple of places (folders) where background resources would be found by default
+    baseBackgroundLocations = (
+        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds'),
+        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
+        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
+        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
+    )
+    return baseBackgroundLocations
+
 def convertMcf(mcfname, keepDoublePages):
 #Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
@@ -134,25 +144,29 @@ def convertMcf(mcfname, keepDoublePages):
         print(mcfname + 'is not a valid mcf file. Exiting.')
         sys.exit(1)
 
+    # find cewe folder using the original cewe_folder.txt file
     try:
-        configuration = configparser.ConfigParser()
-        configuration.read('cewe2pdf.ini')
-        defaultConfigSection = configuration['DEFAULT']
-        # find cewe folder from ini file
-        cewe_folder = defaultConfigSection['cewe_folder']
+        configFolderFileName = findFileInDirs('cewe_folder.txt', (mcfBaseFolder,  os.path.curdir))
+        cewe_file = open(configFolderFileName, 'r')
+        cewe_folder = cewe_file.read().strip()
+        cewe_file.close()
+        baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
+        backgroundLocations = baseBackgroundLocations;
     except:
-        print('cannot find cewe installation folder cewe_folder in cewe2pdf.ini')
-        cewe_folder = None
-
-    # create a tuple of places (folders) where background resources might be found
-    baseBackgroundLocations = (
-        os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
-        os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
-        os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
-        os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
-    )
-    xbg = defaultConfigSection.get('extraBackgroundFolders','') # comma separated list of folders
-    backgroundLocations = baseBackgroundLocations + tuple(xbg.split(","))
+        print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini')
+        configuration = configparser.ConfigParser()
+        filesread = configuration.read('cewe2pdf.ini')
+        if len(filesread) < 1: 
+            print('cannot find cewe installation folder cewe_folder in cewe2pdf.ini')
+            cewe_folder = None
+        else:
+            defaultConfigSection = configuration['DEFAULT']
+            # find cewe folder from ini file
+            cewe_folder = defaultConfigSection['cewe_folder'].strip()
+            baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
+            # add any extra background folders
+            xbg = defaultConfigSection.get('extraBackgroundFolders','').strip() # comma separated list of folders
+            backgroundLocations = baseBackgroundLocations + tuple(xbg.split(","))
 
     bg_notfound = set([])
 
