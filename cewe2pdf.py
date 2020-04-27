@@ -133,6 +133,7 @@ def findFileByExtInDirs(filebase, extList, paths):
     print(prtStr)
     raise ValueError(prtStr)
 
+
 def findFileInDirs(filenames, paths):
     if  not isinstance(filenames, list): filenames = [filenames]
     for f in filenames:
@@ -144,15 +145,7 @@ def findFileInDirs(filenames, paths):
     print('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
     raise ValueError('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
 
-def getBaseBackgroundLocations(basefolder):
-    # create a tuple of places (folders) where background resources would be found by default
-    baseBackgroundLocations = (
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds'),
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
-    )
-    return baseBackgroundLocations
+
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)), 'd'))
 
@@ -192,8 +185,11 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, keepDoubl
                     print(
                         'value of background attribute not supported: type =  %s' % backgroundTag.get('type'))
             try:
-                    bgpath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
-
+                bgPath = findFileByExtInDirs(bg, ('.webp', '.jpg', '.bmp'), (
+                    os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds'),
+                    os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
+                    os.path.join(cewe_folder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
+                ))
                 areaWidth = pw*2
                 if keepDoublePages:
                     areaWidth = pw
