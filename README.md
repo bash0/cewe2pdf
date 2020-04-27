@@ -5,7 +5,7 @@ A python script to turn cewe photobooks into pdf documents.
 The CEWE pdf export is achieved by interpreting the mcf xml-files 
 and compiling a pdf document which looks like the cewe photo book.
 
-There are many unsupported options, so an exact conversion cannot be guaranteed.
+There are many unsupported options, so an exact conversion cannot be guaranteed. The script is mostly based on reverse-engineering and guessing. It is not meeting any official specifications. So don't be surprised if one or another feature doesn't work. However, improvements are always appreciated.
 
 tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf exportieren, cewe Fotobuch pdf, mcf in pdf umwandeln, aus CEW-Fotobuch ein pdf machen, cewe Fotobuch pdf
 
