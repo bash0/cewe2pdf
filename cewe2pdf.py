@@ -298,6 +298,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         # we can not delete now, because file is opened by pdf library
 
 def AppendText(pdf_styleN, text):
+    if text is None:
+        text = "&nbsp;"
     newString = '<para autoLeading="max">' + text + '</para>'
     pdf_flowableList.append(Paragraph(newString, pdf_styleN))
 
