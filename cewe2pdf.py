@@ -297,6 +297,10 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         tempFileList.append(jpeg.name)
         # we can not delete now, because file is opened by pdf library
 
+def AppendText(pdf_styleN, text):
+    newString = '<para autoLeading="max">' + text + '</para>'
+    pdf_flowableList.append(Paragraph(newString, pdf_styleN))
+
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     # note: it would be better to use proper html processing here
     html = etree.XML(textTag.text)
@@ -313,7 +317,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         font = family
     elif family in additionnal_fonts:
         font = family
-    color = '#000000'                                
+    color = '#000000'  
+
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
     
@@ -323,58 +328,79 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     if (backgroundColorAttrib is not None):
         backgroundColor = reportlab.lib.colors.HexColor(backgroundColorAttrib)
     
+    # set default para style in case there are no spans to set it
+    pdf_styleN = ParagraphStyle(None, None,
+        alignment=reportlab.lib.enums.TA_LEFT,
+        fontSize=fs,
+        fontName=font,
+        leading=fs*line_scale,  # line spacing
+        borderPadding=0,
+        borderWidth=0,
+        leftIndent=0,
+        rightIndent=0,
+        textColor=reportlab.lib.colors.black,
+        backColor=backgroundColor
+        )
+    
     #y_p = 0    #keep track of y-position for multi-line text using DrawString
-    for p in body.findall(".//p"):
-        for span in p.findall(".//span"):
-            spanfont = font
-            style = dict([kv.split(':') for kv in
-                            span.get('style').lstrip(' ').rstrip(';').split('; ')])
-            if 'font-family' in style:
-                spanfamily = style['font-family'].strip(
-                    "'")
-                if spanfamily in pdf.getAvailableFonts():
-                    spanfont = spanfamily
-                elif spanfamily in additionnal_fonts:
-                    spanfont = spanfamily
-                if spanfamily != spanfont:
-                    print("Using font family = '%s' (wanted %s)" % (
-                        spanfont, spanfamily))
-            if 'font-size' in style:
-                fs = int(style['font-size'].strip()[:-2])
-            if 'color' in style:
-                color = style['color']
-            # pdf.setFont(spanfont, fs) # from old code with drawCentredString
-            # pdf.setFillColor(color) # from old code with drawCentredString
-            pdf_styleN = ParagraphStyle(None, None,
-                                        alignment=reportlab.lib.enums.TA_LEFT,
-                                        fontSize=fs,
-                                        fontName=spanfont,
-                                        leading=fs*1.2,  # line spacing
-                                        borderPadding=0,
-                                        borderWidth=0,
-                                        leftIndent=0,
-                                        rightIndent=0,
-                                        textColor=reportlab.lib.colors.HexColor(color),
-                                        backColor=backgroundColor
-                                        )
-            if p.get('align') == 'center':
-                #    pdf.drawCentredString(0,
-                #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
-            elif p.get('align') == 'right':
-                #    pdf.drawRightString(0.5 * f * areaWidth,
-                #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
+    htmlparas = body.findall(".//p")
+    for p in htmlparas:
+        htmlspans = p.findall(".//span")
+        if (len(htmlspans) < 1): 
+            # append the paragraph text, accepting whatever format is valid now
+            if (p.text == None):
+                AppendText(pdf_styleN, "&nbsp;<br />")
             else:
-                #    pdf.drawString(-0.5 * f * areaWidth,
-                #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
-            # add some flowables
-            # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
+                AppendText(pdf_styleN, p.text)
+        else:
+            for span in htmlspans:
+                spanfont = font
+                style = dict([kv.split(':') for kv in
+                                span.get('style').lstrip(' ').rstrip(';').split('; ')])
+                if 'font-family' in style:
+                    spanfamily = style['font-family'].strip(
+                        "'")
+                    if spanfamily in pdf.getAvailableFonts():
+                        spanfont = spanfamily
+                    elif spanfamily in additionnal_fonts:
+                        spanfont = spanfamily
+                    if spanfamily != spanfont:
+                        print("Using font family = '%s' (wanted %s)" % (
+                            spanfont, spanfamily))
+                if 'font-size' in style:
+                    fs = int(style['font-size'].strip()[:-2])
+                if 'color' in style:
+                    color = style['color']
+                # pdf.setFont(spanfont, fs) # from old code with drawCentredString
+                # pdf.setFillColor(color) # from old code with drawCentredString
+                pdf_styleN = ParagraphStyle(None, None,
+                                            alignment=reportlab.lib.enums.TA_LEFT,
+                                            fontSize=fs,
+                                            fontName=spanfont,
+                                            leading=fs*line_scale,  # line spacing
+                                            borderPadding=0,
+                                            borderWidth=0,
+                                            leftIndent=0,
+                                            rightIndent=0,
+                                            textColor=reportlab.lib.colors.HexColor(color),
+                                            backColor=backgroundColor
+                                            )
+                if p.get('align') == 'center':
+                    #    pdf.drawCentredString(0,
+                    #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
+                    pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
+                elif p.get('align') == 'right':
+                    #    pdf.drawRightString(0.5 * f * areaWidth,
+                    #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
+                    pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
+                else:
+                    #    pdf.drawString(-0.5 * f * areaWidth,
+                    #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
+                    pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
+                # add some flowables
+                # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
                 
-            newString = '<para autoLeading="max">' + span.text + '</para>'
-            pdf_flowableList.append(
-                Paragraph(newString, pdf_styleN))
+                AppendText(pdf_styleN, span.text)
     
         #y_p -= 1.3*fs
     #Add a frame object that can contain multiple paragraphs
