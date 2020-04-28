@@ -135,56 +135,11 @@ def getBaseBackgroundLocations(basefolder):
     )
     return baseBackgroundLocations
 
-#def textobject_demo(my_canvas, x, y):
-#    # Create textobject
-#    textobject = my_canvas.beginText()
-#    # Set text location (x, y)
-#    textobject.setTextOrigin(x, y)
-#    # Set font face and size
-#    textobject.setFont('Times-Roman', 16)
-#    # Change text color
-#    textobject.setFillColor(colors.red)
-#    # Write red text
-#    textobject.textLine(text='Python rocks in red!')
-#    # Write text to the canvas
-#    my_canvas.drawText(textobject)
-
-#def paragraph_demo(my_canvas, x, y):
-#    styles = getSampleStyleSheet()
-#    ptext = """
-#        The document you are holding is a set of requirements for your next mission, should you
-#        choose to accept it. In any event, this document will self-destruct <b>%s</b> seconds after you
-#        read it. Yes, <b>%s</b> can tell when you're done...usually.
-#        """ % (10, "we")
-#    p = Paragraph(ptext, styles["Normal"])
-#    p.wrapOn(my_canvas, 200, 100)
-#    p.drawOn(my_canvas, x, y)
-
-def AdjustXLine(current_x_line, fs, text):
-    x_line = current_x_line
-    if text == '':
-        x_line += tab_pitch*f
-    else:
-        x_line += (floor((len(text)*0.55*fs/f)/tab_pitch)+1)*tab_pitch*f
-    return x_line
-
 def DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line):
     p = Paragraph(text, paragraphStyle)
     p.wrapOn(pdf, f * areaWidth, f * areaHeight)
     p.drawOn(pdf, -0.5 * f * areaWidth + x_line, -0.5 * f * areaHeight + y_line)
-    return AdjustXLine(x_line, paragraphStyle.fontSize, text)
-
-def PreanalyzeFontSizes(fs_body, htmlpara):
-    fs_max = 0
-    for span in htmlpara.findall(".//span"):
-        spanstyle = dict([kv.split(':') for kv in
-            span.get('style').lstrip(' ').rstrip(';').split('; ')])
-        fs = fs_body
-        if 'font-size' in spanstyle:
-            fs = int(spanstyle['font-size'].strip("pt"))
-        if fs_max < fs:
-            fs_max = fs
-    return fs_max
+    return p.width, p.height
 
 def DrawText(pdf, text, areaHeight, areaWidth, additionnal_fonts):
     # note: it would be better to use proper html processing here
@@ -206,15 +161,17 @@ def DrawText(pdf, text, areaHeight, areaWidth, additionnal_fonts):
         parafont = family
     color = '#000000'
     y_para = 0.0
-    for htmlpara in body.findall(".//p"):
-        # Pre-analyze fontsizes
-        fs_max = PreanalyzeFontSizes(bodyfs, htmlpara)
-    
+    htmlparas = body.findall(".//p")
+    if len(htmlparas) > 1:
+        print("break here to check multiple paragraph behaviour")
+    for htmlpara in reversed(htmlparas):
         # Do the writing
         x_span = 0.0
         y_span = 0.0
-        lines_span = 0
-        for span in htmlpara.findall(".//span"): # each span in the html para
+        spans = htmlpara.findall(".//span")
+        if len(spans) > 1:
+            print("break here to check multiple span behaviour")
+        for span in spans: # each span in the html para
             spanfont = parafont
             spanstyle = dict([kv.split(':') for kv in
                 span.get('style').lstrip(' ').rstrip(';').split('; ')])
@@ -237,11 +194,10 @@ def DrawText(pdf, text, areaHeight, areaWidth, additionnal_fonts):
 
             lines = span.text.split('\n') # split the span on what used to be <br>
             lines_cnt = len(lines)
-            lines_span += lines_cnt-1
             x_line = 0.0
             for line_no, line in enumerate(lines): # each line in the html span
                 x_line = x_span
-                y_line = -line_scale*fs_max*(line_no) + y_para + y_span
+                y_line = y_para + y_span
                 logging.debug("Line %d/%d: |%s|" % (line_no+1, lines_cnt, line))
                 texts = line.split('\t')
                 paragraphStyle = ParagraphStyle(
@@ -255,25 +211,23 @@ def DrawText(pdf, text, areaHeight, areaWidth, additionnal_fonts):
                     paragraphStyle.alignment = TA_CENTER
                     for text in texts:
                         #pdf.drawCentredString(0, 0.5 * f * areaHeight + y_line, line)
-                        x_line = DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line)
+                        drawnWidth, drawnHeight = DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line)
                 elif htmlpara.get('align') == 'right':
                     paragraphStyle.alignment = TA_RIGHT
-                    for text in reversed(texts):
-                        logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
-                            (x_line, y_line, x_span, y_span, y_para, spanfs, fs_max, text ))
+                    for text in texts:
+                        logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d\t|%s|" % \
+                            (x_line, y_line, x_span, y_span, y_para, spanfs, text ))
                         #pdf.drawRightString(0.5 * f * areaWidth - x_line, 0.5 * f * areaHeight + y_line, text)
-                        x_line = DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line)
+                        drawnWidth, drawnHeight = DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line)
                 else:   # left aligned
                     for text in texts:
-                        logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d/%d\t|%s|" % \
-                            (x_line, y_line, x_span, y_span, y_para, spanfs, fs_max, text ))
+                        logging.debug("xl: %d\tyl: %d\t(xs: %d\tys: %d\typ: %d)\tFS: %d\t|%s|" % \
+                            (x_line, y_line, x_span, y_span, y_para, spanfs, text ))
                         #pdf.drawString(-0.5 * f * areaWidth + x_line, 0.5 * f * areaHeight + y_line, text)
-                        x_line = DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line)
-            x_span = x_line
-            if lines_cnt > 1:
-                x_span = 0.0
-                y_span -= line_scale*fs_max*(lines_cnt-1)
-        y_para -= line_scale*fs_max*(lines_span+1)
+                        drawnWidth, drawnHeight = DrawStyledParagraph(pdf, text, paragraphStyle, areaHeight, areaWidth, x_line, y_line)
+            x_span += drawnWidth
+            y_span -= drawnHeight
+        y_para -= y_span
 
 def convertMcf(mcfname, keepDoublePages):
 #Get the folder in which the .mcf file is
