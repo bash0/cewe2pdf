@@ -609,6 +609,9 @@ def convertMcf(mcfname, keepDoublePages:bool):
 
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
+    if articleConfigElement == None:
+        print(mcfname + ' is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
+        sys.exit(1)
     pageCount = int(articleConfigElement.get('normalpages')) + 2    #maximum number of pages
     imagedir = fotobook.get('imagedir')
 
