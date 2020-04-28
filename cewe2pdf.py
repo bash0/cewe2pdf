@@ -341,8 +341,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         spanfont, spanfamily))
             if 'font-size' in style:
                 fs = int(style['font-size'].strip()[:-2])
-                if 'color' in style:
-                    color = style['color']
+            if 'color' in style:
+                color = style['color']
             # pdf.setFont(spanfont, fs) # from old code with drawCentredString
             # pdf.setFillColor(color) # from old code with drawCentredString
             pdf_styleN = ParagraphStyle(None, None,
