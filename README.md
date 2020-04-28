@@ -47,7 +47,15 @@ C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
 ```
 Save the file and close it.
 
-Create a nother text file called ``additional_fonts.txt``, but leave it empty.
+Alternatively, you can move on to more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``. The contents can, for example, be of the form:
+```
+[DEFAULT]
+cewe_folder = C:\Program Files\Elkjop fotoservice_6.3\elkjop fotoservice
+extraBackgroundFolders = C:/ProgramData/hps/5026/addons/447/backgrounds,C:/ProgramData/hps/5026/addons/448/backgrounds
+```
+In addition to specifying the location of the cewe folder, you may also provide a comma separated list of locations for additional background images.
+
+Create another text file called ``additional_fonts.txt``, but leave it empty.
 
 Install - Linux
 ---------------
