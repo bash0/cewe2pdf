@@ -574,8 +574,10 @@ def convertMcf(mcfname, keepDoublePages:bool):
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
             # add any extra background folders
-            xbg = defaultConfigSection.get('extraBackgroundFolders','').strip() # comma separated list of folders
-            backgroundLocations = baseBackgroundLocations + tuple(xbg.split(","))
+            xbg = defaultConfigSection.get('extraBackgroundFolders','').splitlines() # newline separated list of folders
+            fxbg = tuple(filter(lambda bg: (len(bg) != 0), xbg))
+            backgroundLocations = baseBackgroundLocations + fxbg
+    
     bg_notFoundDirList = set([])   #keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
     # Load additionnal fonts
