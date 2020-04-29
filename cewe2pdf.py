@@ -402,7 +402,14 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                 # add some flowables
                 # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
                 
+                # append the text of the span
                 AppendText(pdf_styleN, span.text)
+
+                # if there are line breaks in the span then we must pick up the following texts
+                brs = span.findall(".//br")
+                if len(brs) > 0:
+                    for br in brs:
+                        AppendText(pdf_styleN, br.tail)
     
         #y_p -= 1.3*fs
     #Add a frame object that can contain multiple paragraphs
