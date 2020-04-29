@@ -1,6 +1,4 @@
-# eg python processManyMcfs.py
-# D:\Users\pete\Documents\Fotobooks\PhotoAlbum201?.mcf
-# D:\Users\pete\Documents\Fotobooks\PhotoAlbum2014?.mcf
+# eg python processManyMcfs.py D:\Users\fred\albums\PhotoAlbum*.mcf
 import sys
 from glob import glob
 from cewe2pdf import convertMcf
