@@ -5,6 +5,8 @@ sys.path.append('..')
 sys.path.append('.')
 from pathlib import Path
 import os, os.path
+from pdfrw import PdfReader
+
 
 from cewe2pdf import convertMcf
 
@@ -16,6 +18,15 @@ def tryToBuildBook(keepDoublePages):
     assert os.path.exists(outFile) == False
     convertMcf(inFile, keepDoublePages)
     assert Path(outFile).exists() == True
+
+    #check the pdf contents
+    readerObj = PdfReader(outFile)
+    numPages =  len(readerObj.pages)
+    if keepDoublePages:
+        assert numPages == 15
+    else:
+        assert numPages == 28
+
     os.remove(outFile)
 
 def test_simpleBookSinglePage():
@@ -26,4 +37,5 @@ def test_simpleBookDoublePage():
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    test_simpleBookSinglePage()
+    #test_simpleBookSinglePage()
+    test_simpleBookDoublePage();
