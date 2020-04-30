@@ -301,7 +301,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 def AppendText(paratext, newtext):
     if newtext is None:
         return paratext
-    return paratext + newtext;
+    return paratext + newtext
 
 def AppendBreak(paragraphText, parachild):
     br = parachild
@@ -314,7 +314,7 @@ def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
         alignment=reportlab.lib.enums.TA_LEFT, # will often be overridden
         fontSize=fontsize,
         fontName=font,
-        # leading=fontsize*line_scale,  # line spacing (text + leading)
+        leading=fontsize*line_scale,  # line spacing (text + leading)
         borderPadding=0,
         borderWidth=0,
         leftIndent=0,
@@ -372,58 +372,67 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
         paragraphText = '<para autoLeading="max">'
+        htmlspans = p.findall(".*")
+        if (len(htmlspans) < 1): 
+            # append the paragraph text, accepting whatever format is valid now
+            if (p.text == None):
+                paragraphText = AppendText(paragraphText, "<br></br>")
+            else:
+                paragraphText = AppendText(paragraphText, html.escape(p.text))
+        else:
+            for item in htmlspans:
+                if item.tag == 'br':
+                    paragraphText = AppendBreak(paragraphText, item)
+                elif item.tag == 'span':
+                    span = item
+                    spanfont = font
+                    style = dict([kv.split(':') for kv in
+                                    span.get('style').lstrip(' ').rstrip(';').split('; ')])
+                    if 'font-family' in style:
+                        spanfamily = style['font-family'].strip(
+                            "'")
+                        if spanfamily in pdf.getAvailableFonts():
+                            spanfont = spanfamily
+                        elif spanfamily in additionnal_fonts:
+                            spanfont = spanfamily
+                        if spanfamily != spanfont:
+                            print("Using font family = '%s' (wanted %s)" % (
+                                spanfont, spanfamily))
+                    if 'font-size' in style:
+                        spanfs = floor(float(style['font-size'].strip("pt")))
+                    else:
+                        spanfs = bodyfs
+                    if spanfs > maxfs:
+                        maxfs = spanfs
 
-        # process span and br sequentially, so they come in the right order in the output
-        for parachild in p:
-            if parachild.tag == 'br':
-                paragraphText = AppendBreak(paragraphText, parachild)
-                continue
-            if parachild.tag == 'span':
-                span = parachild
-                spanfont = font
-                style = dict([kv.split(':') for kv in
-                                span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                if 'font-family' in style:
-                    spanfamily = style['font-family'].strip(
-                        "'")
-                    if spanfamily in pdf.getAvailableFonts():
-                        spanfont = spanfamily
-                    elif spanfamily in additionnal_fonts:
-                        spanfont = spanfamily
-                    if spanfamily != spanfont:
-                        print("Using font family = '%s' (wanted %s)" % (
-                            spanfont, spanfamily))
-                if 'font-size' in style:
-                    spanfs = floor(float(style['font-size'].strip("pt")))
-                else:
-                    spanfs = bodyfs
-                if spanfs > maxfs:
-                    maxfs = spanfs
+                    paragraphText = AppendText(paragraphText, '<span name="' + spanfont + '"'
+                        ' size=' + str(spanfs)
+                        )
 
-                if 'color' in style:
-                    color = style['color']
-                
-                paragraphText = AppendText(paragraphText, '<font name="' + spanfont + '"'
-                    ' color=' + color +
-                    ' size=' + str(spanfs)
-                    )
+                    if 'color' in style:
+                        paragraphText = AppendText(paragraphText, ' color=' + style['color'] )
 
-                # if we need this, then we must use the span tag rather than font
-                #if (backgroundColorAttrib is not None):
-                #    paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
-                
-                paragraphText = AppendText(paragraphText, '>')
-                                
-                # append the actual text of the span
-                paragraphText = AppendText(paragraphText, html.escape(span.text))
-                paragraphText = AppendText(paragraphText, '</font>')
-                if (span.tail != None):
-                    paragraphText = AppendText(paragraphText, html.escape(span.tail))
+                    if 'font-style' in style:
+                        pass  # paragraphText = AppendText(paragraphText, ' style=' + style['font-style'] )
+
+                    if (backgroundColorAttrib is not None):
+                        paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
+                    
+                    paragraphText = AppendText(paragraphText, '>')
+                                    
+                    # append the text of the span
+                    paragraphText = AppendText(paragraphText, html.escape(span.text))
+                    paragraphText = AppendText(paragraphText, '</span>')
+
+                    if (span.tail != None):
+                        paragraphText = AppendText(paragraphText, html.escape(span.tail))
             
-                # there might be line breaks within the span. Could be that this should be recursive.
-                for spanchild in span:
-                    if spanchild.tag == 'br':
-                        paragraphText = AppendBreak(paragraphText, spanchild)
+                    # there might be line breaks within the span. Could be that this should be recursive.
+                    for spanchild in span:
+                        if spanchild.tag == 'br':
+                            paragraphText = AppendBreak(paragraphText, spanchild)
+                else:
+                    print('Ignoring unhandled tag ' + item.tag )
 
         paragraphText += '</para>'
 
@@ -587,7 +596,7 @@ def convertMcf(mcfname, keepDoublePages:bool):
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
         baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
-        backgroundLocations = baseBackgroundLocations;
+        backgroundLocations = baseBackgroundLocations
     except:
         print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini')
         configuration = configparser.ConfigParser()
