@@ -426,8 +426,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 
         paragraphText += '</para>'
 
-        pdf_styleN.fontSize = maxfs
-        pdf_styleN.leading = pdf_styleN.fontSize * line_scale  # line spacing (text + leading)
+        pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
 
         pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
 
