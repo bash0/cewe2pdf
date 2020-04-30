@@ -324,6 +324,25 @@ def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
         backColor=backgroundColor)
     return parastyle
 
+def IsBold(weight):
+    return weight > 400
+
+def IsItalic(spanstyle):
+    return 'font-style' in spanstyle and spanstyle['font-style'].strip(" ") == "italic"
+
+def IsUnderline(spanstyle):
+    return 'text-decoration' in spanstyle and spanstyle['text-decoration'].strip(" ") == "underline"
+
+def Dequote(s):
+    """
+    If a string has single or double quotes around it, remove them.
+    Make sure the pair of quotes match.
+    If a matching pair of quotes is not found, return the string unchanged.
+    """
+    if (s[0] == s[-1]) and s.startswith(("'", '"')):
+        return s[1:-1]
+    return s
+
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     # note: it would be better to use proper html processing here
     htmlxml = etree.XML(textTag.text)
@@ -340,6 +359,10 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         font = family
     elif family in additionnal_fonts:
         font = family
+    try:
+        bweight = int(Dequote(bstyle['font-weight']))
+    except:
+        bweight = 400
     color = '#000000' 
     maxfs = bodyfs
 
@@ -371,7 +394,12 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
+        
         paragraphText = '<para autoLeading="max">'
+
+        if IsBold(bweight): # ref https://www.w3schools.com/csSref/pr_font_weight.asp
+            paragraphText = AppendText(paragraphText, "<u>")
+
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1): 
             # append the paragraph text, accepting whatever format is valid now
@@ -386,10 +414,10 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                 elif item.tag == 'span':
                     span = item
                     spanfont = font
-                    style = dict([kv.split(':') for kv in
+                    spanstyle = dict([kv.split(':') for kv in
                                     span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                    if 'font-family' in style:
-                        spanfamily = style['font-family'].strip(
+                    if 'font-family' in spanstyle:
+                        spanfamily = spanstyle['font-family'].strip(
                             "'")
                         if spanfamily in pdf.getAvailableFonts():
                             spanfont = spanfamily
@@ -398,8 +426,16 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         if spanfamily != spanfont:
                             print("Using font family = '%s' (wanted %s)" % (
                                 spanfont, spanfamily))
-                    if 'font-size' in style:
-                        spanfs = floor(float(style['font-size'].strip("pt")))
+                    
+                    spanweight = 400
+                    if 'font-weight' in spanstyle:
+                        try:
+                            spanweight = int(Dequote(spanstyle['font-weight']))
+                        except:
+                            spanweight = 400
+
+                    if 'font-size' in spanstyle:
+                        spanfs = floor(float(spanstyle['font-size'].strip("pt")))
                     else:
                         spanfs = bodyfs
                     if spanfs > maxfs:
@@ -409,16 +445,20 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         ' size=' + str(spanfs)
                         )
 
-                    if 'color' in style:
-                        paragraphText = AppendText(paragraphText, ' color=' + style['color'] )
-
-                    if 'font-style' in style:
-                        pass  # paragraphText = AppendText(paragraphText, ' style=' + style['font-style'] )
+                    if 'color' in spanstyle:
+                        paragraphText = AppendText(paragraphText, ' color=' + spanstyle['color'] )
 
                     if (backgroundColorAttrib is not None):
                         paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
                     
                     paragraphText = AppendText(paragraphText, '>')
+
+                    if IsBold(spanweight): # ref https://www.w3schools.com/csSref/pr_font_weight.asp
+                        paragraphText = AppendText(paragraphText, "<b>")
+                    if IsItalic(spanstyle):
+                        paragraphText = AppendText(paragraphText, '<i>')
+                    if IsUnderline(spanstyle):
+                        paragraphText = AppendText(paragraphText, '<u>')
                                     
                     # append the text of the span
                     paragraphText = AppendText(paragraphText, html.escape(span.text))
@@ -428,12 +468,22 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         if spanchild.tag == 'br':
                             paragraphText = AppendBreak(paragraphText, spanchild)
 
+                    if IsUnderline(spanstyle):
+                        paragraphText = AppendText(paragraphText, '</u>')
+                    if IsItalic(spanstyle):
+                        paragraphText = AppendText(paragraphText, '</i>')
+                    if IsBold(spanweight):
+                        paragraphText = AppendText(paragraphText, "</b>")
+
                     paragraphText = AppendText(paragraphText, '</span>')
 
                     if (span.tail != None):
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
                 else:
                     print('Ignoring unhandled tag ' + item.tag )
+        
+        if IsBold(bweight):
+            paragraphText = AppendText(paragraphText, "</u>")
 
         paragraphText += '</para>'
 
