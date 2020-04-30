@@ -303,12 +303,18 @@ def AppendText(paratext, newtext):
         return paratext
     return paratext + newtext;
 
+def AppendBreak(paragraphText, parachild):
+    br = parachild
+    paragraphText = AppendText(paragraphText, "<br></br>")
+    paragraphText = AppendText(paragraphText, br.tail)
+    return paragraphText
+
 def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
     parastyle = ParagraphStyle(None, None,
         alignment=reportlab.lib.enums.TA_LEFT, # will often be overridden
         fontSize=fontsize,
         fontName=font,
-        leading=fontsize*line_scale,  # line spacing (text + leading)
+        # leading=fontsize*line_scale,  # line spacing (text + leading)
         borderPadding=0,
         borderWidth=0,
         leftIndent=0,
@@ -366,15 +372,14 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
         paragraphText = '<para autoLeading="max">'
-        htmlspans = p.findall(".//span")
-        if (len(htmlspans) < 1): 
-            # append the paragraph text, accepting whatever format is valid now
-            if (p.text == None):
-                paragraphText = AppendText(paragraphText, "<br></br>")
-            else:
-                paragraphText = AppendText(paragraphText, html.escape(p.text))
-        else:
-            for span in htmlspans:
+
+        # process span and br sequentially, so they come in the right order in the output
+        for parachild in p:
+            if parachild.tag == 'br':
+                paragraphText = AppendBreak(paragraphText, parachild)
+                continue
+            if parachild.tag == 'span':
+                span = parachild
                 spanfont = font
                 style = dict([kv.split(':') for kv in
                                 span.get('style').lstrip(' ').rstrip(';').split('; ')])
@@ -398,31 +403,27 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                 if 'color' in style:
                     color = style['color']
                 
-                paragraphText = AppendText(paragraphText, '<span name="' + spanfont + '"'
+                paragraphText = AppendText(paragraphText, '<font name="' + spanfont + '"'
                     ' color=' + color +
                     ' size=' + str(spanfs)
                     )
 
-                if (backgroundColorAttrib is not None):
-                    paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
-                    #'style=' + stylename +
+                # if we need this, then we must use the span tag rather than font
+                #if (backgroundColorAttrib is not None):
+                #    paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
                 
                 paragraphText = AppendText(paragraphText, '>')
                                 
-                # append the text of the span
+                # append the actual text of the span
                 paragraphText = AppendText(paragraphText, html.escape(span.text))
-
-                # if there are line breaks in the span then we must pick up the following texts
-                brs = span.findall(".//br")
-                if len(brs) > 0:
-                    for br in brs:
-                        paragraphText = AppendText(paragraphText, "<br></br>")
-                        paragraphText = AppendText(paragraphText, br.tail)
-
-                paragraphText = AppendText(paragraphText, '</span>')
-
+                paragraphText = AppendText(paragraphText, '</font>')
                 if (span.tail != None):
                     paragraphText = AppendText(paragraphText, html.escape(span.tail))
+            
+                # there might be line breaks within the span. Could be that this should be recursive.
+                for spanchild in span:
+                    if spanchild.tag == 'br':
+                        paragraphText = AppendBreak(paragraphText, spanchild)
 
         paragraphText += '</para>'
 
