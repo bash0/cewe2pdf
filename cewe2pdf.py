@@ -349,16 +349,18 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     body = htmlxml.find('.//body')
     bstyle = dict([kv.split(':') for kv in
                     body.get('style').lstrip(' ').rstrip(';').split('; ')])
-    family = bstyle['font-family'].strip("'")
-    font = 'Helvetica'
     try:
         bodyfs = floor(float(bstyle['font-size'].strip("pt")))
     except:
         bodyfs = 20
+    family = bstyle['font-family'].strip("'")
     if family in pdf.getAvailableFonts():
         font = family
     elif family in additionnal_fonts:
         font = family
+    else:
+        font = 'Helvetica'
+
     try:
         bweight = int(Dequote(bstyle['font-weight']))
     except:
@@ -417,15 +419,13 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     spanstyle = dict([kv.split(':') for kv in
                                     span.get('style').lstrip(' ').rstrip(';').split('; ')])
                     if 'font-family' in spanstyle:
-                        spanfamily = spanstyle['font-family'].strip(
-                            "'")
+                        spanfamily = spanstyle['font-family'].strip("'")
                         if spanfamily in pdf.getAvailableFonts():
                             spanfont = spanfamily
                         elif spanfamily in additionnal_fonts:
                             spanfont = spanfamily
                         if spanfamily != spanfont:
-                            print("Using font family = '%s' (wanted %s)" % (
-                                spanfont, spanfamily))
+                            print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
                     
                     spanweight = 400
                     if 'font-weight' in spanstyle:
@@ -638,6 +638,8 @@ def convertMcf(mcfname, keepDoublePages:bool):
         print(mcfname + 'is not a valid mcf file. Exiting.')
         sys.exit(1)
 
+    # a null default configuration section means that some capabilities will be missing!
+    defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
         configFolderFileName = findFileInDirs(
@@ -691,11 +693,30 @@ def convertMcf(mcfname, keepDoublePages:bool):
     for n in additionnal_fonts:
         try:
             pdfmetrics.registerFont(TTFont(n, additionnal_fonts[n]))
-            print("Successfully registered '%s' from '%s'" %
-                  (n, additionnal_fonts[n]))
+            print("Successfully registered '%s' from '%s'" %(n, additionnal_fonts[n]))
         except:
-            print("Failed to register font '%s' (from %s)" %
-                  (n, additionnal_fonts[n]))
+            print("Failed to register font '%s' (from %s)" %(n, additionnal_fonts[n]))
+
+    if defaultConfigSection != None:
+        # the reportlab manual says:
+        #  Before using the TT Fonts in Platypus we should add a mapping from the family name to the individual font
+        #  names that describe the behaviour under the <b> and <i> attributes.
+        #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
+        #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
+        ff = defaultConfigSection.get('FontFamilies','').splitlines() # newline separated list of folders
+        fontFamilies = filter(lambda bg: (len(bg) != 0), ff)
+        for fontfamily in fontFamilies:
+            members = fontfamily.split(",")
+            if len(members) == 5:
+                pdfmetrics.registerFontFamily(
+                    members[0],
+                    normal=members[1],
+                    bold=members[2],
+                    italic=members[3],
+                    boldItalic=members[4]
+                    )
+            else:
+                print('Invalid FontFamily line ignored (!= 5 comma-separated strings): ' + fontfamily)
 
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
