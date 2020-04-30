@@ -301,7 +301,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 def AppendText(paratext, newtext):
     if newtext is None:
         return paratext
-    return paratext + newtext;
+    return paratext + newtext
 
 def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
     parastyle = ParagraphStyle(None, None,
@@ -366,7 +366,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
         paragraphText = '<para autoLeading="max">'
-        htmlspans = p.findall(".//span")
+        htmlspans = p.findall(".*")
         if (len(htmlspans) < 1): 
             # append the paragraph text, accepting whatever format is valid now
             if (p.text == None):
@@ -374,55 +374,62 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             else:
                 paragraphText = AppendText(paragraphText, html.escape(p.text))
         else:
-            for span in htmlspans:
-                spanfont = font
-                style = dict([kv.split(':') for kv in
-                                span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                if 'font-family' in style:
-                    spanfamily = style['font-family'].strip(
-                        "'")
-                    if spanfamily in pdf.getAvailableFonts():
-                        spanfont = spanfamily
-                    elif spanfamily in additionnal_fonts:
-                        spanfont = spanfamily
-                    if spanfamily != spanfont:
-                        print("Using font family = '%s' (wanted %s)" % (
-                            spanfont, spanfamily))
-                if 'font-size' in style:
-                    spanfs = floor(float(style['font-size'].strip("pt")))
+            for item in htmlspans:
+                if item.tag == 'br':
+                    paragraphText = AppendText(paragraphText, "<br></br>")
+                elif item.tag == 'span':
+                    span = item
+                    spanfont = font
+                    style = dict([kv.split(':') for kv in
+                                    span.get('style').lstrip(' ').rstrip(';').split('; ')])
+                    if 'font-family' in style:
+                        spanfamily = style['font-family'].strip(
+                            "'")
+                        if spanfamily in pdf.getAvailableFonts():
+                            spanfont = spanfamily
+                        elif spanfamily in additionnal_fonts:
+                            spanfont = spanfamily
+                        if spanfamily != spanfont:
+                            print("Using font family = '%s' (wanted %s)" % (
+                                spanfont, spanfamily))
+                    if 'font-size' in style:
+                        spanfs = floor(float(style['font-size'].strip("pt")))
+                    else:
+                        spanfs = bodyfs
+                    if spanfs > maxfs:
+                        maxfs = spanfs
+
+                    paragraphText = AppendText(paragraphText, '<span name="' + spanfont + '"'
+                        ' size=' + str(spanfs)
+                        )
+
+                    if 'color' in style:
+                        paragraphText = AppendText(paragraphText, ' color=' + style['color'] )
+
+                    if 'font-style' in style:
+                        pass  # paragraphText = AppendText(paragraphText, ' style=' + style['font-style'] )
+
+                    if (backgroundColorAttrib is not None):
+                        paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
+                    
+                    paragraphText = AppendText(paragraphText, '>')
+                                    
+                    # append the text of the span
+                    paragraphText = AppendText(paragraphText, html.escape(span.text))
+
+                    # if there are line breaks in the span then we must pick up the following texts
+                    brs = span.findall(".//br")
+                    if len(brs) > 0:
+                        for br in brs:
+                            paragraphText = AppendText(paragraphText, "<br></br>")
+                            paragraphText = AppendText(paragraphText, br.tail)
+
+                    paragraphText = AppendText(paragraphText, '</span>')
+
+                    if (span.tail != None):
+                        paragraphText = AppendText(paragraphText, html.escape(span.tail))
                 else:
-                    spanfs = bodyfs
-                if spanfs > maxfs:
-                    maxfs = spanfs
-
-                if 'color' in style:
-                    color = style['color']
-                
-                paragraphText = AppendText(paragraphText, '<span name="' + spanfont + '"'
-                    ' color=' + color +
-                    ' size=' + str(spanfs)
-                    )
-
-                if (backgroundColorAttrib is not None):
-                    paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
-                    #'style=' + stylename +
-                
-                paragraphText = AppendText(paragraphText, '>')
-                                
-                # append the text of the span
-                paragraphText = AppendText(paragraphText, html.escape(span.text))
-
-                # if there are line breaks in the span then we must pick up the following texts
-                brs = span.findall(".//br")
-                if len(brs) > 0:
-                    for br in brs:
-                        paragraphText = AppendText(paragraphText, "<br></br>")
-                        paragraphText = AppendText(paragraphText, br.tail)
-
-                paragraphText = AppendText(paragraphText, '</span>')
-
-                if (span.tail != None):
-                    paragraphText = AppendText(paragraphText, html.escape(span.tail))
+                    print('Ignoring unhandled tag ' + item.tag )
 
         paragraphText += '</para>'
 
@@ -585,7 +592,7 @@ def convertMcf(mcfname, keepDoublePages:bool):
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
         baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
-        backgroundLocations = baseBackgroundLocations;
+        backgroundLocations = baseBackgroundLocations
     except:
         print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini')
         configuration = configparser.ConfigParser()
