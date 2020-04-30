@@ -1,0 +1,7 @@
+Arial = C:\WINDOWS\FONTS\ARIAL.TTF
+Arial Rounded MT Bold = C:\WINDOWS\FONTS\ARLRDBD.TTF
+Bodoni = C:\Windows\Fonts\BOD_R.TTF
+Stafford = C:\Windows\Fonts\times.ttf
+CalligraphScript = C:\Windows\Fonts\PALSCRI.TTF
+FranklinGothic = C:\Windows\Fonts\framd.ttf
+Calibri = C:\Windows\Fonts\calibri.ttf

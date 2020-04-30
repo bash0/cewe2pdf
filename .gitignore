@@ -44,3 +44,9 @@ nosetests.xml
 /.vscode/settings.json
 /tests/unittest_fotobook_mcf-Dateien/folderid.xml
 /cewe2pdf - Copy.py
+/examples.xml
+/cewe2pdf.pyproj.user
+/tests/unittest_fotobook.mcf.pdf
+*.mcf~
+*.xml~
+/tests/unittest_fotobook_mcf-Dateien/identifier.xml

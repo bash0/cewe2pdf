@@ -49,6 +49,7 @@ import sys
 from lxml import etree
 import tempfile
 from math import sqrt, floor
+import html
 
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
@@ -297,63 +298,81 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         tempFileList.append(jpeg.name)
         # we can not delete now, because file is opened by pdf library
 
-def AppendText(pdf_styleN, text):
-    if text is None:
-        text = "&nbsp;"
-    newString = '<para autoLeading="max">' + text + '</para>'
-    pdf_flowableList.append(Paragraph(newString, pdf_styleN))
+def AppendText(paratext, newtext):
+    if newtext is None:
+        return paratext
+    return paratext + newtext;
+
+def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
+    parastyle = ParagraphStyle(None, None,
+        alignment=reportlab.lib.enums.TA_LEFT, # will often be overridden
+        fontSize=fontsize,
+        fontName=font,
+        leading=fontsize*line_scale,  # line spacing (text + leading)
+        borderPadding=0,
+        borderWidth=0,
+        leftIndent=0,
+        rightIndent=0,
+        embeddedHyphenation=1, # allow line break on existing hyphens
+        textColor=textcolor,
+        backColor=backgroundColor)
+    return parastyle
 
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     # note: it would be better to use proper html processing here
-    html = etree.XML(textTag.text)
-    body = html.find('.//body')
+    htmlxml = etree.XML(textTag.text)
+    body = htmlxml.find('.//body')
     bstyle = dict([kv.split(':') for kv in
                     body.get('style').lstrip(' ').rstrip(';').split('; ')])
     family = bstyle['font-family'].strip("'")
     font = 'Helvetica'
     try:
-        fs = int(bstyle['font-size'].strip("pt"))
+        bodyfs = floor(float(bstyle['font-size'].strip("pt")))
     except:
-        fs = 20
+        bodyfs = 20
     if family in pdf.getAvailableFonts():
         font = family
     elif family in additionnal_fonts:
         font = family
-    color = '#000000'  
+    color = '#000000' 
+    maxfs = bodyfs
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
     
     #Get the background color. It is stored in an extra element.
-    backgroundColor= None
+    backgroundColor = None
     backgroundColorAttrib = area.get('backgroundcolor')
     if (backgroundColorAttrib is not None):
         backgroundColor = reportlab.lib.colors.HexColor(backgroundColorAttrib)
     
     # set default para style in case there are no spans to set it
-    pdf_styleN = ParagraphStyle(None, None,
-        alignment=reportlab.lib.enums.TA_LEFT,
-        fontSize=fs,
-        fontName=font,
-        leading=fs*line_scale,  # line spacing
-        borderPadding=0,
-        borderWidth=0,
-        leftIndent=0,
-        rightIndent=0,
-        textColor=reportlab.lib.colors.black,
-        backColor=backgroundColor
-        )
+    pdf_styleN = CreateParagraphStyle(backgroundColor, reportlab.lib.colors.black, font, bodyfs)
+
+    ################
+    # potential killer here .. the leading for the paragraph is set on the basis of the bodyfs and will
+    # not be changed as the size of the text changes! So the lines of the paragraph can collide
+    # or be too widely spaced for the font size as that size changes through the paragraph.
+    ################
+
+    # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
     
-    #y_p = 0    #keep track of y-position for multi-line text using DrawString
     htmlparas = body.findall(".//p")
     for p in htmlparas:
+        if p.get('align') == 'center':
+            pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
+        elif p.get('align') == 'right':
+            pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
+        else:
+            pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
+        paragraphText = '<para autoLeading="max">'
         htmlspans = p.findall(".//span")
         if (len(htmlspans) < 1): 
             # append the paragraph text, accepting whatever format is valid now
             if (p.text == None):
-                AppendText(pdf_styleN, "&nbsp;<br />")
+                paragraphText = AppendText(paragraphText, "<br></br>")
             else:
-                AppendText(pdf_styleN, p.text)
+                paragraphText = AppendText(paragraphText, html.escape(p.text))
         else:
             for span in htmlspans:
                 spanfont = font
@@ -370,41 +389,47 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         print("Using font family = '%s' (wanted %s)" % (
                             spanfont, spanfamily))
                 if 'font-size' in style:
-                    fs = int(style['font-size'].strip()[:-2])
+                    spanfs = floor(float(style['font-size'].strip("pt")))
+                else:
+                    spanfs = bodyfs
+                if spanfs > maxfs:
+                    maxfs = spanfs
+
                 if 'color' in style:
                     color = style['color']
-                # pdf.setFont(spanfont, fs) # from old code with drawCentredString
-                # pdf.setFillColor(color) # from old code with drawCentredString
-                pdf_styleN = ParagraphStyle(None, None,
-                                            alignment=reportlab.lib.enums.TA_LEFT,
-                                            fontSize=fs,
-                                            fontName=spanfont,
-                                            leading=fs*line_scale,  # line spacing
-                                            borderPadding=0,
-                                            borderWidth=0,
-                                            leftIndent=0,
-                                            rightIndent=0,
-                                            textColor=reportlab.lib.colors.HexColor(color),
-                                            backColor=backgroundColor
-                                            )
-                if p.get('align') == 'center':
-                    #    pdf.drawCentredString(0,
-                    #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                    pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
-                elif p.get('align') == 'right':
-                    #    pdf.drawRightString(0.5 * f * areaWidth,
-                    #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                    pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
-                else:
-                    #    pdf.drawString(-0.5 * f * areaWidth,
-                    #        0.5 * f * areaHeight + y_p -1.3*fs, span.text)
-                    pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
-                # add some flowables
-                # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
                 
-                AppendText(pdf_styleN, span.text)
-    
-        #y_p -= 1.3*fs
+                paragraphText = AppendText(paragraphText, '<span name="' + spanfont + '"'
+                    ' color=' + color +
+                    ' size=' + str(spanfs)
+                    )
+
+                if (backgroundColorAttrib is not None):
+                    paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
+                    #'style=' + stylename +
+                
+                paragraphText = AppendText(paragraphText, '>')
+                                
+                # append the text of the span
+                paragraphText = AppendText(paragraphText, html.escape(span.text))
+
+                # if there are line breaks in the span then we must pick up the following texts
+                brs = span.findall(".//br")
+                if len(brs) > 0:
+                    for br in brs:
+                        paragraphText = AppendText(paragraphText, "<br></br>")
+                        paragraphText = AppendText(paragraphText, br.tail)
+
+                paragraphText = AppendText(paragraphText, '</span>')
+
+                if (span.tail != None):
+                    paragraphText = AppendText(paragraphText, html.escape(span.tail))
+
+        paragraphText += '</para>'
+
+        pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+
+        pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+
     #Add a frame object that can contain multiple paragraphs
     frameBottomLeft_x = -0.5 * f * areaWidth
     frameBottomLeft_y = -0.5 * f * areaHeight
@@ -574,8 +599,10 @@ def convertMcf(mcfname, keepDoublePages:bool):
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
             # add any extra background folders
-            xbg = defaultConfigSection.get('extraBackgroundFolders','').strip() # comma separated list of folders
-            backgroundLocations = baseBackgroundLocations + tuple(xbg.split(","))
+            xbg = defaultConfigSection.get('extraBackgroundFolders','').splitlines() # newline separated list of folders
+            fxbg = tuple(filter(lambda bg: (len(bg) != 0), xbg))
+            backgroundLocations = baseBackgroundLocations + fxbg
+    
     bg_notFoundDirList = set([])   #keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
     # Load additionnal fonts

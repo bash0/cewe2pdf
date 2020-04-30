@@ -27,7 +27,7 @@ def tryToBuildBook(keepDoublePages):
     else:
         assert numPages == 28
 
-    os.remove(outFile)
+    #os.remove(outFile)
 
 def test_simpleBookSinglePage():
     tryToBuildBook(False)
@@ -37,5 +37,5 @@ def test_simpleBookDoublePage():
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    #test_simpleBookSinglePage()
-    test_simpleBookDoublePage();
+    test_simpleBookSinglePage()
+    #test_simpleBookDoublePage();
