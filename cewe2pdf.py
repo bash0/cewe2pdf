@@ -422,15 +422,16 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                                     
                     # append the text of the span
                     paragraphText = AppendText(paragraphText, html.escape(span.text))
-                    paragraphText = AppendText(paragraphText, '</span>')
-
-                    if (span.tail != None):
-                        paragraphText = AppendText(paragraphText, html.escape(span.tail))
             
                     # there might be line breaks within the span. Could be that this should be recursive.
                     for spanchild in span:
                         if spanchild.tag == 'br':
                             paragraphText = AppendBreak(paragraphText, spanchild)
+
+                    paragraphText = AppendText(paragraphText, '</span>')
+
+                    if (span.tail != None):
+                        paragraphText = AppendText(paragraphText, html.escape(span.tail))
                 else:
                     print('Ignoring unhandled tag ' + item.tag )
 
