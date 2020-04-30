@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>cewe2pdf.py</StartupFile>
+    <StartupFile>tests\test_simpleBook.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -25,6 +25,7 @@
     <Content Include="additional_fonts.txt" />
     <Content Include="cewe2pdf.ini" />
     <Content Include="requirements.txt" />
+    <Content Include="tests\unittest_fotobook.mcf" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img.png" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img2.png" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img3.png" />
