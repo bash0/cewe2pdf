@@ -303,6 +303,12 @@ def AppendText(paratext, newtext):
         return paratext
     return paratext + newtext
 
+def AppendBreak(paragraphText, parachild):
+    br = parachild
+    paragraphText = AppendText(paragraphText, "<br></br>")
+    paragraphText = AppendText(paragraphText, br.tail)
+    return paragraphText
+
 def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
     parastyle = ParagraphStyle(None, None,
         alignment=reportlab.lib.enums.TA_LEFT, # will often be overridden
@@ -318,22 +324,47 @@ def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
         backColor=backgroundColor)
     return parastyle
 
+def IsBold(weight):
+    return weight > 400
+
+def IsItalic(spanstyle):
+    return 'font-style' in spanstyle and spanstyle['font-style'].strip(" ") == "italic"
+
+def IsUnderline(spanstyle):
+    return 'text-decoration' in spanstyle and spanstyle['text-decoration'].strip(" ") == "underline"
+
+def Dequote(s):
+    """
+    If a string has single or double quotes around it, remove them.
+    Make sure the pair of quotes match.
+    If a matching pair of quotes is not found, return the string unchanged.
+    """
+    if (s[0] == s[-1]) and s.startswith(("'", '"')):
+        return s[1:-1]
+    return s
+
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     # note: it would be better to use proper html processing here
     htmlxml = etree.XML(textTag.text)
     body = htmlxml.find('.//body')
     bstyle = dict([kv.split(':') for kv in
                     body.get('style').lstrip(' ').rstrip(';').split('; ')])
-    family = bstyle['font-family'].strip("'")
-    font = 'Helvetica'
     try:
         bodyfs = floor(float(bstyle['font-size'].strip("pt")))
     except:
         bodyfs = 20
+    family = bstyle['font-family'].strip("'")
     if family in pdf.getAvailableFonts():
         font = family
     elif family in additionnal_fonts:
         font = family
+    else:
+        font = 'Helvetica'
+
+    try:
+        bweight = int(Dequote(bstyle['font-weight']))
+    except:
+        bweight = 400
     color = '#000000' 
     maxfs = bodyfs
 
@@ -365,7 +396,12 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
+        
         paragraphText = '<para autoLeading="max">'
+
+        if IsBold(bweight): # ref https://www.w3schools.com/csSref/pr_font_weight.asp
+            paragraphText = AppendText(paragraphText, "<u>")
+
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1): 
             # append the paragraph text, accepting whatever format is valid now
@@ -376,24 +412,30 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         else:
             for item in htmlspans:
                 if item.tag == 'br':
-                    paragraphText = AppendText(paragraphText, "<br></br>")
+                    paragraphText = AppendBreak(paragraphText, item)
                 elif item.tag == 'span':
                     span = item
                     spanfont = font
-                    style = dict([kv.split(':') for kv in
+                    spanstyle = dict([kv.split(':') for kv in
                                     span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                    if 'font-family' in style:
-                        spanfamily = style['font-family'].strip(
-                            "'")
+                    if 'font-family' in spanstyle:
+                        spanfamily = spanstyle['font-family'].strip("'")
                         if spanfamily in pdf.getAvailableFonts():
                             spanfont = spanfamily
                         elif spanfamily in additionnal_fonts:
                             spanfont = spanfamily
                         if spanfamily != spanfont:
-                            print("Using font family = '%s' (wanted %s)" % (
-                                spanfont, spanfamily))
-                    if 'font-size' in style:
-                        spanfs = floor(float(style['font-size'].strip("pt")))
+                            print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
+                    
+                    spanweight = 400
+                    if 'font-weight' in spanstyle:
+                        try:
+                            spanweight = int(Dequote(spanstyle['font-weight']))
+                        except:
+                            spanweight = 400
+
+                    if 'font-size' in spanstyle:
+                        spanfs = floor(float(spanstyle['font-size'].strip("pt")))
                     else:
                         spanfs = bodyfs
                     if spanfs > maxfs:
@@ -403,26 +445,35 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         ' size=' + str(spanfs)
                         )
 
-                    if 'color' in style:
-                        paragraphText = AppendText(paragraphText, ' color=' + style['color'] )
-
-                    if 'font-style' in style:
-                        pass  # paragraphText = AppendText(paragraphText, ' style=' + style['font-style'] )
+                    if 'color' in spanstyle:
+                        paragraphText = AppendText(paragraphText, ' color=' + spanstyle['color'] )
 
                     if (backgroundColorAttrib is not None):
                         paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
                     
                     paragraphText = AppendText(paragraphText, '>')
+
+                    if IsBold(spanweight): # ref https://www.w3schools.com/csSref/pr_font_weight.asp
+                        paragraphText = AppendText(paragraphText, "<b>")
+                    if IsItalic(spanstyle):
+                        paragraphText = AppendText(paragraphText, '<i>')
+                    if IsUnderline(spanstyle):
+                        paragraphText = AppendText(paragraphText, '<u>')
                                     
                     # append the text of the span
                     paragraphText = AppendText(paragraphText, html.escape(span.text))
+            
+                    # there might be line breaks within the span. Could be that this should be recursive.
+                    for spanchild in span:
+                        if spanchild.tag == 'br':
+                            paragraphText = AppendBreak(paragraphText, spanchild)
 
-                    # if there are line breaks in the span then we must pick up the following texts
-                    brs = span.findall(".//br")
-                    if len(brs) > 0:
-                        for br in brs:
-                            paragraphText = AppendText(paragraphText, "<br></br>")
-                            paragraphText = AppendText(paragraphText, br.tail)
+                    if IsUnderline(spanstyle):
+                        paragraphText = AppendText(paragraphText, '</u>')
+                    if IsItalic(spanstyle):
+                        paragraphText = AppendText(paragraphText, '</i>')
+                    if IsBold(spanweight):
+                        paragraphText = AppendText(paragraphText, "</b>")
 
                     paragraphText = AppendText(paragraphText, '</span>')
 
@@ -430,6 +481,9 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
                 else:
                     print('Ignoring unhandled tag ' + item.tag )
+        
+        if IsBold(bweight):
+            paragraphText = AppendText(paragraphText, "</u>")
 
         paragraphText += '</para>'
 
@@ -584,6 +638,8 @@ def convertMcf(mcfname, keepDoublePages:bool):
         print(mcfname + 'is not a valid mcf file. Exiting.')
         sys.exit(1)
 
+    # a null default configuration section means that some capabilities will be missing!
+    defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
         configFolderFileName = findFileInDirs(
@@ -637,11 +693,30 @@ def convertMcf(mcfname, keepDoublePages:bool):
     for n in additionnal_fonts:
         try:
             pdfmetrics.registerFont(TTFont(n, additionnal_fonts[n]))
-            print("Successfully registered '%s' from '%s'" %
-                  (n, additionnal_fonts[n]))
+            print("Successfully registered '%s' from '%s'" %(n, additionnal_fonts[n]))
         except:
-            print("Failed to register font '%s' (from %s)" %
-                  (n, additionnal_fonts[n]))
+            print("Failed to register font '%s' (from %s)" %(n, additionnal_fonts[n]))
+
+    if defaultConfigSection != None:
+        # the reportlab manual says:
+        #  Before using the TT Fonts in Platypus we should add a mapping from the family name to the individual font
+        #  names that describe the behaviour under the <b> and <i> attributes.
+        #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
+        #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
+        ff = defaultConfigSection.get('FontFamilies','').splitlines() # newline separated list of folders
+        fontFamilies = filter(lambda bg: (len(bg) != 0), ff)
+        for fontfamily in fontFamilies:
+            members = fontfamily.split(",")
+            if len(members) == 5:
+                pdfmetrics.registerFontFamily(
+                    members[0],
+                    normal=members[1],
+                    bold=members[2],
+                    italic=members[3],
+                    boldItalic=members[4]
+                    )
+            else:
+                print('Invalid FontFamily line ignored (!= 5 comma-separated strings): ' + fontfamily)
 
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
