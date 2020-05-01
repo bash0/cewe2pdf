@@ -435,7 +435,15 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 
         pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
 
-        pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+        #try to create a paragraph with the current text and style. Catch errors.
+        try:
+            newParagraph = Paragraph(paragraphText, pdf_styleN)
+            pdf_flowableList.append(newParagraph)
+        except Exception as ex:
+            print('Error:', ex.args[0])
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print('', (exc_type, fname, exc_tb.tb_lineno))        
 
     #Add a frame object that can contain multiple paragraphs
     frameBottomLeft_x = -0.5 * f * areaWidth
@@ -639,15 +647,16 @@ def convertMcf(mcfname, keepDoublePages:bool):
         pagesize = formats[fotobook.get('productname')]
     pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
 
-    # Add additionnal fonts
-    for n in additionnal_fonts:
+    # Add additionnal fonts. We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
+    for curFontName in list(additionnal_fonts):
         try:
-            pdfmetrics.registerFont(TTFont(n, additionnal_fonts[n]))
+            pdfmetrics.registerFont(TTFont(curFontName, additionnal_fonts[curFontName]))
             print("Successfully registered '%s' from '%s'" %
-                  (n, additionnal_fonts[n]))
+                  (curFontName, additionnal_fonts[curFontName]))
         except:
-            print("Failed to register font '%s' (from %s)" %
-                  (n, additionnal_fonts[n]))
+            print("Failed to register font '%s' (from %s). Removing it from the font list." %
+                  (curFontName, additionnal_fonts[curFontName]))
+            del additionnal_fonts[curFontName]    #remove this item from the font list, so it won't be used later and cause problems.
 
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
