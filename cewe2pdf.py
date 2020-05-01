@@ -154,7 +154,7 @@ def getPageElementForPageNumber(fotobook, pageNumber):
 
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
-    if (pagetype=="emptypage"):  #don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
+    if (pagetype == "emptypage"):  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
         return
     if backgroundTags != None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
@@ -435,7 +435,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         bweight = int(Dequote(bstyle['font-weight']))
     except:
         bweight = 400
-    color = '#000000' 
+    color = '#000000'
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
@@ -456,19 +456,17 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     ################
 
     # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
-    
+
     htmlparas = body.findall(".//p")
     for p in htmlparas:
-        maxfs = bodyfs # reset to body font size for each paragraph
+        maxfs = bodyfs  # reset to body font size for each paragraph
         if p.get('align') == 'center':
             pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
         elif p.get('align') == 'right':
             pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
-        
         paragraphText = '<para autoLeading="max">'
-
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1):
             # append the paragraph text in the paragraph style
@@ -497,10 +495,10 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         maxfs = spanfs
 
                     paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, spanfont, spanfs, spanweight, spanstyle)
-                                    
+
                     if span.text != None:
                         paragraphText = AppendText(paragraphText, html.escape(span.text))
-            
+
                     # there might be line breaks within the span. Could be that this should be recursive?
                     for spanchild in span:
                         if spanchild.tag == 'br':
@@ -555,7 +553,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 
 
 def processAreaClipartTag(clipartElement):
-    clipartID = int( clipartElement.get('designElementId'))
+    clipartID = int(clipartElement.get('designElementId'))
     print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
 
 
@@ -567,7 +565,7 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
         # switch pack to the page element for the even page to get the elements
         if pagetype == 'normal' and oddpage == 1:
             page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
-    
+
         for area in page.findall('area'):
             areaPos = area.find('position')
             areaLeft = float(areaPos.get('left').replace(',', '.'))
@@ -735,7 +733,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
         #  names that describe the behaviour under the <b> and <i> attributes.
         #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
         #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
-        ff = defaultConfigSection.get('FontFamilies', '').splitlines() # newline separated list of folders
+        ff = defaultConfigSection.get('FontFamilies', '').splitlines()  # newline separated list of folders
         fontFamilies = filter(lambda bg: (len(bg) != 0), ff)
         for fontfamily in fontFamilies:
             members = fontfamily.split(",")
@@ -779,7 +777,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
                         fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
                         fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
                         if (i.find("./area") is not None)]
-                if (len(page) >= 1):                
+                if (len(page) >= 1):
                     page = page[0]
                     # If there is on page 1 only text, the area-tag is still on page 0.
                     #  So this will either include the text (which is put in page 0),
@@ -788,8 +786,8 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 # Look for the the frist page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
                 if (len(realFirstPageList) > 0):
-                     # we need to do run parseInputPage twico for one output page in the PDF.
-                     #The background needs to be drawn first, or it would obscure any other other elements.
+                    # we need to do run parseInputPage twico for one output page in the PDF.
+                    # The background needs to be drawn first, or it would obscure any other other elements.
                     pagetype = 'singleside'
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
                 pagetype = 'emptypage'
@@ -805,10 +803,10 @@ def convertMcf(mcfname, keepDoublePages: bool):
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
             if ( (keepDoublePages == False)
-               or (
-                    (not (keepDoublePages==True and oddpage==True and pagetype =='normal'))
-                and (not (keepDoublePages==True and n == (pageCount - 1) and pagetype =='cover'))
-               )):
+                or (
+                    (not (keepDoublePages == True and oddpage == True and pagetype == 'normal'))
+                and (not (keepDoublePages == True and n == (pageCount - 1) and pagetype == 'cover'))
+                )):
                 pdf.showPage()
 
         except Exception as ex:
