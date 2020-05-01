@@ -683,6 +683,8 @@ def convertMcf(mcfname, keepDoublePages:bool):
                     #If there is on page 1 only text, the area-tag is still on page 0.
                     #  So this will either include the text (which is put in page 0),
                     #  or the packground which is put in page 1.
+                else:
+                    page = None #if we find no empty page with an area tag, we need to set this to None to prevent an exception later.
 
                 #Look for the the frist page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
