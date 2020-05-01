@@ -343,6 +343,63 @@ def Dequote(s):
         return s[1:-1]
     return s
 
+def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs):
+    spanfont = dfltfont
+    spanfs = dfltfs
+    spanweight = 400
+    
+    spanstyle = dict([kv.split(':') for kv in
+                    item.get('style').lstrip(' ').rstrip(';').split('; ')])
+    if 'font-family' in spanstyle:
+        spanfamily = spanstyle['font-family'].strip("'")
+        if spanfamily in pdf.getAvailableFonts():
+            spanfont = spanfamily
+        elif spanfamily in additionnal_fonts:
+            spanfont = spanfamily
+        if spanfamily != spanfont:
+            print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
+    
+    if 'font-weight' in spanstyle:
+        try:
+            spanweight = int(Dequote(spanstyle['font-weight']))
+        except:
+            spanweight = 400
+    
+    if 'font-size' in spanstyle:
+        spanfs = floor(float(spanstyle['font-size'].strip("pt")))
+    return spanfont, spanfs, spanweight, spanstyle
+
+def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle):
+    paragraphText = AppendText(paragraphText, '<span name="' + font + '"'
+        + ' size=' + str(fsize)
+        )
+    
+    if 'color' in fstyle:
+        paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'] )
+    
+    if (bgColorAttrib is not None):
+        paragraphText = AppendText(paragraphText, ' backcolor=' + bgColorAttrib)
+    
+    paragraphText = AppendText(paragraphText, '>')
+    
+    if IsBold(fweight): # ref https://www.w3schools.com/csSref/pr_font_weight.asp
+        paragraphText = AppendText(paragraphText, "<b>")
+    if IsItalic(fstyle):
+        paragraphText = AppendText(paragraphText, '<i>')
+    if IsUnderline(fstyle):
+        paragraphText = AppendText(paragraphText, '<u>')
+    return paragraphText
+
+def AppendSpanEnd(paragraphText, weight, style):
+    if IsUnderline(style):
+        paragraphText = AppendText(paragraphText, '</u>')
+    if IsItalic(style):
+        paragraphText = AppendText(paragraphText, '</i>')
+    if IsBold(weight):
+        paragraphText = AppendText(paragraphText, "</b>")
+    paragraphText = AppendText(paragraphText, '</span>')
+    return paragraphText
+
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     # note: it would be better to use proper html processing here
     htmlxml = etree.XML(textTag.text)
@@ -355,11 +412,11 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         bodyfs = 20
     family = bstyle['font-family'].strip("'")
     if family in pdf.getAvailableFonts():
-        font = family
+        bodyfont = family
     elif family in additionnal_fonts:
-        font = family
+        bodyfont = family
     else:
-        font = 'Helvetica'
+        bodyfont = 'Helvetica'
 
     try:
         bweight = int(Dequote(bstyle['font-weight']))
@@ -378,7 +435,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         backgroundColor = reportlab.lib.colors.HexColor(backgroundColorAttrib)
     
     # set default para style in case there are no spans to set it
-    pdf_styleN = CreateParagraphStyle(backgroundColor, reportlab.lib.colors.black, font, bodyfs)
+    pdf_styleN = CreateParagraphStyle(backgroundColor, reportlab.lib.colors.black, bodyfont, bodyfs)
 
     ################
     # potential killer here .. the leading for the paragraph is set on the basis of the bodyfs and will
@@ -399,95 +456,49 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         
         paragraphText = '<para autoLeading="max">'
 
-        if IsBold(bweight): # ref https://www.w3schools.com/csSref/pr_font_weight.asp
-            paragraphText = AppendText(paragraphText, "<u>")
-
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1): 
-            # append the paragraph text, accepting whatever format is valid now
+            # append the paragraph text in the paragraph style
+            pfont, pfs, pweight, pstyle = CollectFontInfo(p, pdf, additionnal_fonts, bodyfont, bodyfs)
+            paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, pfont, pfs, pweight, pstyle)
             if (p.text == None):
-                paragraphText = AppendText(paragraphText, "<br></br>")
+                paragraphText = AppendText(paragraphText, "&nbsp;")
             else:
                 paragraphText = AppendText(paragraphText, html.escape(p.text))
+            paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
         else:
             for item in htmlspans:
                 if item.tag == 'br':
+                    pfont, pfs, pweight, pstyle = CollectFontInfo(p, pdf, additionnal_fonts, bodyfont, bodyfs)
+                    paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, pfont, pfs, pweight, pstyle)
                     if len(htmlspans) == 1 and item.tail == None:
                         paragraphText = AppendText(paragraphText, "&nbsp;")
                     else:
                         paragraphText = AppendBreak(paragraphText, item)
+                    paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
                 elif item.tag == 'span':
                     span = item
-                    spanfont = font
-                    spanstyle = dict([kv.split(':') for kv in
-                                    span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                    if 'font-family' in spanstyle:
-                        spanfamily = spanstyle['font-family'].strip("'")
-                        if spanfamily in pdf.getAvailableFonts():
-                            spanfont = spanfamily
-                        elif spanfamily in additionnal_fonts:
-                            spanfont = spanfamily
-                        if spanfamily != spanfont:
-                            print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
-                    
-                    spanweight = 400
-                    if 'font-weight' in spanstyle:
-                        try:
-                            spanweight = int(Dequote(spanstyle['font-weight']))
-                        except:
-                            spanweight = 400
+                    spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additionnal_fonts, bodyfont, bodyfs)
 
-                    if 'font-size' in spanstyle:
-                        spanfs = floor(float(spanstyle['font-size'].strip("pt")))
-                    else:
-                        spanfs = bodyfs
                     if spanfs > maxfs:
                         maxfs = spanfs
 
-                    paragraphText = AppendText(paragraphText, '<span name="' + spanfont + '"'
-                        ' size=' + str(spanfs)
-                        )
-
-                    if 'color' in spanstyle:
-                        paragraphText = AppendText(paragraphText, ' color=' + spanstyle['color'] )
-
-                    if (backgroundColorAttrib is not None):
-                        paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
-                    
-                    paragraphText = AppendText(paragraphText, '>')
-
-                    if IsBold(spanweight): # ref https://www.w3schools.com/csSref/pr_font_weight.asp
-                        paragraphText = AppendText(paragraphText, "<b>")
-                    if IsItalic(spanstyle):
-                        paragraphText = AppendText(paragraphText, '<i>')
-                    if IsUnderline(spanstyle):
-                        paragraphText = AppendText(paragraphText, '<u>')
+                    paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, spanfont, spanfs, spanweight, spanstyle)
                                     
-                    # append the text of the span
                     if span.text != None:
                         paragraphText = AppendText(paragraphText, html.escape(span.text))
             
-                    # there might be line breaks within the span. Could be that this should be recursive.
+                    # there might be line breaks within the span. Could be that this should be recursive?
                     for spanchild in span:
                         if spanchild.tag == 'br':
                             paragraphText = AppendBreak(paragraphText, spanchild)
 
-                    if IsUnderline(spanstyle):
-                        paragraphText = AppendText(paragraphText, '</u>')
-                    if IsItalic(spanstyle):
-                        paragraphText = AppendText(paragraphText, '</i>')
-                    if IsBold(spanweight):
-                        paragraphText = AppendText(paragraphText, "</b>")
-
-                    paragraphText = AppendText(paragraphText, '</span>')
+                    paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle)
 
                     if (span.tail != None):
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
                 else:
                     print('Ignoring unhandled tag ' + item.tag )
-        
-        if IsBold(bweight):
-            paragraphText = AppendText(paragraphText, "</u>")
 
         paragraphText += '</para>'
 

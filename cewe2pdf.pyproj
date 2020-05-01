@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>tests\test_simpleBook.py</StartupFile>
+    <StartupFile>cewe2pdf.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -13,7 +13,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId>CondaEnv|CondaEnv|anaconda3</InterpreterId>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
-    <CommandLineArguments>D:\temp\Cewe2PdfTester.mcf</CommandLineArguments>
+    <CommandLineArguments>D:\Users\pete\Documents\Fotobooks\Cewe2PdfTester.mcf</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
