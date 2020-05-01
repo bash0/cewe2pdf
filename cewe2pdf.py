@@ -66,18 +66,18 @@ from io import BytesIO
 from pathlib import Path
 import argparse  # to parse arguments
 
-import configparser # to read config file, see https://docs.python.org/3/library/configparser.html
+import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
 
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 #### settings ####
-image_quality = 86 # 0=worst, 100=best
-image_res = 150 # dpi
-bg_res = 100 # dpi
+image_quality = 86  # 0=worst, 100=best
+image_res = 150  # dpi
+bg_res = 100  # dpi
 ###########
 
-#.mcf units are 0.1 mm
+# .mcf units are 0.1 mm
 # Tabs seem to be in 8mm pitch
 tab_pitch = 80
 line_scale = 1.2
@@ -93,6 +93,7 @@ tempFileList = []  # we need to remove all this temporary files at the end
 pdf_styles = getSampleStyleSheet()
 pdf_styleN = pdf_styles['Normal']
 pdf_flowableList = []
+
 
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
@@ -135,7 +136,8 @@ def findFileByExtInDirs(filebase, extList, paths):
 
 
 def findFileInDirs(filenames, paths):
-    if  not isinstance(filenames, list): filenames = [filenames]
+    if not isinstance(filenames, list):
+        filenames = [filenames]
     for f in filenames:
         for p in paths:
             testPath = os.path.join(p, f)
@@ -149,9 +151,10 @@ def findFileInDirs(filenames, paths):
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)), 'd'))
 
+
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
-    if (pagetype=="emptypage"): #don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
+    if (pagetype == "emptypage"):  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
         return
     if backgroundTags != None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
@@ -159,7 +162,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
             if curTag.get('alignment') != None:
                 backgroundTag = curTag
                 break
-    
+
         if (backgroundTag != None and cewe_folder != None and
                 backgroundTag.get('designElementId') != None):
             bg = backgroundTag.get('designElementId')
@@ -204,11 +207,10 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 imObj = imObj.convert("RGB")
                 imObj.save(memFileHandle, 'jpeg')
                 memFileHandle.seek(0)
-    
                 # im = imread(bgpath) #does not work with 1-bit images
                 pdf.drawImage(ImageReader(
                     memFileHandle), f * ax, 0, width=f * areaWidth, height=f * areaHeight)
-                #pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
+                # pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
             except Exception as ex:
                 if bgPath not in bg_notFoundDirList:
                     print('cannot find background or error when adding to pdf', bgPath, '\n', ex.args[0])
@@ -218,94 +220,104 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 bg_notFoundDirList.add(bgPath)
     return
 
+
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy):
-        # open raw image file
-        if imageTag.get('filename') == None:
-            return
-        imagePath = os.path.join(
-            mcfBaseFolder, imagedir, imageTag.get('filename'))
-        # the layout software copies the images to another collection folder
-        imagePath = imagePath.replace('safecontainer:/', '')
-        im = PIL.Image.open(imagePath)
-    
-        if imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
-            # display on the right page
-            if keepDoublePages:
-                img_transx = transx + f * pw/2
-            else:
-                img_transx = transx + f * pw
+    # open raw image file
+    if imageTag.get('filename') == None:
+        return
+    imagePath = os.path.join(
+        mcfBaseFolder, imagedir, imageTag.get('filename'))
+    # the layout software copies the images to another collection folder
+    imagePath = imagePath.replace('safecontainer:/', '')
+    im = PIL.Image.open(imagePath)
+
+    if imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
+        # display on the right page
+        if keepDoublePages:
+            img_transx = transx + f * pw/2
         else:
-            img_transx = transx
-    
-        # correct for exif rotation
-        im = autorot(im)
-        # get the cutout position and scale
-        imleft = float(imageTag.find('cutout').get(
-            'left').replace(',', '.'))
-        imtop = float(imageTag.find('cutout').get(
-            'top').replace(',', '.'))
-        imageWidth_px, imageHeight_px = im.size
-        imsc = float(imageTag.find('cutout').get('scale'))
-    
-        # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
-        # to get from .mcf units are divided by the scale factor to get to image pixel units.
-    
-        # crop image
-        im = im.crop((int(0.5 - imleft/imsc),
-                        int(0.5 - imtop/imsc),
-                        int(0.5 - imleft/imsc +
-                            areaWidth / imsc),
-                        int(0.5 - imtop/imsc + areaHeight / imsc)))
-    
-        # scale image
-        # re-scale the image if it is much bigger than final resolution in PDF
-        # set desired DPI based on where the image is used. The background gets a lower DPI.
-        if imageTag.tag == 'imagebackground' and pagetype != 'cover':
-            res = bg_res
-        else:
-            res = image_res
-        # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
-        new_w = int(0.5 + areaWidth * res / 254.)
-        new_h = int(0.5 + areaHeight * res / 254.)
-        factor = sqrt(new_w * new_h /
-                        float(im.size[0] * im.size[1]))
-        if factor <= 0.8:
-            im = im.resize(
-                (new_w, new_h), PIL.Image.ANTIALIAS)
-        im.load()
-    
-        # re-compress image
-        jpeg = tempfile.NamedTemporaryFile()
-        # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
-        jpeg.close()
-        if im.mode == 'RGBA' or im.mode == 'P':
-            im.save(jpeg.name, "PNG")
-        else:
-            im.save(jpeg.name, "JPEG",
-                    quality=image_quality)
-    
-        # place image
-        print('image', imageTag.get('filename'))
-        pdf.translate(img_transx, transy)
-        pdf.rotate(-areaRot)
-        pdf.drawImage(ImageReader(jpeg.name),
-                        f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-                        width=f * areaWidth, height=f * areaHeight, mask='auto')
-        pdf.rotate(areaRot)
-        pdf.translate(-img_transx, -transy)
-    
-        # we now have temporary file, that we need to delete after pdf creation
-        tempFileList.append(jpeg.name)
-        # we can not delete now, because file is opened by pdf library
+            img_transx = transx + f * pw
+    else:
+        img_transx = transx
+
+    # correct for exif rotation
+    im = autorot(im)
+    # get the cutout position and scale
+    imleft = float(imageTag.find('cutout').get(
+        'left').replace(',', '.'))
+    imtop = float(imageTag.find('cutout').get(
+        'top').replace(',', '.'))
+    imageWidth_px, imageHeight_px = im.size
+    imsc = float(imageTag.find('cutout').get('scale'))
+
+    # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
+    # to get from .mcf units are divided by the scale factor to get to image pixel units.
+
+    # crop image
+    im = im.crop((int(0.5 - imleft/imsc),
+                    int(0.5 - imtop/imsc),
+                    int(0.5 - imleft/imsc +
+                        areaWidth / imsc),
+                    int(0.5 - imtop/imsc + areaHeight / imsc)))
+
+    # scale image
+    # re-scale the image if it is much bigger than final resolution in PDF
+    # set desired DPI based on where the image is used. The background gets a lower DPI.
+    if imageTag.tag == 'imagebackground' and pagetype != 'cover':
+        res = bg_res
+    else:
+        res = image_res
+    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
+    new_w = int(0.5 + areaWidth * res / 254.)
+    new_h = int(0.5 + areaHeight * res / 254.)
+    factor = sqrt(new_w * new_h /
+                    float(im.size[0] * im.size[1]))
+    if factor <= 0.8:
+        im = im.resize(
+            (new_w, new_h), PIL.Image.ANTIALIAS)
+    im.load()
+
+    # re-compress image
+    jpeg = tempfile.NamedTemporaryFile()
+    # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
+    jpeg.close()
+    if im.mode == 'RGBA' or im.mode == 'P':
+        im.save(jpeg.name, "PNG")
+    else:
+        im.save(jpeg.name, "JPEG",
+                quality=image_quality)
+
+    # place image
+    print('image', imageTag.get('filename'))
+    pdf.translate(img_transx, transy)
+    pdf.rotate(-areaRot)
+    pdf.drawImage(ImageReader(jpeg.name),
+                    f * -0.5 * areaWidth, f * -0.5 * areaHeight,
+                    width=f * areaWidth, height=f * areaHeight, mask='auto')
+    pdf.rotate(areaRot)
+    pdf.translate(-img_transx, -transy)
+
+    # we now have temporary file, that we need to delete after pdf creation
+    tempFileList.append(jpeg.name)
+    # we can not delete now, because file is opened by pdf library
+
 
 def AppendText(paratext, newtext):
     if newtext is None:
         return paratext
-    return paratext + newtext
+    return paratext + newtext.replace('\t', '&nbsp;&nbsp;&nbsp;')
+
+
+def AppendBreak(paragraphText, parachild):
+    br = parachild
+    paragraphText = AppendText(paragraphText, "<br></br>")
+    paragraphText = AppendText(paragraphText, br.tail)
+    return paragraphText
+
 
 def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
     parastyle = ParagraphStyle(None, None,
-        alignment=reportlab.lib.enums.TA_LEFT, # will often be overridden
+        alignment=reportlab.lib.enums.TA_LEFT,  # will often be overridden
         fontSize=fontsize,
         fontName=font,
         leading=fontsize*line_scale,  # line spacing (text + leading)
@@ -313,10 +325,93 @@ def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
         borderWidth=0,
         leftIndent=0,
         rightIndent=0,
-        embeddedHyphenation=1, # allow line break on existing hyphens
+        embeddedHyphenation=1,  # allow line break on existing hyphens
         textColor=textcolor,
         backColor=backgroundColor)
     return parastyle
+
+
+def IsBold(weight):
+    return weight > 400
+
+
+def IsItalic(spanstyle):
+    return 'font-style' in spanstyle and spanstyle['font-style'].strip(" ") == "italic"
+
+
+def IsUnderline(spanstyle):
+    return 'text-decoration' in spanstyle and spanstyle['text-decoration'].strip(" ") == "underline"
+
+
+def Dequote(s):
+    """
+    If a string has single or double quotes around it, remove them.
+    Make sure the pair of quotes match.
+    If a matching pair of quotes is not found, return the string unchanged.
+    """
+    if (s[0] == s[-1]) and s.startswith(("'", '"')):
+        return s[1:-1]
+    return s
+
+
+def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs):
+    spanfont = dfltfont
+    spanfs = dfltfs
+    spanweight = 400
+    spanstyle = dict([kv.split(':') for kv in
+                    item.get('style').lstrip(' ').rstrip(';').split('; ')])
+    if 'font-family' in spanstyle:
+        spanfamily = spanstyle['font-family'].strip("'")
+        if spanfamily in pdf.getAvailableFonts():
+            spanfont = spanfamily
+        elif spanfamily in additionnal_fonts:
+            spanfont = spanfamily
+        if spanfamily != spanfont:
+            print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
+
+    if 'font-weight' in spanstyle:
+        try:
+            spanweight = int(Dequote(spanstyle['font-weight']))
+        except:
+            spanweight = 400
+
+    if 'font-size' in spanstyle:
+        spanfs = floor(float(spanstyle['font-size'].strip("pt")))
+    return spanfont, spanfs, spanweight, spanstyle
+
+
+def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle):
+    paragraphText = AppendText(paragraphText, '<span name="' + font + '"'
+        + ' size=' + str(fsize)
+        )
+
+    if 'color' in fstyle:
+        paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])
+
+    if (bgColorAttrib is not None):
+        paragraphText = AppendText(paragraphText, ' backcolor=' + bgColorAttrib)
+
+    paragraphText = AppendText(paragraphText, '>')
+
+    if IsBold(fweight):  # ref https://www.w3schools.com/csSref/pr_font_weight.asp
+        paragraphText = AppendText(paragraphText, "<b>")
+    if IsItalic(fstyle):
+        paragraphText = AppendText(paragraphText, '<i>')
+    if IsUnderline(fstyle):
+        paragraphText = AppendText(paragraphText, '<u>')
+    return paragraphText
+
+
+def AppendSpanEnd(paragraphText, weight, style):
+    if IsUnderline(style):
+        paragraphText = AppendText(paragraphText, '</u>')
+    if IsItalic(style):
+        paragraphText = AppendText(paragraphText, '</i>')
+    if IsBold(weight):
+        paragraphText = AppendText(paragraphText, "</b>")
+    paragraphText = AppendText(paragraphText, '</span>')
+    return paragraphText
+
 
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     # note: it would be better to use proper html processing here
@@ -324,30 +419,35 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     body = htmlxml.find('.//body')
     bstyle = dict([kv.split(':') for kv in
                     body.get('style').lstrip(' ').rstrip(';').split('; ')])
-    family = bstyle['font-family'].strip("'")
-    font = 'Helvetica'
     try:
         bodyfs = floor(float(bstyle['font-size'].strip("pt")))
     except:
-        bodyfs = 20
+        bodyfs = 12
+    family = bstyle['font-family'].strip("'")
     if family in pdf.getAvailableFonts():
-        font = family
+        bodyfont = family
     elif family in additionnal_fonts:
-        font = family
-    color = '#000000' 
-    maxfs = bodyfs
+        bodyfont = family
+    else:
+        bodyfont = 'Helvetica'
+
+    try:
+        bweight = int(Dequote(bstyle['font-weight']))
+    except:
+        bweight = 400
+    color = '#000000'
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
-    
-    #Get the background color. It is stored in an extra element.
+
+    # Get the background color. It is stored in an extra element.
     backgroundColor = None
     backgroundColorAttrib = area.get('backgroundcolor')
     if (backgroundColorAttrib is not None):
         backgroundColor = reportlab.lib.colors.HexColor(backgroundColorAttrib)
-    
+
     # set default para style in case there are no spans to set it
-    pdf_styleN = CreateParagraphStyle(backgroundColor, reportlab.lib.colors.black, font, bodyfs)
+    pdf_styleN = CreateParagraphStyle(backgroundColor, reportlab.lib.colors.black, bodyfont, bodyfs)
 
     ################
     # potential killer here .. the leading for the paragraph is set on the basis of the bodyfs and will
@@ -356,9 +456,10 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     ################
 
     # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
-    
+
     htmlparas = body.findall(".//p")
     for p in htmlparas:
+        maxfs = bodyfs  # reset to body font size for each paragraph
         if p.get('align') == 'center':
             pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
         elif p.get('align') == 'right':
@@ -367,69 +468,48 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
         paragraphText = '<para autoLeading="max">'
         htmlspans = p.findall(".*")
-        if (len(htmlspans) < 1): 
-            # append the paragraph text, accepting whatever format is valid now
+        if (len(htmlspans) < 1):
+            # append the paragraph text in the paragraph style
+            pfont, pfs, pweight, pstyle = CollectFontInfo(p, pdf, additionnal_fonts, bodyfont, bodyfs)
+            paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, pfont, pfs, pweight, pstyle)
             if (p.text == None):
-                paragraphText = AppendText(paragraphText, "<br></br>")
+                paragraphText = AppendText(paragraphText, "&nbsp;")
             else:
                 paragraphText = AppendText(paragraphText, html.escape(p.text))
+            paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
         else:
             for item in htmlspans:
                 if item.tag == 'br':
-                    paragraphText = AppendText(paragraphText, "<br></br>")
+                    pfont, pfs, pweight, pstyle = CollectFontInfo(p, pdf, additionnal_fonts, bodyfont, bodyfs)
+                    paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, pfont, pfs, pweight, pstyle)
+                    if len(htmlspans) == 1 and item.tail == None:
+                        paragraphText = AppendText(paragraphText, "&nbsp;")
+                    else:
+                        paragraphText = AppendBreak(paragraphText, item)
+                    paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
                 elif item.tag == 'span':
                     span = item
-                    spanfont = font
-                    style = dict([kv.split(':') for kv in
-                                    span.get('style').lstrip(' ').rstrip(';').split('; ')])
-                    if 'font-family' in style:
-                        spanfamily = style['font-family'].strip(
-                            "'")
-                        if spanfamily in pdf.getAvailableFonts():
-                            spanfont = spanfamily
-                        elif spanfamily in additionnal_fonts:
-                            spanfont = spanfamily
-                        if spanfamily != spanfont:
-                            print("Using font family = '%s' (wanted %s)" % (
-                                spanfont, spanfamily))
-                    if 'font-size' in style:
-                        spanfs = floor(float(style['font-size'].strip("pt")))
-                    else:
-                        spanfs = bodyfs
+                    spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additionnal_fonts, bodyfont, bodyfs)
+
                     if spanfs > maxfs:
                         maxfs = spanfs
 
-                    paragraphText = AppendText(paragraphText, '<span name="' + spanfont + '"'
-                        ' size=' + str(spanfs)
-                        )
+                    paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, spanfont, spanfs, spanweight, spanstyle)
 
-                    if 'color' in style:
-                        paragraphText = AppendText(paragraphText, ' color=' + style['color'] )
+                    if span.text != None:
+                        paragraphText = AppendText(paragraphText, html.escape(span.text))
 
-                    if 'font-style' in style:
-                        pass  # paragraphText = AppendText(paragraphText, ' style=' + style['font-style'] )
+                    # there might be line breaks within the span. Could be that this should be recursive?
+                    for spanchild in span:
+                        if spanchild.tag == 'br':
+                            paragraphText = AppendBreak(paragraphText, spanchild)
 
-                    if (backgroundColorAttrib is not None):
-                        paragraphText = AppendText(paragraphText, ' backcolor=' + backgroundColorAttrib)
-                    
-                    paragraphText = AppendText(paragraphText, '>')
-                                    
-                    # append the text of the span
-                    paragraphText = AppendText(paragraphText, html.escape(span.text))
-
-                    # if there are line breaks in the span then we must pick up the following texts
-                    brs = span.findall(".//br")
-                    if len(brs) > 0:
-                        for br in brs:
-                            paragraphText = AppendText(paragraphText, "<br></br>")
-                            paragraphText = AppendText(paragraphText, br.tail)
-
-                    paragraphText = AppendText(paragraphText, '</span>')
+                    paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle)
 
                     if (span.tail != None):
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
                 else:
-                    print('Ignoring unhandled tag ' + item.tag )
+                    print('Ignoring unhandled tag ' + item.tag)
 
         paragraphText += '</para>'
 
@@ -445,14 +525,14 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print('', (exc_type, fname, exc_tb.tb_lineno))        
 
-    #Add a frame object that can contain multiple paragraphs
+    # Add a frame object that can contain multiple paragraphs
     frameBottomLeft_x = -0.5 * f * areaWidth
     frameBottomLeft_y = -0.5 * f * areaHeight
     frameWidth = f * areaWidth
     frameHeight = f * areaHeight
 
-    #Go through all flowables and test if the fit in the frame. If not increase the frame height.
-    #To solve the problem, that if each paragraph will fit indivdually, and also all together,
+    # Go through all flowables and test if the fit in the frame. If not increase the frame height.
+    # To solve the problem, that if each paragraph will fit indivdually, and also all together,
     # we need to keep track of the total summed height+
     totalMaxHeight = 0
     for j in range(len(pdf_flowableList)):
@@ -460,7 +540,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         totalMaxHeight += neededHeight
     if (totalMaxHeight > frameHeight):
         print('Warning: A set of paragraphs would not fit inside its frame. Frame height will be increased to prevent loss of text.')
-    frameHeight = max( frameHeight, totalMaxHeight)   # increase the height
+    frameHeight = max(frameHeight, totalMaxHeight)   # increase the height
 
     newFrame = Frame(frameBottomLeft_x, frameBottomLeft_y,
                         frameWidth, frameHeight,
@@ -469,19 +549,21 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         showBoundary=0  # for debugging useful
                         )
 
-    #This call should produce an exception, if any of the flowables do not fit inside the frame.
-    #But there seems to be a bug, and no exception is triggered.
-    #We took care of this by making the frame so large, that it always can fit the flowables.
-    #maybe should switch to res=newFrame.split(flowable, pdf) and check the result manually.
+    # This call should produce an exception, if any of the flowables do not fit inside the frame.
+    # But there seems to be a bug, and no exception is triggered.
+    # We took care of this by making the frame so large, that it always can fit the flowables.
+    # maybe should switch to res=newFrame.split(flowable, pdf) and check the result manually.
     newFrame.addFromList(pdf_flowableList, pdf)
 
     pdf.rotate(areaRot)
     pdf.translate(-transx, -transy)
     return
 
+
 def processAreaClipartTag(clipartElement):
-    clipartID = int( clipartElement.get('designElementId'))
+    clipartID = int(clipartElement.get('designElementId'))
     print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
+
 
 def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw):
     if keepDoublePages and oddpage == 1 and pagetype == 'normal':
@@ -491,7 +573,7 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
         # switch pack to the page element for the even page to get the elements
         if pagetype == 'normal' and oddpage == 1:
             page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
-    
+
         for area in page.findall('area'):
             areaPos = area.find('position')
             areaLeft = float(areaPos.get('left').replace(',', '.'))
@@ -504,7 +586,7 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
             areaWidth = float(areaPos.get('width').replace(',', '.'))
             areaHeight = float(areaPos.get('height').replace(',', '.'))
             areaRot = float(areaPos.get('rotation'))
-    
+
             # check if the image is on current page at all
             if pagetype == 'normal' and not keepDoublePages:
                 if oddpage:
@@ -514,14 +596,14 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
                 else:
                     if areaLeft > pw:  # the left image edge is beyond the right page border.
                         continue
-    
+
             # center positions
             cx = areaLeft + 0.5 * areaWidth
             cy = ph - (areaTop + 0.5 * areaHeight)
-    
+
             transx = f * cx
             transy = f * cy
-    
+
             # process images
             for imageTag in area.findall('imagebackground') + area.findall('image'):
                 processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy)
@@ -529,14 +611,14 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
             # process text
             for textTag in area.findall('text'):
                 processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
-                        
-            #Clip-Art
-            #In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
-            # We are using the <clipart> element here
-            for clipartElement in area.findall('clipart'):                            
-                processAreaClipartTag(clipartElement)
 
+            # Clip-Art
+            # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
+            # We are using the <clipart> element here
+            for clipartElement in area.findall('clipart'):
+                processAreaClipartTag(clipartElement)
     return
+
 
 def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
     print('parsing page', page.get('pagenr'), ' of ', pageCount)
@@ -567,6 +649,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
     processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw)
 
+
 def getBaseBackgroundLocations(basefolder):
     # create a tuple of places (folders) where background resources would be found by default
     baseBackgroundLocations = (
@@ -577,7 +660,8 @@ def getBaseBackgroundLocations(basefolder):
     )
     return baseBackgroundLocations
 
-def convertMcf(mcfname, keepDoublePages:bool):
+
+def convertMcf(mcfname, keepDoublePages: bool):
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
     mcfBaseFolder = mcfPathObj.parent
@@ -592,6 +676,8 @@ def convertMcf(mcfname, keepDoublePages:bool):
         print(mcfname + 'is not a valid mcf file. Exiting.')
         sys.exit(1)
 
+    # a null default configuration section means that some capabilities will be missing!
+    defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
         configFolderFileName = findFileInDirs(
@@ -620,11 +706,11 @@ def convertMcf(mcfname, keepDoublePages:bool):
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
             # add any extra background folders
-            xbg = defaultConfigSection.get('extraBackgroundFolders','').splitlines() # newline separated list of folders
+            xbg = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()  # newline separated list of folders
             fxbg = tuple(filter(lambda bg: (len(bg) != 0), xbg))
             backgroundLocations = baseBackgroundLocations + fxbg
-    
-    bg_notFoundDirList = set([])   #keep a list with background folders that not found, to prevent multiple errors for the same cause.
+
+    bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
     # Load additionnal fonts
     additionnal_fonts = {}
@@ -651,19 +737,39 @@ def convertMcf(mcfname, keepDoublePages:bool):
     for curFontName in list(additionnal_fonts):
         try:
             pdfmetrics.registerFont(TTFont(curFontName, additionnal_fonts[curFontName]))
-            print("Successfully registered '%s' from '%s'" %
-                  (curFontName, additionnal_fonts[curFontName]))
+            print("Successfully registered '%s' from '%s'" %(n, additionnal_fonts[curFontName]))
         except:
-            print("Failed to register font '%s' (from %s). Removing it from the font list." %
-                  (curFontName, additionnal_fonts[curFontName]))
+            print("Failed to register font '%s' (from %s)" %(curFontName, additionnal_fonts[curFontName]))
             del additionnal_fonts[curFontName]    #remove this item from the font list, so it won't be used later and cause problems.
+
+
+    if defaultConfigSection != None:
+        # the reportlab manual says:
+        #  Before using the TT Fonts in Platypus we should add a mapping from the family name to the individual font
+        #  names that describe the behaviour under the <b> and <i> attributes.
+        #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
+        #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
+        ff = defaultConfigSection.get('FontFamilies', '').splitlines()  # newline separated list of folders
+        fontFamilies = filter(lambda bg: (len(bg) != 0), ff)
+        for fontfamily in fontFamilies:
+            members = fontfamily.split(",")
+            if len(members) == 5:
+                pdfmetrics.registerFontFamily(
+                    members[0],
+                    normal=members[1],
+                    bold=members[2],
+                    italic=members[3],
+                    boldItalic=members[4]
+                    )
+            else:
+                print('Invalid FontFamily line ignored (!= 5 comma-separated strings): ' + fontfamily)
 
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
     if articleConfigElement == None:
         print(mcfname + ' is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
-    pageCount = int(articleConfigElement.get('normalpages')) + 2    #maximum number of pages
+    pageCount = int(articleConfigElement.get('normalpages')) + 2    # maximum number of pages
     imagedir = fotobook.get('imagedir')
 
     for n in range(pageCount):
@@ -676,30 +782,30 @@ def convertMcf(mcfname, keepDoublePages:bool):
                         if (i.find("./area") is not None)][0]
                 oddpage = (n == 0)
                 pagetype = 'cover'
-                 #for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
-                if ((keepDoublePages == True) and  (n == (pageCount - 1))):
+                # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
+                if ((keepDoublePages == True) and (n == (pageCount - 1))):
                     page = None
             elif n == 1:
                 pageNumber = 1
                 oddpage = True
-                #Look for an empty page 0 that still contains an area element
+                # Look for an empty page 0 that still contains an area element
                 page = [i for i in
                         fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
                         fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
                         if (i.find("./area") is not None)]
-                if (len(page) >= 1):                
+                if (len(page) >= 1):
                     page = page[0]
-                    #If there is on page 1 only text, the area-tag is still on page 0.
+                    # If there is on page 1 only text, the area-tag is still on page 0.
                     #  So this will either include the text (which is put in page 0),
                     #  or the packground which is put in page 1.
                 else:
                     page = None #if we find no empty page with an area tag, we need to set this to None to prevent an exception later.
 
-                #Look for the the frist page and set it up for processing
+                # Look for the the frist page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
                 if (len(realFirstPageList) > 0):
-                     # we need to do run parseInputPage twico for one output page in the PDF.
-                     #The background needs to be drawn first, or it would obscure any other other elements.
+                    # we need to do run parseInputPage twico for one output page in the PDF.
+                    # The background needs to be drawn first, or it would obscure any other other elements.
                     pagetype = 'singleside'
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
                 pagetype = 'emptypage'
@@ -715,10 +821,10 @@ def convertMcf(mcfname, keepDoublePages:bool):
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
             if ( (keepDoublePages == False)
-               or (
-                    (not (keepDoublePages==True and oddpage==True and pagetype =='normal'))
-                and (not (keepDoublePages==True and n == (pageCount - 1) and pagetype =='cover'))
-               )):
+                or (
+                    (not (keepDoublePages == True and oddpage == True and pagetype == 'normal'))
+                and (not (keepDoublePages == True and n == (pageCount - 1) and pagetype == 'cover'))
+                )):
                 pdf.showPage()
 
         except Exception as ex:
@@ -738,6 +844,7 @@ def convertMcf(mcfname, keepDoublePages:bool):
         if os.path.exists(tmpFileName):
             os.remove(tmpFileName)
     return True
+
 
 if __name__ == '__main__':
     # only executed when this file is run directly.
