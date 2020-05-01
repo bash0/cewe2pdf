@@ -423,7 +423,6 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     except:
         bweight = 400
     color = '#000000' 
-    maxfs = bodyfs
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
@@ -447,6 +446,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     
     htmlparas = body.findall(".//p")
     for p in htmlparas:
+        maxfs = bodyfs # reset to body font size for each paragraph
+
         if p.get('align') == 'center':
             pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
         elif p.get('align') == 'right':
