@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="7250" externalProjectId="" folderID="9c28add9-401b-41ac-af20-b152b6a12f15" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="7250" externalProjectId="" identifier="79d50010-d8ee-48b3-81c3-afd8a70ab061" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.0.1" createdWithHPSVersionBuild="20191025" projectID="69675965-93ed-4a07-b25f-7dc31eedcc67" projectIDCreatedEpoch="1575196183"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="7.0.2" programversionBuild="20200306" savetime="2020-04-29 17:09"/>
-    <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="6.4.7" programversionBuild="20191106" savetime="2020-04-30 19:34"/>
+    <articleConfig normalpages="26" pagenaming="1" productvariant="pages:26" totalpages="31"/>
     <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
-        <outline width="0"/>
+        <outline enabled="0" width="0"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+        <lastTextFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="0" backgroundColor="#fffbd75d" font="Bodoni,16,-1,5,75,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
         <bundlesize height="2750" width="4290"/>
         <designElementIDs background="201" layout="82069"/>
         <background alignment="4" designElementId="201" rotation="0" type="1"/>
         <background designElementId="82069" layout="1" templatename="fullcoverpage_portrait,normal"/>
-        <area areatype="imagearea">
+        <area areatype="imagearea" isResizable="1">
             <position height="2950" left="-100" rotation="0" top="-100" width="2192" zposition="100"/>
             <decoration/>
             <image filename="safecontainer:/img6.png" useABK="0">
                 <cutout left="-10.25" scale="4.60938" top="0"/>
             </image>
         </area>
-        <area areatype="imagearea">
+        <area areatype="imagearea" isResizable="1">
             <position height="2950" left="2198" rotation="0" top="-100" width="2192" zposition="101"/>
             <decoration/>
             <image filename="safecontainer:/img5.png" useABK="0">
                 <cutout left="-10.25" scale="4.60938" top="0"/>
             </image>
         </area>
-        <area areatype="spinetextarea">
+        <area areatype="spinetextarea" isResizable="0">
             <position height="106" left="820" rotation="270" top="1322" width="2650" zposition="7000"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:8pt; font-weight:600; font-style:normal;"><table style="-qt-table-type: root; margin-top:7px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#df1900;">Front title	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Amsterdam - Baltimore - Casablanca - Danemark - Edison -<br /></span><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#1b7dd4;">  Subtitle	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Florida - Gallipoli - Havanna - Italia - Jerusalem</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Stafford,8,-1,5,75,0,0,0,0,0" foregroundColor="#ffffffff" hasOutline="0"/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:8pt; font-weight:600; font-style:normal;"><table style="-qt-table-type: root; margin-top:7px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#df1900;">Front title	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Amsterdam - Baltimore - Casablanca - Danemark - Edison -<br /></span><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#1b7dd4;">  Subtitle	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Florida - Gallipoli - Havanna - Italia - Jerusalem</span></p></td></tr></table></body></html>]]><outline enabled="0" width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Stafford,8,-1,5,75,0,0,0,0,0" foregroundColor="#ffffffff" hasOutline="0"/>
             </text>
         </area>
-        <area areatype="textarea">
+        <area areatype="textarea" isResizable="1">
             <position height="550" left="2398.19" rotation="0" top="200" width="1691.62" zposition="7000"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="title"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:12pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Front title</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            <text applySpotColor="0" areaTextType="title"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:12pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Front title</span></p></td></tr></table></body></html>]]><outline enabled="0" width="0"/>
+                <textFormat Alignment="ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
             </text>
         </area>
     </page>
@@ -58,39 +58,39 @@
         <bundlesize height="2700" width="4100"/>
         <designElementIDs background="201"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
-        <area areatype="imagearea">
+        <area areatype="imagearea" isResizable="1">
             <position height="1200" left="2160" rotation="0" top="110" width="1830" zposition="100"/>
             <decoration/>
             <image filename="safecontainer:/img.png" useABK="0">
                 <cutout left="0" scale="2.85938" top="-86.25"/>
             </image>
         </area>
-        <area areatype="imagearea">
+        <area areatype="imagearea" isResizable="1">
             <position height="1200" left="2160" rotation="0" top="1390" width="1830" zposition="101"/>
             <decoration/>
             <image filename="safecontainer:/img2.png" useABK="0">
                 <cutout left="0" scale="2.85938" top="-86.25"/>
             </image>
         </area>
-        <area areatype="textarea">
+        <area areatype="textarea" isResizable="1">
             <position height="244" left="2160" rotation="0" top="1235.31" width="1696.8" zposition="7000"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:18pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">There is text.</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This will overflow into two lines. This will overflow into two lines. This will overflow into two lines. This will overflow into two lines. </span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,18,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:18pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">There is text.</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This will overflow into two lines. This will overflow into two lines. This will overflow into two lines. This will overflow into two lines. </span></p></td></tr></table></body></html>]]><outline enabled="0" width="0"/>
+                <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,18,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
             </text>
         </area>
-        <area areatype="textarea">
+        <area areatype="textarea" isResizable="1">
             <position height="464" left="2210" rotation="0" top="2030" width="1720" zposition="7004"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:12pt; font-weight:400; font-style:normal;"><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Stafford'; font-size:22pt; font-weight:600; color:#ffffff;">Amsterdam - Baltimore - Casablanca - Danemark - Edison -<br />Florida - Gallipoli - Havanna - Italia - Jerusalem</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING" IndentMargin="4" VerticalIndentMargin="4" backgroundColor="#00000000" font="Calibri,12,-1,5,50,0,0,0,0,0" foregroundColor="#ffffffff" hasOutline="0"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:12pt; font-weight:400; font-style:normal;"><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Stafford'; font-size:22pt; font-weight:600; color:#ffffff;">Amsterdam - Baltimore - Casablanca - Danemark - Edison -<br />Florida - Gallipoli - Havanna - Italia - Jerusalem</span></p></body></html>]]><outline enabled="0" width="0"/>
+                <textFormat Alignment="ALIGNLEFT" IndentMargin="4" VerticalIndentMargin="4" backgroundColor="#00000000" font="Calibri,12,-1,5,50,0,0,0,0,0" foregroundColor="#ffffffff" hasOutline="0"/>
             </text>
         </area>
-        <area areatype="textarea">
+        <area areatype="textarea" isResizable="1">
             <position height="724" left="2130" rotation="0" top="310" width="1920" zposition="7005"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Bodoni'; font-size:48pt; font-weight:600; font-style:normal;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Centered</span></p><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Right</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Left</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Bodoni,48,-1,5,75,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Bodoni'; font-size:48pt; font-weight:600; font-style:normal;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Centered</span></p><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Right</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Left</span></p></body></html>]]><outline enabled="0" width="0"/>
+                <textFormat Alignment="ALIGNLEFT" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Bodoni,48,-1,5,75,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
             </text>
         </area>
     </page>
@@ -105,35 +105,35 @@
         <designElementIDs background="201" layout="125061"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
-        <area areatype="imagebackgroundarea">
+        <area areatype="imagebackgroundarea" isResizable="0">
             <position height="2760" left="-30" rotation="0" top="-30" width="4160" zposition="1"/>
             <decoration/>
             <imagebackground backgroundPosition="BUNDLE" filename="safecontainer:/img2.png" useABK="0">
                 <cutout left="0" scale="6.5" top="-156"/>
             </imagebackground>
         </area>
-        <area areatype="imagearea">
+        <area areatype="imagearea" isResizable="1">
             <position height="1200" left="110" rotation="0" top="110" width="1830" zposition="100"/>
             <decoration/>
             <image filename="safecontainer:/img3.png" useABK="0">
                 <cutout left="0" scale="2.85938" top="-86.25"/>
             </image>
         </area>
-        <area areatype="imagearea">
+        <area areatype="imagearea" isResizable="1">
             <position height="1200" left="109.966" rotation="356" top="1390.04" width="1830" zposition="101"/>
             <decoration/>
             <image filename="safecontainer:/img4.png" useABK="0">
                 <cutout left="0" scale="2.85938" top="-86.25"/>
             </image>
         </area>
-        <area areatype="imagearea">
+        <area areatype="imagearea" isResizable="1">
             <position height="1359" left="2165.84" rotation="0" top="169.247" width="1019" zposition="102"/>
             <decoration/>
             <image filename="safecontainer:/img5.png" useABK="0">
                 <cutout left="0" scale="2.12344" top="0"/>
             </image>
         </area>
-        <area areatype="imagearea">
+        <area areatype="imagearea" isResizable="1">
             <position height="1359" left="2845.41" rotation="0" top="1231" width="1019" zposition="103"/>
             <decoration/>
             <image filename="safecontainer:/img6.png" useABK="0">
@@ -152,32 +152,32 @@
         <designElementIDs background="201" layout="125061"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
-        <area areatype="textarea" backgroundcolor="4289655497">
+        <area areatype="textarea" backgroundcolor="4289655497" isResizable="1">
             <position height="713" left="250" rotation="0" top="228" width="1240" zposition="7001"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Bodoni'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Calibri'; color:#000000;">&lt;Shift-Enter&gt;<br />Lorem ipsum dolores Calibri 16<br /></span><span style=" color:#000000;">Next </span><span style=" font-size:24pt; color:#000000;">Line Bodoni 16 &amp; 24<br /></span><span style=" font-family:'Stafford'; color:#000000;">Third Line Stafford 16<br /></span><span style=" font-family:'CalligraphScript'; color:#000000;">4. Line Script 16<br /></span><span style=" color:#1b7dd4;">Blue </span><span style=" color:#df1900;">Red </span><span style=" color:#1ea44d;">Green </span><span style=" color:#ffffff;">White </span>Black<br /><span style=" font-weight:600; color:#1b7dd4;">Blue </span><span style=" font-weight:600; color:#df1900;">Red </span><span style=" font-weight:600; color:#ffffff;">White </span><span style=" font-weight:600; color:#1ea44d;">Green </span><span style=" font-weight:600;">Black<br /></span><span style=" color:#1b7dd4;">Blue </span><span style=" font-weight:600; color:#df1900;">Red </span><span style=" font-weight:600; font-style:italic; color:#1ea44d;">Green </span><span style=" font-weight:600; font-style:italic; color:#fca404;">Orange</span><span style=" font-style:italic; color:#fca404;"> </span>Black<br /></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#ffaef2c9" font="Bodoni,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff1b7dd4" hasOutline="0"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Bodoni'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Calibri'; color:#000000;">&lt;Shift-Enter&gt;<br />Lorem ipsum dolores Calibri 16<br /></span><span style=" color:#000000;">Next </span><span style=" font-size:24pt; color:#000000;">Line Bodoni 16 &amp; 24<br /></span><span style=" font-family:'Stafford'; color:#000000;">Third Line Stafford 16<br /></span><span style=" font-family:'CalligraphScript'; color:#000000;">4. Line Script 16<br /></span><span style=" color:#1b7dd4;">Blue </span><span style=" color:#df1900;">Red </span><span style=" color:#1ea44d;">Green </span><span style=" color:#ffffff;">White </span>Black<br /><span style=" font-weight:600; color:#1b7dd4;">Blue </span><span style=" font-weight:600; color:#df1900;">Red </span><span style=" font-weight:600; color:#ffffff;">White </span><span style=" font-weight:600; color:#1ea44d;">Green </span><span style=" font-weight:600;">Black<br /></span><span style=" color:#1b7dd4;">Blue </span><span style=" font-weight:600; color:#df1900;">Red </span><span style=" font-weight:600; font-style:italic; color:#1ea44d;">Green </span><span style=" font-weight:600; text-decoration: underline; color:#fca404;">Orange</span><span style=" font-style:italic; color:#fca404;"> </span>Black<br /></p></td></tr></table></body></html>]]><outline enabled="0" width="0"/>
+                <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#ffaef2c9" font="Bodoni,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff1b7dd4" hasOutline="0"/>
             </text>
         </area>
-        <area areatype="textarea" backgroundcolor="4294694749">
+        <area areatype="textarea" backgroundcolor="4294694749" isResizable="1">
             <position height="663" left="210" rotation="0" top="1030" width="1200" zposition="7002"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:12pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt;">&lt;Enter&gt;</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:16pt; color:#000000;">Lorem ipsum dolores Calibri 16</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt; color:#000000;">Next </span><span style=" font-family:'Bodoni'; font-size:24pt; color:#000000;">Line Bodoni 16 &amp; 24</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Stafford'; font-size:16pt; color:#000000;">Third Line Stafford 16</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'CalligraphScript'; font-size:16pt; color:#000000;">4. Line Script 16</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt; color:#1b7dd4;">Blue </span><span style=" font-family:'Bodoni'; font-size:16pt; color:#df1900;">Red </span><span style=" font-family:'Bodoni'; font-size:16pt; color:#1ea44d;">Green </span><span style=" font-family:'Bodoni'; font-size:16pt; color:#ffffff;">White </span><span style=" font-family:'Bodoni'; font-size:16pt;">Black</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#1b7dd4;">Blue </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#df1900;">Red </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#ffffff;">White </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#1ea44d;">Green </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600;">Black</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt; color:#1b7dd4;">Blue </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#df1900;">Red </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; font-style:italic; color:#1ea44d;">Green </span><span style=" font-family:'Bodoni'; font-size:16pt; font-style:italic; color:#fca404;">Orange </span><span style=" font-family:'Bodoni'; font-size:16pt;">Black</span></p><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Bodoni'; font-size:16pt;"><br /></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#fffbd75d" font="Calibri,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:12pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt;">&lt;Enter&gt;</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:16pt; color:#000000;">Lorem ipsum dolores Calibri 16</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt; color:#000000;">Next </span><span style=" font-family:'Bodoni'; font-size:24pt; color:#000000;">Line Bodoni 16 &amp; 24</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Stafford'; font-size:16pt; color:#000000;">Third Line Stafford 16</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'CalligraphScript'; font-size:16pt; color:#000000;">4. Line Script 16</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt; color:#1b7dd4;">Blue </span><span style=" font-family:'Bodoni'; font-size:16pt; color:#df1900;">Red </span><span style=" font-family:'Bodoni'; font-size:16pt; color:#1ea44d;">Green </span><span style=" font-family:'Bodoni'; font-size:16pt; color:#ffffff;">White </span><span style=" font-family:'Bodoni'; font-size:16pt;">Black</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#1b7dd4;">Blue </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#df1900;">Red </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#ffffff;">White </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#1ea44d;">Green </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600;">Black</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; font-size:16pt; color:#1b7dd4;">Blue </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; color:#df1900;">Red </span><span style=" font-family:'Bodoni'; font-size:16pt; font-weight:600; font-style:italic; color:#1ea44d;">Green </span><span style=" font-family:'Bodoni'; font-size:16pt; text-decoration: underline; color:#fca404;">Orange</span><span style=" font-family:'Bodoni'; font-size:16pt; font-style:italic; color:#fca404;"> </span><span style=" font-family:'Bodoni'; font-size:16pt;">Black</span></p><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Bodoni'; font-size:16pt;"><br /></p></td></tr></table></body></html>]]><outline enabled="0" width="0"/>
+                <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#fffbd75d" font="Calibri,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
             </text>
         </area>
-        <area areatype="textarea" backgroundcolor="4289655497">
+        <area areatype="textarea" backgroundcolor="4289655497" isResizable="1">
             <position height="320" left="165" rotation="0" top="1750" width="805" zposition="7004"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">&lt;Shift-Enter&gt;<br />|	|	|	| some tabs<br />123		2. Column<br />	456	Zweite Spalte<br /></span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#ffaef2c9" font="Stafford,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">&lt;Shift-Enter&gt;<br />|	|	|	| some tabs<br />123		2. Column<br />	456	Zweite Spalte<br /></span></p></td></tr></table></body></html>]]><outline enabled="0" width="0"/>
+                <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#ffaef2c9" font="Stafford,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
             </text>
         </area>
-        <area areatype="textarea" backgroundcolor="4294694749">
+        <area areatype="textarea" backgroundcolor="4294694749" isResizable="1">
             <position height="382" left="1050" rotation="0" top="1950" width="805" zposition="7005"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;Enter&gt;</p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">|	|	|	| some tabs</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">123		2. Column</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">	456	Zweite Spalte</span></p><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;"><br /></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#fffbd75d" font="Stafford,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;Enter&gt;</p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">|	|	|	| some tabs</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">123		2. Column</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">	456	Zweite Spalte</span></p><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;"><br /></p></td></tr></table></body></html>]]><outline enabled="0" width="0"/>
+                <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#fffbd75d" font="Stafford,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
             </text>
         </area>
     </page>
@@ -320,12 +320,12 @@
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships>
-        <foto id="safecontainer:/img5.png"/>
-        <foto id="safecontainer:/img.png"/>
-        <foto id="safecontainer:/img2.png"/>
-        <foto id="safecontainer:/img3.png"/>
-        <foto id="safecontainer:/img4.png"/>
         <foto id="safecontainer:/img6.png"/>
+        <foto id="safecontainer:/img5.png"/>
+        <foto id="safecontainer:/img3.png"/>
+        <foto id="safecontainer:/img2.png"/>
+        <foto id="safecontainer:/img4.png"/>
+        <foto id="safecontainer:/img.png"/>
     </fotoRelationships>
-    <statistics assistantUsed="0" countPauses="0" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="7639" fotosAdded="0" fotosRemoved="0" pauseTime="0" sessionsUsed="7"/>
+    <statistics assistantUsed="0" countPauses="0" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="20178" fotosAdded="0" fotosRemoved="0" pauseTime="0" sessionsUsed="8"/>
 </fotobook>
