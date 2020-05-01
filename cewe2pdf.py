@@ -461,7 +461,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         paragraphText = AppendText(paragraphText, '<u>')
                                     
                     # append the text of the span
-                    paragraphText = AppendText(paragraphText, html.escape(span.text))
+                    if span.text != None:
+                        paragraphText = AppendText(paragraphText, html.escape(span.text))
             
                     # there might be line breaks within the span. Could be that this should be recursive.
                     for spanchild in span:
