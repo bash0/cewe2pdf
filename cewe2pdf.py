@@ -737,7 +737,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
     for curFontName in list(additionnal_fonts):
         try:
             pdfmetrics.registerFont(TTFont(curFontName, additionnal_fonts[curFontName]))
-            print("Successfully registered '%s' from '%s'" %(n, additionnal_fonts[curFontName]))
+            print("Successfully registered '%s' from '%s'" %(curFontName, additionnal_fonts[curFontName]))
         except:
             print("Failed to register font '%s' (from %s)" %(curFontName, additionnal_fonts[curFontName]))
             del additionnal_fonts[curFontName]    #remove this item from the font list, so it won't be used later and cause problems.
