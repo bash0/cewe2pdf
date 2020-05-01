@@ -594,13 +594,19 @@ def convertMcf(mcfname, keepDoublePages:bool):
         baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
         backgroundLocations = baseBackgroundLocations
     except:
-        print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini')
+        print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
-        filesread = configuration.read('cewe2pdf.ini')
+        # Try to read the .ini first from the current directory, and second from the directory where the .mcf file is.
+        # Order of the files is important, because config entires are
+        #  overwritten when they appear in the later config files.
+        # We want the config file in the .mcf directory to be the most important file.
+        filesread = configuration.read(['cewe2pdf.ini', os.path.join(mcfBaseFolder, 'cewe2pdf.ini')])
         if len(filesread) < 1: 
             print('cannot find cewe installation folder cewe_folder in cewe2pdf.ini')
             cewe_folder = None
         else:
+            #Give the user feedback which config-file is used, in case there is a problem.
+            print('\n'.join(map('Used configuration in: {}'.format, filesread)))
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
