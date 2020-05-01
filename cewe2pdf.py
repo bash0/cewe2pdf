@@ -310,7 +310,7 @@ def AppendText(paratext, newtext):
 
 def AppendBreak(paragraphText, parachild):
     br = parachild
-    paragraphText = AppendText(paragraphText, "<br></br>")
+    paragraphText = AppendText(paragraphText, "<br></br>&nbsp;")
     paragraphText = AppendText(paragraphText, br.tail)
     return paragraphText
 
@@ -412,11 +412,11 @@ def AppendSpanEnd(paragraphText, weight, style):
     paragraphText = AppendText(paragraphText, '</span>')
     return paragraphText
 
-def AppendParagraphTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bgColorAttrib):
+def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bgColorAttrib):
     pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additionnal_fonts, bodyfont, bodyfs)
     paragraphText = AppendSpanStart(paragraphText, bgColorAttrib, pfont, pfs, pweight, pstyle)
     if (text == None):
-        paragraphText = AppendText(paragraphText, "&nbsp;")
+        paragraphText = AppendText(paragraphText, "")
     else:
         paragraphText = AppendText(paragraphText, html.escape(text))
     paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
@@ -471,7 +471,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1): # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
-            paragraphText, maxfs = AppendParagraphTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
+            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
             paragraphText += '</para>'
             pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
@@ -481,13 +481,14 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             for item in htmlspans:
                 if item.tag == 'br':
                     br = item
-                    # terminate the current pdf para and add it to the flow
-                    paragraphText += '</para>'
+                    # terminate the current pdf para and add it to the flow. The nbsp seems unnecessary
+                    # but if it is not there then an empty paragraph goes missing :-(
+                    paragraphText += '&nbsp;</para>'
                     pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
-                    paragraphText, maxfs = AppendParagraphTextInStyle(paragraphText, br.tail, p, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
+                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
 
                 elif item.tag == 'span':
                     span = item
@@ -507,21 +508,14 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         # terminate the "real" span that we started above
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle)
                         for br in brs:
-                            # now add the tail text of each br in the span style
-                            if br.tail is None:
-                                brtext = "&nbsp;"
-                            else:
-                                brtext = br.tail
-                            paragraphText, brfs = AppendParagraphTextInStyle(paragraphText, brtext, span, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
-                            if brfs > maxfs:
-                                maxfs = brfs
                             # terminate the current pdf para and add it to the flow
                             paragraphText += '</para>'
                             pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
                             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
-                            paragraphText, maxfs = AppendParagraphTextInStyle(paragraphText, "", span, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
+                            # now add the tail text of each br in the span style
+                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle)
 
