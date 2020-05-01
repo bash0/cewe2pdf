@@ -412,7 +412,10 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         else:
             for item in htmlspans:
                 if item.tag == 'br':
-                    paragraphText = AppendBreak(paragraphText, item)
+                    if len(htmlspans) == 1 and item.tail == None:
+                        paragraphText = AppendText(paragraphText, "&nbsp;")
+                    else:
+                        paragraphText = AppendBreak(paragraphText, item)
                 elif item.tag == 'span':
                     span = item
                     spanfont = font
