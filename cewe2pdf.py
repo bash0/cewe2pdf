@@ -466,9 +466,9 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
-        paragraphText = '<para autoLeading="max">'
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1):
+            paragraphText = '<para autoLeading="max">'
             # append the paragraph text in the paragraph style
             pfont, pfs, pweight, pstyle = CollectFontInfo(p, pdf, additionnal_fonts, bodyfont, bodyfs)
             paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, pfont, pfs, pweight, pstyle)
@@ -477,16 +477,27 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             else:
                 paragraphText = AppendText(paragraphText, html.escape(p.text))
             paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
+            paragraphText += '</para>'
+            pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+            pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+
         else:
+            paragraphText = '<para autoLeading="max">'
             for item in htmlspans:
                 if item.tag == 'br':
-                    pfont, pfs, pweight, pstyle = CollectFontInfo(p, pdf, additionnal_fonts, bodyfont, bodyfs)
-                    paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, pfont, pfs, pweight, pstyle)
-                    if len(htmlspans) == 1 and item.tail == None:
-                        paragraphText = AppendText(paragraphText, "&nbsp;")
-                    else:
-                        paragraphText = AppendBreak(paragraphText, item)
-                    paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
+                    #pfont, pfs, pweight, pstyle = CollectFontInfo(p, pdf, additionnal_fonts, bodyfont, bodyfs)
+                    #paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, pfont, pfs, pweight, pstyle)
+                    #if len(htmlspans) == 1 and item.tail == None:
+                    #    paragraphText = AppendText(paragraphText, "&nbsp;")
+                    #else:
+                    #    paragraphText = AppendBreak(paragraphText, item)
+                    #paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
+                    paragraphText += '</para>'
+                    pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+                    pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+                    paragraphText = '<para autoLeading="max">'
+                    maxfs = bodyfs
+
                 elif item.tag == 'span':
                     span = item
                     spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additionnal_fonts, bodyfont, bodyfs)
@@ -500,22 +511,32 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         paragraphText = AppendText(paragraphText, html.escape(span.text))
 
                     # there might be line breaks within the span. Could be that this should be recursive?
-                    for spanchild in span:
-                        if spanchild.tag == 'br':
-                            paragraphText = AppendBreak(paragraphText, spanchild)
+#                    for spanchild in span:
+#                        if spanchild.tag == 'br':
+#                            paragraphText = AppendBreak(paragraphText, spanchild)
+
+                    brs = span.findall(".//br")
+                    if len(brs) > 0:
+                        for br in brs:
+                            paragraphText = AppendBreak(paragraphText, br)
 
                     paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle)
 
                     if (span.tail != None):
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
+                    if len(brs) > 0:
+                        paragraphText += '</para>'
+                        pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+                        pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+                        paragraphText = '<para autoLeading="max">'
+                        maxfs = bodyfs
+
                 else:
                     print('Ignoring unhandled tag ' + item.tag)
 
-        paragraphText += '</para>'
-
-        pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
-
-        pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+            paragraphText += '</para>'
+            pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+            pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
 
     # Add a frame object that can contain multiple paragraphs
     frameBottomLeft_x = -0.5 * f * areaWidth
