@@ -13,7 +13,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId>CondaEnv|CondaEnv|anaconda3</InterpreterId>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
-    <CommandLineArguments>D:\temp\Cewe2PdfTester.mcf</CommandLineArguments>
+    <CommandLineArguments>D:\Users\pete\Documents\Fotobooks\Cewe2PdfTester.mcf</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
@@ -25,6 +25,7 @@
     <Content Include="additional_fonts.txt" />
     <Content Include="cewe2pdf.ini" />
     <Content Include="requirements.txt" />
+    <Content Include="tests\unittest_fotobook.mcf" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img.png" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img2.png" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img3.png" />
