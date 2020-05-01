@@ -3,6 +3,9 @@
 #author(s): BarchSteel
 #Copyright (c) 2020 by BarchSteel
 
+# This test needs to be in its own directory, so it can have it's own cwew2pdf.ini with
+# with an invalid entry to test the error handling.
+
 # test what happens when a font file does not exist.
 # if the font is missing, the page where it was used should still exist.
 
@@ -18,8 +21,8 @@ from pdfrw import PdfReader
 from cewe2pdf import convertMcf
 
 def tryToBuildBook(keepDoublePages):
-    inFile = str(Path(Path.cwd(), 'tests', 'test_font_does_not_exist.mcf'))
-    outFile = str(Path(Path.cwd(), 'tests', 'test_font_does_not_exist.mcf.pdf'))
+    inFile = str(Path(Path.cwd(), 'tests', 'testFontDoesNotExist', 'testFontDoesNotExist.mcf'))
+    outFile = str(Path(Path.cwd(), 'tests', 'testFontDoesNotExist', 'testFontDoesNotExist.mcf.pdf'))
     if os.path.exists(outFile) == True:
         os.remove(outFile)
     assert os.path.exists(outFile) == False

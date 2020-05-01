@@ -51,3 +51,4 @@ nosetests.xml
 *.xml~
 /tests/unittest_fotobook_mcf-Dateien/identifier.xml
 /tests/test_font_does_not_exist.mcf.pdf
+/tests/testFontDoesNotExist/testFontDoesNotExist.mcf.pdf
