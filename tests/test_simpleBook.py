@@ -1,3 +1,8 @@
+#SPDX-License-Identifier: GPL-3.0-only
+
+#author(s): BarchSteel
+#Copyright (c) 2019, 2020 by BarchSteel
+
 # test to convert a simple mcf to pdf
 #if you run this file directly, it won't have access to parent folder, so add it to python path
 import sys
