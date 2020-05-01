@@ -1,6 +1,9 @@
 Arial = C:\WINDOWS\FONTS\ARIAL.TTF
 Arial Rounded MT Bold = C:\WINDOWS\FONTS\ARLRDBD.TTF
 Bodoni = C:\Windows\Fonts\BOD_R.TTF
+BodoniB = C:\Windows\Fonts\BOD_B.TTF
+BodoniI = C:\Windows\Fonts\BOD_I.TTF
+BodoniBI = C:\Windows\Fonts\BOD_BI.TTF
 Stafford = C:\Windows\Fonts\times.ttf
 CalligraphScript = C:\Windows\Fonts\PALSCRI.TTF
 FranklinGothic = C:\Windows\Fonts\framd.ttf
