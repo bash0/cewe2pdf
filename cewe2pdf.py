@@ -525,9 +525,17 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                 else:
                     print('Ignoring unhandled tag ' + item.tag)
 
-            paragraphText += '</para>'
-            pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
-            pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+            #try to create a paragraph with the current text and style. Catch errors.
+            try:
+                paragraphText += '</para>'
+                pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+                pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+            except Exception as ex:
+                print('Error:', ex.args[0])
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print('', (exc_type, fname, exc_tb.tb_lineno))        
+
 
     # Add a frame object that can contain multiple paragraphs
     frameBottomLeft_x = -0.5 * f * areaWidth
@@ -692,13 +700,19 @@ def convertMcf(mcfname, keepDoublePages: bool):
         baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
         backgroundLocations = baseBackgroundLocations
     except:
-        print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini')
+        print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
-        filesread = configuration.read('cewe2pdf.ini')
-        if len(filesread) < 1:
+        # Try to read the .ini first from the current directory, and second from the directory where the .mcf file is.
+        # Order of the files is important, because config entires are
+        #  overwritten when they appear in the later config files.
+        # We want the config file in the .mcf directory to be the most important file.
+        filesread = configuration.read(['cewe2pdf.ini', os.path.join(mcfBaseFolder, 'cewe2pdf.ini')])
+        if len(filesread) < 1: 
             print('cannot find cewe installation folder cewe_folder in cewe2pdf.ini')
             cewe_folder = None
         else:
+            #Give the user feedback which config-file is used, in case there is a problem.
+            print('\n'.join(map('Used configuration in: {}'.format, filesread)))
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
@@ -731,13 +745,15 @@ def convertMcf(mcfname, keepDoublePages: bool):
         pagesize = formats[fotobook.get('productname')]
     pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
 
-    # Add additionnal fonts
-    for n in additionnal_fonts:
+    # Add additionnal fonts. We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
+    for curFontName in list(additionnal_fonts):
         try:
-            pdfmetrics.registerFont(TTFont(n, additionnal_fonts[n]))
-            print("Successfully registered '%s' from '%s'" %(n, additionnal_fonts[n]))
+            pdfmetrics.registerFont(TTFont(curFontName, additionnal_fonts[curFontName]))
+            print("Successfully registered '%s' from '%s'" %(curFontName, additionnal_fonts[curFontName]))
         except:
-            print("Failed to register font '%s' (from %s)" %(n, additionnal_fonts[n]))
+            print("Failed to register font '%s' (from %s)" %(curFontName, additionnal_fonts[curFontName]))
+            del additionnal_fonts[curFontName]    #remove this item from the font list, so it won't be used later and cause problems.
+
 
     if defaultConfigSection != None:
         # the reportlab manual says:
@@ -794,6 +810,8 @@ def convertMcf(mcfname, keepDoublePages: bool):
                     # If there is on page 1 only text, the area-tag is still on page 0.
                     #  So this will either include the text (which is put in page 0),
                     #  or the packground which is put in page 1.
+                else:
+                    page = None #if we find no empty page with an area tag, we need to set this to None to prevent an exception later.
 
                 # Look for the the frist page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
