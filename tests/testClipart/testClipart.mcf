@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="8794" externalProjectId="" folderID="707025a6-657c-46c3-bd8a-a654b52e11d3" imagedir="testClipart_mcf-Dateien" isDataMcf="0" productname="ALB82" startdatecalendarium="" useSpineLogo="1" version="4.0">
+    <project createdWithHPSVersion="7.0.2" createdWithHPSVersionBuild="20200306" projectID="8e61112e-60ff-48de-9ba6-8d88398bee6b" projectIDCreatedEpoch="1588495585"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.0.2" programversionBuild="20200306" savetime="2020-05-03 10:46"/>
+    <articleConfig normalpages="4" pagenaming="1" spotColor="gold_foil" totalpages="6"/>
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="12" format="0" margin="110" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
+        <outline width="0"/>
+    </pagenumbering>
+    <extra>
+        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Arial,20,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+    </extra>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4280"/>
+        <designElementIDs background="201" layout="82069"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="82069" layout="1" templatename="fullcoverpage_portrait,normal"/>
+        <area areatype="clipartarea">
+            <position height="652.451" left="2441.16" rotation="0" top="429.513" width="697.333" zposition="100"/>
+            <designElementIDs clipart="12345"/>
+            <decoration/>
+            <clipart designElementId="12345">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="488.133" left="3246.08" rotation="0" top="429.513" width="697.333" zposition="101"/>
+            <designElementIDs clipart="1234"/>
+            <decoration/>
+            <clipart designElementId="1234">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="715.582" left="3443.86" rotation="0" top="984.317" width="697.333" zposition="102"/>
+            <designElementIDs clipart="123"/>
+            <decoration/>
+            <clipart designElementId="123">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="652.451" left="2615.32" rotation="0" top="1877.25" width="697.333" zposition="103"/>
+            <designElementIDs clipart="12345"/>
+            <decoration/>
+            <clipart designElementId="12345">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="488.133" left="2984.67" rotation="30" top="2041.57" width="697.333" zposition="104"/>
+            <designElementIDs clipart="1234"/>
+            <decoration/>
+            <clipart designElementId="1234">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="381.081" left="3072.5" rotation="-10" top="2188.92" width="371.363" zposition="105"/>
+            <designElementIDs clipart="123"/>
+            <decoration/>
+            <clipart designElementId="123">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="spinelogoarea">
+            <position height="96" left="2000" rotation="270" top="2662" width="280" zposition="6999"/>
+            <decoration/>
+            <clipart designElementId="0"/>
+        </area>
+        <area areatype="textarea">
+            <position height="192.361" left="2441.16" rotation="0" top="151.141" width="1502.25" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial'; font-size:20pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">There should be 3 different cliparts on this page.</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,20,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            </text>
+        </area>
+        <area areatype="spinetextarea">
+            <position height="96" left="930" rotation="270" top="1212" width="2420" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="275" left="2399.94" rotation="0" top="1767.89" width="1703.77" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial'; font-size:20pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Test for overlap</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,20,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="spine">
+        <bundlesize height="2750" width="4280"/>
+        <designElementIDs background="201"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4280"/>
+        <designElementIDs background="201" layout="82075"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="82075" layout="1" templatename="fullcoverpage_with_text_portrait,normal"/>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="-1" pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
+    </page>
+    <page designStyleID="-1" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
+    </page>
+    <page designStyleID="-1" pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
+    </page>
+    <page designStyleID="-1" pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships/>
+    <statistics assistantUsed="0" countPauses="0" elapsedTimeGross="2020-05-03T10:42:36" elapsedTimeNet="229" fotosAdded="0" fotosRemoved="0" pauseTime="0" sessionsUsed="1"/>
+</fotobook>
