@@ -68,6 +68,9 @@ import argparse  # to parse arguments
 
 import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
 
+from clpFile import ClpFile  #for clipart .CLP and .SVG files
+import traceback
+
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
@@ -94,6 +97,8 @@ pdf_styles = getSampleStyleSheet()
 pdf_styleN = pdf_styles['Normal']
 pdf_flowableList = []
 
+clipartDict = dict()    # a dictionary for clipart element IDs to file name
+clipartPathList = tuple()
 
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
@@ -571,10 +576,57 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     pdf.translate(-transx, -transy)
     return
 
+def loadClipart(fileName) -> ClpFile :
+    """Tries to load a clipart file. Either from .CLP or .SVG file
+    returns a clpFile object"""
+    pathObj = Path(fileName)
+    baseFileName = pathObj.stem
+    filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
+    filePath = Path(filePath)
+    newClpFile = ClpFile("")
+    if (filePath.suffix == '.clp'):
+        newClpFile.readClp(filePath)
+    else:
+        newClpFile.loadFromSVG(filePath)
 
-def processAreaClipartTag(clipartElement):
+    return newClpFile
+
+def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     clipartID = int(clipartElement.get('designElementId'))
-    print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
+    #print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
+
+    #designElementId 0 seems to be a special empty placeholder
+    if (clipartID == 0):
+        return
+
+    img_transx = transx
+
+    res = image_res #use the fore-gorund resolution setting for clipart
+
+    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
+    new_w = int(0.5 + areaWidth * res / 254.)
+    new_h = int(0.5 + areaHeight * res / 254.)
+
+    #Load the clipart
+    fileName = None
+    if clipartID in clipartDict:
+        fileName = clipartDict[clipartID]
+    if (not fileName):
+        print("Problem getting file name for clipart ID:", clipartID)
+        return
+
+    clipart = loadClipart(fileName) 
+    clipart.convertToPngInBuffer(new_w, new_h)  #so we can access the pngMemFile later
+
+    # place image
+    print('Clipart file:', fileName)
+    pdf.translate(img_transx, transy)
+    pdf.rotate(-areaRot)
+    pdf.drawImage(ImageReader(clipart.pngMemFile),
+                    f * -0.5 * areaWidth, f * -0.5 * areaHeight,
+                    width=f * areaWidth, height=f * areaHeight, mask='auto')
+    pdf.rotate(areaRot)
+    pdf.translate(-img_transx, -transy)
 
 
 def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw):
@@ -628,7 +680,7 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
             # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
             # We are using the <clipart> element here
             for clipartElement in area.findall('clipart'):
-                processAreaClipartTag(clipartElement)
+                processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
     return
 
 
@@ -661,6 +713,38 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
     processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw)
 
+def getBaseClipartLocations(baseFolder):
+    # create a tuple of places (folders) where background resources would be found by default
+    baseClipartLocations = (
+        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations'),   #trailing comma is important to make a 1-element tuple
+#        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'form_frames'),
+#        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'frame_frames')
+    )
+    return baseClipartLocations
+
+def readClipArtConfigXML(baseFolder):
+    """Parse the configuration XML file and generate a dictionary of designElementId to fileName
+    currently only cliparts_default.xml is supported !"""
+    global clipartPathList
+    clipartPathList = getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
+    xmlConfigFileName='cliparts_default.xml'
+    try:
+        xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
+    except Exception as ex:
+        print('Could not load clipart definition file: {}'.format(xmlConfigFileName))
+        print('Cliparts will not be available.')
+        return
+
+    clipArtXml = open(xmlFileName, 'rb')
+    xmlInfo = etree.parse(xmlFileName)
+    clipArtXml.close()
+
+    for decoration in xmlInfo.findall('decoration'):
+            clipartElement = decoration.find('clipart')
+            fileName = clipartElement.get('file')
+            designElementId = int(clipartElement.get('designElementId'))    #assume these IDs are always integers. 
+            clipartDict[designElementId] = fileName
+    return
 
 def getBaseBackgroundLocations(basefolder):
     # create a tuple of places (folders) where background resources would be found by default
@@ -784,6 +868,9 @@ def convertMcf(mcfname, keepDoublePages: bool):
     pageCount = int(articleConfigElement.get('normalpages')) + 2    # maximum number of pages
     imagedir = fotobook.get('imagedir')
 
+    #generate a list of available clip-arts
+    readClipArtConfigXML(cewe_folder)
+
     for n in range(pageCount):
         try:
             if (n == 0) or (n == pageCount - 1):
@@ -845,6 +932,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print('', (exc_type, fname, exc_tb.tb_lineno))
+            traceback.print_tb(exc_tb)  # show a stack trace to see in which function the error occured
 
     # save final output pdf
     pdf.save()
