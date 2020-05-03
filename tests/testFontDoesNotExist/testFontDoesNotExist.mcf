@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="7250" externalProjectId="" folderID="b415ee9a-4eae-4c25-994e-067376f19942" imagedir="test_font_not_existent_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="1" version="4.0">
+    <project createdWithHPSVersion="7.0.2" createdWithHPSVersionBuild="20200306" projectID="436306b5-ff44-4d9b-90bd-8f210535369b" projectIDCreatedEpoch="1588335481"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.0.2" programversionBuild="20200306" savetime="2020-05-01 14:18"/>
+    <articleConfig normalpages="4" pagenaming="1" totalpages="9"/>
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
+        <outline width="0"/>
+    </pagenumbering>
+    <extra>
+        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="Arial,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+    </extra>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4290"/>
+        <designElementIDs background="201" layout="82069"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="82069" layout="1" templatename="fullcoverpage_portrait,normal"/>
+        <area areatype="imagearea">
+            <position height="2950" left="-100" rotation="0" top="-100" width="2192" zposition="100"/>
+            <decoration/>
+            <image/>
+        </area>
+        <area areatype="imagearea">
+            <position height="2950" left="2198" rotation="0" top="-100" width="2192" zposition="101"/>
+            <decoration/>
+            <image/>
+        </area>
+        <area areatype="spinelogoarea">
+            <position height="106" left="2005" rotation="270" top="2657" width="280" zposition="6999"/>
+            <decoration/>
+            <clipart designElementId="0"/>
+        </area>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="spine">
+        <bundlesize height="2750" width="4290"/>
+        <designElementIDs background="201"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4290"/>
+        <designElementIDs background="201" layout="82075"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="82075" layout="1" templatename="fullcoverpage_with_text_portrait,normal"/>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="-1" pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
+        <area areatype="textarea">
+            <position height="279.149" left="2291.72" rotation="0" top="409.719" width="1089.58" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'TestDoesNotExistFont'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This text is in font TestDoesNotExistFont.</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="TestDoesNotExistFont,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="89.9037" left="2296.23" rotation="0" top="180.096" width="1112.09" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Arial'; color:#000000;">This text is in Arial.</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="Arial,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
+            </text>
+        </area>		
+    </page>
+    <page designStyleID="-1" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
+    </page>
+    <page designStyleID="-1" pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
+    </page>
+    <page designStyleID="-1" pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships/>
+    <statistics assistantUsed="0" countPauses="0" elapsedTimeGross="2020-05-01T14:16:19" elapsedTimeNet="1234" fotosAdded="0" fotosRemoved="0" pauseTime="0" sessionsUsed="1"/>
+</fotobook>
