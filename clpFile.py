@@ -1,4 +1,4 @@
-#Dual licenced as GLPv3 and LGPLv3
+#SPDX-License-Identifier:LGPL-3.0-only or GPL-3.0-only
 
 # Copyright (c) 2020 by BarchSteel
 
