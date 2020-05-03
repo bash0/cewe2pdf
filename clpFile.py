@@ -16,7 +16,7 @@ class ClpFile(object):
         self.pngMemFile: BytesIO = BytesIO(bytes())     #this can be used to access the buffer like a file.
 
         if (clpFileName):
-            readClp(clpFileName)
+            self.readClp(clpFileName)
 
     def readClp(self, fileName) -> None:
         """Read a .CLP file and convert it to a .SVG file.
@@ -44,7 +44,7 @@ class ClpFile(object):
         self.svgData = svgData
     
         
-    def saveToSVG(outfileName):
+    def saveToSVG(self, outfileName):
         """save internal SVG data to a file"""
         outFile = open(outfileName,"wb")
         outFile.write(self.svgData)
