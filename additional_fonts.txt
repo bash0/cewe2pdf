@@ -8,6 +8,4 @@ Stafford = C:\Windows\Fonts\times.ttf
 CalligraphScript = C:\Windows\Fonts\PALSCRI.TTF
 FranklinGothic = C:\Windows\Fonts\framd.ttf
 Calibri = C:\Windows\Fonts\calibri.ttf
-Segoe UI Emoji = C:\Windows\Fonts\seguiemj.ttf
-Segoe UI Emoji,sans-serif = C:\Windows\Fonts\seguiemj.ttf
-Segoe MDL2 Assets = C:\Windows\Fonts\segmdl2.ttf
+Segoe UI Symbol = C:\Windows\Fonts\seguisym.ttf

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="7250" externalProjectId="" identifier="34259215-28db-46fb-ab8e-d06b31e075d7" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="7250" externalProjectId="" identifier="ec45185b-90f3-450c-beae-5101c24c2272" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.0.1" createdWithHPSVersionBuild="20191025" projectID="69675965-93ed-4a07-b25f-7dc31eedcc67" projectIDCreatedEpoch="1575196183"/>
-    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="6.4.7" programversionBuild="20191106" savetime="2020-05-04 18:38"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="6.4.7" programversionBuild="20191106" savetime="2020-05-04 22:53"/>
     <articleConfig normalpages="26" pagenaming="1" productvariant="pages:26" totalpages="31"/>
     <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
         <outline enabled="0" width="0"/>
@@ -39,7 +39,7 @@
             <position height="106" left="820" rotation="270" top="1322" width="2650" zposition="7000"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:8pt; font-weight:600; font-style:normal;"><table style="-qt-table-type: root; margin-top:7px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#df1900;">Front title	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Amsterdam - Baltimore - Casablanca - Danemark - Edison -<br /></span><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#1b7dd4;">  Subtitle	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Florida - Gallipoli - Havanna - Italia - Jerusalem</span></p></td></tr></table></body></html>]]><outline enabled="0" width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Stafford,8,-1,5,75,0,0,0,0,0" foregroundColor="#ffffffff" hasOutline="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Stafford,8,-1,5,75,0,0,0,0,0" foregroundColor="#ffffffff" hasOutline="0"/>
             </text>
         </area>
     </page>
@@ -209,18 +209,18 @@
             </text>
         </area>
         <area areatype="textarea" isResizable="1">
-            <position height="220" left="2134.179216877314" rotation="0" top="1890.822265748404" width="1383.450340208679" zposition="7010"/>
+            <position height="179.1777342515961" left="2134.179216877314" rotation="0" top="1890.822265748404" width="1220.565979567871" zposition="7010"/>
             <decoration>
                 <border applySpotColor="0" color="#ff0055ff" enabled="1" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Arial Rounded MT Bold'; font-size:14pt; color:#000000; background-color:#ffffff;">3 more copied in from Windows Character Map, Segoe MDL2 Assets. ''</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Arial Rounded MT Bold'; font-size:14pt; color:#000000; background-color:#ffffff;">and 3 from Segoe UI Emoji in larger font</span><span style=" font-family:'Arial Rounded MT Bold'; font-size:18pt; color:#000000; background-color:#ffffff;"> '©☹♡'</span></p></td></tr></table></body></html>]]><outline color="#ff000000" enabled="0" width="1"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Arial Rounded MT Bold'; font-size:14pt; color:#000000; background-color:#ffffff;">3 more from Segoe UI Symbol. '</span><span style=" font-family:'Segoe UI Symbol'; font-size:14pt; color:#000000; background-color:#ffffff;"></span><span style=" font-family:'Arial Rounded MT Bold'; font-size:14pt; color:#000000; background-color:#ffffff;">' and then ...</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Arial Rounded MT Bold'; font-size:14pt; color:#000000; background-color:#ffffff;">3 from Segoe UI Symbol in larger font</span><span style=" font-family:'Arial Rounded MT Bold'; font-size:18pt; color:#000000; background-color:#ffffff;"> '</span><span style=" font-family:'Segoe UI Symbol'; font-size:20pt; color:#000000; background-color:#ffffff;">©☹♡</span><span style=" font-family:'Arial Rounded MT Bold'; font-size:18pt; color:#000000; background-color:#ffffff;">'</span></p></td></tr></table></body></html>]]><outline color="#ff000000" enabled="0" width="1"/>
                 <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
             </text>
         </area>
         <area areatype="textarea" isResizable="1">
             <position height="104" left="2134.179216877314" rotation="0" top="1750" width="1180.949263916093" zposition="7011"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;"><table border="0" style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Arial Rounded MT Bold'; font-size:20pt; color:#000000;">Original issue 45 smiley. .</span></p></td></tr></table></body></html>]]><outline enabled="0" width="1"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial Rounded MT Bold'; font-size:20pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Original issue 45 smiley. </span><span style=" font-family:'Segoe UI Symbol'; color:#000000;"></span><span style=" color:#000000;">.</span></p></td></tr></table></body></html>]]><outline enabled="0" width="1"/>
                 <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial Rounded MT Bold,20,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
             </text>
         </area>
@@ -371,12 +371,12 @@
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships>
-        <foto id="safecontainer:/img4.png"/>
+        <foto id="safecontainer:/img6.png"/>
         <foto id="safecontainer:/img.png"/>
         <foto id="safecontainer:/img5.png"/>
-        <foto id="safecontainer:/img6.png"/>
         <foto id="safecontainer:/img3.png"/>
         <foto id="safecontainer:/img2.png"/>
+        <foto id="safecontainer:/img4.png"/>
     </fotoRelationships>
-    <statistics assistantUsed="0" countPauses="0" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="24298" fotosAdded="0" fotosRemoved="0" pauseTime="0" sessionsUsed="14"/>
+    <statistics assistantUsed="0" countPauses="0" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="25463" fotosAdded="0" fotosRemoved="0" pauseTime="0" sessionsUsed="16"/>
 </fotobook>
