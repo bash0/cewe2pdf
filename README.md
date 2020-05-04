@@ -7,6 +7,8 @@ and compiling a pdf document which looks like the cewe photo book.
 
 There are many unsupported options, so an exact conversion cannot be guaranteed. The script is mostly based on reverse-engineering and guessing. It is not meeting any official specifications. So don't be surprised if one or another feature doesn't work. However, improvements are always appreciated.
 
+You will need underlying Cairographics (https://www.cairographics.org/) support installed on your machine for the handling of clip art. How you get this will depend on your platform, but if you have the GTK+ toolkit installed (https://www.gtk.org/docs/installations/) that should do it.
+
 tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf exportieren, cewe Fotobuch pdf, mcf in pdf umwandeln, aus CEW-Fotobuch ein pdf machen, cewe Fotobuch pdf
 
 
@@ -35,10 +37,11 @@ conda install lxml
 conda uninstall reportlab pillow
 pip install reportlab pillow
 ```
+There does not appear to be a "binaries only" installation for GTK+ or Cairographics, which means you'll have to build it yourself.
 
 Install - Windows (continued)
 -----------------------------
-Go to the directory where cewe2pdf is installed and create a text file there with filname ``cewe_folder.txt``
+Go to the directory where cewe2pdf is installed and create a text file there with filename ``cewe_folder.txt``
 and use a text editor to write the installation directory of the CEWE software into the text file.
 Example
 if you have the software branded for the company DM, called "dm-Fotowelt", then the file ``cewe_folder.txt`` should contain:
@@ -47,15 +50,30 @@ C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
 ```
 Save the file and close it.
 
-Alternatively, you can move on to more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``. The contents can, for example, be of the form:
+Alternatively - indeed, preferably, if you want full functionality - you can move on to more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``. Here you can specify the location of the cewe folder, provide a comma separated list of locations for additional background images and define how the additional fonts you have specified (see below) are organised into families so that bold and italic texts are shown correctly.
+The contents can, for example, be of the form:
 ```
 [DEFAULT]
 cewe_folder = C:\Program Files\Elkjop fotoservice_6.3\elkjop fotoservice
-extraBackgroundFolders = C:/ProgramData/hps/5026/addons/447/backgrounds,C:/ProgramData/hps/5026/addons/448/backgrounds
+extraBackgroundFolders = 
+	C:/ProgramData/hps/5026/addons/447/backgrounds/v1/backgrounds
+	C:/ProgramData/hps/5026/addons/448/backgrounds/v1/backgrounds
+fontFamilies =
+	Bodoni,Bodoni,BodoniB,BodoniI,BodoniBI
 ```
-In addition to specifying the location of the cewe folder, you may also provide a comma separated list of locations for additional background images.
-
-Create another text file called ``additional_fonts.txt``, but leave it empty.
+Create another text file called ``additional_fonts.txt``; this can be left empty but to get the correct fonts in the pdf you should specify them here. The example below defines the fonts for the unit test:
+```
+Arial = C:\WINDOWS\FONTS\ARIAL.TTF
+Arial Rounded MT Bold = C:\WINDOWS\FONTS\ARLRDBD.TTF
+Bodoni = C:\Windows\Fonts\BOD_R.TTF
+BodoniB = C:\Windows\Fonts\BOD_B.TTF
+BodoniI = C:\Windows\Fonts\BOD_I.TTF
+BodoniBI = C:\Windows\Fonts\BOD_BI.TTF
+Stafford = C:\Windows\Fonts\times.ttf
+CalligraphScript = C:\Windows\Fonts\PALSCRI.TTF
+FranklinGothic = C:\Windows\Fonts\framd.ttf
+Calibri = C:\Windows\Fonts\calibri.ttf
+```
 
 Install - Linux
 ---------------
@@ -96,7 +114,7 @@ Install - continued
 At this point, you should have these files in your current directory :
 * `cewe2pdf.py`
 * `cewe_folder.txt`
-* `additionnal_fonts.txt`
+* `additional_fonts.txt`
 * your `*.mcf` file
 * a directory named `<album>_mcf-Datein`
 
