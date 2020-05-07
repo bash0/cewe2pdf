@@ -57,7 +57,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph, Frame
+from reportlab.platypus import Paragraph, Frame, Table
 from reportlab.lib.styles import ParagraphStyle
 
 import PIL
@@ -427,6 +427,34 @@ def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bod
     paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
     return paragraphText, pfs
 
+def processAreaDecorationTag(decoration, areaHeight, areaRot, areaWidth, pdf, transx, transy):
+    # Draw a single cell table to represent any text decoration (a box around the text)
+    for border in decoration.findall('border'):
+        bwidth = 1
+        bcolor = reportlab.lib.colors.blue
+        frameBottomLeft_x = -0.5 * f * areaWidth
+        frameBottomLeft_y = -0.5 * f * areaHeight
+        frameWidth = f * areaWidth
+        frameHeight = f * areaHeight
+        frm_table = Table(
+          data=[[None]],
+          colWidths=frameWidth,
+          rowHeights=frameHeight,
+          style=[
+           # The two (0, 0) in each attribute represent the range of table cells that the style applies to. Since there's only one cell at (0, 0), it's used for both start and end of the range
+           ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+           ('BOX', (0, 0), (0, 0), bwidth, bcolor), # The fourth argument to this style attribute is the border width
+           ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
+          ]
+        )
+        pdf.translate(transx, transy)
+        pdf.rotate(-areaRot)
+        frm_table.wrapOn(pdf, frameWidth, frameHeight)
+        frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
+        pdf.rotate(areaRot)
+        pdf.translate(-transx, -transy)
+
+
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     # note: it would be better to use proper html processing here
     htmlxml = etree.XML(textTag.text)
@@ -675,6 +703,9 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
             # process text
             for textTag in area.findall('text'):
                 processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
+            
+            for decorationTag in area.findall('decoration'):
+                processAreaDecorationTag(decorationTag, areaHeight, areaRot, areaWidth, pdf, transx, transy)
 
             # Clip-Art
             # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
