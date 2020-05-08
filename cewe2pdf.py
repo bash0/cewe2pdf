@@ -299,6 +299,10 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     pdf.drawImage(ImageReader(jpeg.name),
                     f * -0.5 * areaWidth, f * -0.5 * areaHeight,
                     width=f * areaWidth, height=f * areaHeight, mask='auto')
+
+    for decorationTag in area.findall('decoration'):
+        processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
+    
     pdf.rotate(areaRot)
     pdf.translate(-img_transx, -transy)
 
@@ -427,32 +431,57 @@ def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bod
     paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
     return paragraphText, pfs
 
-def processAreaDecorationTag(decoration, areaHeight, areaRot, areaWidth, pdf, transx, transy):
-    # Draw a single cell table to represent any text decoration (a box around the text)
+def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
+    # Draw a single cell table to represent border decoration (a box around the object)
+    # We assume that this is called from inside the rotation and translation operation
+
     for border in decoration.findall('border'):
+        if "enabled" in border.attrib:
+            enabledAttrib = border.get('enabled')
+            if (enabledAttrib is not '1'):
+                return
+
         bwidth = 1
+        if "width" in border.attrib:
+            widthAttrib = border.get('width')
+            if (widthAttrib is not None):
+                bwidth = f * int(widthAttrib) # units are 1/10 mm
+
         bcolor = reportlab.lib.colors.blue
-        frameBottomLeft_x = -0.5 * f * areaWidth
-        frameBottomLeft_y = -0.5 * f * areaHeight
-        frameWidth = f * areaWidth
-        frameHeight = f * areaHeight
+        if "color" in border.attrib:
+            colorAttrib = border.get('color')
+            bcolor = reportlab.lib.colors.HexColor(colorAttrib)
+
+        adjustment = 0
+        if "position" in border.attrib:
+            positionAttrib = border.get('position')
+            if (positionAttrib == "inside"):
+                adjustment = -bwidth * 0.5
+            if (positionAttrib == "centered"):
+                adjustment = 0
+            if (positionAttrib == "outside"):
+                adjustment = bwidth * 0.5
+        
+        frameBottomLeft_x = -0.5 * (f * areaWidth) - adjustment
+        frameBottomLeft_y = -0.5 * (f * areaHeight) - adjustment
+        frameWidth = f * areaWidth + 2 * adjustment
+        frameHeight = f * areaHeight + 2 * adjustment
         frm_table = Table(
           data=[[None]],
           colWidths=frameWidth,
           rowHeights=frameHeight,
           style=[
-           # The two (0, 0) in each attribute represent the range of table cells that the style applies to. Since there's only one cell at (0, 0), it's used for both start and end of the range
+           # The two (0, 0) in each attribute represent the range of table cells that the style applies to.
+           # Since there's only one cell at (0, 0), it's used for both start and end of the range
            ('ALIGN', (0, 0), (0, 0), 'CENTER'),
            ('BOX', (0, 0), (0, 0), bwidth, bcolor), # The fourth argument to this style attribute is the border width
            ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
           ]
         )
-        pdf.translate(transx, transy)
-        pdf.rotate(-areaRot)
         frm_table.wrapOn(pdf, frameWidth, frameHeight)
         frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
-        pdf.rotate(areaRot)
-        pdf.translate(-transx, -transy)
+        
+        return
 
 
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
@@ -599,6 +628,9 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     # We took care of this by making the frame so large, that it always can fit the flowables.
     # maybe should switch to res=newFrame.split(flowable, pdf) and check the result manually.
     newFrame.addFromList(pdf_flowableList, pdf)
+            
+    for decorationTag in area.findall('decoration'):
+        processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
 
     pdf.rotate(areaRot)
     pdf.translate(-transx, -transy)
@@ -703,9 +735,6 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
             # process text
             for textTag in area.findall('text'):
                 processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
-            
-            for decorationTag in area.findall('decoration'):
-                processAreaDecorationTag(decorationTag, areaHeight, areaRot, areaWidth, pdf, transx, transy)
 
             # Clip-Art
             # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
