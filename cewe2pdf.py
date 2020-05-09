@@ -438,13 +438,13 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
     for border in decoration.findall('border'):
         if "enabled" in border.attrib:
             enabledAttrib = border.get('enabled')
-            if (enabledAttrib is not '1'):
+            if (enabledAttrib != '1'):
                 return
 
         bwidth = 1
         if "width" in border.attrib:
             widthAttrib = border.get('width')
-            if (widthAttrib is not None):
+            if (widthAttrib != None):
                 bwidth = f * floor(float(widthAttrib)) # units are 1/10 mm
 
         bcolor = reportlab.lib.colors.blue
