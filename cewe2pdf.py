@@ -363,10 +363,10 @@ def Dequote(s):
     return s
 
 
-def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs):
+def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs, bweight):
     spanfont = dfltfont
     spanfs = dfltfs
-    spanweight = 400
+    spanweight = bweight
     spanstyle = dict([kv.split(':') for kv in
                     item.get('style').lstrip(' ').rstrip(';').split('; ')])
     if 'font-family' in spanstyle:
@@ -421,8 +421,8 @@ def AppendSpanEnd(paragraphText, weight, style):
     paragraphText = AppendText(paragraphText, '</span>')
     return paragraphText
 
-def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bgColorAttrib):
-    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additionnal_fonts, bodyfont, bodyfs)
+def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bgColorAttrib):
+    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight)
     paragraphText = AppendSpanStart(paragraphText, bgColorAttrib, pfont, pfs, pweight, pstyle)
     if (text == None):
         paragraphText = AppendText(paragraphText, "")
@@ -523,7 +523,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 
     htmlparas = body.findall(".//p")
     for p in htmlparas:
-        maxfs = bodyfs  # reset to body font size for each paragraph
+        maxfs = 0  # cannot use the bodyfs as a default, there may not actually be any text at body size
         if p.get('align') == 'center':
             pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
         elif p.get('align') == 'right':
@@ -533,9 +533,10 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1): # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
-            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
+            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, backgroundColorAttrib)
             paragraphText += '</para>'
-            pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+            usefs = maxfs if maxfs > 0 else bodyfs
+            pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
 
         else:
@@ -546,15 +547,16 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     # terminate the current pdf para and add it to the flow. The nbsp seems unnecessary
                     # but if it is not there then an empty paragraph goes missing :-(
                     paragraphText += '&nbsp;</para>'
-                    pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+                    usefs = maxfs if maxfs > 0 else bodyfs
+                    pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
-                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
+                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, backgroundColorAttrib)
 
                 elif item.tag == 'span':
                     span = item
-                    spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additionnal_fonts, bodyfont, bodyfs)
+                    spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additionnal_fonts, bodyfont, bodyfs, bweight)
 
                     if spanfs > maxfs:
                         maxfs = spanfs
@@ -572,12 +574,13 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         for br in brs:
                             # terminate the current pdf para and add it to the flow
                             paragraphText += '</para>'
-                            pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+                            usefs = maxfs if maxfs > 0 else bodyfs
+                            pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
                             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
                             # now add the tail text of each br in the span style
-                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
+                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, backgroundColorAttrib)
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle)
 
@@ -590,7 +593,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             #try to create a paragraph with the current text and style. Catch errors.
             try:
                 paragraphText += '</para>'
-                pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+                usefs = maxfs if maxfs > 0 else bodyfs
+                pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception as ex:
                 print('Error:', ex.args[0])
