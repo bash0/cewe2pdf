@@ -523,7 +523,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 
     htmlparas = body.findall(".//p")
     for p in htmlparas:
-        maxfs = bodyfs  # reset to body font size for each paragraph
+        maxfs = 0  # cannot use the bodyfs as a default, there may not actually be any text at body size
         if p.get('align') == 'center':
             pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
         elif p.get('align') == 'right':
@@ -535,7 +535,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             paragraphText = '<para autoLeading="max">'
             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
             paragraphText += '</para>'
-            pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+            usefs = maxfs if maxfs > 0 else bodyfs
+            pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
 
         else:
@@ -546,7 +547,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     # terminate the current pdf para and add it to the flow. The nbsp seems unnecessary
                     # but if it is not there then an empty paragraph goes missing :-(
                     paragraphText += '&nbsp;</para>'
-                    pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+                    usefs = maxfs if maxfs > 0 else bodyfs
+                    pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
@@ -572,7 +574,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                         for br in brs:
                             # terminate the current pdf para and add it to the flow
                             paragraphText += '</para>'
-                            pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+                            usefs = maxfs if maxfs > 0 else bodyfs
+                            pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
                             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
@@ -590,7 +593,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             #try to create a paragraph with the current text and style. Catch errors.
             try:
                 paragraphText += '</para>'
-                pdf_styleN.leading = maxfs * line_scale  # line spacing (text + leading)
+                usefs = maxfs if maxfs > 0 else bodyfs
+                pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception as ex:
                 print('Error:', ex.args[0])
