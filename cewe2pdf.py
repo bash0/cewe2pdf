@@ -363,10 +363,10 @@ def Dequote(s):
     return s
 
 
-def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs):
+def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs, bweight):
     spanfont = dfltfont
     spanfs = dfltfs
-    spanweight = 400
+    spanweight = bweight
     spanstyle = dict([kv.split(':') for kv in
                     item.get('style').lstrip(' ').rstrip(';').split('; ')])
     if 'font-family' in spanstyle:
@@ -421,8 +421,8 @@ def AppendSpanEnd(paragraphText, weight, style):
     paragraphText = AppendText(paragraphText, '</span>')
     return paragraphText
 
-def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bgColorAttrib):
-    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additionnal_fonts, bodyfont, bodyfs)
+def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bgColorAttrib):
+    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight)
     paragraphText = AppendSpanStart(paragraphText, bgColorAttrib, pfont, pfs, pweight, pstyle)
     if (text == None):
         paragraphText = AppendText(paragraphText, "")
@@ -533,7 +533,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1): # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
-            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
+            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, backgroundColorAttrib)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
             pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
@@ -552,11 +552,11 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
-                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
+                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, backgroundColorAttrib)
 
                 elif item.tag == 'span':
                     span = item
-                    spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additionnal_fonts, bodyfont, bodyfs)
+                    spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additionnal_fonts, bodyfont, bodyfs, bweight)
 
                     if spanfs > maxfs:
                         maxfs = spanfs
@@ -580,7 +580,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
                             # now add the tail text of each br in the span style
-                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf, additionnal_fonts, bodyfont, bodyfs, backgroundColorAttrib)
+                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, backgroundColorAttrib)
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle)
 
