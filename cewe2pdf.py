@@ -344,12 +344,34 @@ def IsBold(weight):
     return weight > 400
 
 
-def IsItalic(spanstyle):
-    return 'font-style' in spanstyle and spanstyle['font-style'].strip(" ") == "italic"
+def IsItalic(itemstyle, outerstyle):
+    if 'font-style' in itemstyle:
+        if itemstyle['font-style'].strip(" ") == "italic":
+            return True
+        else:
+            return False
+    elif 'font-style' in outerstyle:
+        if outerstyle['font-style'].strip(" ") == "italic":
+            return True
+        else:
+            return False
+    else:
+        return False
 
 
-def IsUnderline(spanstyle):
-    return 'text-decoration' in spanstyle and spanstyle['text-decoration'].strip(" ") == "underline"
+def IsUnderline(itemstyle, outerstyle):
+    if 'text-decoration' in itemstyle:
+        if itemstyle['text-decoration'].strip(" ") == "underline":
+            return True
+        else:
+            return False
+    elif 'text-decoration' in outerstyle:
+        if outerstyle['text-decoration'].strip(" ") == "underline":
+            return True
+        else:
+            return False
+    else:
+        return False
 
 
 def Dequote(s):
@@ -389,7 +411,7 @@ def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs, bweight):
     return spanfont, spanfs, spanweight, spanstyle
 
 
-def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle):
+def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle, outerstyle):
     paragraphText = AppendText(paragraphText, '<span name="' + font + '"'
         + ' size=' + str(fsize)
         )
@@ -404,31 +426,32 @@ def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle):
 
     if IsBold(fweight):  # ref https://www.w3schools.com/csSref/pr_font_weight.asp
         paragraphText = AppendText(paragraphText, "<b>")
-    if IsItalic(fstyle):
+    if IsItalic(fstyle, outerstyle):
         paragraphText = AppendText(paragraphText, '<i>')
-    if IsUnderline(fstyle):
+    if IsUnderline(fstyle, outerstyle):
         paragraphText = AppendText(paragraphText, '<u>')
     return paragraphText
 
 
-def AppendSpanEnd(paragraphText, weight, style):
-    if IsUnderline(style):
+def AppendSpanEnd(paragraphText, weight, style, outerstyle):
+    if IsUnderline(style, outerstyle):
         paragraphText = AppendText(paragraphText, '</u>')
-    if IsItalic(style):
+    if IsItalic(style, outerstyle):
         paragraphText = AppendText(paragraphText, '</i>')
     if IsBold(weight):
         paragraphText = AppendText(paragraphText, "</b>")
     paragraphText = AppendText(paragraphText, '</span>')
     return paragraphText
 
-def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bgColorAttrib):
+
+def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, bgColorAttrib):
     pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight)
-    paragraphText = AppendSpanStart(paragraphText, bgColorAttrib, pfont, pfs, pweight, pstyle)
+    paragraphText = AppendSpanStart(paragraphText, bgColorAttrib, pfont, pfs, pweight, pstyle, bstyle)
     if (text == None):
         paragraphText = AppendText(paragraphText, "")
     else:
         paragraphText = AppendText(paragraphText, html.escape(text))
-    paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle)
+    paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle, bstyle)
     return paragraphText, pfs
 
 def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
@@ -533,7 +556,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1): # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
-            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, backgroundColorAttrib)
+            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
             pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
@@ -552,7 +575,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
-                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, backgroundColorAttrib)
+                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
 
                 elif item.tag == 'span':
                     span = item
@@ -561,7 +584,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     if spanfs > maxfs:
                         maxfs = spanfs
 
-                    paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, spanfont, spanfs, spanweight, spanstyle)
+                    paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, spanfont, spanfs, spanweight, spanstyle, bstyle)
 
                     if span.text != None:
                         paragraphText = AppendText(paragraphText, html.escape(span.text))
@@ -570,7 +593,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     brs = span.findall(".//br")
                     if len(brs) > 0:
                         # terminate the "real" span that we started above
-                        paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle)
+                        paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
                         for br in brs:
                             # terminate the current pdf para and add it to the flow
                             paragraphText += '</para>'
@@ -580,9 +603,9 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
                             # now add the tail text of each br in the span style
-                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, backgroundColorAttrib)
+                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
                     else:
-                        paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle)
+                        paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
                     if (span.tail != None):
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
