@@ -25,7 +25,10 @@
     <Content Include="additional_fonts.txt" />
     <Content Include="cewe2pdf.ini" />
     <Content Include="requirements.txt" />
+    <Content Include="tests\cewe2pdf.ini" />
     <Content Include="tests\unittest_fotobook.mcf" />
+    <Content Include="tests\unittest_fotobook.mcf.pdf" />
+    <Content Include="tests\unittest_fotobook_mcf-Dateien\GreySquareBlueBorder.jpg" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img.png" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img2.png" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img3.png" />
