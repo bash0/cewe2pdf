@@ -461,7 +461,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
     for border in decoration.findall('border'):
         if "enabled" in border.attrib:
             enabledAttrib = border.get('enabled')
-            if (enabledAttrib is not '1'):
+            if (enabledAttrib != '1'):
                 return
 
         bwidth = 1
