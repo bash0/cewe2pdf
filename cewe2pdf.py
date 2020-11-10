@@ -412,7 +412,11 @@ def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs, bweight):
 
 
 def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle, outerstyle):
-    paragraphText = AppendText(paragraphText, '<span name="' + font + '"'
+    """
+    Remember this is not really HTML, though it looks that way. 
+    See 6.2 Paragraph XML Markup Tags in the reportlabs user guide.
+    """
+    paragraphText = AppendText(paragraphText, '<font name="' + font + '"'
         + ' size=' + str(fsize)
         )
 
@@ -440,7 +444,7 @@ def AppendSpanEnd(paragraphText, weight, style, outerstyle):
         paragraphText = AppendText(paragraphText, '</i>')
     if IsBold(weight):
         paragraphText = AppendText(paragraphText, "</b>")
-    paragraphText = AppendText(paragraphText, '</span>')
+    paragraphText = AppendText(paragraphText, '</font>')
     return paragraphText
 
 
@@ -461,7 +465,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
     for border in decoration.findall('border'):
         if "enabled" in border.attrib:
             enabledAttrib = border.get('enabled')
-            if (enabledAttrib is not '1'):
+            if (enabledAttrib != '1'):
                 return
 
         bwidth = 1
