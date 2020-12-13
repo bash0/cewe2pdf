@@ -13,7 +13,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId>CondaEnv|CondaEnv|anaconda3</InterpreterId>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
-    <CommandLineArguments>D:\Users\pete\Documents\Fotobooks\Cewe2PdfTester.mcf</CommandLineArguments>
+    <CommandLineArguments>D:\Users\pete\Source\GitHub\cewe2pdf\tests\unittest_fotobook.mcf</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
