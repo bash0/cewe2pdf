@@ -50,7 +50,7 @@ class ClpFile(object):
         outFile.write(self.svgData)
         outFile.close()
 
-    def convertToPngInBuffer(self, width:int = None, height:int = None):
+    def convertToPngInBuffer(self, width:int = None, height:int = None, alpha:int = 128):
         """convert the SVG to a PNG file, but only in memory"""
 
         #We are using cairosvg, but this does not allow to scale the output image to the dimensions that we like.
@@ -76,6 +76,17 @@ class ClpFile(object):
         tmpMemFile.seek(0)
         tempImage = PIL.Image.open(tmpMemFile)
         scaledImage = tempImage.resize((width, height))
+
+        # create a mask the same size as the original. For all pixels which are
+        # non zero ("not used") set the mask value to the required transparency
+        alphamask = scaledImage.copy().convert('L').resize(scaledImage.size)
+        pixels = alphamask.load()
+        for i in range(alphamask.size[0]): # for every pixel:
+            for j in range(alphamask.size[1]):
+                if (pixels[i,j] != 0):
+                    pixels[i,j] = alpha
+        scaledImage.putalpha(alphamask)
+
         scaledImage.save(self.pngMemFile, 'png')
         self.pngMemFile.seek(0)
         return self

@@ -682,7 +682,7 @@ def loadClipart(fileName) -> ClpFile :
 
     return newClpFile
 
-def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
+def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha):
     clipartID = int(clipartElement.get('designElementId'))
     #print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
 
@@ -707,7 +707,7 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
         return
 
     clipart = loadClipart(fileName) 
-    clipart.convertToPngInBuffer(new_w, new_h)  #so we can access the pngMemFile later
+    clipart.convertToPngInBuffer(new_w, new_h, alpha)  #so we can access the pngMemFile later
 
     # place image
     print('Clipart file:', fileName)
@@ -770,8 +770,15 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
             # Clip-Art
             # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
             # We are using the <clipart> element here
-            for clipartElement in area.findall('clipart'):
-                processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
+            if (area.get('areatype') == 'clipartarea'): # only look for alpha and clipart within clipartarea tags
+                alpha = 255
+                decoration = area.find('decoration') # decoration tag
+                if decoration is not None:
+                    alphatext = decoration.get('alpha') # alpha attribute
+                    if alphatext is not None:
+                        alpha = int((1.0 - float(alphatext)) * 255)
+                for clipartElement in area.findall('clipart'):
+                    processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha)
     return
 
 

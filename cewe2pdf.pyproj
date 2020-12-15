@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="cewe2pdf.py" />
+    <Compile Include="clpFile.py" />
     <Compile Include="processManyMcfs.py" />
     <Compile Include="tests\test_simpleBook.py" />
   </ItemGroup>
