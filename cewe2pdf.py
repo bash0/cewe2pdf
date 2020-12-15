@@ -670,10 +670,13 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 def loadClipart(fileName) -> ClpFile :
     """Tries to load a clipart file. Either from .CLP or .SVG file
     returns a clpFile object"""
-    pathObj = Path(fileName)
-    baseFileName = pathObj.stem
-    filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
-    filePath = Path(filePath)
+    if os.path.isabs(fileName):
+        filePath = Path(fileName)
+    else:
+        pathObj = Path(fileName)
+        baseFileName = pathObj.stem
+        filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
+        filePath = Path(filePath)
     newClpFile = ClpFile("")
     if (filePath.suffix == '.clp'):
         newClpFile.readClp(filePath)
@@ -776,7 +779,7 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
                 if decoration is not None:
                     alphatext = decoration.get('alpha') # alpha attribute
                     if alphatext is not None:
-                        alpha = int((1.0 - float(alphatext)) * 255)
+                        alpha = int((float(alphatext)) * 255)
                 for clipartElement in area.findall('clipart'):
                     processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha)
     return
@@ -898,11 +901,30 @@ def convertMcf(mcfname, keepDoublePages: bool):
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
+
+            # set the key account value
+            ka = defaultConfigSection['keyaccount']
+            if ka is not None:
+                os.environ['KEYACCOUNT'] = ka.strip()
+
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
-            # add any extra background folders
+
+            # add any extra background folders, substituting environment variables
             xbg = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()  # newline separated list of folders
-            fxbg = tuple(filter(lambda bg: (len(bg) != 0), xbg))
-            backgroundLocations = baseBackgroundLocations + fxbg
+            fxbg = list(filter(lambda bg: (len(bg) != 0), xbg)) # filter out empty entries
+            f2xbg = tuple(map(lambda bg: os.path.expandvars(bg), fxbg)) # expand environment variables
+            backgroundLocations = baseBackgroundLocations + f2xbg
+
+            # adds extra clipart ids, with absolute file references
+            xca = defaultConfigSection.get('extraClipArts', '').splitlines()  # newline separated list of id, filename pairs
+            fxca = list(filter(lambda ca: (len(ca) != 0), xca)) # filter out empty entries
+            f2xca = tuple(map(lambda ca: os.path.expandvars(ca), fxca)) # expand environment variables
+            for ca in f2xca:
+                definition = ca.split(',')
+                if (len(definition) == 2):
+                    id = int(definition[0])
+                    file = definition[1].strip()
+                    clipartDict[id] = file
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 

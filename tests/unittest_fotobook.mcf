@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="ea26b41b-cee3-4d37-ac06-e61c0af959be" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="b64674c6-16d9-409c-8c0c-dd64ca71190c" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.0.1" createdWithHPSVersionBuild="20191025" projectID="69675965-93ed-4a07-b25f-7dc31eedcc67" projectIDCreatedEpoch="1575196183"/>
-    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.0.4" programversionBuild="20201119" savetime="2020-12-15 19:53"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.0.4" programversionBuild="20201119" savetime="2020-12-15 21:19"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
         <outline width="0"/>
@@ -287,8 +287,8 @@
     </page>
     <page designStyleID="-1" pagenr="6" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
-        <designElementIDs background="201" layout="125061"/>
-        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <designElementIDs background="448" layout="125061"/>
+        <background alignment="1" designElementId="448" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002,normal"/>
         <area areatype="imagearea">
             <position height="635.125" left="348.692" rotation="0" top="130.732" width="1306.54" zposition="100"/>
@@ -326,14 +326,14 @@
             </text>
         </area>
         <area areatype="textarea">
-            <position height="350" left="795.255" rotation="0" top="783.066" width="407.022" zposition="7001"/>
+            <position height="350" left="754.255" rotation="0" top="783.066" width="407.022" zposition="7001"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;"><table border="0" style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">55% transparent color clip above here, id 63488, a downloaded color clip</span></p></td></tr></table></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="350" left="1236.58" rotation="0" top="783.066" width="407.022" zposition="7002"/>
+            <position height="350" left="1152.58" rotation="0" top="783.066" width="407.022" zposition="7002"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;"><table border="0" style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">30% transparent color clip above here, id 63504, a standard color clip</span></p></td></tr></table></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0"/>
@@ -485,5 +485,5 @@
         </foto>
         <foto id="safecontainer:/img4.png"/>
     </fotoRelationships>
-    <statistics assistantUsed="0" countPauses="15" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="132112" fotosAdded="6" fotosRemoved="4" pauseTime="94976" sessionsUsed="27"/>
+    <statistics assistantUsed="0" countPauses="17" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="137265" fotosAdded="6" fotosRemoved="4" pauseTime="99951" sessionsUsed="27"/>
 </fotobook>
