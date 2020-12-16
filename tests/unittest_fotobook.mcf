@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="b64674c6-16d9-409c-8c0c-dd64ca71190c" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="6dce93e6-d2b1-49ec-998d-b0c74f22a90f" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.0.1" createdWithHPSVersionBuild="20191025" projectID="69675965-93ed-4a07-b25f-7dc31eedcc67" projectIDCreatedEpoch="1575196183"/>
-    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.0.4" programversionBuild="20201119" savetime="2020-12-15 21:19"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.0.4" programversionBuild="20201119" savetime="2020-12-16 06:34"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
         <outline width="0"/>
@@ -318,6 +318,24 @@
             <decoration alpha="0.45"/>
             <clipart designElementId="63488"/>
         </area>
+        <area areatype="clipartarea">
+            <position height="346.269" left="223.191" rotation="44" top="1242.71" width="346.269" zposition="104"/>
+            <designElementIDs clipart="63539"/>
+            <decoration/>
+            <clipart designElementId="63539"/>
+        </area>
+        <area areatype="clipartarea">
+            <position height="234.521" left="221.064" rotation="0" top="1327.25" width="362.808" zposition="105"/>
+            <designElementIDs clipart="68859"/>
+            <decoration/>
+            <clipart designElementId="68859"/>
+        </area>
+        <area areatype="clipartarea">
+            <position height="372.555" left="333.452" rotation="0" top="1425.61" width="498.104" zposition="106"/>
+            <designElementIDs clipart="104304"/>
+            <decoration/>
+            <clipart designElementId="104304"/>
+        </area>
         <area areatype="textarea">
             <position height="282" left="353.928" rotation="0" top="783.066" width="407.022" zposition="7000"/>
             <decoration/>
@@ -485,5 +503,5 @@
         </foto>
         <foto id="safecontainer:/img4.png"/>
     </fotoRelationships>
-    <statistics assistantUsed="0" countPauses="17" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="137265" fotosAdded="6" fotosRemoved="4" pauseTime="99951" sessionsUsed="27"/>
+    <statistics assistantUsed="0" countPauses="20" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="170613" fotosAdded="6" fotosRemoved="4" pauseTime="132038" sessionsUsed="27"/>
 </fotobook>

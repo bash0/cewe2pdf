@@ -858,6 +858,24 @@ def getBaseBackgroundLocations(basefolder):
     return baseBackgroundLocations
 
 
+def SetKeyAccount(cewe_folder, defaultConfigSection):
+    try:
+        keyAccountFileName = os.path.join(cewe_folder, "Resources", "config", "keyaccount.xml")
+        katree = etree.parse(keyAccountFileName)
+        karoot = katree.getroot()
+        ka = karoot.find('keyAccount').text # that's the official installed value
+        # see if he has a .ini file override for the keyaccount
+        inika = defaultConfigSection.get('keyaccount');
+        if not inika is None:
+            print('ini file overrides keyaccount from {} to {}'.format(ka, inika))
+            ka = inika
+        # put the value into the environment so that it can be substituted in later config elements
+        os.environ['KEYACCOUNT'] = ka.strip()
+    except Exception as ex:
+        print('Could not extract keyAccount tag in file: {}, reason {}'.format(keyAccountFileName, ex))
+    return
+
+
 def convertMcf(mcfname, keepDoublePages: bool):
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
@@ -902,10 +920,8 @@ def convertMcf(mcfname, keepDoublePages: bool):
             # find cewe folder from ini file
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
 
-            # set the key account value
-            ka = defaultConfigSection['keyaccount']
-            if ka is not None:
-                os.environ['KEYACCOUNT'] = ka.strip()
+            # set the key account number into the environment
+            SetKeyAccount(cewe_folder, defaultConfigSection)
 
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
 
