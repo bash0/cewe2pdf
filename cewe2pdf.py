@@ -535,6 +535,24 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         bweight = 400
     color = '#000000'
 
+    # issue https://github.com/bash0/cewe2pdf/issues/58 - margins are not being used
+    # assume (based on empirical evidence!) that there is just one table, and collect
+    # the margin values.
+    tabletmarg = tablebmarg = tablelmarg = tablermarg = 0
+    table = htmlxml.find('.//body/table')
+    if (table is not None):
+        tableStyleAttrib = table.get('style')
+        if (tableStyleAttrib is not None):
+            tablestyle = dict([kv.split(':') for kv in
+                table.get('style').lstrip(' ').rstrip(';').split('; ')])
+            try:
+                tabletmarg = floor(float(tablestyle['margin-top'].strip("px")))
+                tablebmarg = floor(float(tablestyle['margin-bottom'].strip("px")))
+                tablelmarg = floor(float(tablestyle['margin-left'].strip("px")))
+                tablermarg = floor(float(tablestyle['margin-right'].strip("px")))
+            except:
+                print('Ignoring invalid table margin settings ' + tableStyleAttrib)
+
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
 
@@ -631,27 +649,52 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 
 
     # Add a frame object that can contain multiple paragraphs
-    frameBottomLeft_x = -0.5 * f * areaWidth
-    frameBottomLeft_y = -0.5 * f * areaHeight
+    leftPad =   f * tablelmarg
+    rightPad =  f * tablermarg
+    bottomPad = f * tablebmarg
+    topPad =    f * tabletmarg
     frameWidth = f * areaWidth
     frameHeight = f * areaHeight
+    frameBottomLeft_x = -0.5 * frameWidth
+    frameBottomLeft_y = -0.5 * frameHeight
+
+    finalTotalHeight = topPad + bottomPad # built up in the text height check loop
+    finalTotalWidth = frameWidth # should never be exceeded in the text height check loop
+    availableTextHeight = frameHeight - topPad - bottomPad
+    availableTextWidth = frameWidth - leftPad - rightPad
 
     # Go through all flowables and test if the fit in the frame. If not increase the frame height.
     # To solve the problem, that if each paragraph will fit indivdually, and also all together,
     # we need to keep track of the total summed height+
-    totalMaxHeight = 0
     for j in range(len(pdf_flowableList)):
-        neededWidth, neededHeight = pdf_flowableList[j].wrap(frameWidth, frameHeight)
-        totalMaxHeight += neededHeight
-    if (totalMaxHeight > frameHeight):
-        print('Warning: A set of paragraphs would not fit inside its frame. Frame height will be increased to prevent loss of text.')
-    frameHeight = max(frameHeight, totalMaxHeight)   # increase the height
+        neededTextWidth, neededTextHeight = pdf_flowableList[j].wrap(availableTextWidth, availableTextHeight)
+        finalTotalHeight += neededTextHeight
+        availableTextHeight -= neededTextHeight
+        if neededTextWidth > availableTextWidth:
+            # I have never seen this happen, but check anyway
+            print('Warning: A set of paragraphs too wide for its frame. INTERNAL ERROR!')
+            finalTotalWidth = neededTextWidth + leftPad + rightPad 
+    
+    if finalTotalHeight > frameHeight:
+        # One of the possible causes here is that wrap function has used an extra line (because 
+        #  of some slight mismatch in character widths and a frame that matches too precisely?)
+        #  so that a word wraps over when it shouldn't. I don't know how to fix that sensibly. 
+        #  Increasing the height is NOT a good visual solution, because the line wrap is still
+        #  not where the user expects it - increasing the width would almost be more sensible!
+        # Another suspected cause is in the use of multiple font sizes in one text. Perhaps the
+        #  line scale (interline space) gets confused by this?
+        print('Warning: A set of paragraphs would not fit inside its frame. Frame height is increased to prevent loss of text.')
+        print(' Try widening the text box just slightly to avoid an unexpected word wrap, or increasing the height yourself')
+        print(' Most recent paragraph text: {}'.format(paragraphText))
+        frameHeight = finalTotalHeight
+    if finalTotalWidth > frameWidth:
+        frameWidth = finalTotalWidth
 
     newFrame = Frame(frameBottomLeft_x, frameBottomLeft_y,
                         frameWidth, frameHeight,
-                        leftPadding=0, bottomPadding=0,
-                        rightPadding=0, topPadding=0,
-                        showBoundary=0  # for debugging useful
+                        leftPadding=leftPad, bottomPadding=bottomPad,
+                        rightPadding=rightPad, topPadding=topPad,
+                        showBoundary=0  # for debugging useful to set 1
                         )
 
     # This call should produce an exception, if any of the flowables do not fit inside the frame.

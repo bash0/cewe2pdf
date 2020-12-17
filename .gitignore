@@ -53,3 +53,4 @@ nosetests.xml
 /tests/testFontDoesNotExist/testFontDoesNotExist.mcf.pdf
 /test.pdf
 /cewe_folder_txt
+/tests/unittest_fotobook.mcf.20200516.pdf
