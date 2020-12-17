@@ -299,6 +299,26 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     pdf.drawImage(ImageReader(jpeg.name),
                     f * -0.5 * areaWidth, f * -0.5 * areaHeight,
                     width=f * areaWidth, height=f * areaHeight, mask='auto')
+    
+    passepartoutid = imageTag.get('passepartoutDesignElementId')
+    # TODO implement frames (which can come either from the installation or from a download)
+    # This is probably quite complicated. Below is an xml definition I found in the xml 
+    # associated with a downloaded frame, along with 3 .clp files (of which 2 are actually
+    # mentioned here).
+    #   <decorations>
+    #   	<decoration designElementId="125186" id="12809-DECO-ZZ" type="fading">
+    #   		<categories>
+    #   			<category>Rahmen</category>
+    #   		</categories>
+    #   		<fading designElementType="passepartout" file="12809-DECO-ZZ-mask.svg" keepAspectRatio="1" ratio="0.68">
+    #   			<clipart designElementType="clipart" file="12809-DECO-ZZ-clip.svg" ratio="0.68"/>
+    #   			<fotoarea height="0.8687" width="0.9073" x="0.04" y="0.06"/>
+    #   		</fading>
+    #   	</decoration>
+    #   </decorations>
+    # A job for somebody else, I think.
+    if not passepartoutid is None:
+        print('Frames (passepartout) are not implemented ()', passepartoutid)
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
