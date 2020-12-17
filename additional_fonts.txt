@@ -9,4 +9,4 @@ CalligraphScript = C:\Windows\Fonts\PALSCRI.TTF
 FranklinGothic = C:\Windows\Fonts\framd.ttf
 Calibri = C:\Windows\Fonts\calibri.ttf
 Segoe UI Symbol = C:\Windows\Fonts\seguisym.ttf
-Function = C:\Program Files\Elkjop fotoservice_6.3\elkjop fotoservice\Resources\photofun\fonts\Function-Light.ttf
+Function = ${CEWE_FOLDER}\Resources\photofun\fonts\Function-Light.ttf

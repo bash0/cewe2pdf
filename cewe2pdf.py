@@ -901,7 +901,8 @@ def getBaseBackgroundLocations(basefolder):
     return baseBackgroundLocations
 
 
-def SetKeyAccount(cewe_folder, defaultConfigSection):
+def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
+    os.environ['CEWE_FOLDER'] = cewe_folder
     try:
         keyAccountFileName = os.path.join(cewe_folder, "Resources", "config", "keyaccount.xml")
         katree = etree.parse(keyAccountFileName)
@@ -963,8 +964,8 @@ def convertMcf(mcfname, keepDoublePages: bool):
             # find cewe folder from ini file
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
 
-            # set the key account number into the environment
-            SetKeyAccount(cewe_folder, defaultConfigSection)
+            # set the cewe folder and key account number into the environment for use in other config files 
+            SetEnvironmentVariables(cewe_folder, defaultConfigSection)
 
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
 
@@ -994,7 +995,9 @@ def convertMcf(mcfname, keepDoublePages: bool):
         with open(configFontFileName, 'r') as fp:
             for line in fp:
                 p = line.split(" = ", 1)
-                additionnal_fonts[p[0]] = p[1].strip()
+                fontname = p[0]
+                fontfile = os.path.expandvars(p[1].strip())
+                additionnal_fonts[fontname] = fontfile
             fp.close()
     except:
         print('cannot find additionnal fonts (define them in additional_fonts.txt)')
