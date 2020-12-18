@@ -943,7 +943,7 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
 def convertMcf(mcfname, keepDoublePages: bool):
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
-    mcfBaseFolder = mcfPathObj.parent
+    mcfBaseFolder = str(mcfPathObj.parent)
 
     # parse the input mcf xml file
     # read file as binary, so UTF-8 encoding is preserved for xml-parser
