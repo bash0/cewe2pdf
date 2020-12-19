@@ -46,7 +46,6 @@ nosetests.xml
 /cewe2pdf - Copy.py
 /examples.xml
 /cewe2pdf.pyproj.user
-/tests/unittest_fotobook.mcf.pdf
 *.mcf~
 *.xml~
 /tests/unittest_fotobook_mcf-Dateien/identifier.xml
@@ -54,3 +53,4 @@ nosetests.xml
 /tests/testFontDoesNotExist/testFontDoesNotExist.mcf.pdf
 /test.pdf
 /cewe_folder_txt
+/tests/unittest_fotobook.mcf.20200516.pdf
