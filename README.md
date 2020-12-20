@@ -19,7 +19,7 @@ Download or clone this cewe2pdf repository into a folder of your choice.
 The easiest way to start this Python script, is to install the latest pyhthon version.
 Then from the start-menu open your pyhthon promt and install the dependencies
 ```
-pip install lxml reportlab pillow
+pip install lxml reportlab pillow cairosvg
 ```
 
 If you have installed the Anaconda Pyhton distribution, there is one catch:
@@ -84,7 +84,7 @@ Ensure the python dependancies are installed.
 
 On Fedora :
 ```
-sudo dnf install python2-lxml python2-reportlab
+sudo dnf install python2-lxml python2-reportlab cairosvg
 ```
 
 Define the CEWE path (the directory where your CEWE album software is installed. You can recognize it by the many `.so` files and some subdirs like `Resources`). Put this directory name into a file named `cewe_folder.txt`.
