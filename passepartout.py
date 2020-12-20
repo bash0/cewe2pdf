@@ -70,6 +70,9 @@ class Passepartout(object):
         # a dictionary for passepartout element IDs to file name
         passepartoutIdDict = dict()
 
+        if isinstance(directoryList, tuple):
+            directoryList = list(directoryList)
+
         if not isinstance(directoryList, list):
             directoryList = [directoryList]
 

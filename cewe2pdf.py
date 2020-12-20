@@ -81,6 +81,7 @@ import configparser  # to read config file, see https://docs.python.org/3/librar
 
 from clpFile import ClpFile  #for clipart .CLP and .SVG files
 import traceback
+from passepartout import Passepartout
 
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
@@ -110,6 +111,8 @@ pdf_flowableList = []
 
 clipartDict = dict()    # a dictionary for clipart element IDs to file name
 clipartPathList = tuple()
+passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
+passepartoutFolders = None #global variable with the folders for passepartout frames
 
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
@@ -330,6 +333,11 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # A job for somebody else, I think.
     if not passepartoutid is None:
         print('Frames (passepartout) are not implemented ()', passepartoutid)
+        global passepartoutDict
+        if  (passepartoutDict is None):
+            print("Regenerating passepartout index from .XML files.")
+            global passepartoutFolders
+            passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
@@ -1016,6 +1024,14 @@ def convertMcf(mcfname, keepDoublePages: bool):
                     id = int(definition[0])
                     file = definition[1].strip()
                     clipartDict[id] = file
+
+
+             # read passepartout folders and substitute environment variables
+            pptout_rawFolder = defaultConfigSection.get('passepartoutFolders', '').splitlines()  # newline separated list of folders
+            pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
+            pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment variables
+            global passepartoutFolders
+            passepartoutFolders = pptout_filtered2
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
