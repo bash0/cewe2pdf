@@ -324,6 +324,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     #   </decorations>
     # A job for somebody else, I think.
     frameClipartFileName = None
+    frameDeltaX = 0
+    frameDeltaY = 0
     if not passepartoutid is None:
         print('Frames (passepartout) are not fully implemented ()', passepartoutid)
         #re-generate the index of designElementId to .xml files, if it does not exist
