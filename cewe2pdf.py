@@ -333,15 +333,20 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # A job for somebody else, I think.
     if not passepartoutid is None:
         print('Frames (passepartout) are not implemented ()', passepartoutid)
+        #re-generate the index of designElementId to .xml files, if it does not exist
         passepartoutid = int(passepartoutid)    #we need to work with a number below
         global passepartoutDict
         if  (passepartoutDict is None):
             print("Regenerating passepartout index from .XML files.")
             global passepartoutFolders
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
+        # read information from .xml file
         pptXmlInfo = Passepartout.extractInfoFromXml(passepartoutDict[passepartoutid])
         frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
         print("Using clipart file: {}".format(frameClipartFileName))
+        # draw the passepartout clipart file.
+        # ToDo: apply the masking
+        # ToDo: adjust for the cutout of the masking (?)
         alpha = 255
         # we set the transx, transy, and areaRot for the clipart to zero, because will do it in the image processing
         # at the end. So don't do it twice. 
