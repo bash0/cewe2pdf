@@ -305,14 +305,6 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     else:
         im.save(jpeg.name, "JPEG",
                 quality=image_quality)
-
-    # place image
-    print('image', imageTag.get('filename'))
-    pdf.translate(img_transx, transy)
-    pdf.rotate(-areaRot)
-    pdf.drawImage(ImageReader(jpeg.name),
-                    f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-                    width=f * areaWidth, height=f * areaHeight, mask='auto')
     
     passepartoutid = imageTag.get('passepartoutDesignElementId')
     # TODO implement frames (which can come either from the installation or from a download)
@@ -331,8 +323,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     #   	</decoration>
     #   </decorations>
     # A job for somebody else, I think.
+    frameClipartFileName = None
     if not passepartoutid is None:
-        print('Frames (passepartout) are not implemented ()', passepartoutid)
+        print('Frames (passepartout) are not fully implemented ()', passepartoutid)
         #re-generate the index of designElementId to .xml files, if it does not exist
         passepartoutid = int(passepartoutid)    #we need to work with a number below
         global passepartoutDict
@@ -340,18 +333,42 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             print("Regenerating passepartout index from .XML files.")
             global passepartoutFolders
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
-        # read information from .xml file
-        pptXmlInfo = Passepartout.extractInfoFromXml(passepartoutDict[passepartoutid])
-        frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
-        print("Using clipart file: {}".format(frameClipartFileName))
-        # draw the passepartout clipart file.
-        # ToDo: apply the masking
-        # ToDo: adjust for the cutout of the masking (?)
-        alpha = 255
+        # read information from .xml file        
+        try:
+            pptXmlFileName = passepartoutDict[passepartoutid]
+        except:
+            pptXmlFileName = None
+        if pptXmlFileName is None:
+            print("Error can't find passepartout for {}".format(passepartoutid))
+        else:
+            pptXmlFileName = passepartoutDict[passepartoutid]
+            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName)
+            frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
+            maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
+            print("Using clipart file: {}".format(frameClipartFileName))
+            # draw the passepartout clipart file.
+            # ToDo: apply the masking
+            frameAlpha = 255
+            #Adjust the position of the real image depending on the frame
+            frameDeltaX = f *pptXmlInfo.fotoarea_x * areaWidth
+            frameDeltaY = f * pptXmlInfo.fotoarea_y * areaHeight
+
+
+    # place image
+    print('image', imageTag.get('filename'))
+    pdf.translate(img_transx, transy)
+    pdf.rotate(-areaRot)
+    pdf.translate(frameDeltaX, -frameDeltaY) # for adjustments from passepartout
+    pdf.drawImage(ImageReader(jpeg.name),
+                    f * -0.5 * areaWidth, f * -0.5 * areaHeight,
+                    width=f * areaWidth, height=f * areaHeight, mask='auto')
+    pdf.translate(-frameDeltaX, frameDeltaY) # for adjustments from passepartout
+
+    #we need to draw our passepartout after the real image, so it overlays it.
+    if not (frameClipartFileName is None):
         # we set the transx, transy, and areaRot for the clipart to zero, because will do it in the image processing
         # at the end. So don't do it twice. 
-        insertClipartFile(frameClipartFileName, 0, areaWidth, areaHeight, alpha, pdf, 0, 0)
-
+        insertClipartFile(frameClipartFileName, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0)
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
@@ -1052,6 +1069,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
 
              # read passepartout folders and substitute environment variables
             pptout_rawFolder = defaultConfigSection.get('passepartoutFolders', '').splitlines()  # newline separated list of folders
+            pptout_rawFolder.append(cewe_folder)    #add the base folder
             pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
             pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment variables
             global passepartoutFolders

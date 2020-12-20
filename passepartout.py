@@ -37,8 +37,13 @@ class Passepartout(object):
         # read information from xml file about passepartout
 
         clipArtXml = open(xmlFileName, 'rb')
-        xmlInfo = etree.parse(xmlFileName)
-        clipArtXml.close()
+        try:
+            xmlInfo = etree.parse(xmlFileName)
+        except:
+            print("Error while parsing. Maybe not a XML.:{}".format(xmlFileName))
+            return None
+        finally:
+            clipArtXml.close()        
 
         for decoration in xmlInfo.findall('decoration'):
             # assume these IDs are always integers.
@@ -55,10 +60,10 @@ class Passepartout(object):
             clipartElement = typeElement.find('clipart')
             clipartFile = clipartElement.get('file')
             fotoareaElement = typeElement.find('fotoarea')
-            fotoarea_height = fotoareaElement.get('height')
-            fotoarea_width = fotoareaElement.get('width')
-            fotoarea_x = fotoareaElement.get('x')
-            fotoarea_y = fotoareaElement.get('y')
+            fotoarea_height = float(fotoareaElement.get('height'))
+            fotoarea_width = float(fotoareaElement.get('width'))
+            fotoarea_x = float(fotoareaElement.get('x'))
+            fotoarea_y = float(fotoareaElement.get('y'))
 
             return Passepartout.decorationXmlInfo(xmlFileName, designElementId, decoration_id, decoration_type,
                             designElementType, maskFile, clipartFile,
@@ -72,6 +77,10 @@ class Passepartout(object):
 
         # a dictionary for passepartout element IDs to file name
         passepartoutIdDict = dict()
+
+        if (directoryList is None):
+            print("Error: no directories passed to Passepartout.buildElementIdIndex!")
+            return passepartoutIdDict
 
         if isinstance(directoryList, tuple):
             directoryList = list(directoryList)
@@ -93,11 +102,12 @@ class Passepartout(object):
 
         # load each .xml file and extract the information
         for curXmlFile in xmlFileList:
+            print("Parsing passepartout: {}".format(curXmlFile))
             xmlInfo = Passepartout.extractInfoFromXml(curXmlFile)
             if xmlInfo is None:
                 continue  # this .xml file is not for a passepartout, or something went wrong
             if (xmlInfo.designElementType == 'passepartout'):
-                print("Found passepartout: {}".format(curXmlFile))
+                #print("Adding passepartout to dict: {}".format(curXmlFile))
                 passepartoutIdDict[xmlInfo.designElementId] = curXmlFile
 
         return passepartoutIdDict
