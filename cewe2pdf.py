@@ -333,11 +333,20 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # A job for somebody else, I think.
     if not passepartoutid is None:
         print('Frames (passepartout) are not implemented ()', passepartoutid)
+        passepartoutid = int(passepartoutid)    #we need to work with a number below
         global passepartoutDict
         if  (passepartoutDict is None):
             print("Regenerating passepartout index from .XML files.")
             global passepartoutFolders
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
+        pptXmlInfo = Passepartout.extractInfoFromXml(passepartoutDict[passepartoutid])
+        frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
+        print("Using clipart file: {}".format(frameClipartFileName))
+        alpha = 255
+        # we set the transx, transy, and areaRot for the clipart to zero, because will do it in the image processing
+        # at the end. So don't do it twice. 
+        insertClipartFile(frameClipartFileName, 0, areaWidth, areaHeight, alpha, pdf, 0, 0)
+
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
@@ -752,14 +761,21 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 def loadClipart(fileName) -> ClpFile :
     """Tries to load a clipart file. Either from .CLP or .SVG file
     returns a clpFile object"""
+    newClpFile = ClpFile("")
+
     if os.path.isabs(fileName):
         filePath = Path(fileName)
+        if not filePath.exists():
+            filePath = filePath.parent.joinpath(filePath.stem+".clp")
+            if not filePath.exists():
+                print("Error: can't find as .clp or .svg: {}".format(fileName))   
+                return ClpFile("")   #return an empty ClpFile             
     else:
         pathObj = Path(fileName)
         baseFileName = pathObj.stem
         filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
         filePath = Path(filePath)
-    newClpFile = ClpFile("")
+    
     if (filePath.suffix == '.clp'):
         newClpFile.readClp(filePath)
     else:
@@ -775,14 +791,6 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
     if (clipartID == 0):
         return
 
-    img_transx = transx
-
-    res = image_res #use the fore-gorund resolution setting for clipart
-
-    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
-    new_w = int(0.5 + areaWidth * res / 254.)
-    new_h = int(0.5 + areaHeight * res / 254.)
-
     #Load the clipart
     fileName = None
     if clipartID in clipartDict:
@@ -790,6 +798,17 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
     if (not fileName):
         print("Problem getting file name for clipart ID:", clipartID)
         return
+
+    insertClipartFile(fileName, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot)
+
+def insertClipartFile(fileName:str, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot):
+    img_transx = transx
+
+    res = image_res #use the fore-gorund resolution setting for clipart
+
+    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
+    new_w = int(0.5 + areaWidth * res / 254.)
+    new_h = int(0.5 + areaHeight * res / 254.)
 
     clipart = loadClipart(fileName) 
     clipart.convertToPngInBuffer(new_w, new_h, alpha)  #so we can access the pngMemFile later

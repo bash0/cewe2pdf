@@ -20,8 +20,9 @@ class Passepartout(object):
         return
 
     class decorationXmlInfo(NamedTuple):
+        srcXmlFile: str
         designElementId: int
-        decoration_id: int
+        decoration_id: str
         decoration_type: str
         designElementType: str
         maskFile: str
@@ -44,6 +45,7 @@ class Passepartout(object):
             designElementId = decoration.get('designElementId')
             if designElementId is None:
                 continue
+            designElementId = int(designElementId)
             decoration_id = decoration.get('id')
             decoration_type = decoration.get('type')
             # decoration_type is often "fading", so typeElement is then looking for <fading .../>
@@ -58,8 +60,9 @@ class Passepartout(object):
             fotoarea_x = fotoareaElement.get('x')
             fotoarea_y = fotoareaElement.get('y')
 
-            return Passepartout.decorationXmlInfo(designElementId, decoration_id, decoration_type, designElementType, maskFile, clipartFile,
-                                                  fotoarea_height, fotoarea_width, fotoarea_x, fotoarea_y)
+            return Passepartout.decorationXmlInfo(xmlFileName, designElementId, decoration_id, decoration_type,
+                            designElementType, maskFile, clipartFile,
+                            fotoarea_height, fotoarea_width, fotoarea_x, fotoarea_y)
         return None
 
     @staticmethod
@@ -98,10 +101,32 @@ class Passepartout(object):
                 passepartoutIdDict[xmlInfo.designElementId] = curXmlFile
 
         return passepartoutIdDict
+    
+    @staticmethod
+    def getPassepartoutFileFullName(xmlInfo:decorationXmlInfo, fileName:str) -> str:   
+            pathObj = Path(xmlInfo.srcXmlFile)
+            #should not be needed: pathObj = pathObj.resolve()    # convert it to an absolute path
+            basePath = pathObj.parent
+            fullPath = basePath.joinpath(fileName)
+            return (str(fullPath))
+
+    @staticmethod
+    def getClipartFullName(xmlInfo:decorationXmlInfo) -> str:        
+            return Passepartout.getPassepartoutFileFullName(xmlInfo, xmlInfo.clipartFile)
+
+    @staticmethod
+    def getMaskFullName(xmlInfo:decorationXmlInfo) -> str:        
+            return Passepartout.getPassepartoutFileFullName(xmlInfo, xmlInfo.maskFile)
 
 
 if __name__ == '__main__':
     # only executed when this file is run directly.
-    Passepartout.buildElementIdIndex(
+    myDict = Passepartout.buildElementIdIndex(
         [r"C:\ProgramData\hps\1320",
          "C:/Program Files/dm/dm-Fotowelt/Resources/photofun/decorations"])
+    testId = 125186
+    testXmlInfo = Passepartout.extractInfoFromXml(myDict[testId])
+    print(testId)
+    print(testXmlInfo)
+    print(Passepartout.getClipartFullName(testXmlInfo))
+
