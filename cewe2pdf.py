@@ -43,9 +43,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
-import os, os.path
-import logging
+# extend the search path so Cairo will find its dlls.
+# only needed when the program is forzen (i.e. compiled).
 import sys
+import logging
+import os.path
+import os
+
+if hasattr(sys, 'frozen'):
+    # This is needed for compiled, i.e. frozen programs on Windows to find their dlls.
+    # this _may_ pose a security risk, as normally on Linux the current path is on the path
+    dllpath = os.path.dirname(os.path.realpath(sys.argv[0]))
+    if dllpath not in os.environ:
+        os.environ["PATH"] += os.pathsep + dllpath
+        
 from lxml import etree
 import tempfile
 from math import sqrt, floor
@@ -491,7 +502,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         bwidth = 1
         if "width" in border.attrib:
             widthAttrib = border.get('width')
-            if (widthAttrib is not None):
+            if (widthAttrib != None):
                 bwidth = f * floor(float(widthAttrib)) # units are 1/10 mm
 
         bcolor = reportlab.lib.colors.blue
