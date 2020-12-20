@@ -81,6 +81,7 @@ import configparser  # to read config file, see https://docs.python.org/3/librar
 
 from clpFile import ClpFile  #for clipart .CLP and .SVG files
 import traceback
+from passepartout import Passepartout
 
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
@@ -110,6 +111,8 @@ pdf_flowableList = []
 
 clipartDict = dict()    # a dictionary for clipart element IDs to file name
 clipartPathList = tuple()
+passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
+passepartoutFolders = None #global variable with the folders for passepartout frames
 
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
@@ -302,14 +305,6 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     else:
         im.save(jpeg.name, "JPEG",
                 quality=image_quality)
-
-    # place image
-    print('image', imageTag.get('filename'))
-    pdf.translate(img_transx, transy)
-    pdf.rotate(-areaRot)
-    pdf.drawImage(ImageReader(jpeg.name),
-                    f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-                    width=f * areaWidth, height=f * areaHeight, mask='auto')
     
     passepartoutid = imageTag.get('passepartoutDesignElementId')
     # TODO implement frames (which can come either from the installation or from a download)
@@ -328,8 +323,54 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     #   	</decoration>
     #   </decorations>
     # A job for somebody else, I think.
+    frameClipartFileName = None
+    frameDeltaX = 0
+    frameDeltaY = 0
     if not passepartoutid is None:
-        print('Frames (passepartout) are not implemented ()', passepartoutid)
+        print('Frames (passepartout) are not fully implemented ()', passepartoutid)
+        #re-generate the index of designElementId to .xml files, if it does not exist
+        passepartoutid = int(passepartoutid)    #we need to work with a number below
+        global passepartoutDict
+        if  (passepartoutDict is None):
+            print("Regenerating passepartout index from .XML files.")
+            global passepartoutFolders
+            passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
+        # read information from .xml file        
+        try:
+            pptXmlFileName = passepartoutDict[passepartoutid]
+        except:
+            pptXmlFileName = None
+        if pptXmlFileName is None:
+            print("Error can't find passepartout for {}".format(passepartoutid))
+        else:
+            pptXmlFileName = passepartoutDict[passepartoutid]
+            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName)
+            frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
+            maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
+            print("Using clipart file: {}".format(frameClipartFileName))
+            # draw the passepartout clipart file.
+            # ToDo: apply the masking
+            frameAlpha = 255
+            #Adjust the position of the real image depending on the frame
+            frameDeltaX = f *pptXmlInfo.fotoarea_x * areaWidth
+            frameDeltaY = f * pptXmlInfo.fotoarea_y * areaHeight
+
+
+    # place image
+    print('image', imageTag.get('filename'))
+    pdf.translate(img_transx, transy)
+    pdf.rotate(-areaRot)
+    pdf.translate(frameDeltaX, -frameDeltaY) # for adjustments from passepartout
+    pdf.drawImage(ImageReader(jpeg.name),
+                    f * -0.5 * areaWidth, f * -0.5 * areaHeight,
+                    width=f * areaWidth, height=f * areaHeight, mask='auto')
+    pdf.translate(-frameDeltaX, frameDeltaY) # for adjustments from passepartout
+
+    #we need to draw our passepartout after the real image, so it overlays it.
+    if not (frameClipartFileName is None):
+        # we set the transx, transy, and areaRot for the clipart to zero, because will do it in the image processing
+        # at the end. So don't do it twice. 
+        insertClipartFile(frameClipartFileName, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0)
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
@@ -744,14 +785,21 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 def loadClipart(fileName) -> ClpFile :
     """Tries to load a clipart file. Either from .CLP or .SVG file
     returns a clpFile object"""
+    newClpFile = ClpFile("")
+
     if os.path.isabs(fileName):
         filePath = Path(fileName)
+        if not filePath.exists():
+            filePath = filePath.parent.joinpath(filePath.stem+".clp")
+            if not filePath.exists():
+                print("Error: can't find as .clp or .svg: {}".format(fileName))   
+                return ClpFile("")   #return an empty ClpFile             
     else:
         pathObj = Path(fileName)
         baseFileName = pathObj.stem
         filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
         filePath = Path(filePath)
-    newClpFile = ClpFile("")
+    
     if (filePath.suffix == '.clp'):
         newClpFile.readClp(filePath)
     else:
@@ -767,14 +815,6 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
     if (clipartID == 0):
         return
 
-    img_transx = transx
-
-    res = image_res #use the fore-gorund resolution setting for clipart
-
-    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
-    new_w = int(0.5 + areaWidth * res / 254.)
-    new_h = int(0.5 + areaHeight * res / 254.)
-
     #Load the clipart
     fileName = None
     if clipartID in clipartDict:
@@ -782,6 +822,17 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
     if (not fileName):
         print("Problem getting file name for clipart ID:", clipartID)
         return
+
+    insertClipartFile(fileName, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot)
+
+def insertClipartFile(fileName:str, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot):
+    img_transx = transx
+
+    res = image_res #use the fore-gorund resolution setting for clipart
+
+    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
+    new_w = int(0.5 + areaWidth * res / 254.)
+    new_h = int(0.5 + areaHeight * res / 254.)
 
     clipart = loadClipart(fileName) 
     clipart.convertToPngInBuffer(new_w, new_h, alpha)  #so we can access the pngMemFile later
@@ -1016,6 +1067,15 @@ def convertMcf(mcfname, keepDoublePages: bool):
                     id = int(definition[0])
                     file = definition[1].strip()
                     clipartDict[id] = file
+
+
+             # read passepartout folders and substitute environment variables
+            pptout_rawFolder = defaultConfigSection.get('passepartoutFolders', '').splitlines()  # newline separated list of folders
+            pptout_rawFolder.append(cewe_folder)    #add the base folder
+            pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
+            pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment variables
+            global passepartoutFolders
+            passepartoutFolders = pptout_filtered2
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
