@@ -87,9 +87,9 @@ from passepartout import Passepartout
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 #### settings ####
-image_quality = 86  # 0=worst, 100=best
-image_res = 150  # dpi
-bg_res = 100  # dpi
+image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
+image_res = 150  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
+bg_res = 100  # dpi The resolution of background images will be reduced to this value, if it is higher.
 ###########
 
 # .mcf units are 0.1 mm
@@ -342,6 +342,11 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             (new_w, new_h), PIL.Image.ANTIALIAS)
     im.load()
 
+    #apply the frame mask from the passepartout to the image
+    if not (maskClipartFileName is None):
+        maskClp = loadClipart(maskClipartFileName) 
+        im = maskClp.applyAsAlphaMaskToFoto(im)
+
     # re-compress image
     jpeg = tempfile.NamedTemporaryFile()
     # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
@@ -370,8 +375,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     #we need to draw our passepartout after the real image, so it overlays it.
     if not (frameClipartFileName is None):
-        # we set the transx, transy, and areaRot for the clipart to zero, because will do it in the image processing
-        # at the end. So don't do it twice. 
+        # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
+        # already has these transformations applied. So don't do it twice. 
         insertClipartFile(frameClipartFileName, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0)
 
     for decorationTag in area.findall('decoration'):
@@ -830,7 +835,7 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
 def insertClipartFile(fileName:str, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot):
     img_transx = transx
 
-    res = image_res #use the fore-gorund resolution setting for clipart
+    res = image_res #use the foreground resolution setting for clipart
 
     # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
     new_w = int(0.5 + areaWidth * res / 254.)
