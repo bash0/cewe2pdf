@@ -272,6 +272,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # we need to take care of changes introduced by passepartout elements, before further image processing
     passepartoutid = imageTag.get('passepartoutDesignElementId')
     frameClipartFileName = None
+    maskClipartFileName = None
     frameDeltaX_mcfunit = 0
     frameDeltaY_mcfunit = 0
     imgCropWidth_mcfunit = areaWidth
