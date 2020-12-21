@@ -267,65 +267,15 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     imtop = float(imageTag.find('cutout').get(
         'top').replace(',', '.'))
     imageWidth_px, imageHeight_px = im.size
-    imsc = float(imageTag.find('cutout').get('scale'))
+    imScale = float(imageTag.find('cutout').get('scale'))
 
-    # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
-    # to get from .mcf units are divided by the scale factor to get to image pixel units.
-
-    # crop image
-    im = im.crop((int(0.5 - imleft/imsc),
-                    int(0.5 - imtop/imsc),
-                    int(0.5 - imleft/imsc +
-                        areaWidth / imsc),
-                    int(0.5 - imtop/imsc + areaHeight / imsc)))
-
-    # scale image
-    # re-scale the image if it is much bigger than final resolution in PDF
-    # set desired DPI based on where the image is used. The background gets a lower DPI.
-    if imageTag.tag == 'imagebackground' and pagetype != 'cover':
-        res = bg_res
-    else:
-        res = image_res
-    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
-    new_w = int(0.5 + areaWidth * res / 254.)
-    new_h = int(0.5 + areaHeight * res / 254.)
-    factor = sqrt(new_w * new_h /
-                    float(im.size[0] * im.size[1]))
-    if factor <= 0.8:
-        im = im.resize(
-            (new_w, new_h), PIL.Image.ANTIALIAS)
-    im.load()
-
-    # re-compress image
-    jpeg = tempfile.NamedTemporaryFile()
-    # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
-    jpeg.close()
-    if im.mode == 'RGBA' or im.mode == 'P':
-        im.save(jpeg.name, "PNG")
-    else:
-        im.save(jpeg.name, "JPEG",
-                quality=image_quality)
-    
+    # we need to take care of changes introduced by passepartout elements, before further image processing
     passepartoutid = imageTag.get('passepartoutDesignElementId')
-    # TODO implement frames (which can come either from the installation or from a download)
-    # This is probably quite complicated. Below is an xml definition I found in the xml 
-    # associated with a downloaded frame, along with 3 .clp files (of which 2 are actually
-    # mentioned here).
-    #   <decorations>
-    #   	<decoration designElementId="125186" id="12809-DECO-ZZ" type="fading">
-    #   		<categories>
-    #   			<category>Rahmen</category>
-    #   		</categories>
-    #   		<fading designElementType="passepartout" file="12809-DECO-ZZ-mask.svg" keepAspectRatio="1" ratio="0.68">
-    #   			<clipart designElementType="clipart" file="12809-DECO-ZZ-clip.svg" ratio="0.68"/>
-    #   			<fotoarea height="0.8687" width="0.9073" x="0.04" y="0.06"/>
-    #   		</fading>
-    #   	</decoration>
-    #   </decorations>
-    # A job for somebody else, I think.
     frameClipartFileName = None
-    frameDeltaX = 0
-    frameDeltaY = 0
+    frameDeltaX_mcfunit = 0
+    frameDeltaY_mcfunit = 0
+    imgCropWidth_mcfunit = areaWidth
+    imgCropHeight_mcfunit = areaHeight
     if not passepartoutid is None:
         print('Frames (passepartout) are not fully implemented ()', passepartoutid)
         #re-generate the index of designElementId to .xml files, if it does not exist
@@ -352,19 +302,71 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             # ToDo: apply the masking
             frameAlpha = 255
             #Adjust the position of the real image depending on the frame
-            frameDeltaX = f *pptXmlInfo.fotoarea_x * areaWidth
-            frameDeltaY = f * pptXmlInfo.fotoarea_y * areaHeight
+            frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
+            frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
+            imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
+            imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
+            
+    # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
+    # to get from .mcf units are divided by the scale factor to get to image pixel units.
 
+    # crop image
+    # currently the values can result in pixel coordinates outside the original image size
+    # Pillow will fill these areas with black pixels. That's ok, but not documented anywhere.
+    # For normal image display without passepartout there should be no black pixels visible,
+    # because the CEWE software doesn't allow the creation of such parameters that would result in them.
+    # For frames, the situation might arrise, but then the mask is applied.
+    
+    #first calcualte cropping coordinate for normal case
+    cropLeft =  int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale)    
+    cropUpper = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale)
+    cropRight = int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale + imgCropWidth_mcfunit / imScale)
+    cropLower = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale + imgCropHeight_mcfunit / imScale)
 
+    im = im.crop((cropLeft, cropUpper, cropRight, cropLower))
+
+    # scale image
+    # re-scale the image if it is much bigger than final resolution in PDF
+    # set desired DPI based on where the image is used. The background gets a lower DPI.
+    if imageTag.tag == 'imagebackground' and pagetype != 'cover':
+        res = bg_res
+    else:
+        res = image_res
+    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
+    new_w = int(0.5 + imgCropWidth_mcfunit * res / 254.)
+    new_h = int(0.5 + imgCropHeight_mcfunit * res / 254.)
+    factor = sqrt(new_w * new_h /
+                    float(im.size[0] * im.size[1]))
+    if factor <= 0.8:
+        im = im.resize(
+            (new_w, new_h), PIL.Image.ANTIALIAS)
+    im.load()
+
+    # re-compress image
+    jpeg = tempfile.NamedTemporaryFile()
+    # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
+    jpeg.close()
+    if im.mode == 'RGBA' or im.mode == 'P':
+        im.save(jpeg.name, "PNG")
+    else:
+        im.save(jpeg.name, "JPEG",
+                quality=image_quality)
+    
     # place image
     print('image', imageTag.get('filename'))
-    pdf.translate(img_transx, transy)
-    pdf.rotate(-areaRot)
-    pdf.translate(frameDeltaX, -frameDeltaY) # for adjustments from passepartout
+    pdf.translate(img_transx, transy)   #we need to go to the center for correct rotation
+    pdf.rotate(-areaRot)   #rotation around center of area
+    #calculate the non-symmetric shift of the center, given the left pos and the width.
+    frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
+    frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
+    pdf.translate(frameShiftX_mcf * f, -frameShiftY_mcf * f) # for adjustments from passepartout
     pdf.drawImage(ImageReader(jpeg.name),
-                    f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-                    width=f * areaWidth, height=f * areaHeight, mask='auto')
-    pdf.translate(-frameDeltaX, frameDeltaY) # for adjustments from passepartout
+                    f * -0.5 * imgCropWidth_mcfunit,
+                    f * -0.5 * imgCropHeight_mcfunit,
+                    width=f * imgCropWidth_mcfunit,
+                    height=f * imgCropHeight_mcfunit,
+                    mask='auto')
+    pdf.translate(-frameShiftX_mcf * f,  frameShiftY_mcf * f) # for adjustments from passepartout
 
     #we need to draw our passepartout after the real image, so it overlays it.
     if not (frameClipartFileName is None):
