@@ -6,7 +6,7 @@
 #   build_a_compiled_version.md
 #
 # usage:
-# > python setup.py install
+# > python setup.py py2exe
 
 from distutils.core import setup
 import py2exe
