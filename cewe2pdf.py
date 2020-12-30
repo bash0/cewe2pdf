@@ -645,6 +645,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             pdf_styleN.alignment = reportlab.lib.enums.TA_CENTER
         elif p.get('align') == 'right':
             pdf_styleN.alignment = reportlab.lib.enums.TA_RIGHT
+        elif p.get('align') == 'justify':
+            pdf_styleN.alignment = reportlab.lib.enums.TA_JUSTIFY
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
         htmlspans = p.findall(".*")
