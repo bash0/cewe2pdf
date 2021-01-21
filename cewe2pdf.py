@@ -262,22 +262,73 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # correct for exif rotation
     im = autorot(im)
     # get the cutout position and scale
-    imleft = float(imageTag.find('cutout').get(
-        'left').replace(',', '.'))
-    imtop = float(imageTag.find('cutout').get(
-        'top').replace(',', '.'))
+    imleft = float(imageTag.find('cutout').get('left').replace(',', '.'))
+    imtop = float(imageTag.find('cutout').get('top').replace(',', '.'))
     imageWidth_px, imageHeight_px = im.size
-    imsc = float(imageTag.find('cutout').get('scale'))
+    imsc = float(imageTag.find('cutout').get('scale').replace(',', '.'))
 
     # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
     # to get from .mcf units are divided by the scale factor to get to image pixel units.
 
-    # crop image
+    # Almost ready to crop image. BUT if there is a passepartout, then we have to crop more than just the cutout,
+    # we also have to take account of the reduction in the photo area caused by the presence of the frame
+        
+    # TODO implement passepartout/frames (which can come either from the installation or from a download)
+    # This is probably quite complicated. Below is an xml definition I found in the xml 
+    # associated with a downloaded frame, along with 3 .clp files (of which 2 are actually
+    # mentioned here).
+    #   <decorations>
+    #   	<decoration designElementId="125186" id="12809-DECO-ZZ" type="fading">
+    #   		<categories>
+    #   			<category>Rahmen</category>
+    #   		</categories>
+    #   		<fading designElementType="passepartout" file="12809-DECO-ZZ-mask.svg" keepAspectRatio="1" ratio="0.68">
+    #   			<clipart designElementType="clipart" file="12809-DECO-ZZ-clip.svg" ratio="0.68"/>
+    #   			<fotoarea height="0.8687" width="0.9073" x="0.04" y="0.06"/>
+    #   		</fading>
+    #   	</decoration>
+    #   </decorations>
+    passepartoutid = imageTag.get('passepartoutDesignElementId')
+    frameClipartFileName = None
+    frameDeltaX = 0
+    frameDeltaY = 0
+    finalImageWidth = areaWidth
+    finalImageHeight = areaHeight
+    if not passepartoutid is None:
+        print('Frames (passepartout) are not fully implemented ()', passepartoutid)
+        #re-generate the index of designElementId to .xml files, if it does not exist
+        passepartoutid = int(passepartoutid)    #we need to work with a number below
+        global passepartoutDict
+        if  (passepartoutDict is None): # first passepartout causes the dictionary to be initialised
+            print("Regenerating passepartout index from .XML files.")
+            global passepartoutFolders
+            passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
+        # read information from specific passepartout .xml file        
+        try:
+            pptXmlFileName = passepartoutDict[passepartoutid]
+        except:
+            pptXmlFileName = None
+        if pptXmlFileName is None:
+            print("Error can't find passepartout for {}".format(passepartoutid))
+        else:
+            pptXmlFileName = passepartoutDict[passepartoutid]
+            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName)
+            frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
+            maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
+            print("Using clipart file: {}".format(frameClipartFileName))
+            # draw the passepartout clipart file.
+            # ToDo: apply the masking
+            frameAlpha = 255
+            # Get values to adjust the position and size of the real image depending on the frame
+            frameDeltaX = f *pptXmlInfo.fotoarea_x * areaWidth
+            frameDeltaY = f * pptXmlInfo.fotoarea_y * areaHeight
+            finalImageWidth = pptXmlInfo.fotoarea_width * areaWidth
+            finalImageHeight = pptXmlInfo.fotoarea_height * areaHeight
+
     im = im.crop((int(0.5 - imleft/imsc),
-                    int(0.5 - imtop/imsc),
-                    int(0.5 - imleft/imsc +
-                        areaWidth / imsc),
-                    int(0.5 - imtop/imsc + areaHeight / imsc)))
+                  int(0.5 - imtop/imsc),
+                  int(0.5 - imleft/imsc + finalImageWidth/imsc),
+                  int(0.5 - imtop/imsc + finalImageHeight/imsc)))
 
     # scale image
     # re-scale the image if it is much bigger than final resolution in PDF
@@ -287,8 +338,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     else:
         res = image_res
     # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
-    new_w = int(0.5 + areaWidth * res / 254.)
-    new_h = int(0.5 + areaHeight * res / 254.)
+    new_w = int(0.5 + finalImageWidth * res / 254.)
+    new_h = int(0.5 + finalImageHeight * res / 254.)
     factor = sqrt(new_w * new_h /
                     float(im.size[0] * im.size[1]))
     if factor <= 0.8:
@@ -305,66 +356,20 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     else:
         im.save(jpeg.name, "JPEG",
                 quality=image_quality)
-    
-    passepartoutid = imageTag.get('passepartoutDesignElementId')
-    # TODO implement frames (which can come either from the installation or from a download)
-    # This is probably quite complicated. Below is an xml definition I found in the xml 
-    # associated with a downloaded frame, along with 3 .clp files (of which 2 are actually
-    # mentioned here).
-    #   <decorations>
-    #   	<decoration designElementId="125186" id="12809-DECO-ZZ" type="fading">
-    #   		<categories>
-    #   			<category>Rahmen</category>
-    #   		</categories>
-    #   		<fading designElementType="passepartout" file="12809-DECO-ZZ-mask.svg" keepAspectRatio="1" ratio="0.68">
-    #   			<clipart designElementType="clipart" file="12809-DECO-ZZ-clip.svg" ratio="0.68"/>
-    #   			<fotoarea height="0.8687" width="0.9073" x="0.04" y="0.06"/>
-    #   		</fading>
-    #   	</decoration>
-    #   </decorations>
-    # A job for somebody else, I think.
-    frameClipartFileName = None
-    frameDeltaX = 0
-    frameDeltaY = 0
-    if not passepartoutid is None:
-        print('Frames (passepartout) are not fully implemented ()', passepartoutid)
-        #re-generate the index of designElementId to .xml files, if it does not exist
-        passepartoutid = int(passepartoutid)    #we need to work with a number below
-        global passepartoutDict
-        if  (passepartoutDict is None):
-            print("Regenerating passepartout index from .XML files.")
-            global passepartoutFolders
-            passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
-        # read information from .xml file        
-        try:
-            pptXmlFileName = passepartoutDict[passepartoutid]
-        except:
-            pptXmlFileName = None
-        if pptXmlFileName is None:
-            print("Error can't find passepartout for {}".format(passepartoutid))
-        else:
-            pptXmlFileName = passepartoutDict[passepartoutid]
-            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName)
-            frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
-            maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
-            print("Using clipart file: {}".format(frameClipartFileName))
-            # draw the passepartout clipart file.
-            # ToDo: apply the masking
-            frameAlpha = 255
-            #Adjust the position of the real image depending on the frame
-            frameDeltaX = f *pptXmlInfo.fotoarea_x * areaWidth
-            frameDeltaY = f * pptXmlInfo.fotoarea_y * areaHeight
-
 
     # place image
     print('image', imageTag.get('filename'))
     pdf.translate(img_transx, transy)
     pdf.rotate(-areaRot)
-    pdf.translate(frameDeltaX, -frameDeltaY) # for adjustments from passepartout
+
+    # Bracketing the drawImage with the two commented translations for the passepartout 
+    # appears to be unnecessary. Presumably the image placement values have been adjusted
+    # in the mcf file, so cropping was enough.
+    #   pdf.translate(frameDeltaX, -frameDeltaY) # for adjustments from passepartout
+    #   pdf.translate(-frameDeltaX, frameDeltaY) # for adjustments from passepartout
     pdf.drawImage(ImageReader(jpeg.name),
-                    f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-                    width=f * areaWidth, height=f * areaHeight, mask='auto')
-    pdf.translate(-frameDeltaX, frameDeltaY) # for adjustments from passepartout
+                    f * -0.5 * finalImageWidth, f * -0.5 * finalImageHeight,
+                    width=f * finalImageWidth, height=f * finalImageHeight, mask='auto')
 
     #we need to draw our passepartout after the real image, so it overlays it.
     if not (frameClipartFileName is None):
