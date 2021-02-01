@@ -6,6 +6,7 @@ from pathlib import Path
 import os
 import cairosvg
 import PIL
+from PIL import ImageOps
 from PIL.ExifTags import TAGS
 from io import BytesIO
 
@@ -53,43 +54,94 @@ class ClpFile(object):
     def convertToPngInBuffer(self, width:int = None, height:int = None, alpha:int = 128):
         """convert the SVG to a PNG file, but only in memory"""
 
+        #create a byte buffer that can be used like a file and use it as the output of svg2png.
+        scaledImage = self.rasterSvgData(width, height)
+        
+        if (scaledImage.mode == "RGB"):
+            # create a mask the same size as the original. For all pixels which are
+            # non zero ("not used") set the mask value to the required transparency
+            # L = 8-bit gray-scale
+            #Important: .convert('L') should not be used on RGBA images -> very bad quality. Not supported.
+            alphamask = scaledImage.copy().convert('L').resize(scaledImage.size)
+            pixels = alphamask.load()
+            for i in range(alphamask.size[0]): # for every pixel:
+                for j in range(alphamask.size[1]):
+                    if (pixels[i,j] != 0):
+                        pixels[i,j] = alpha
+            scaledImage.putalpha(alphamask)
+
+        scaledImage.save(self.pngMemFile, 'png')
+        self.pngMemFile.seek(0)
+        return self
+
+    def rasterSvgData(self, width:int, height:int):
+
         #We are using cairosvg, but this does not allow to scale the output image to the dimensions that we like.
         #we need to do a two-pass convertion, to get the desired result
         #1. Do the first conversion and see what the output size is
         #2. calculate the scaling in x-, and y-direction that is needed
-        #3. use the maxium of these x-, and y-scaling and do a aspect-ratio-preserving scaleing of the image
+        #3. use the maxium of these x-, and y-scaling and do a aspect-ratio-preserving scaling of the image
+        #   convert the image again from svg to png with this max. scale factor
         #4. do a raster-image scaling to skew the image to the final dimension. 
         #   This should only scale in x- or y-direction, as the other direction should alread be the desired one.
 
         #create a byte buffer that can be used like a file and use it as the output of svg2png.
         tmpMemFile = BytesIO()
+        #Step 1.
         cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile)
         tmpMemFile.seek(0)
         tempImage = PIL.Image.open(tmpMemFile)
         origWidth = tempImage.width
         origHeight = tempImage.height
+        #Step 2.
         scale_x = width/origWidth
         scale_y = height/origHeight
+        #Step 3.
         scaleMax = max(scale_x, scale_y)
         tmpMemFile = BytesIO()
         cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile, scale=scaleMax)
+        #Step 4.
         tmpMemFile.seek(0)
         tempImage = PIL.Image.open(tmpMemFile)
         scaledImage = tempImage.resize((width, height))
+        return scaledImage
 
-        # create a mask the same size as the original. For all pixels which are
-        # non zero ("not used") set the mask value to the required transparency
-        alphamask = scaledImage.copy().convert('L').resize(scaledImage.size)
-        pixels = alphamask.load()
-        for i in range(alphamask.size[0]): # for every pixel:
-            for j in range(alphamask.size[1]):
-                if (pixels[i,j] != 0):
-                    pixels[i,j] = alpha
-        scaledImage.putalpha(alphamask)
+    # def convertMaskToPngInBuffer(self, width:int = None, height:int = None):
+    #     """convert a loaded mask (.clp, .SVG) to a in-memory PNG file
+    #         Use this for the passepartout frames.
+    #      """
 
-        scaledImage.save(self.pngMemFile, 'png')
-        self.pngMemFile.seek(0)
-        return self
+    #     #create a byte buffer that can be used like a file and use it as the output of svg2png.
+    #     maskImgPng:PIL.Image = self.rasterSvgData(width, height)
+
+    #     maskImgPng.save(self.pngMemFile, 'png')
+    #     self.pngMemFile.seek(0)
+    #     return self
+
+    def applyAsAlphaMaskToFoto(self, photo:PIL.Image):
+        """" Use the currently loaded mask clipart to create a alpha mask on the input image."""
+        #create the PNG as RBGA in internal buffer
+        #create a byte buffer that can be used like a file and use it as the output of svg2png.
+        maskImgPng:PIL.Image = self.rasterSvgData(photo.width, photo.height)
+
+        #get the alpha channel
+        # if the .svg is fully filled by the mask, then only a black rectangle with RGA (=no background!) is returned.
+        # if the mask does not fully fill the mask, then an RGBA image is returned. In this case, use the alpha value directly.
+        if (maskImgPng.mode == "RGBA"):
+            alphaChannel = maskImgPng.getchannel("A")
+        elif (maskImgPng.mode == "RGB"):
+             # convert image to gray-scale and use that as alpha channel.
+             # we need to invert, otherwise black whould be transparent.
+             # normally the whole image is a black rectangle
+             alphaChannel = maskImgPng.convert('L')
+             alphaChannel = PIL.ImageOps.invert(alphaChannel)
+        
+        #apply it the input photo. They must have the same dimensions. But that is ensured by rasterSvgData
+        if (photo.mode != "RGB") or (photo.mode != "RGBA"):
+            photo = photo.convert("RGBA")
+        photo.putalpha(alphaChannel)
+        
+        return photo    
 
     def savePNGfromBufferToFile(self, fileName) -> None:
         """ write the internal PNG buffer to a file """
@@ -131,6 +183,10 @@ class ClpFile(object):
 
 #if __name__ == '__main__':
     # only executed when this file is run directly.
+
+    #myClp = ClpFile(r"C:\Program Files\dm\dm-Fotowelt\Resources\photofun\decorations\summerholiday_frames\12195-DECO-SILVER-GD\12195-DECO-SILVER-GD-mask.clp")
+    #outImg = myClp.applyAsAlphaMaskToFoto(PIL.Image.open(r"tests\unittest_fotobook_mcf-Dateien\img.png"))
+    #outImg.save(r"test.png")
 
     #clpFile.convertSVGtoCLP("circle.svg")
 
