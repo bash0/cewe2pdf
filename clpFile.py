@@ -56,17 +56,19 @@ class ClpFile(object):
 
         #create a byte buffer that can be used like a file and use it as the output of svg2png.
         scaledImage = self.rasterSvgData(width, height)
-
-        # create a mask the same size as the original. For all pixels which are
-        # non zero ("not used") set the mask value to the required transparency
-        # L = 8-bit gray-scale
-        alphamask = scaledImage.copy().convert('L').resize(scaledImage.size)
-        pixels = alphamask.load()
-        for i in range(alphamask.size[0]): # for every pixel:
-            for j in range(alphamask.size[1]):
-                if (pixels[i,j] != 0):
-                    pixels[i,j] = alpha
-        scaledImage.putalpha(alphamask)
+        
+        if (scaledImage.mode == "RGB"):
+            # create a mask the same size as the original. For all pixels which are
+            # non zero ("not used") set the mask value to the required transparency
+            # L = 8-bit gray-scale
+            #Important: .convert('L') should not be used on RGBA images -> very bad quality. Not supported.
+            alphamask = scaledImage.copy().convert('L').resize(scaledImage.size)
+            pixels = alphamask.load()
+            for i in range(alphamask.size[0]): # for every pixel:
+                for j in range(alphamask.size[1]):
+                    if (pixels[i,j] != 0):
+                        pixels[i,j] = alpha
+            scaledImage.putalpha(alphamask)
 
         scaledImage.save(self.pngMemFile, 'png')
         self.pngMemFile.seek(0)
