@@ -87,9 +87,9 @@ from passepartout import Passepartout
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 #### settings ####
-image_quality = 86  # 0=worst, 100=best
-image_res = 150  # dpi
-bg_res = 100  # dpi
+image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
+image_res = 150  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
+bg_res = 100  # dpi The resolution of background images will be reduced to this value, if it is higher.
 ###########
 
 # .mcf units are 0.1 mm
@@ -262,48 +262,31 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # correct for exif rotation
     im = autorot(im)
     # get the cutout position and scale
-    imleft = float(imageTag.find('cutout').get('left').replace(',', '.'))
-    imtop = float(imageTag.find('cutout').get('top').replace(',', '.'))
+    imleft = float(imageTag.find('cutout').get(
+        'left').replace(',', '.'))
+    imtop = float(imageTag.find('cutout').get(
+        'top').replace(',', '.'))
     imageWidth_px, imageHeight_px = im.size
-    imsc = float(imageTag.find('cutout').get('scale').replace(',', '.'))
+    imScale = float(imageTag.find('cutout').get('scale'))
 
-    # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
-    # to get from .mcf units are divided by the scale factor to get to image pixel units.
-
-    # Almost ready to crop image. BUT if there is a passepartout, then we have to crop more than just the cutout,
-    # we also have to take account of the reduction in the photo area caused by the presence of the frame
-        
-    # TODO implement passepartout/frames (which can come either from the installation or from a download)
-    # This is probably quite complicated. Below is an xml definition I found in the xml 
-    # associated with a downloaded frame, along with 3 .clp files (of which 2 are actually
-    # mentioned here).
-    #   <decorations>
-    #   	<decoration designElementId="125186" id="12809-DECO-ZZ" type="fading">
-    #   		<categories>
-    #   			<category>Rahmen</category>
-    #   		</categories>
-    #   		<fading designElementType="passepartout" file="12809-DECO-ZZ-mask.svg" keepAspectRatio="1" ratio="0.68">
-    #   			<clipart designElementType="clipart" file="12809-DECO-ZZ-clip.svg" ratio="0.68"/>
-    #   			<fotoarea height="0.8687" width="0.9073" x="0.04" y="0.06"/>
-    #   		</fading>
-    #   	</decoration>
-    #   </decorations>
+    # we need to take care of changes introduced by passepartout elements, before further image processing
     passepartoutid = imageTag.get('passepartoutDesignElementId')
     frameClipartFileName = None
-    frameDeltaX = 0
-    frameDeltaY = 0
-    finalImageWidth = areaWidth
-    finalImageHeight = areaHeight
+    maskClipartFileName = None
+    frameDeltaX_mcfunit = 0
+    frameDeltaY_mcfunit = 0
+    imgCropWidth_mcfunit = areaWidth
+    imgCropHeight_mcfunit = areaHeight
     if not passepartoutid is None:
         print('Frames (passepartout) are not fully implemented ()', passepartoutid)
         #re-generate the index of designElementId to .xml files, if it does not exist
         passepartoutid = int(passepartoutid)    #we need to work with a number below
         global passepartoutDict
-        if  (passepartoutDict is None): # first passepartout causes the dictionary to be initialised
+        if  (passepartoutDict is None):
             print("Regenerating passepartout index from .XML files.")
             global passepartoutFolders
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
-        # read information from specific passepartout .xml file        
+        # read information from .xml file        
         try:
             pptXmlFileName = passepartoutDict[passepartoutid]
         except:
@@ -319,16 +302,29 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             # draw the passepartout clipart file.
             # ToDo: apply the masking
             frameAlpha = 255
-            # Get values to adjust the position and size of the real image depending on the frame
-            frameDeltaX = f *pptXmlInfo.fotoarea_x * areaWidth
-            frameDeltaY = f * pptXmlInfo.fotoarea_y * areaHeight
-            finalImageWidth = pptXmlInfo.fotoarea_width * areaWidth
-            finalImageHeight = pptXmlInfo.fotoarea_height * areaHeight
+            #Adjust the position of the real image depending on the frame
+            frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
+            frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
+            imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
+            imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
+            
+    # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
+    # to get from .mcf units are divided by the scale factor to get to image pixel units.
 
-    im = im.crop((int(0.5 - imleft/imsc),
-                  int(0.5 - imtop/imsc),
-                  int(0.5 - imleft/imsc + finalImageWidth/imsc),
-                  int(0.5 - imtop/imsc + finalImageHeight/imsc)))
+    # crop image
+    # currently the values can result in pixel coordinates outside the original image size
+    # Pillow will fill these areas with black pixels. That's ok, but not documented anywhere.
+    # For normal image display without passepartout there should be no black pixels visible,
+    # because the CEWE software doesn't allow the creation of such parameters that would result in them.
+    # For frames, the situation might arrise, but then the mask is applied.
+    
+    #first calcualte cropping coordinate for normal case
+    cropLeft =  int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale)    
+    cropUpper = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale)
+    cropRight = int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale + imgCropWidth_mcfunit / imScale)
+    cropLower = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale + imgCropHeight_mcfunit / imScale)
+
+    im = im.crop((cropLeft, cropUpper, cropRight, cropLower))
 
     # scale image
     # re-scale the image if it is much bigger than final resolution in PDF
@@ -338,14 +334,19 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     else:
         res = image_res
     # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
-    new_w = int(0.5 + finalImageWidth * res / 254.)
-    new_h = int(0.5 + finalImageHeight * res / 254.)
+    new_w = int(0.5 + imgCropWidth_mcfunit * res / 254.)
+    new_h = int(0.5 + imgCropHeight_mcfunit * res / 254.)
     factor = sqrt(new_w * new_h /
                     float(im.size[0] * im.size[1]))
     if factor <= 0.8:
         im = im.resize(
             (new_w, new_h), PIL.Image.ANTIALIAS)
     im.load()
+
+    #apply the frame mask from the passepartout to the image
+    if not (maskClipartFileName is None):
+        maskClp = loadClipart(maskClipartFileName) 
+        im = maskClp.applyAsAlphaMaskToFoto(im)
 
     # re-compress image
     jpeg = tempfile.NamedTemporaryFile()
@@ -356,25 +357,27 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     else:
         im.save(jpeg.name, "JPEG",
                 quality=image_quality)
-
+    
     # place image
     print('image', imageTag.get('filename'))
-    pdf.translate(img_transx, transy)
-    pdf.rotate(-areaRot)
-
-    # Bracketing the drawImage with the two commented translations for the passepartout 
-    # appears to be unnecessary. Presumably the image placement values have been adjusted
-    # in the mcf file, so cropping was enough.
-    #   pdf.translate(frameDeltaX, -frameDeltaY) # for adjustments from passepartout
-    #   pdf.translate(-frameDeltaX, frameDeltaY) # for adjustments from passepartout
+    pdf.translate(img_transx, transy)   #we need to go to the center for correct rotation
+    pdf.rotate(-areaRot)   #rotation around center of area
+    #calculate the non-symmetric shift of the center, given the left pos and the width.
+    frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
+    frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
+    pdf.translate(frameShiftX_mcf * f, -frameShiftY_mcf * f) # for adjustments from passepartout
     pdf.drawImage(ImageReader(jpeg.name),
-                    f * -0.5 * finalImageWidth, f * -0.5 * finalImageHeight,
-                    width=f * finalImageWidth, height=f * finalImageHeight, mask='auto')
+                    f * -0.5 * imgCropWidth_mcfunit,
+                    f * -0.5 * imgCropHeight_mcfunit,
+                    width=f * imgCropWidth_mcfunit,
+                    height=f * imgCropHeight_mcfunit,
+                    mask='auto')
+    pdf.translate(-frameShiftX_mcf * f,  frameShiftY_mcf * f) # for adjustments from passepartout
 
     #we need to draw our passepartout after the real image, so it overlays it.
     if not (frameClipartFileName is None):
-        # we set the transx, transy, and areaRot for the clipart to zero, because will do it in the image processing
-        # at the end. So don't do it twice. 
+        # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
+        # already has these transformations applied. So don't do it twice. 
         insertClipartFile(frameClipartFileName, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0)
 
     for decorationTag in area.findall('decoration'):
@@ -835,7 +838,7 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
 def insertClipartFile(fileName:str, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot):
     img_transx = transx
 
-    res = image_res #use the fore-gorund resolution setting for clipart
+    res = image_res #use the foreground resolution setting for clipart
 
     # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
     new_w = int(0.5 + areaWidth * res / 254.)

@@ -40,7 +40,7 @@ class Passepartout(object):
         try:
             xmlInfo = etree.parse(xmlFileName)
         except:
-            print("Error while parsing. Maybe not a XML.:{}".format(xmlFileName))
+            print("Error while parsing. Maybe not valid XML:{}".format(xmlFileName))
             return None
         finally:
             clipArtXml.close()        
@@ -102,7 +102,7 @@ class Passepartout(object):
 
         # load each .xml file and extract the information
         for curXmlFile in xmlFileList:
-            print("Parsing passepartout: {}".format(curXmlFile))
+            #print("Parsing passepartout: {}".format(curXmlFile))
             xmlInfo = Passepartout.extractInfoFromXml(curXmlFile)
             if xmlInfo is None:
                 continue  # this .xml file is not for a passepartout, or something went wrong
