@@ -829,6 +829,7 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
     fileName = None
     if clipartID in clipartDict:
         fileName = clipartDict[clipartID]
+    # verify preconditions to avoid exception loading the clip art file, which would break the page count
     if (not fileName):
         print("Problem getting file name for clipart ID:", clipartID)
         return
@@ -844,7 +845,12 @@ def insertClipartFile(fileName:str, transx, areaWidth, areaHeight, alpha, pdf, t
     new_w = int(0.5 + areaWidth * res / 254.)
     new_h = int(0.5 + areaHeight * res / 254.)
 
-    clipart = loadClipart(fileName) 
+    clipart = loadClipart(fileName)
+    if len(clipart.svgData) <= 0:
+        print('Clipart file could not be loaded:', fileName)
+        # avoiding exception in the processing below here
+        return 
+
     clipart.convertToPngInBuffer(new_w, new_h, alpha)  #so we can access the pngMemFile later
 
     # place image
