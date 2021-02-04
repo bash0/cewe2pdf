@@ -13,7 +13,7 @@ def printFileName(filename):
 def main():
     args = sys.argv[1:]
     for arg in args:
-          for filename in glob(arg):
+        for filename in glob(arg):
             printFileName(filename)
 
 

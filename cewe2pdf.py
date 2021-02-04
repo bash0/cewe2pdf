@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 '''
 Create pdf files from CEWE .mcf photo books (cewe-fotobuch)
 version 0.11 (Dec 2019)
@@ -56,7 +55,7 @@ if hasattr(sys, 'frozen'):
     dllpath = os.path.dirname(os.path.realpath(sys.argv[0]))
     if dllpath not in os.environ:
         os.environ["PATH"] += os.pathsep + dllpath
-        
+
 from lxml import etree
 import tempfile
 from math import sqrt, floor
@@ -157,9 +156,9 @@ def findFileByExtInDirs(filebase, extList, paths):
 def findFileInDirs(filenames, paths):
     if not isinstance(filenames, list):
         filenames = [filenames]
-    for f in filenames:
+    for filename in filenames:
         for p in paths:
-            testPath = os.path.join(p, f)
+            testPath = os.path.join(p, filename)
             if os.path.exists(testPath):
                 return testPath
 
@@ -173,7 +172,7 @@ def getPageElementForPageNumber(fotobook, pageNumber):
 
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
-    if (pagetype == "emptypage"):  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
+    if pagetype == "emptypage":  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
         return
     if backgroundTags != None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
@@ -286,7 +285,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             print("Regenerating passepartout index from .XML files.")
             global passepartoutFolders
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
-        # read information from .xml file        
+        # read information from .xml file
         try:
             pptXmlFileName = passepartoutDict[passepartoutid]
         except:
@@ -307,7 +306,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
             imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
             imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
-            
+
     # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
     # to get from .mcf units are divided by the scale factor to get to image pixel units.
 
@@ -317,9 +316,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # For normal image display without passepartout there should be no black pixels visible,
     # because the CEWE software doesn't allow the creation of such parameters that would result in them.
     # For frames, the situation might arrise, but then the mask is applied.
-    
+
     #first calcualte cropping coordinate for normal case
-    cropLeft =  int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale)    
+    cropLeft =  int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale)
     cropUpper = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale)
     cropRight = int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale + imgCropWidth_mcfunit / imScale)
     cropLower = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale + imgCropHeight_mcfunit / imScale)
@@ -345,7 +344,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     #apply the frame mask from the passepartout to the image
     if not (maskClipartFileName is None):
-        maskClp = loadClipart(maskClipartFileName) 
+        maskClp = loadClipart(maskClipartFileName)
         im = maskClp.applyAsAlphaMaskToFoto(im)
 
     # re-compress image
@@ -357,7 +356,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     else:
         im.save(jpeg.name, "JPEG",
                 quality=image_quality)
-    
+
     # place image
     print('image', imageTag.get('filename'))
     pdf.translate(img_transx, transy)   #we need to go to the center for correct rotation
@@ -377,12 +376,12 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     #we need to draw our passepartout after the real image, so it overlays it.
     if not (frameClipartFileName is None):
         # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
-        # already has these transformations applied. So don't do it twice. 
+        # already has these transformations applied. So don't do it twice.
         insertClipartFile(frameClipartFileName, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0)
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
-    
+
     pdf.rotate(areaRot)
     pdf.translate(-img_transx, -transy)
 
@@ -493,7 +492,7 @@ def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs, bweight):
 
 def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle, outerstyle):
     """
-    Remember this is not really HTML, though it looks that way. 
+    Remember this is not really HTML, though it looks that way.
     See 6.2 Paragraph XML Markup Tags in the reportlabs user guide.
     """
     paragraphText = AppendText(paragraphText, '<font name="' + font + '"'
@@ -568,7 +567,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
                 adjustment = 0
             if (positionAttrib == "outside"):
                 adjustment = bwidth * 0.5
-        
+
         frameBottomLeft_x = -0.5 * (f * areaWidth) - adjustment
         frameBottomLeft_y = -0.5 * (f * areaHeight) - adjustment
         frameWidth = f * areaWidth + 2 * adjustment
@@ -587,7 +586,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         )
         frm_table.wrapOn(pdf, frameWidth, frameHeight)
         frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
-        
+
         return
 
 
@@ -727,7 +726,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                 print('Error:', ex.args[0])
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                print('', (exc_type, fname, exc_tb.tb_lineno))        
+                print('', (exc_type, fname, exc_tb.tb_lineno))
 
 
     # Add a frame object that can contain multiple paragraphs
@@ -756,11 +755,11 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
             # I have never seen this happen, but check anyway
             print('Warning: A set of paragraphs too wide for its frame. INTERNAL ERROR!')
             finalTotalWidth = neededTextWidth + leftPad + rightPad 
-    
+
     if finalTotalHeight > frameHeight:
-        # One of the possible causes here is that wrap function has used an extra line (because 
+        # One of the possible causes here is that wrap function has used an extra line (because
         #  of some slight mismatch in character widths and a frame that matches too precisely?)
-        #  so that a word wraps over when it shouldn't. I don't know how to fix that sensibly. 
+        #  so that a word wraps over when it shouldn't. I don't know how to fix that sensibly.
         #  Increasing the height is NOT a good visual solution, because the line wrap is still
         #  not where the user expects it - increasing the width would almost be more sensible!
         # Another suspected cause is in the use of multiple font sizes in one text. Perhaps the
@@ -784,7 +783,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     # We took care of this by making the frame so large, that it always can fit the flowables.
     # maybe should switch to res=newFrame.split(flowable, pdf) and check the result manually.
     newFrame.addFromList(pdf_flowableList, pdf)
-            
+
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
 
@@ -802,8 +801,8 @@ def loadClipart(fileName) -> ClpFile :
         if not filePath.exists():
             filePath = filePath.parent.joinpath(filePath.stem+".clp")
             if not filePath.exists():
-                print("Error: missing .clp: {}".format(fileName))   
-                return ClpFile("")   #return an empty ClpFile             
+                print("Error: missing .clp: {}".format(fileName))
+                return ClpFile("")   #return an empty ClpFile
     else:
         pathObj = Path(fileName)
         baseFileName = pathObj.stem
@@ -811,8 +810,8 @@ def loadClipart(fileName) -> ClpFile :
             filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
             filePath = Path(filePath)
         except Exception as ex:
-            print("Error: {}, {}".format(baseFileName, ex)) 
-            return ClpFile("")   #return an empty ClpFile             
+            print("Error: {}, {}".format(baseFileName, ex))
+            return ClpFile("")   #return an empty ClpFile
 
     if (filePath.suffix == '.clp'):
         newClpFile.readClp(filePath)
@@ -853,7 +852,7 @@ def insertClipartFile(fileName:str, transx, areaWidth, areaHeight, alpha, pdf, t
     if len(clipart.svgData) <= 0:
         print('Clipart file could not be loaded:', fileName)
         # avoiding exception in the processing below here
-        return 
+        return
 
     clipart.convertToPngInBuffer(new_w, new_h, alpha)  #so we can access the pngMemFile later
 
@@ -986,10 +985,10 @@ def readClipArtConfigXML(baseFolder):
     clipArtXml.close()
 
     for decoration in xmlInfo.findall('decoration'):
-            clipartElement = decoration.find('clipart')
-            fileName = clipartElement.get('file')
-            designElementId = int(clipartElement.get('designElementId'))    #assume these IDs are always integers. 
-            clipartDict[designElementId] = fileName
+        clipartElement = decoration.find('clipart')
+        fileName = clipartElement.get('file')
+        designElementId = int(clipartElement.get('designElementId'))    #assume these IDs are always integers.
+        clipartDict[designElementId] = fileName
     return
 
 def getBaseBackgroundLocations(basefolder):
@@ -1011,7 +1010,7 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
         karoot = katree.getroot()
         ka = karoot.find('keyAccount').text # that's the official installed value
         # see if he has a .ini file override for the keyaccount
-        inika = defaultConfigSection.get('keyaccount');
+        inika = defaultConfigSection.get('keyaccount')
         if not inika is None:
             print('ini file overrides keyaccount from {} to {}'.format(ka, inika))
             ka = inika
@@ -1056,7 +1055,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
         #  overwritten when they appear in the later config files.
         # We want the config file in the .mcf directory to be the most important file.
         filesread = configuration.read(['cewe2pdf.ini', os.path.join(mcfBaseFolder, 'cewe2pdf.ini')])
-        if len(filesread) < 1: 
+        if len(filesread) < 1:
             print('Cannot find cewe installation folder cewe_folder from cewe2pdf.ini')
             cewe_folder = None
         else:
@@ -1066,7 +1065,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
             # find cewe folder from ini file
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
 
-            # set the cewe folder and key account number into the environment for use in other config files 
+            # set the cewe folder and key account number into the environment for use in other config files
             SetEnvironmentVariables(cewe_folder, defaultConfigSection)
 
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
@@ -1084,9 +1083,9 @@ def convertMcf(mcfname, keepDoublePages: bool):
             for ca in f2xca:
                 definition = ca.split(',')
                 if (len(definition) == 2):
-                    id = int(definition[0])
+                    clipartId = int(definition[0])
                     file = definition[1].strip()
-                    clipartDict[id] = file
+                    clipartDict[clipartId] = file
 
 
              # read passepartout folders and substitute environment variables

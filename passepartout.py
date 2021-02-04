@@ -43,7 +43,7 @@ class Passepartout(object):
             print("Error while parsing. Maybe not valid XML:{}".format(xmlFileName))
             return None
         finally:
-            clipArtXml.close()        
+            clipArtXml.close()
 
         for decoration in xmlInfo.findall('decoration'):
             # assume these IDs are always integers.
@@ -111,22 +111,22 @@ class Passepartout(object):
                 passepartoutIdDict[xmlInfo.designElementId] = curXmlFile
 
         return passepartoutIdDict
-    
-    @staticmethod
-    def getPassepartoutFileFullName(xmlInfo:decorationXmlInfo, fileName:str) -> str:   
-            pathObj = Path(xmlInfo.srcXmlFile)
-            #should not be needed: pathObj = pathObj.resolve()    # convert it to an absolute path
-            basePath = pathObj.parent
-            fullPath = basePath.joinpath(fileName)
-            return (str(fullPath))
 
     @staticmethod
-    def getClipartFullName(xmlInfo:decorationXmlInfo) -> str:        
-            return Passepartout.getPassepartoutFileFullName(xmlInfo, xmlInfo.clipartFile)
+    def getPassepartoutFileFullName(xmlInfo:decorationXmlInfo, fileName:str) -> str:
+        pathObj = Path(xmlInfo.srcXmlFile)
+        #should not be needed: pathObj = pathObj.resolve()    # convert it to an absolute path
+        basePath = pathObj.parent
+        fullPath = basePath.joinpath(fileName)
+        return (str(fullPath))
 
     @staticmethod
-    def getMaskFullName(xmlInfo:decorationXmlInfo) -> str:        
-            return Passepartout.getPassepartoutFileFullName(xmlInfo, xmlInfo.maskFile)
+    def getClipartFullName(xmlInfo:decorationXmlInfo) -> str:
+        return Passepartout.getPassepartoutFileFullName(xmlInfo, xmlInfo.clipartFile)
+
+    @staticmethod
+    def getMaskFullName(xmlInfo:decorationXmlInfo) -> str:
+        return Passepartout.getPassepartoutFileFullName(xmlInfo, xmlInfo.maskFile)
 
 
 if __name__ == '__main__':
@@ -139,4 +139,3 @@ if __name__ == '__main__':
     print(testId)
     print(testXmlInfo)
     print(Passepartout.getClipartFullName(testXmlInfo))
-

@@ -21,9 +21,9 @@ class ClpFile(object):
 
     def readClp(self, fileName) -> None:
         """Read a .CLP file and convert it to a .SVG file.
-         
+
          reads the data into the internal buffer as SVG
-        
+
          Remarks: The current implementation using immutable strings may not be best.
            But it should work for typical cliparts with a size of less then a few megabytes."""
 
@@ -32,7 +32,7 @@ class ClpFile(object):
         fileClp = open(inFilePath,"rt")
         contents = fileClp.read()
         fileClp.close()
-    
+
         #check the header
         if (contents[0] != 'a'):
             raise Exception("A .cpl file should start with character 'a', but instead it was: {} ({})".format(contents[0], hex(ord(contents[0]))))
@@ -43,8 +43,8 @@ class ClpFile(object):
         #the string is hexadecimal representation of the real data. Let's convert it back.
         svgData = bytes.fromhex(hexData)
         self.svgData = svgData
-    
-        
+
+
     def saveToSVG(self, outfileName):
         """save internal SVG data to a file"""
         outFile = open(outfileName,"wb")
@@ -56,7 +56,7 @@ class ClpFile(object):
 
         #create a byte buffer that can be used like a file and use it as the output of svg2png.
         scaledImage = self.rasterSvgData(width, height)
-        
+
         if (scaledImage.mode == "RGB"):
             # create a mask the same size as the original. For all pixels which are
             # non zero ("not used") set the mask value to the required transparency
@@ -82,7 +82,7 @@ class ClpFile(object):
         #2. calculate the scaling in x-, and y-direction that is needed
         #3. use the maxium of these x-, and y-scaling and do a aspect-ratio-preserving scaling of the image
         #   convert the image again from svg to png with this max. scale factor
-        #4. do a raster-image scaling to skew the image to the final dimension. 
+        #4. do a raster-image scaling to skew the image to the final dimension.
         #   This should only scale in x- or y-direction, as the other direction should alread be the desired one.
 
         #create a byte buffer that can be used like a file and use it as the output of svg2png.
@@ -130,18 +130,18 @@ class ClpFile(object):
         if (maskImgPng.mode == "RGBA"):
             alphaChannel = maskImgPng.getchannel("A")
         elif (maskImgPng.mode == "RGB"):
-             # convert image to gray-scale and use that as alpha channel.
-             # we need to invert, otherwise black whould be transparent.
-             # normally the whole image is a black rectangle
-             alphaChannel = maskImgPng.convert('L')
-             alphaChannel = PIL.ImageOps.invert(alphaChannel)
-        
+            # convert image to gray-scale and use that as alpha channel.
+            # we need to invert, otherwise black whould be transparent.
+            # normally the whole image is a black rectangle
+            alphaChannel = maskImgPng.convert('L')
+            alphaChannel = PIL.ImageOps.invert(alphaChannel)
+
         #apply it the input photo. They must have the same dimensions. But that is ensured by rasterSvgData
         if (photo.mode != "RGB") or (photo.mode != "RGBA"):
             photo = photo.convert("RGBA")
         photo.putalpha(alphaChannel)
-        
-        return photo    
+
+        return photo
 
     def savePNGfromBufferToFile(self, fileName) -> None:
         """ write the internal PNG buffer to a file """
@@ -151,7 +151,7 @@ class ClpFile(object):
         self.pngMemFile.seek(0) # reset file pointer back to the start for other function calls
 
     def loadFromSVG(self, inputFileSVG:str):
-        #read SVG file into memory        
+        #read SVG file into memory
         svgFile = open(inputFileSVG,"rb") #input file should be UTF-8 encoded
         self.svgData = svgFile.read()
         svgFile.close()
@@ -165,7 +165,7 @@ class ClpFile(object):
         if (not outputFileCLP): #check for None and empty string
             outputFileCLP = Path(inFilePath.parent).joinpath(inFilePath.stem + ".clp")
 
-        #read SVG into memory        
+        #read SVG into memory
         svgFile = open(inFilePath,"rt")
         contents = svgFile.read()
         svgFile.close()
