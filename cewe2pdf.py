@@ -802,14 +802,18 @@ def loadClipart(fileName) -> ClpFile :
         if not filePath.exists():
             filePath = filePath.parent.joinpath(filePath.stem+".clp")
             if not filePath.exists():
-                print("Error: can't find as .clp or .svg: {}".format(fileName))   
+                print("Error: missing .clp: {}".format(fileName))   
                 return ClpFile("")   #return an empty ClpFile             
     else:
         pathObj = Path(fileName)
         baseFileName = pathObj.stem
-        filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
-        filePath = Path(filePath)
-    
+        try:
+            filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
+            filePath = Path(filePath)
+        except Exception as ex:
+            print("Error: {}, {}".format(baseFileName, ex)) 
+            return ClpFile("")   #return an empty ClpFile             
+
     if (filePath.suffix == '.clp'):
         newClpFile.readClp(filePath)
     else:
