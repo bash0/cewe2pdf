@@ -54,3 +54,5 @@ nosetests.xml
 /test.pdf
 /cewe_folder_txt
 /tests/unittest_fotobook.mcf.20200516.pdf
+/tests/unittest_fotobook.mcf.20201217.pdf
+/tests/unittest_fotobook.mcf.20210202.pdf

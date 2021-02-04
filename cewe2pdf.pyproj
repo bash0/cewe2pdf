@@ -23,11 +23,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="additional_fonts.txt" />
+    <Content Include="build_a_compiled_version.md" />
     <Content Include="cewe2pdf.ini" />
+    <Content Include="CLP file format.txt" />
+    <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="tests\cewe2pdf.ini" />
     <Content Include="tests\unittest_fotobook.mcf" />
     <Content Include="tests\unittest_fotobook.mcf.pdf" />
+    <Content Include="tests\unittest_fotobook_mcf-Dateien\20200306_111748.jpg" />
+    <Content Include="tests\unittest_fotobook_mcf-Dateien\20200320_124632.jpg" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\GreySquareBlueBorder.jpg" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img.png" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\img2.png" />
@@ -39,6 +44,7 @@
   <ItemGroup>
     <Compile Include="cewe2pdf.py" />
     <Compile Include="clpFile.py" />
+    <Compile Include="passepartout.py" />
     <Compile Include="processManyMcfs.py" />
     <Compile Include="tests\test_simpleBook.py" />
   </ItemGroup>
