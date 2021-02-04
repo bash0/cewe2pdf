@@ -95,7 +95,7 @@ bg_res = 100  # dpi The resolution of background images will be reduced to this 
 # .mcf units are 0.1 mm
 # Tabs seem to be in 8mm pitch
 tab_pitch = 80
-line_scale = 1.2
+line_scale = 1.1
 
 # definitions
 formats = {"ALB82": reportlab.lib.pagesizes.A4,
@@ -1039,7 +1039,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
         baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
         backgroundLocations = baseBackgroundLocations
     except:
-        print('cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
+        print('Cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
         # Try to read the .ini first from the current directory, and second from the directory where the .mcf file is.
         # Order of the files is important, because config entires are
@@ -1047,7 +1047,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
         # We want the config file in the .mcf directory to be the most important file.
         filesread = configuration.read(['cewe2pdf.ini', os.path.join(mcfBaseFolder, 'cewe2pdf.ini')])
         if len(filesread) < 1: 
-            print('cannot find cewe installation folder cewe_folder in cewe2pdf.ini')
+            print('Cannot find cewe installation folder cewe_folder from cewe2pdf.ini')
             cewe_folder = None
         else:
             #Give the user feedback which config-file is used, in case there is a problem.
