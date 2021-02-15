@@ -377,7 +377,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     if not (frameClipartFileName is None):
         # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
         # already has these transformations applied. So don't do it twice.
-        insertClipartFile(frameClipartFileName, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0)
+        insertClipartFile(frameClipartFileName, [], 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0)
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
@@ -837,9 +837,18 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
         print("Problem getting file name for clipart ID:", clipartID)
         return
 
-    insertClipartFile(fileName, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot)
+    colorreplacements = []
+    for clipconfig in clipartElement.findall('ClipartConfiguration'):
+        for clipcolors in clipconfig.findall('colors'):
+            for clipcolor in clipcolors.findall('color'):
+                source = '#'+clipcolor.get('source').upper()[3:9]
+                target = '#'+clipcolor.get('target').upper()[3:9]
+                replacement = (source,target)
+                colorreplacements.append(replacement)
 
-def insertClipartFile(fileName:str, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot):
+    insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot)
+
+def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot):
     img_transx = transx
 
     res = image_res #use the foreground resolution setting for clipart
@@ -853,6 +862,9 @@ def insertClipartFile(fileName:str, transx, areaWidth, areaHeight, alpha, pdf, t
         print('Clipart file could not be loaded:', fileName)
         # avoiding exception in the processing below here
         return
+
+    if len(colorreplacements) > 0:
+        clipart.replaceColors(colorreplacements)
 
     clipart.convertToPngInBuffer(new_w, new_h, alpha)  #so we can access the pngMemFile later
 
