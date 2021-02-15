@@ -22,6 +22,7 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
     <Content Include="build_a_compiled_version.md" />
     <Content Include="cewe2pdf.ini" />
