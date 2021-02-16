@@ -288,7 +288,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         # read information from .xml file
         try:
             pptXmlFileName = passepartoutDict[passepartoutid]
-        except:
+        except: # noqa: E722
             pptXmlFileName = None
         if pptXmlFileName is None:
             print("Error can't find passepartout for {}".format(passepartoutid))
@@ -335,8 +335,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
     new_w = int(0.5 + imgCropWidth_mcfunit * res / 254.)
     new_h = int(0.5 + imgCropHeight_mcfunit * res / 254.)
-    factor = sqrt(new_w * new_h /
-                    float(im.size[0] * im.size[1]))
+    factor = sqrt(new_w * new_h / float(im.size[0] * im.size[1]))
     if factor <= 0.8:
         im = im.resize(
             (new_w, new_h), PIL.Image.ANTIALIAS)
@@ -366,11 +365,11 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
     pdf.translate(frameShiftX_mcf * f, -frameShiftY_mcf * f) # for adjustments from passepartout
     pdf.drawImage(ImageReader(jpeg.name),
-                    f * -0.5 * imgCropWidth_mcfunit,
-                    f * -0.5 * imgCropHeight_mcfunit,
-                    width=f * imgCropWidth_mcfunit,
-                    height=f * imgCropHeight_mcfunit,
-                    mask='auto')
+        f * -0.5 * imgCropWidth_mcfunit,
+        f * -0.5 * imgCropHeight_mcfunit,
+        width=f * imgCropWidth_mcfunit,
+        height=f * imgCropHeight_mcfunit,
+        mask='auto')
     pdf.translate(-frameShiftX_mcf * f, frameShiftY_mcf * f) # for adjustments from passepartout
 
     # we need to draw our passepartout after the real image, so it overlays it.
@@ -482,7 +481,7 @@ def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs, bweight):
     if 'font-weight' in spanstyle:
         try:
             spanweight = int(Dequote(spanstyle['font-weight']))
-        except:
+        except: # noqa: E722
             spanweight = 400
 
     if 'font-size' in spanstyle:
@@ -573,16 +572,16 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         frameWidth = f * areaWidth + 2 * adjustment
         frameHeight = f * areaHeight + 2 * adjustment
         frm_table = Table(
-          data=[[None]],
-          colWidths=frameWidth,
-          rowHeights=frameHeight,
-          style=[
-           # The two (0, 0) in each attribute represent the range of table cells that the style applies to.
-           # Since there's only one cell at (0, 0), it's used for both start and end of the range
-           ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-           ('BOX', (0, 0), (0, 0), bwidth, bcolor), # The fourth argument to this style attribute is the border width
-           ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
-          ]
+            data=[[None]],
+            colWidths=frameWidth,
+            rowHeights=frameHeight,
+            style=[
+                # The two (0, 0) in each attribute represent the range of table cells that the style applies to.
+                # Since there's only one cell at (0, 0), it's used for both start and end of the range
+                ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+                ('BOX', (0, 0), (0, 0), bwidth, bcolor), # The fourth argument to this style attribute is the border width
+                ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
+            ]
         )
         frm_table.wrapOn(pdf, frameWidth, frameHeight)
         frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
@@ -594,11 +593,10 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     # note: it would be better to use proper html processing here
     htmlxml = etree.XML(textTag.text)
     body = htmlxml.find('.//body')
-    bstyle = dict([kv.split(':') for kv in
-                    body.get('style').lstrip(' ').rstrip(';').split('; ')])
+    bstyle = dict([kv.split(':') for kv in body.get('style').lstrip(' ').rstrip(';').split('; ')])
     try:
         bodyfs = floor(float(bstyle['font-size'].strip("pt")))
-    except:
+    except: # noqa: E722
         bodyfs = 12
     family = bstyle['font-family'].strip("'")
     if family in pdf.getAvailableFonts():
@@ -610,7 +608,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 
     try:
         bweight = int(Dequote(bstyle['font-weight']))
-    except:
+    except: # noqa: E722
         bweight = 400
     color = '#000000'
 
@@ -629,7 +627,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                 tablebmarg = floor(float(tablestyle['margin-bottom'].strip("px")))
                 tablelmarg = floor(float(tablestyle['margin-left'].strip("px")))
                 tablermarg = floor(float(tablestyle['margin-right'].strip("px")))
-            except:
+            except: # noqa: E722
                 print('Ignoring invalid table margin settings ' + tableStyleAttrib)
 
     pdf.translate(transx, transy)
@@ -659,7 +657,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         htmlspans = p.findall(".*")
         if (len(htmlspans) < 1): # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
-            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
+                additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
             pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
@@ -678,7 +677,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
-                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf,
+                        additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
 
                 elif item.tag == 'span':
                     span = item
@@ -706,7 +706,8 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
                             # now add the tail text of each br in the span style
-                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf,
+                                additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
@@ -771,11 +772,11 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         frameWidth = finalTotalWidth
 
     newFrame = Frame(frameBottomLeft_x, frameBottomLeft_y,
-                        frameWidth, frameHeight,
-                        leftPadding=leftPad, bottomPadding=bottomPad,
-                        rightPadding=rightPad, topPadding=topPad,
-                        showBoundary=0  # for debugging useful to set 1
-                        )
+        frameWidth, frameHeight,
+        leftPadding=leftPad, bottomPadding=bottomPad,
+        rightPadding=rightPad, topPadding=topPad,
+        showBoundary=0  # for debugging useful to set 1
+        )
 
     # This call should produce an exception, if any of the flowables do not fit inside the frame.
     # But there seems to be a bug, and no exception is triggered.
@@ -872,8 +873,8 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     pdf.translate(img_transx, transy)
     pdf.rotate(-areaRot)
     pdf.drawImage(ImageReader(clipart.pngMemFile),
-                    f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-                    width=f * areaWidth, height=f * areaHeight, mask='auto')
+        f * -0.5 * areaWidth, f * -0.5 * areaHeight,
+        width=f * areaWidth, height=f * areaHeight, mask='auto')
     pdf.rotate(areaRot)
     pdf.translate(-img_transx, -transy)
 
@@ -940,7 +941,9 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
     return
 
 
-def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts):
+def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
+        page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
+        bg_notFoundDirList, additionnal_fonts):
     print('parsing page', page.get('pagenr'), ' of ', pageCount)
 
     bundlesize = page.find("./bundlesize")
@@ -973,8 +976,8 @@ def getBaseClipartLocations(baseFolder):
     # create a tuple of places (folders) where background resources would be found by default
     baseClipartLocations = (
         os.path.join(baseFolder, 'Resources', 'photofun', 'decorations'),   # trailing comma is important to make a 1-element tuple
-#        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'form_frames'),
-#        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'frame_frames')
+        # os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'form_frames'),
+        # os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'frame_frames')
     )
     return baseClipartLocations
 
@@ -1058,7 +1061,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
         cewe_file.close()
         baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
         backgroundLocations = baseBackgroundLocations
-    except:
+    except: # noqa: E722
         print('Cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
         # Try to read the .ini first from the current directory, and second from the directory where the .mcf file is.
@@ -1119,7 +1122,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 fontfile = os.path.expandvars(p[1].strip())
                 additionnal_fonts[fontname] = fontfile
             fp.close()
-    except:
+    except: # noqa: E722
         print('cannot find additionnal fonts (define them in additional_fonts.txt)')
         print('Content example:')
         print('Vera = /tmp/vera.ttf')
@@ -1136,7 +1139,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
         try:
             pdfmetrics.registerFont(TTFont(curFontName, additionnal_fonts[curFontName]))
             print("Successfully registered '%s' from '%s'" % (curFontName, additionnal_fonts[curFontName]))
-        except:
+        except:# noqa: E722
             print("Failed to register font '%s' (from %s)" % (curFontName, additionnal_fonts[curFontName]))
             del additionnal_fonts[curFontName]    # remove this item from the font list, so it won't be used later and cause problems.
 
@@ -1207,7 +1210,9 @@ def convertMcf(mcfname, keepDoublePages: bool):
                     # we need to do run parseInputPage twico for one output page in the PDF.
                     # The background needs to be drawn first, or it would obscure any other other elements.
                     pagetype = 'singleside'
-                    parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
+                    parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
+                        realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
+                        bg_notFoundDirList, additionnal_fonts)
                 pagetype = 'emptypage'
             else:
                 pageNumber = n
@@ -1216,7 +1221,9 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 pagetype = 'normal'
 
             if (page is not None):
-                parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
+                parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
+                    page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
+                    bg_notFoundDirList, additionnal_fonts)
 
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
@@ -1224,7 +1231,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 or (
                     (not (keepDoublePages is True and oddpage is True and pagetype == 'normal'))
                 and (not (keepDoublePages is True and n == (pageCount - 1) and pagetype == 'cover'))
-                )):
+                    )):
                 pdf.showPage()
 
         except Exception as ex:

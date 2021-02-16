@@ -39,7 +39,7 @@ class Passepartout(object):
         clipArtXml = open(xmlFileName, 'rb')
         try:
             xmlInfo = etree.parse(xmlFileName)
-        except:
+        except: # noqa: E722
             print("Error while parsing. Maybe not valid XML:{}".format(xmlFileName))
             return None
         finally:
