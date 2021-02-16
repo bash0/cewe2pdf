@@ -181,8 +181,8 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 backgroundTag = curTag
                 break
 
-        if (backgroundTag is not None and cewe_folder is not None and
-                backgroundTag.get('designElementId') is not None):
+        if (backgroundTag is not None and cewe_folder is not None
+                and backgroundTag.get('designElementId') is not None):
             bg = backgroundTag.get('designElementId')
             # example: fading="0" hue="270" rotation="0" type="1"
             backgroundFading = 0
@@ -265,7 +265,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         'left').replace(',', '.'))
     imtop = float(imageTag.find('cutout').get(
         'top').replace(',', '.'))
-    imageWidth_px, imageHeight_px = im.size
+    # imageWidth_px, imageHeight_px = im.size
     imScale = float(imageTag.find('cutout').get('scale'))
 
     # we need to take care of changes introduced by passepartout elements, before further image processing
@@ -494,9 +494,7 @@ def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle, 
     Remember this is not really HTML, though it looks that way.
     See 6.2 Paragraph XML Markup Tags in the reportlabs user guide.
     """
-    paragraphText = AppendText(paragraphText, '<font name="' + font + '"'
-        + ' size=' + str(fsize)
-        )
+    paragraphText = AppendText(paragraphText, '<font name="' + font + '"' + ' size=' + str(fsize))
 
     if 'color' in fstyle:
         paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])
@@ -1228,10 +1226,10 @@ def convertMcf(mcfname, keepDoublePages: bool):
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
             if ((keepDoublePages is False)
-                or (
-                    (not (keepDoublePages is True and oddpage is True and pagetype == 'normal'))
-                and (not (keepDoublePages is True and n == (pageCount - 1) and pagetype == 'cover'))
-                    )):
+                or ((not (keepDoublePages is True and oddpage is True and pagetype == 'normal'))
+                    and (not (keepDoublePages is True and n == (pageCount - 1) and pagetype == 'cover'))
+                   )
+               ):
                 pdf.showPage()
 
         except Exception as ex:
