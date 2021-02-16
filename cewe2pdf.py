@@ -118,7 +118,7 @@ def autorot(im):
     if im.format != 'JPEG' and im.format != 'MPO':
         return im
     exifdict = im._getexif()
-    if exifdict != None and 274 in list(exifdict.keys()):
+    if exifdict is not None and 274 in list(exifdict.keys()):
         orientation = exifdict[274]
 
         if orientation == 2:
@@ -174,15 +174,15 @@ def getPageElementForPageNumber(fotobook, pageNumber):
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
     if pagetype == "emptypage":  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
         return
-    if backgroundTags != None and len(backgroundTags) > 0:
+    if backgroundTags is not None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
         for curTag in backgroundTags:
-            if curTag.get('alignment') != None:
+            if curTag.get('alignment') is not None:
                 backgroundTag = curTag
                 break
 
-        if (backgroundTag != None and cewe_folder != None and
-                backgroundTag.get('designElementId') != None):
+        if (backgroundTag is not None and cewe_folder is not None and
+                backgroundTag.get('designElementId') is not None):
             bg = backgroundTag.get('designElementId')
             # example: fading="0" hue="270" rotation="0" type="1"
             backgroundFading = 0
@@ -241,7 +241,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
 
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy):
     # open raw image file
-    if imageTag.get('filename') == None:
+    if imageTag.get('filename') is None:
         return
     imagePath = os.path.join(
         mcfBaseFolder, imagedir, imageTag.get('filename'))
@@ -276,7 +276,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     frameDeltaY_mcfunit = 0
     imgCropWidth_mcfunit = areaWidth
     imgCropHeight_mcfunit = areaHeight
-    if not passepartoutid is None:
+    if passepartoutid is not None:
         print('Frames (passepartout) are not fully implemented ()', passepartoutid)
         # re-generate the index of designElementId to .xml files, if it does not exist
         passepartoutid = int(passepartoutid)    # we need to work with a number below
@@ -530,7 +530,7 @@ def AppendSpanEnd(paragraphText, weight, style, outerstyle):
 def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, bgColorAttrib):
     pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight)
     paragraphText = AppendSpanStart(paragraphText, bgColorAttrib, pfont, pfs, pweight, pstyle, bstyle)
-    if (text == None):
+    if (text is None):
         paragraphText = AppendText(paragraphText, "")
     else:
         paragraphText = AppendText(paragraphText, html.escape(text))
@@ -550,7 +550,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         bwidth = 1
         if "width" in border.attrib:
             widthAttrib = border.get('width')
-            if (widthAttrib != None):
+            if (widthAttrib is not None):
                 bwidth = f * floor(float(widthAttrib)) # units are 1/10 mm
 
         bcolor = reportlab.lib.colors.blue
@@ -689,7 +689,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 
                     paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, spanfont, spanfs, spanweight, spanstyle, bstyle)
 
-                    if span.text != None:
+                    if span.text is not None:
                         paragraphText = AppendText(paragraphText, html.escape(span.text))
 
                     # there might be (one or more, or only one?) line break within the span.
@@ -710,7 +710,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
-                    if (span.tail != None):
+                    if (span.tail is not None):
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
 
                 else:
@@ -1022,7 +1022,7 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
         ka = karoot.find('keyAccount').text # that's the official installed value
         # see if he has a .ini file override for the keyaccount
         inika = defaultConfigSection.get('keyaccount')
-        if not inika is None:
+        if inika is not None:
             print('ini file overrides keyaccount from {} to {}'.format(ka, inika))
             ka = inika
         # put the value into the environment so that it can be substituted in later config elements
@@ -1140,7 +1140,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
             print("Failed to register font '%s' (from %s)" % (curFontName, additionnal_fonts[curFontName]))
             del additionnal_fonts[curFontName]    # remove this item from the font list, so it won't be used later and cause problems.
 
-    if defaultConfigSection != None:
+    if defaultConfigSection is not None:
         # the reportlab manual says:
         #  Before using the TT Fonts in Platypus we should add a mapping from the family name to the individual font
         #  names that describe the behaviour under the <b> and <i> attributes.
@@ -1163,7 +1163,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
 
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
-    if articleConfigElement == None:
+    if articleConfigElement is None:
         print(mcfname + ' is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
     pageCount = int(articleConfigElement.get('normalpages')) + 2    # maximum number of pages
@@ -1183,7 +1183,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 oddpage = (n == 0)
                 pagetype = 'cover'
                 # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
-                if ((keepDoublePages == True) and (n == (pageCount - 1))):
+                if ((keepDoublePages is True) and (n == (pageCount - 1))):
                     page = None
             elif n == 1:
                 pageNumber = 1
@@ -1215,15 +1215,15 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 page = getPageElementForPageNumber(fotobook, n)
                 pagetype = 'normal'
 
-            if (page != None):
+            if (page is not None):
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf, page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage, bg_notFoundDirList, additionnal_fonts)
 
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
-            if ((keepDoublePages == False)
+            if ((keepDoublePages is False)
                 or (
-                    (not (keepDoublePages == True and oddpage == True and pagetype == 'normal'))
-                and (not (keepDoublePages == True and n == (pageCount - 1) and pagetype == 'cover'))
+                    (not (keepDoublePages is True and oddpage is True and pagetype == 'normal'))
+                and (not (keepDoublePages is True and n == (pageCount - 1) and pagetype == 'cover'))
                 )):
                 pdf.showPage()
 
