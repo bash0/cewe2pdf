@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# In this file it is permitted to catch exceptions on a broad basis since there
+# are many things that can go wrong with file handling and xml parsing:
+#    pylint: disable=bare-except,broad-except
+# We're not quite at the level of documenting all the classes and functions yet :-)
+#    pylint: disable=missing-function-docstring,missing-class-docstring,missing-module-docstring
+
 '''
 Create pdf files from CEWE .mcf photo books (cewe-fotobuch)
 version 0.11 (Dec 2019)
@@ -43,11 +49,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # extend the search path so Cairo will find its dlls.
-# only needed when the program is forzen (i.e. compiled).
+# only needed when the program is frozen (i.e. compiled).
 import sys
 import logging
 import os.path
 import os
+import tempfile
+import html
+import traceback
+
+import argparse  # to parse arguments
+import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
+
+from io import BytesIO
+from math import sqrt, floor
+
+from pathlib import Path
+
+from reportlab.pdfgen import canvas
+import reportlab.lib.pagesizes
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import Paragraph, Frame, Table
+from reportlab.lib.styles import ParagraphStyle
+# from reportlab.lib.styles import getSampleStyleSheet
+
+from lxml import etree
+
+import PIL
+from clpFile import ClpFile  # for clipart .CLP and .SVG files
+from passepartout import Passepartout
 
 if hasattr(sys, 'frozen'):
     # This is needed for compiled, i.e. frozen programs on Windows to find their dlls.
@@ -55,33 +87,6 @@ if hasattr(sys, 'frozen'):
     dllpath = os.path.dirname(os.path.realpath(sys.argv[0]))
     if dllpath not in os.environ:
         os.environ["PATH"] += os.pathsep + dllpath
-
-from lxml import etree
-import tempfile
-from math import sqrt, floor
-import html
-
-from reportlab.pdfgen import canvas
-import reportlab.lib.pagesizes
-from reportlab.lib.utils import ImageReader
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph, Frame, Table
-from reportlab.lib.styles import ParagraphStyle
-
-import PIL
-from PIL.ExifTags import TAGS
-from io import BytesIO
-from pathlib import Path
-import argparse  # to parse arguments
-
-import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
-
-from clpFile import ClpFile  # for clipart .CLP and .SVG files
-import traceback
-from passepartout import Passepartout
-
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
@@ -104,8 +109,8 @@ f = 72. / 254.  # convert from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 tempFileList = []  # we need to remove all this temporary files at the end
 
 # reportlab defaults
-pdf_styles = getSampleStyleSheet()
-pdf_styleN = pdf_styles['Normal']
+# pdf_styles = getSampleStyleSheet()
+# pdf_styleN = pdf_styles['Normal']
 pdf_flowableList = []
 
 clipartDict = dict()    # a dictionary for clipart element IDs to file name
@@ -185,22 +190,22 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 and backgroundTag.get('designElementId') is not None):
             bg = backgroundTag.get('designElementId')
             # example: fading="0" hue="270" rotation="0" type="1"
-            backgroundFading = 0
+            backgroundFading = 0 # backgroundFading not used yet pylint: disable=unused-variable
             if "fading" in backgroundTag.attrib:
                 if float(backgroundTag.get('fading')) != 0:
                     print('value of background attribute not supported: fading = %s' % backgroundTag.get(
                         'fading'))
-            backgroundHue = 0
+            backgroundHue = 0 # backgroundHue not used yet pylint: disable=unused-variable
             if "hue" in backgroundTag.attrib:
                 if float(backgroundTag.get('hue')) != 0:
                     print(
                         'value of background attribute not supported: hue =  %s' % backgroundTag.get('hue'))
-            backgroundRotation = 0
+            backgroundRotation = 0 # backgroundRotation not used yet pylint: disable=unused-variable
             if "rotation" in backgroundTag.attrib:
                 if float(backgroundTag.get('rotation')) != 0:
                     print('value of background attribute not supported: rotation =  %s' % backgroundTag.get(
                         'rotation'))
-            backgroundType = 1
+            backgroundType = 1 # backgroundType not used yet pylint: disable=unused-variable
             if "type" in backgroundTag.attrib:
                 if int(backgroundTag.get('type')) != 1:
                     print(
@@ -232,7 +237,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
             except Exception as ex:
                 if bgPath not in bg_notFoundDirList:
                     print('cannot find background or error when adding to pdf', bgPath, '\n', ex.args[0])
-                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    exc_type, exc_obj, exc_tb = sys.exc_info() # exc_obj pylint: disable=unused-variable
                     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                     print('', (exc_type, fname, exc_tb.tb_lineno))
                 bg_notFoundDirList.add(bgPath)
@@ -280,10 +285,10 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         print('Frames (passepartout) are not fully implemented ()', passepartoutid)
         # re-generate the index of designElementId to .xml files, if it does not exist
         passepartoutid = int(passepartoutid)    # we need to work with a number below
-        global passepartoutDict
-        if (passepartoutDict is None):
+        global passepartoutDict # pylint: disable=global-statement
+        if passepartoutDict is None:
             print("Regenerating passepartout index from .XML files.")
-            global passepartoutFolders
+            global passepartoutFolders  # pylint: disable=global-statement
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
         # read information from .xml file
         try:
@@ -342,7 +347,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     im.load()
 
     # apply the frame mask from the passepartout to the image
-    if not (maskClipartFileName is None):
+    if maskClipartFileName is not None:
         maskClp = loadClipart(maskClipartFileName)
         im = maskClp.applyAsAlphaMaskToFoto(im)
 
@@ -373,7 +378,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     pdf.translate(-frameShiftX_mcf * f, frameShiftY_mcf * f) # for adjustments from passepartout
 
     # we need to draw our passepartout after the real image, so it overlays it.
-    if not (frameClipartFileName is None):
+    if frameClipartFileName is not None:
         # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
         # already has these transformations applied. So don't do it twice.
         insertClipartFile(frameClipartFileName, [], 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0)
@@ -424,32 +429,18 @@ def IsBold(weight):
 
 def IsItalic(itemstyle, outerstyle):
     if 'font-style' in itemstyle:
-        if itemstyle['font-style'].strip(" ") == "italic":
-            return True
-        else:
-            return False
-    elif 'font-style' in outerstyle:
-        if outerstyle['font-style'].strip(" ") == "italic":
-            return True
-        else:
-            return False
-    else:
-        return False
+        return itemstyle['font-style'].strip(" ") == "italic"
+    if 'font-style' in outerstyle:
+        return outerstyle['font-style'].strip(" ") == "italic"
+    return False
 
 
 def IsUnderline(itemstyle, outerstyle):
     if 'text-decoration' in itemstyle:
-        if itemstyle['text-decoration'].strip(" ") == "underline":
-            return True
-        else:
-            return False
-    elif 'text-decoration' in outerstyle:
-        if outerstyle['text-decoration'].strip(" ") == "underline":
-            return True
-        else:
-            return False
-    else:
-        return False
+        return itemstyle['text-decoration'].strip(" ") == "underline"
+    if 'text-decoration' in outerstyle:
+        return outerstyle['text-decoration'].strip(" ") == "underline"
+    return False
 
 
 def Dequote(s):
@@ -499,7 +490,7 @@ def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle, 
     if 'color' in fstyle:
         paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])
 
-    if (bgColorAttrib is not None):
+    if bgColorAttrib is not None:
         paragraphText = AppendText(paragraphText, ' backcolor=' + bgColorAttrib)
 
     paragraphText = AppendText(paragraphText, '>')
@@ -527,7 +518,7 @@ def AppendSpanEnd(paragraphText, weight, style, outerstyle):
 def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, bgColorAttrib):
     pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight)
     paragraphText = AppendSpanStart(paragraphText, bgColorAttrib, pfont, pfs, pweight, pstyle, bstyle)
-    if (text is None):
+    if text is None:
         paragraphText = AppendText(paragraphText, "")
     else:
         paragraphText = AppendText(paragraphText, html.escape(text))
@@ -541,13 +532,13 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
     for border in decoration.findall('border'):
         if "enabled" in border.attrib:
             enabledAttrib = border.get('enabled')
-            if (enabledAttrib != '1'):
+            if enabledAttrib != '1':
                 return
 
         bwidth = 1
         if "width" in border.attrib:
             widthAttrib = border.get('width')
-            if (widthAttrib is not None):
+            if widthAttrib is not None:
                 bwidth = f * floor(float(widthAttrib)) # units are 1/10 mm
 
         bcolor = reportlab.lib.colors.blue
@@ -558,11 +549,11 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         adjustment = 0
         if "position" in border.attrib:
             positionAttrib = border.get('position')
-            if (positionAttrib == "inside"):
+            if positionAttrib == "inside":
                 adjustment = -bwidth * 0.5
-            if (positionAttrib == "centered"):
+            if positionAttrib == "centered":
                 adjustment = 0
-            if (positionAttrib == "outside"):
+            if positionAttrib == "outside":
                 adjustment = bwidth * 0.5
 
         frameBottomLeft_x = -0.5 * (f * areaWidth) - adjustment
@@ -583,8 +574,6 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         )
         frm_table.wrapOn(pdf, frameWidth, frameHeight)
         frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
-
-        return
 
 
 def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
@@ -608,16 +597,15 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         bweight = int(Dequote(bstyle['font-weight']))
     except: # noqa: E722
         bweight = 400
-    color = '#000000'
 
     # issue https://github.com/bash0/cewe2pdf/issues/58 - margins are not being used
     # assume (based on empirical evidence!) that there is just one table, and collect
     # the margin values.
     tabletmarg = tablebmarg = tablelmarg = tablermarg = 0
     table = htmlxml.find('.//body/table')
-    if (table is not None):
+    if table is not None:
         tableStyleAttrib = table.get('style')
-        if (tableStyleAttrib is not None):
+        if tableStyleAttrib is not None:
             tablestyle = dict([kv.split(':') for kv in
                 table.get('style').lstrip(' ').rstrip(';').split('; ')])
             try:
@@ -634,7 +622,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     # Get the background color. It is stored in an extra element.
     backgroundColor = None
     backgroundColorAttrib = area.get('backgroundcolor')
-    if (backgroundColorAttrib is not None):
+    if backgroundColorAttrib is not None:
         backgroundColor = reportlab.lib.colors.HexColor(backgroundColorAttrib)
 
     # set default para style in case there are no spans to set it
@@ -653,7 +641,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
         htmlspans = p.findall(".*")
-        if (len(htmlspans) < 1): # i.e. there are no spans, just a paragraph
+        if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
                 additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
@@ -709,7 +697,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
-                    if (span.tail is not None):
+                    if span.tail is not None:
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
 
                 else:
@@ -723,7 +711,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception as ex:
                 print('Error:', ex.args[0])
-                exc_type, exc_obj, exc_tb = sys.exc_info()
+                exc_type, exc_obj, exc_tb = sys.exc_info() # exc_obj pylint: disable=unused-variable
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                 print('', (exc_type, fname, exc_tb.tb_lineno))
 
@@ -787,7 +775,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
 
     pdf.rotate(areaRot)
     pdf.translate(-transx, -transy)
-    return
+
 
 def loadClipart(fileName) -> ClpFile:
     """Tries to load a clipart file. Either from .CLP or .SVG file
@@ -811,19 +799,20 @@ def loadClipart(fileName) -> ClpFile:
             print("Error: {}, {}".format(baseFileName, ex))
             return ClpFile("")   # return an empty ClpFile
 
-    if (filePath.suffix == '.clp'):
+    if filePath.suffix == '.clp':
         newClpFile.readClp(filePath)
     else:
         newClpFile.loadFromSVG(filePath)
 
     return newClpFile
 
-def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha):
+
+def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha):
     clipartID = int(clipartElement.get('designElementId'))
     # print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
 
     # designElementId 0 seems to be a special empty placeholder
-    if (clipartID == 0):
+    if clipartID == 0:
         return
 
     # Load the clipart
@@ -831,7 +820,7 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
     if clipartID in clipartDict:
         fileName = clipartDict[clipartID]
     # verify preconditions to avoid exception loading the clip art file, which would break the page count
-    if (not fileName):
+    if not fileName:
         print("Problem getting file name for clipart ID:", clipartID)
         return
 
@@ -845,6 +834,7 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
                 colorreplacements.append(replacement)
 
     insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot)
+
 
 def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot):
     img_transx = transx
@@ -881,61 +871,61 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
     if keepDoublePages and oddpage == 1 and pagetype == 'normal':
         # if we are in double-page mode, all the images are already drawn by the even pages.
         return
-    else:
-        # switch pack to the page element for the even page to get the elements
-        if pagetype == 'normal' and oddpage == 1:
-            page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
 
-        for area in page.findall('area'):
-            areaPos = area.find('position')
-            areaLeft = float(areaPos.get('left').replace(',', '.'))
-            # old python 2 code: aleft = float(area.get('left').replace(',', '.'))
-            if pagetype != 'singleside' or len(area.findall('imagebackground')) == 0:
-                if oddpage and not keepDoublePages:
-                    # shift double-page content from other page
-                    areaLeft -= pw
-            areaTop = float(areaPos.get('top').replace(',', '.'))
-            areaWidth = float(areaPos.get('width').replace(',', '.'))
-            areaHeight = float(areaPos.get('height').replace(',', '.'))
-            areaRot = float(areaPos.get('rotation'))
+    # switch pack to the page element for the even page to get the elements
+    if pagetype == 'normal' and oddpage == 1:
+        page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
 
-            # check if the image is on current page at all
-            if pagetype == 'normal' and not keepDoublePages:
-                if oddpage:
-                    # the right edge of image is beyond the left page border
-                    if (areaLeft+areaWidth) < 0:
-                        continue
-                else:
-                    if areaLeft > pw:  # the left image edge is beyond the right page border.
-                        continue
+    for area in page.findall('area'):
+        areaPos = area.find('position')
+        areaLeft = float(areaPos.get('left').replace(',', '.'))
+        # old python 2 code: aleft = float(area.get('left').replace(',', '.'))
+        if pagetype != 'singleside' or len(area.findall('imagebackground')) == 0:
+            if oddpage and not keepDoublePages:
+                # shift double-page content from other page
+                areaLeft -= pw
+        areaTop = float(areaPos.get('top').replace(',', '.'))
+        areaWidth = float(areaPos.get('width').replace(',', '.'))
+        areaHeight = float(areaPos.get('height').replace(',', '.'))
+        areaRot = float(areaPos.get('rotation'))
 
-            # center positions
-            cx = areaLeft + 0.5 * areaWidth
-            cy = ph - (areaTop + 0.5 * areaHeight)
+        # check if the image is on current page at all
+        if pagetype == 'normal' and not keepDoublePages:
+            if oddpage:
+                # the right edge of image is beyond the left page border
+                if (areaLeft+areaWidth) < 0:
+                    continue
+            else:
+                if areaLeft > pw:  # the left image edge is beyond the right page border.
+                    continue
 
-            transx = f * cx
-            transy = f * cy
+        # center positions
+        cx = areaLeft + 0.5 * areaWidth
+        cy = ph - (areaTop + 0.5 * areaHeight)
 
-            # process images
-            for imageTag in area.findall('imagebackground') + area.findall('image'):
-                processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy)
+        transx = f * cx
+        transy = f * cy
 
-            # process text
-            for textTag in area.findall('text'):
-                processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
+        # process images
+        for imageTag in area.findall('imagebackground') + area.findall('image'):
+            processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy)
 
-            # Clip-Art
-            # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
-            # We are using the <clipart> element here
-            if (area.get('areatype') == 'clipartarea'): # only look for alpha and clipart within clipartarea tags
-                alpha = 255
-                decoration = area.find('decoration') # decoration tag
-                if decoration is not None:
-                    alphatext = decoration.get('alpha') # alpha attribute
-                    if alphatext is not None:
-                        alpha = int((float(alphatext)) * 255)
-                for clipartElement in area.findall('clipart'):
-                    processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha)
+        # process text
+        for textTag in area.findall('text'):
+            processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
+
+        # Clip-Art
+        # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
+        # We are using the <clipart> element here
+        if area.get('areatype') == 'clipartarea': # only look for alpha and clipart within clipartarea tags
+            alpha = 255
+            decoration = area.find('decoration') # decoration tag
+            if decoration is not None:
+                alphatext = decoration.get('alpha') # alpha attribute
+                if alphatext is not None:
+                    alpha = int((float(alphatext)) * 255)
+            for clipartElement in area.findall('clipart'):
+                processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha)
     return
 
 
@@ -945,7 +935,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     print('parsing page', page.get('pagenr'), ' of ', pageCount)
 
     bundlesize = page.find("./bundlesize")
-    if (bundlesize is not None):
+    if bundlesize is not None:
         pw = float(bundlesize.get('width'))
         ph = float(bundlesize.get('height'))
 
@@ -982,12 +972,12 @@ def getBaseClipartLocations(baseFolder):
 def readClipArtConfigXML(baseFolder):
     """Parse the configuration XML file and generate a dictionary of designElementId to fileName
     currently only cliparts_default.xml is supported !"""
-    global clipartPathList
+    global clipartPathList  # pylint: disable=global-statement
     clipartPathList = getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
     xmlConfigFileName = 'cliparts_default.xml'
     try:
         xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
-    except Exception as ex:
+    except: # noqa: E722
         print('Could not load clipart definition file: {}'.format(xmlConfigFileName))
         print('Cliparts will not be available.')
         return
@@ -1030,7 +1020,6 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
         os.environ['KEYACCOUNT'] = ka.strip()
     except Exception as ex:
         print('Could not extract keyAccount tag in file: {}, reason {}'.format(keyAccountFileName, ex))
-    return
 
 
 def convertMcf(mcfname, keepDoublePages: bool):
@@ -1085,16 +1074,16 @@ def convertMcf(mcfname, keepDoublePages: bool):
             # add any extra background folders, substituting environment variables
             xbg = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()  # newline separated list of folders
             fxbg = list(filter(lambda bg: (len(bg) != 0), xbg)) # filter out empty entries
-            f2xbg = tuple(map(lambda bg: os.path.expandvars(bg), fxbg)) # expand environment variables
+            f2xbg = tuple(map(lambda bg: os.path.expandvars(bg), fxbg)) # expand environment vars pylint: disable=unnecessary-lambda
             backgroundLocations = baseBackgroundLocations + f2xbg
 
             # adds extra clipart ids, with absolute file references
             xca = defaultConfigSection.get('extraClipArts', '').splitlines()  # newline separated list of id, filename pairs
             fxca = list(filter(lambda ca: (len(ca) != 0), xca)) # filter out empty entries
-            f2xca = tuple(map(lambda ca: os.path.expandvars(ca), fxca)) # expand environment variables
+            f2xca = tuple(map(lambda ca: os.path.expandvars(ca), fxca)) # expand environment vars pylint: disable=unnecessary-lambda
             for ca in f2xca:
                 definition = ca.split(',')
-                if (len(definition) == 2):
+                if len(definition) == 2:
                     clipartId = int(definition[0])
                     file = definition[1].strip()
                     clipartDict[clipartId] = file
@@ -1103,8 +1092,8 @@ def convertMcf(mcfname, keepDoublePages: bool):
             pptout_rawFolder = defaultConfigSection.get('passepartoutFolders', '').splitlines()  # newline separated list of folders
             pptout_rawFolder.append(cewe_folder)    # add the base folder
             pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
-            pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment variables
-            global passepartoutFolders
+            pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment vars pylint: disable=unnecessary-lambda
+            global passepartoutFolders  # pylint: disable=global-statement
             passepartoutFolders = pptout_filtered2
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
@@ -1178,9 +1167,10 @@ def convertMcf(mcfname, keepDoublePages: bool):
             if (n == 0) or (n == pageCount - 1):
                 pageNumber = 0
                 page = [i for i in
-                        fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']") +
-                        fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
-                        if (i.find("./area") is not None)][0]
+                        fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']")
+                        + fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
+                        if (i.find("./area") is not None)
+                        ][0]
                 oddpage = (n == 0)
                 pagetype = 'cover'
                 # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
@@ -1191,10 +1181,10 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 oddpage = True
                 # Look for an empty page 0 that still contains an area element
                 page = [i for i in
-                        fotobook.findall("./page[@pagenr='0'][@type='EMPTY']") +
-                        fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
-                        if (i.find("./area") is not None)]
-                if (len(page) >= 1):
+                        fotobook.findall("./page[@pagenr='0'][@type='EMPTY']")
+                        + fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
+                        if i.find("./area") is not None]
+                if len(page) >= 1:
                     page = page[0]
                     # If there is on page 1 only text, the area-tag is still on page 0.
                     #  So this will either include the text (which is put in page 0),
@@ -1204,7 +1194,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
 
                 # Look for the the frist page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
-                if (len(realFirstPageList) > 0):
+                if len(realFirstPageList) > 0:
                     # we need to do run parseInputPage twico for one output page in the PDF.
                     # The background needs to be drawn first, or it would obscure any other other elements.
                     pagetype = 'singleside'
@@ -1218,7 +1208,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 page = getPageElementForPageNumber(fotobook, n)
                 pagetype = 'normal'
 
-            if (page is not None):
+            if page is not None:
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
                     bg_notFoundDirList, additionnal_fonts)
@@ -1235,7 +1225,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
         except Exception as ex:
             # if one page fails: continue with next one
             print('error on page %i:' % (n, ), '\n', ex.args[0])
-            exc_type, exc_obj, exc_tb = sys.exc_info()
+            exc_type, exc_obj, exc_tb = sys.exc_info() # exc_obj pylint: disable=unused-variable
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print('', (exc_type, fname, exc_tb.tb_lineno))
             traceback.print_tb(exc_tb)  # show a stack trace to see in which function the error occured

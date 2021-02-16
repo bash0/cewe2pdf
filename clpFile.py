@@ -17,7 +17,7 @@ class ClpFile(object):
         self.svgData: bytes = bytes()   # the byte representation of the SVG file
         self.pngMemFile: BytesIO = BytesIO(bytes())     # this can be used to access the buffer like a file.
 
-        if (clpFileName):
+        if clpFileName:
             self.readClp(clpFileName)
 
     def readClp(self, fileName) -> None:
@@ -35,7 +35,7 @@ class ClpFile(object):
         fileClp.close()
 
         # check the header
-        if (contents[0] != 'a'):
+        if contents[0] != 'a':
             raise Exception("A .cpl file should start with character 'a', but instead it was: {} ({})".format(contents[0], hex(ord(contents[0]))))
         # start after the header and remove all invalid characters
         invalidChars = 'ghijklmnopqrstuvwxyz'
@@ -57,7 +57,7 @@ class ClpFile(object):
         # create a byte buffer that can be used like a file and use it as the output of svg2png.
         scaledImage = self.rasterSvgData(width, height)
 
-        if (scaledImage.mode == "RGB"):
+        if scaledImage.mode == "RGB":
             # create a mask the same size as the original. For all pixels which are
             # non zero ("not used") set the mask value to the required transparency
             # L = 8-bit gray-scale
@@ -127,9 +127,9 @@ class ClpFile(object):
         # get the alpha channel
         #  if the .svg is fully filled by the mask, then only a black rectangle with RGA (=no background!) is returned.
         #  if the mask does not fully fill the mask, then an RGBA image is returned. In this case, use the alpha value directly.
-        if (maskImgPng.mode == "RGBA"):
+        if maskImgPng.mode == "RGBA":
             alphaChannel = maskImgPng.getchannel("A")
-        elif (maskImgPng.mode == "RGB"):
+        elif maskImgPng.mode == "RGB":
             # convert image to gray-scale and use that as alpha channel.
             # we need to invert, otherwise black whould be transparent.
             # normally the whole image is a black rectangle
@@ -188,7 +188,7 @@ class ClpFile(object):
         """Converts a SVG file to a CLP file.
            If outputFileCLP is left empty, a file a the same base name but .clp extension is created."""
         inFilePath = Path(inputFileSVG)
-        if (not outputFileCLP): # check for None and empty string
+        if not outputFileCLP: # check for None and empty string
             outputFileCLP = Path(inFilePath.parent).joinpath(inFilePath.stem + ".clp")
 
         # read SVG into memory

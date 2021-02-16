@@ -1,5 +1,11 @@
 # SPDX-License-Identifier:LGPL-3.0-only or GPL-3.0-only
 
+# In this file it is permitted to catch exceptions on a broad basis since there
+# are many things that can go wrong with file handling and parsing:
+#    pylint: disable=bare-except,broad-except
+# We're not quite at the level of documenting all the classes and functions yet :-)
+#    pylint: disable=missing-function-docstring,missing-class-docstring,missing-module-docstring
+
 # Copyright (c) 2020 by BarchSteel
 
 from pathlib import Path
@@ -78,7 +84,7 @@ class Passepartout(object):
         # a dictionary for passepartout element IDs to file name
         passepartoutIdDict = dict()
 
-        if (directoryList is None):
+        if directoryList is None:
             print("Error: no directories passed to Passepartout.buildElementIdIndex!")
             return passepartoutIdDict
 
@@ -94,7 +100,7 @@ class Passepartout(object):
         xmlFileList = []
         ext = ".xml"
         for path in directoryList:
-            for dirpath, dirnames, filenames in os.walk(path):
+            for dirpath, dirnames, filenames in os.walk(path): # dirnames pylint: disable=unused-variable
                 for filename in (f for f in filenames if f.endswith(ext)):
                     xmlFileList.append(os.path.join(dirpath, filename))
                     # print(os.path.join(dirpath, filename))
@@ -106,7 +112,7 @@ class Passepartout(object):
             xmlInfo = Passepartout.extractInfoFromXml(curXmlFile)
             if xmlInfo is None:
                 continue  # this .xml file is not for a passepartout, or something went wrong
-            if (xmlInfo.designElementType == 'passepartout'):
+            if xmlInfo.designElementType == 'passepartout':
                 # print("Adding passepartout to dict: {}".format(curXmlFile))
                 passepartoutIdDict[xmlInfo.designElementId] = curXmlFile
 
@@ -118,7 +124,7 @@ class Passepartout(object):
         # should not be needed: pathObj = pathObj.resolve()    # convert it to an absolute path
         basePath = pathObj.parent
         fullPath = basePath.joinpath(fileName)
-        return (str(fullPath))
+        return str(fullPath)
 
     @staticmethod
     def getClipartFullName(xmlInfo:decorationXmlInfo) -> str:
