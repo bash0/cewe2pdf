@@ -167,7 +167,7 @@ def findFileInDirs(filenames, paths):
 
 
 def getPageElementForPageNumber(fotobook, pageNumber):
-    return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2)), 'd'))
+    return fotobook.find("./page[@pagenr='{}']".format(floor(2 * (pageNumber / 2))))
 
 
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
