@@ -33,7 +33,7 @@ class Passepartout(object):
         fotoarea_y: float
 
     @staticmethod
-    def extractInfoFromXml(xmlFileName:  str):
+    def extractInfoFromXml(xmlFileName: str):
         # read information from xml file about passepartout
 
         clipArtXml = open(xmlFileName, 'rb')
@@ -71,7 +71,7 @@ class Passepartout(object):
         return None
 
     @staticmethod
-    def buildElementIdIndex(directoryList:  List[str]) -> dict:
+    def buildElementIdIndex(directoryList: List[str]) -> dict:
         # go through directories and search for .xml files and build a dictionary of
         #  designElementId to .xml file
 
@@ -97,17 +97,17 @@ class Passepartout(object):
             for dirpath, dirnames, filenames in os.walk(path):
                 for filename in (f for f in filenames if f.endswith(ext)):
                     xmlFileList.append(os.path.join(dirpath, filename))
-                    #print(os.path.join(dirpath, filename))
+                    # print(os.path.join(dirpath, filename))
         print("Found {:d} XML files.".format(len(xmlFileList)))
 
         # load each .xml file and extract the information
         for curXmlFile in xmlFileList:
-            #print("Parsing passepartout: {}".format(curXmlFile))
+            # print("Parsing passepartout: {}".format(curXmlFile))
             xmlInfo = Passepartout.extractInfoFromXml(curXmlFile)
             if xmlInfo is None:
                 continue  # this .xml file is not for a passepartout, or something went wrong
             if (xmlInfo.designElementType == 'passepartout'):
-                #print("Adding passepartout to dict: {}".format(curXmlFile))
+                # print("Adding passepartout to dict: {}".format(curXmlFile))
                 passepartoutIdDict[xmlInfo.designElementId] = curXmlFile
 
         return passepartoutIdDict
@@ -115,7 +115,7 @@ class Passepartout(object):
     @staticmethod
     def getPassepartoutFileFullName(xmlInfo:decorationXmlInfo, fileName:str) -> str:
         pathObj = Path(xmlInfo.srcXmlFile)
-        #should not be needed: pathObj = pathObj.resolve()    # convert it to an absolute path
+        # should not be needed: pathObj = pathObj.resolve()    # convert it to an absolute path
         basePath = pathObj.parent
         fullPath = basePath.joinpath(fileName)
         return (str(fullPath))

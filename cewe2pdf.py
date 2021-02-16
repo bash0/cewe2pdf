@@ -78,18 +78,18 @@ import argparse  # to parse arguments
 
 import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
 
-from clpFile import ClpFile  #for clipart .CLP and .SVG files
+from clpFile import ClpFile  # for clipart .CLP and .SVG files
 import traceback
 from passepartout import Passepartout
 
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
-#### settings ####
+# ### settings ####
 image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 image_res = 150  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
 bg_res = 100  # dpi The resolution of background images will be reduced to this value, if it is higher.
-###########
+# ##########
 
 # .mcf units are 0.1 mm
 # Tabs seem to be in 8mm pitch
@@ -111,7 +111,7 @@ pdf_flowableList = []
 clipartDict = dict()    # a dictionary for clipart element IDs to file name
 clipartPathList = tuple()
 passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
-passepartoutFolders = None #global variable with the folders for passepartout frames
+passepartoutFolders = None # global variable with the folders for passepartout frames
 
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
@@ -278,10 +278,10 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     imgCropHeight_mcfunit = areaHeight
     if not passepartoutid is None:
         print('Frames (passepartout) are not fully implemented ()', passepartoutid)
-        #re-generate the index of designElementId to .xml files, if it does not exist
-        passepartoutid = int(passepartoutid)    #we need to work with a number below
+        # re-generate the index of designElementId to .xml files, if it does not exist
+        passepartoutid = int(passepartoutid)    # we need to work with a number below
         global passepartoutDict
-        if  (passepartoutDict is None):
+        if (passepartoutDict is None):
             print("Regenerating passepartout index from .XML files.")
             global passepartoutFolders
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
@@ -301,7 +301,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             # draw the passepartout clipart file.
             # ToDo: apply the masking
             frameAlpha = 255
-            #Adjust the position of the real image depending on the frame
+            # Adjust the position of the real image depending on the frame
             frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
             frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
             imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
@@ -317,8 +317,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # because the CEWE software doesn't allow the creation of such parameters that would result in them.
     # For frames, the situation might arrise, but then the mask is applied.
 
-    #first calcualte cropping coordinate for normal case
-    cropLeft =  int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale)
+    # first calcualte cropping coordinate for normal case
+    cropLeft = int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale)
     cropUpper = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale)
     cropRight = int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale + imgCropWidth_mcfunit / imScale)
     cropLower = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale + imgCropHeight_mcfunit / imScale)
@@ -342,7 +342,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             (new_w, new_h), PIL.Image.ANTIALIAS)
     im.load()
 
-    #apply the frame mask from the passepartout to the image
+    # apply the frame mask from the passepartout to the image
     if not (maskClipartFileName is None):
         maskClp = loadClipart(maskClipartFileName)
         im = maskClp.applyAsAlphaMaskToFoto(im)
@@ -359,9 +359,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     # place image
     print('image', imageTag.get('filename'))
-    pdf.translate(img_transx, transy)   #we need to go to the center for correct rotation
-    pdf.rotate(-areaRot)   #rotation around center of area
-    #calculate the non-symmetric shift of the center, given the left pos and the width.
+    pdf.translate(img_transx, transy)   # we need to go to the center for correct rotation
+    pdf.rotate(-areaRot)   # rotation around center of area
+    # calculate the non-symmetric shift of the center, given the left pos and the width.
     frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
     frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
     pdf.translate(frameShiftX_mcf * f, -frameShiftY_mcf * f) # for adjustments from passepartout
@@ -371,9 +371,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
                     width=f * imgCropWidth_mcfunit,
                     height=f * imgCropHeight_mcfunit,
                     mask='auto')
-    pdf.translate(-frameShiftX_mcf * f,  frameShiftY_mcf * f) # for adjustments from passepartout
+    pdf.translate(-frameShiftX_mcf * f, frameShiftY_mcf * f) # for adjustments from passepartout
 
-    #we need to draw our passepartout after the real image, so it overlays it.
+    # we need to draw our passepartout after the real image, so it overlays it.
     if not (frameClipartFileName is None):
         # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
         # already has these transformations applied. So don't do it twice.
@@ -716,7 +716,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                 else:
                     print('Ignoring unhandled tag ' + item.tag)
 
-            #try to create a paragraph with the current text and style. Catch errors.
+            # try to create a paragraph with the current text and style. Catch errors.
             try:
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
@@ -728,12 +728,11 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                 print('', (exc_type, fname, exc_tb.tb_lineno))
 
-
     # Add a frame object that can contain multiple paragraphs
-    leftPad =   f * tablelmarg
-    rightPad =  f * tablermarg
+    leftPad = f * tablelmarg
+    rightPad = f * tablermarg
     bottomPad = f * tablebmarg
-    topPad =    f * tabletmarg
+    topPad = f * tabletmarg
     frameWidth = f * areaWidth
     frameHeight = f * areaHeight
     frameBottomLeft_x = -0.5 * frameWidth
@@ -754,7 +753,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         if neededTextWidth > availableTextWidth:
             # I have never seen this happen, but check anyway
             print('Warning: A set of paragraphs too wide for its frame. INTERNAL ERROR!')
-            finalTotalWidth = neededTextWidth + leftPad + rightPad 
+            finalTotalWidth = neededTextWidth + leftPad + rightPad
 
     if finalTotalHeight > frameHeight:
         # One of the possible causes here is that wrap function has used an extra line (because
@@ -791,7 +790,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     pdf.translate(-transx, -transy)
     return
 
-def loadClipart(fileName) -> ClpFile :
+def loadClipart(fileName) -> ClpFile:
     """Tries to load a clipart file. Either from .CLP or .SVG file
     returns a clpFile object"""
     newClpFile = ClpFile("")
@@ -802,7 +801,7 @@ def loadClipart(fileName) -> ClpFile :
             filePath = filePath.parent.joinpath(filePath.stem+".clp")
             if not filePath.exists():
                 print("Error: missing .clp: {}".format(fileName))
-                return ClpFile("")   #return an empty ClpFile
+                return ClpFile("")   # return an empty ClpFile
     else:
         pathObj = Path(fileName)
         baseFileName = pathObj.stem
@@ -811,7 +810,7 @@ def loadClipart(fileName) -> ClpFile :
             filePath = Path(filePath)
         except Exception as ex:
             print("Error: {}, {}".format(baseFileName, ex))
-            return ClpFile("")   #return an empty ClpFile
+            return ClpFile("")   # return an empty ClpFile
 
     if (filePath.suffix == '.clp'):
         newClpFile.readClp(filePath)
@@ -822,13 +821,13 @@ def loadClipart(fileName) -> ClpFile :
 
 def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha):
     clipartID = int(clipartElement.get('designElementId'))
-    #print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
+    # print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
 
-    #designElementId 0 seems to be a special empty placeholder
+    # designElementId 0 seems to be a special empty placeholder
     if (clipartID == 0):
         return
 
-    #Load the clipart
+    # Load the clipart
     fileName = None
     if clipartID in clipartDict:
         fileName = clipartDict[clipartID]
@@ -843,7 +842,7 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
             for clipcolor in clipcolors.findall('color'):
                 source = '#'+clipcolor.get('source').upper()[3:9]
                 target = '#'+clipcolor.get('target').upper()[3:9]
-                replacement = (source,target)
+                replacement = (source, target)
                 colorreplacements.append(replacement)
 
     insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot)
@@ -851,7 +850,7 @@ def processAreaClipartTag(clipartElement, area, areaHeight, areaRot, areaWidth, 
 def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot):
     img_transx = transx
 
-    res = image_res #use the foreground resolution setting for clipart
+    res = image_res # use the foreground resolution setting for clipart
 
     # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
     new_w = int(0.5 + areaWidth * res / 254.)
@@ -866,7 +865,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     if len(colorreplacements) > 0:
         clipart.replaceColors(colorreplacements)
 
-    clipart.convertToPngInBuffer(new_w, new_h, alpha)  #so we can access the pngMemFile later
+    clipart.convertToPngInBuffer(new_w, new_h, alpha)  # so we can access the pngMemFile later
 
     # place image
     print('Clipart file:', fileName)
@@ -973,7 +972,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
 def getBaseClipartLocations(baseFolder):
     # create a tuple of places (folders) where background resources would be found by default
     baseClipartLocations = (
-        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations'),   #trailing comma is important to make a 1-element tuple
+        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations'),   # trailing comma is important to make a 1-element tuple
 #        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'form_frames'),
 #        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'frame_frames')
     )
@@ -984,7 +983,7 @@ def readClipArtConfigXML(baseFolder):
     currently only cliparts_default.xml is supported !"""
     global clipartPathList
     clipartPathList = getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
-    xmlConfigFileName='cliparts_default.xml'
+    xmlConfigFileName = 'cliparts_default.xml'
     try:
         xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
     except Exception as ex:
@@ -999,7 +998,7 @@ def readClipArtConfigXML(baseFolder):
     for decoration in xmlInfo.findall('decoration'):
         clipartElement = decoration.find('clipart')
         fileName = clipartElement.get('file')
-        designElementId = int(clipartElement.get('designElementId'))    #assume these IDs are always integers.
+        designElementId = int(clipartElement.get('designElementId'))    # assume these IDs are always integers.
         clipartDict[designElementId] = fileName
     return
 
@@ -1053,7 +1052,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
     # find cewe folder using the original cewe_folder.txt file
     try:
         configFolderFileName = findFileInDirs(
-            'cewe_folder.txt', (mcfBaseFolder,  os.path.curdir))
+            'cewe_folder.txt', (mcfBaseFolder, os.path.curdir))
         cewe_file = open(configFolderFileName, 'r')
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
@@ -1071,7 +1070,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
             print('Cannot find cewe installation folder cewe_folder from cewe2pdf.ini')
             cewe_folder = None
         else:
-            #Give the user feedback which config-file is used, in case there is a problem.
+            # Give the user feedback which config-file is used, in case there is a problem.
             print('\n'.join(map('Used configuration in: {}'.format, filesread)))
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
@@ -1099,10 +1098,9 @@ def convertMcf(mcfname, keepDoublePages: bool):
                     file = definition[1].strip()
                     clipartDict[clipartId] = file
 
-
-             # read passepartout folders and substitute environment variables
+            # read passepartout folders and substitute environment variables
             pptout_rawFolder = defaultConfigSection.get('passepartoutFolders', '').splitlines()  # newline separated list of folders
-            pptout_rawFolder.append(cewe_folder)    #add the base folder
+            pptout_rawFolder.append(cewe_folder)    # add the base folder
             pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
             pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment variables
             global passepartoutFolders
@@ -1113,7 +1111,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
     # Load additionnal fonts
     additionnal_fonts = {}
     try:
-        configFontFileName = findFileInDirs('additional_fonts.txt', (mcfBaseFolder,  os.path.curdir))
+        configFontFileName = findFileInDirs('additional_fonts.txt', (mcfBaseFolder, os.path.curdir))
         with open(configFontFileName, 'r') as fp:
             for line in fp:
                 p = line.split(" = ", 1)
@@ -1137,11 +1135,10 @@ def convertMcf(mcfname, keepDoublePages: bool):
     for curFontName in list(additionnal_fonts):
         try:
             pdfmetrics.registerFont(TTFont(curFontName, additionnal_fonts[curFontName]))
-            print("Successfully registered '%s' from '%s'" %(curFontName, additionnal_fonts[curFontName]))
+            print("Successfully registered '%s' from '%s'" % (curFontName, additionnal_fonts[curFontName]))
         except:
-            print("Failed to register font '%s' (from %s)" %(curFontName, additionnal_fonts[curFontName]))
-            del additionnal_fonts[curFontName]    #remove this item from the font list, so it won't be used later and cause problems.
-
+            print("Failed to register font '%s' (from %s)" % (curFontName, additionnal_fonts[curFontName]))
+            del additionnal_fonts[curFontName]    # remove this item from the font list, so it won't be used later and cause problems.
 
     if defaultConfigSection != None:
         # the reportlab manual says:
@@ -1172,7 +1169,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
     pageCount = int(articleConfigElement.get('normalpages')) + 2    # maximum number of pages
     imagedir = fotobook.get('imagedir')
 
-    #generate a list of available clip-arts
+    # generate a list of available clip-arts
     readClipArtConfigXML(cewe_folder)
 
     for n in range(pageCount):
@@ -1202,7 +1199,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
                     #  So this will either include the text (which is put in page 0),
                     #  or the packground which is put in page 1.
                 else:
-                    page = None #if we find no empty page with an area tag, we need to set this to None to prevent an exception later.
+                    page = None # if we find no empty page with an area tag, we need to set this to None to prevent an exception later.
 
                 # Look for the the frist page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
@@ -1223,7 +1220,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
 
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
-            if ( (keepDoublePages == False)
+            if ((keepDoublePages == False)
                 or (
                     (not (keepDoublePages == True and oddpage == True and pagetype == 'normal'))
                 and (not (keepDoublePages == True and n == (pageCount - 1) and pagetype == 'cover'))
