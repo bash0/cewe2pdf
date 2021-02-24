@@ -22,6 +22,7 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".flake8" />
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
     <Content Include="build_a_compiled_version.md" />
@@ -57,4 +58,41 @@
     <InterpreterReference Include="CondaEnv|CondaEnv|anaconda3" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <PropertyGroup>
+    <PythonCommands>
+      $(PythonCommands);
+      RunFlake8Command;
+    </PythonCommands>
+	<!-- A typical flake8 message has this format: -->
+	<!--  .\passepartout.py:36:40: E241 multiple spaces after ':' -->
+	<!--I have been unable to get the message number (code) to appear separately in
+		the VS Error List window and have therefore included it in the message section.
+		I've looked at
+		  https://github.com/microsoft/PTVS/blob/81762d2f2c259b39c46c9ea6d3968c2ec065e370/Python/Product/PythonTools/PythonTools/Project/CustomCommand.cs#L329
+		and I don't believe the code is ever actually used even if the regex locates it!
+		-->
+    <Flake8ErrorRegex>
+      <![CDATA[^(?<filename>.+):(?<line>\d+):(?<column>\d+): (?<message>E\d+ .+)$]]>
+    </Flake8ErrorRegex>
+    <Flake8WarningRegex>
+      <![CDATA[^(?<filename>.+):(?<line>\d+):(?<column>\d+): (?<message>W\d+ .+)$]]>
+    </Flake8WarningRegex>
+    <Flake8MessageRegex>
+      <![CDATA[^(?<filename>.+):(?<line>\d+):(?<column>\d+): (?<message>F\d+ .+)$]]>
+    </Flake8MessageRegex>
+  </PropertyGroup>
+  <Target Name="RunFlake8Command" Label="Run Flake8" Returns="@(Commands)">
+    <CreatePythonCommandItem Target="flake8" 
+		TargetType="module" 
+		Arguments="" 
+		WorkingDirectory="$(MSBuildProjectDirectory)" 
+		ExecuteIn="output" 
+		RequiredPackages="flake8"
+		ErrorRegex="$(Flake8ErrorRegex)"
+		WarningRegex="$(Flake8WarningRegex)"
+		MessageRegex="$(Flake8MessageRegex)"
+		>
+      <Output TaskParameter="Command" ItemName="Commands" />
+    </CreatePythonCommandItem>
+  </Target>
 </Project>

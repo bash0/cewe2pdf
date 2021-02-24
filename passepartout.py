@@ -1,5 +1,11 @@
 # SPDX-License-Identifier:LGPL-3.0-only or GPL-3.0-only
 
+# In this file it is permitted to catch exceptions on a broad basis since there
+# are many things that can go wrong with file handling and parsing:
+#    pylint: disable=bare-except,broad-except
+# We're not quite at the level of documenting all the classes and functions yet :-)
+#    pylint: disable=missing-function-docstring,missing-class-docstring,missing-module-docstring
+
 # Copyright (c) 2020 by BarchSteel
 
 from pathlib import Path
@@ -33,13 +39,13 @@ class Passepartout(object):
         fotoarea_y: float
 
     @staticmethod
-    def extractInfoFromXml(xmlFileName:  str):
+    def extractInfoFromXml(xmlFileName: str):
         # read information from xml file about passepartout
 
         clipArtXml = open(xmlFileName, 'rb')
         try:
             xmlInfo = etree.parse(xmlFileName)
-        except:
+        except: # noqa: E722
             print("Error while parsing. Maybe not valid XML:{}".format(xmlFileName))
             return None
         finally:
@@ -71,14 +77,14 @@ class Passepartout(object):
         return None
 
     @staticmethod
-    def buildElementIdIndex(directoryList:  List[str]) -> dict:
+    def buildElementIdIndex(directoryList: List[str]) -> dict:
         # go through directories and search for .xml files and build a dictionary of
         #  designElementId to .xml file
 
         # a dictionary for passepartout element IDs to file name
         passepartoutIdDict = dict()
 
-        if (directoryList is None):
+        if directoryList is None:
             print("Error: no directories passed to Passepartout.buildElementIdIndex!")
             return passepartoutIdDict
 
@@ -94,20 +100,20 @@ class Passepartout(object):
         xmlFileList = []
         ext = ".xml"
         for path in directoryList:
-            for dirpath, dirnames, filenames in os.walk(path):
+            for dirpath, dirnames, filenames in os.walk(path): # dirnames pylint: disable=unused-variable
                 for filename in (f for f in filenames if f.endswith(ext)):
                     xmlFileList.append(os.path.join(dirpath, filename))
-                    #print(os.path.join(dirpath, filename))
+                    # print(os.path.join(dirpath, filename))
         print("Found {:d} XML files.".format(len(xmlFileList)))
 
         # load each .xml file and extract the information
         for curXmlFile in xmlFileList:
-            #print("Parsing passepartout: {}".format(curXmlFile))
+            # print("Parsing passepartout: {}".format(curXmlFile))
             xmlInfo = Passepartout.extractInfoFromXml(curXmlFile)
             if xmlInfo is None:
                 continue  # this .xml file is not for a passepartout, or something went wrong
-            if (xmlInfo.designElementType == 'passepartout'):
-                #print("Adding passepartout to dict: {}".format(curXmlFile))
+            if xmlInfo.designElementType == 'passepartout':
+                # print("Adding passepartout to dict: {}".format(curXmlFile))
                 passepartoutIdDict[xmlInfo.designElementId] = curXmlFile
 
         return passepartoutIdDict
@@ -115,10 +121,10 @@ class Passepartout(object):
     @staticmethod
     def getPassepartoutFileFullName(xmlInfo:decorationXmlInfo, fileName:str) -> str:
         pathObj = Path(xmlInfo.srcXmlFile)
-        #should not be needed: pathObj = pathObj.resolve()    # convert it to an absolute path
+        # should not be needed: pathObj = pathObj.resolve()    # convert it to an absolute path
         basePath = pathObj.parent
         fullPath = basePath.joinpath(fileName)
-        return (str(fullPath))
+        return str(fullPath)
 
     @staticmethod
     def getClipartFullName(xmlInfo:decorationXmlInfo) -> str:

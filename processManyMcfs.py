@@ -1,13 +1,17 @@
 # eg python processManyMcfs.py D:\Users\fred\albums\PhotoAlbum*.mcf
+
+# We're not quite at the level of documenting all the classes and functions yet :-)
+#    pylint: disable=missing-function-docstring,missing-class-docstring,missing-module-docstring
+
 import sys
 from glob import glob
 from cewe2pdf import convertMcf
 
 
 def printFileName(filename):
-    print
+    print()
     print("--------------------------->" + filename)
-    resultFlag = convertMcf(filename, False)
+    convertMcf(filename, False) # throwing away the result
 
 
 def main():
