@@ -88,7 +88,7 @@ class ClpFile(object):
         # create a byte buffer that can be used like a file and use it as the output of svg2png.
         tmpMemFile = BytesIO()
         # Step 1.
-        cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile)
+        cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile, unsafe=True)
         tmpMemFile.seek(0)
         tempImage = PIL.Image.open(tmpMemFile)
         origWidth = tempImage.width
@@ -99,7 +99,7 @@ class ClpFile(object):
         # Step 3.
         scaleMax = max(scale_x, scale_y)
         tmpMemFile = BytesIO()
-        cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile, scale=scaleMax)
+        cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile, scale=scaleMax, unsafe=True)
         # Step 4.
         tmpMemFile.seek(0)
         tempImage = PIL.Image.open(tmpMemFile)
