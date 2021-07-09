@@ -39,7 +39,14 @@ class Passepartout(object):
         fotoarea_y: float
 
     @staticmethod
-    def extractInfoFromXml(xmlFileName: str):
+    def extractInfoFromXml(xmlFileName: str, passepartoutid: int):
+        for xmlInfo in Passepartout.extractAllInfosFromXml(xmlFileName):
+            if xmlInfo.designElementId == passepartoutid:
+                return xmlInfo
+        return None
+
+    @staticmethod
+    def extractAllInfosFromXml(xmlFileName: str):
         # read information from xml file about passepartout
 
         clipArtXml = open(xmlFileName, 'rb')
@@ -85,7 +92,7 @@ class Passepartout(object):
                 fotoarea_x = None
                 fotoarea_y = None
 
-            return Passepartout.decorationXmlInfo(xmlFileName, designElementId, decoration_id, decoration_type,
+            yield Passepartout.decorationXmlInfo(xmlFileName, designElementId, decoration_id, decoration_type,
                             designElementType, maskFile, clipartFile,
                             fotoarea_height, fotoarea_width, fotoarea_x, fotoarea_y)
         return None
@@ -123,12 +130,12 @@ class Passepartout(object):
         # load each .xml file and extract the information
         for curXmlFile in xmlFileList:
             # print("Parsing passepartout: {}".format(curXmlFile))
-            xmlInfo = Passepartout.extractInfoFromXml(curXmlFile)
-            if xmlInfo is None:
-                continue  # this .xml file is not for a passepartout, or something went wrong
-            if xmlInfo.designElementType == 'passepartout':
-                # print("Adding passepartout to dict: {}".format(curXmlFile))
-                passepartoutIdDict[xmlInfo.designElementId] = curXmlFile
+            for xmlInfo in Passepartout.extractAllInfosFromXml(curXmlFile):
+                if xmlInfo is None:
+                    continue  # this .xml file is not for a passepartout, or something went wrong
+                if xmlInfo.designElementType == 'passepartout':
+                    # print("Adding passepartout to dict: {}".format(curXmlFile))
+                    passepartoutIdDict[xmlInfo.designElementId] = curXmlFile
 
         return passepartoutIdDict
 
@@ -157,7 +164,7 @@ if __name__ == '__main__':
         [r"C:\ProgramData\hps\1320",
          "C:/Program Files/dm/dm-Fotowelt/Resources/photofun/decorations"])
     testId = 125186
-    testXmlInfo = Passepartout.extractInfoFromXml(myDict[testId])
+    testXmlInfo = Passepartout.extractInfoFromXml(myDict[testId], testId)
     print(testId)
     print(testXmlInfo)
     print(Passepartout.getClipartFullName(testXmlInfo))

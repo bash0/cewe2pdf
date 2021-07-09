@@ -300,7 +300,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             print("Error can't find passepartout for {}".format(passepartoutid))
         else:
             pptXmlFileName = passepartoutDict[passepartoutid]
-            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName)
+            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName, passepartoutid)
             frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
             maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
             print("Using clipart file: {}".format(frameClipartFileName))
@@ -1066,7 +1066,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
 
         dotMcfPath = os.path.expanduser("~/.mcf/hps/");
         if os.path.exists(dotMcfPath):
-            passepartoutFolders = glob.glob(dotMcfPath + "/*/addons/")
+            passepartoutFolders = glob.glob(dotMcfPath + "/*/addons/") + [cewe_folder + "Resources/photofun/decorations"]
             backgroundLocations = backgroundLocations + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/backgrounds/")) + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/"))
     except: # noqa: E722
         print('Cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
