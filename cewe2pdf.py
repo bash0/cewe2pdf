@@ -308,10 +308,11 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             # ToDo: apply the masking
             frameAlpha = 255
             # Adjust the position of the real image depending on the frame
-            frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
-            frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
-            imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
-            imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
+            if pptXmlInfo.fotoarea_x is not None:
+                frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
+                frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
+                imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
+                imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
 
     # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
     # to get from .mcf units are divided by the scale factor to get to image pixel units.

@@ -52,24 +52,38 @@ class Passepartout(object):
             clipArtXml.close()
 
         for decoration in xmlInfo.findall('decoration'):
-            # assume these IDs are always integers.
-            designElementId = decoration.get('designElementId')
-            if designElementId is None:
-                continue
-            designElementId = int(designElementId)
             decoration_id = decoration.get('id')
             decoration_type = decoration.get('type')
             # decoration_type is often "fading", so typeElement is then looking for <fading .../>
             typeElement = decoration.find(decoration_type)
+            if typeElement is None:
+                continue;
+            # assume these IDs are always integers.
+            designElementId = decoration.get('designElementId')
+            if designElementId is None:
+                designElementId = typeElement.get('designElementId')
+                if designElementId is None:
+                    continue
+            designElementId = int(designElementId)
+
             designElementType = typeElement.get('designElementType')
             maskFile = typeElement.get('file')
             clipartElement = typeElement.find('clipart')
-            clipartFile = clipartElement.get('file')
+            if clipartElement is not None:
+                clipartFile = clipartElement.get('file')
+            else:
+                clipartFile = None
             fotoareaElement = typeElement.find('fotoarea')
-            fotoarea_height = float(fotoareaElement.get('height'))
-            fotoarea_width = float(fotoareaElement.get('width'))
-            fotoarea_x = float(fotoareaElement.get('x'))
-            fotoarea_y = float(fotoareaElement.get('y'))
+            if fotoareaElement is not None:
+                fotoarea_height = float(fotoareaElement.get('height'))
+                fotoarea_width = float(fotoareaElement.get('width'))
+                fotoarea_x = float(fotoareaElement.get('x'))
+                fotoarea_y = float(fotoareaElement.get('y'))
+            else:
+                fotoarea_height = None
+                fotoarea_width = None
+                fotoarea_x = None
+                fotoarea_y = None
 
             return Passepartout.decorationXmlInfo(xmlFileName, designElementId, decoration_id, decoration_type,
                             designElementType, maskFile, clipartFile,
@@ -120,6 +134,8 @@ class Passepartout(object):
 
     @staticmethod
     def getPassepartoutFileFullName(xmlInfo:decorationXmlInfo, fileName:str) -> str:
+        if fileName is None:
+            return None
         pathObj = Path(xmlInfo.srcXmlFile)
         # should not be needed: pathObj = pathObj.resolve()    # convert it to an absolute path
         basePath = pathObj.parent
