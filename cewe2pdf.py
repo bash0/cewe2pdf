@@ -51,6 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # extend the search path so Cairo will find its dlls.
 # only needed when the program is frozen (i.e. compiled).
 import sys
+import glob
 import logging
 import os.path
 import os
@@ -982,13 +983,25 @@ def readClipArtConfigXML(baseFolder):
         print('Cliparts will not be available.')
         return
 
+    loadClipartConfigXML(xmlFileName)
+
+def readClipArtDownloads():
+    dotMcfPath = os.path.expanduser("~/.mcf/hps/");
+    if not os.path.exists(dotMcfPath):
+        print("~/.mcf not found")
+        return
+
+    for file in glob.glob(dotMcfPath + "/*/addons/*/cliparts/v1/decorations/*.xml"):
+        loadClipartConfigXML(file)
+
+def loadClipartConfigXML(xmlFileName):
     clipArtXml = open(xmlFileName, 'rb')
     xmlInfo = etree.parse(xmlFileName)
     clipArtXml.close()
 
     for decoration in xmlInfo.findall('decoration'):
         clipartElement = decoration.find('clipart')
-        fileName = clipartElement.get('file')
+        fileName = os.path.join(os.path.dirname(xmlFileName), clipartElement.get('file'))
         designElementId = int(clipartElement.get('designElementId'))    # assume these IDs are always integers.
         clipartDict[designElementId] = fileName
     return
@@ -1161,6 +1174,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
 
     # generate a list of available clip-arts
     readClipArtConfigXML(cewe_folder)
+    readClipArtDownloads()
 
     for n in range(pageCount):
         try:
