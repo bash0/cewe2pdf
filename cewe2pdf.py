@@ -1037,6 +1037,7 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
 
 
 def convertMcf(mcfname, keepDoublePages: bool):
+    global passepartoutFolders  # pylint: disable=global-statement
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
     mcfBaseFolder = str(mcfPathObj.parent)
@@ -1062,6 +1063,10 @@ def convertMcf(mcfname, keepDoublePages: bool):
         cewe_file.close()
         baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
         backgroundLocations = baseBackgroundLocations
+
+        dotMcfPath = os.path.expanduser("~/.mcf/hps/");
+        if os.path.exists(dotMcfPath):
+            passepartoutFolders = glob.glob(dotMcfPath + "/*/addons/")
     except: # noqa: E722
         print('Cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
@@ -1107,7 +1112,6 @@ def convertMcf(mcfname, keepDoublePages: bool):
             pptout_rawFolder.append(cewe_folder)    # add the base folder
             pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
             pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment vars pylint: disable=unnecessary-lambda
-            global passepartoutFolders  # pylint: disable=global-statement
             passepartoutFolders = pptout_filtered2
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
