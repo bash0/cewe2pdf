@@ -1067,6 +1067,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
         dotMcfPath = os.path.expanduser("~/.mcf/hps/");
         if os.path.exists(dotMcfPath):
             passepartoutFolders = glob.glob(dotMcfPath + "/*/addons/")
+            backgroundLocations = backgroundLocations + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/backgrounds/")) + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/"))
     except: # noqa: E722
         print('Cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
