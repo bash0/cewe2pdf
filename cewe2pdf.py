@@ -303,7 +303,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName, passepartoutid)
             frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
             maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
-            print("Using clipart file: {}".format(frameClipartFileName))
+            print("Using mask file: {}".format(maskClipartFileName))
             # draw the passepartout clipart file.
             # ToDo: apply the masking
             frameAlpha = 255
