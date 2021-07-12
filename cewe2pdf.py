@@ -456,7 +456,7 @@ def Dequote(s):
     return s
 
 
-def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs, bweight):
+def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
     spanfont = dfltfont
     spanfs = dfltfs
     spanweight = bweight
@@ -466,7 +466,7 @@ def CollectFontInfo(item, pdf, additionnal_fonts, dfltfont, dfltfs, bweight):
         spanfamily = spanstyle['font-family'].strip("'")
         if spanfamily in pdf.getAvailableFonts():
             spanfont = spanfamily
-        elif spanfamily in additionnal_fonts:
+        elif spanfamily in additional_fonts:
             spanfont = spanfamily
         if spanfamily != spanfont:
             print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
@@ -517,8 +517,8 @@ def AppendSpanEnd(paragraphText, weight, style, outerstyle):
     return paragraphText
 
 
-def AppendItemTextInStyle(paragraphText, text, item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, bgColorAttrib):
-    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additionnal_fonts, bodyfont, bodyfs, bweight)
+def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle, bgColorAttrib):
+    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additional_fonts, bodyfont, bodyfs, bweight)
     paragraphText = AppendSpanStart(paragraphText, bgColorAttrib, pfont, pfs, pweight, pstyle, bstyle)
     if text is None:
         paragraphText = AppendText(paragraphText, "")
@@ -578,7 +578,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
 
 
-def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
+def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
     # note: it would be better to use proper html processing here
     htmlxml = etree.XML(textTag.text)
     body = htmlxml.find('.//body')
@@ -590,7 +590,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
     family = bstyle['font-family'].strip("'")
     if family in pdf.getAvailableFonts():
         bodyfont = family
-    elif family in additionnal_fonts:
+    elif family in additional_fonts:
         bodyfont = family
     else:
         bodyfont = 'Helvetica'
@@ -646,7 +646,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
         if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
-                additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
             pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
@@ -666,11 +666,11 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
                     paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf,
-                        additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                        additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
 
                 elif item.tag == 'span':
                     span = item
-                    spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additionnal_fonts, bodyfont, bodyfs, bweight)
+                    spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additional_fonts, bodyfont, bodyfs, bweight)
 
                     if spanfs > maxfs:
                         maxfs = spanfs
@@ -695,7 +695,7 @@ def processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, ar
                             paragraphText = '<para autoLeading="max">'
                             # now add the tail text of each br in the span style
                             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf,
-                                additionnal_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                                additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
@@ -869,7 +869,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     pdf.translate(-img_transx, -transy)
 
 
-def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw):
+def processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw):
     if keepDoublePages and oddpage == 1 and pagetype == 'normal':
         # if we are in double-page mode, all the images are already drawn by the even pages.
         return
@@ -914,7 +914,7 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
 
         # process text
         for textTag in area.findall('text'):
-            processAreaTextTag(textTag, additionnal_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
+            processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
 
         # Clip-Art
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
@@ -933,7 +933,7 @@ def processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfB
 
 def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
         page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
-        bg_notFoundDirList, additionnal_fonts):
+        bg_notFoundDirList, additional_fonts):
     print('parsing page', page.get('pagenr'), ' of ', pageCount)
 
     bundlesize = page.find("./bundlesize")
@@ -960,7 +960,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw)
 
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
-    processElements(additionnal_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw)
+    processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw)
 
 def getBaseClipartLocations(baseFolder):
     # create a tuple of places (folders) where background resources would be found by default
@@ -1109,8 +1109,8 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
-    # Load additionnal fonts
-    additionnal_fonts = {}
+    # Load additional fonts
+    additional_fonts = {}
     try:
         configFontFileName = findFileInDirs('additional_fonts.txt', (mcfBaseFolder, os.path.curdir))
         with open(configFontFileName, 'r') as fp:
@@ -1118,10 +1118,10 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
                 p = line.split(" = ", 1)
                 fontname = p[0]
                 fontfile = os.path.expandvars(p[1].strip())
-                additionnal_fonts[fontname] = fontfile
+                additional_fonts[fontname] = fontfile
             fp.close()
     except: # noqa: E722
-        print('cannot find additionnal fonts (define them in additional_fonts.txt)')
+        print('cannot find additional fonts (define them in additional_fonts.txt)')
         print('Content example:')
         print('Vera = /tmp/vera.ttf')
         print('Separator is " = " (space equal space)')
@@ -1132,14 +1132,14 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
         pagesize = formats[fotobook.get('productname')]
     pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
 
-    # Add additionnal fonts. We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
-    for curFontName in list(additionnal_fonts):
+    # Add additional fonts. We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
+    for curFontName in list(additional_fonts):
         try:
-            pdfmetrics.registerFont(TTFont(curFontName, additionnal_fonts[curFontName]))
-            print("Successfully registered '%s' from '%s'" % (curFontName, additionnal_fonts[curFontName]))
+            pdfmetrics.registerFont(TTFont(curFontName, additional_fonts[curFontName]))
+            print("Successfully registered '%s' from '%s'" % (curFontName, additional_fonts[curFontName]))
         except:# noqa: E722
-            print("Failed to register font '%s' (from %s)" % (curFontName, additionnal_fonts[curFontName]))
-            del additionnal_fonts[curFontName]    # remove this item from the font list, so it won't be used later and cause problems.
+            print("Failed to register font '%s' (from %s)" % (curFontName, additional_fonts[curFontName]))
+            del additional_fonts[curFontName]    # remove this item from the font list, so it won't be used later and cause problems.
 
     if defaultConfigSection is not None:
         # the reportlab manual says:
@@ -1211,7 +1211,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
                     pagetype = 'singleside'
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
-                        bg_notFoundDirList, additionnal_fonts)
+                        bg_notFoundDirList, additional_fonts)
                 pagetype = 'emptypage'
             else:
                 pageNumber = n
@@ -1225,7 +1225,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
             if page is not None:
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
-                    bg_notFoundDirList, additionnal_fonts)
+                    bg_notFoundDirList, additional_fonts)
 
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
