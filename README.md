@@ -16,10 +16,10 @@ Install - Windows
 -----------------
 Download or clone this cewe2pdf repository into a folder of your choice.
 
-The easiest way to start this Python script, is to install the latest pyhthon version.
+The easiest way to start this Python script, is to install the latest python version.
 Then from the start-menu open your pyhthon promt and install the dependencies
 ```
-pip install lxml reportlab pillow cairosvg
+pip install lxml reportlab pillow cairosvg fonttools
 ```
 
 If you have installed the Anaconda Pyhton distribution, there is one catch:
@@ -35,7 +35,7 @@ Make sure you have all the dependencies installed by executing:
 ```
 conda install lxml
 conda uninstall reportlab pillow
-pip install reportlab pillow
+pip install reportlab pillow fonttools
 ```
 There does not appear to be a "binaries only" installation for GTK+ or Cairographics, which means you'll have to build it yourself.
 
@@ -61,19 +61,6 @@ extraBackgroundFolders =
 fontFamilies =
 	Bodoni,Bodoni,BodoniB,BodoniI,BodoniBI
 ```
-Create another text file called ``additional_fonts.txt``; this can be left empty but to get the correct fonts in the pdf you should specify them here. The example below defines the fonts for the unit test:
-```
-Arial = C:\WINDOWS\FONTS\ARIAL.TTF
-Arial Rounded MT Bold = C:\WINDOWS\FONTS\ARLRDBD.TTF
-Bodoni = C:\Windows\Fonts\BOD_R.TTF
-BodoniB = C:\Windows\Fonts\BOD_B.TTF
-BodoniI = C:\Windows\Fonts\BOD_I.TTF
-BodoniBI = C:\Windows\Fonts\BOD_BI.TTF
-Stafford = C:\Windows\Fonts\times.ttf
-CalligraphScript = C:\Windows\Fonts\PALSCRI.TTF
-FranklinGothic = C:\Windows\Fonts\framd.ttf
-Calibri = C:\Windows\Fonts\calibri.ttf
-```
 
 Install - Linux
 ---------------
@@ -84,7 +71,7 @@ Ensure the python dependancies are installed.
 
 On Fedora :
 ```
-sudo dnf install python2-lxml python2-reportlab cairosvg
+sudo dnf install python2-lxml python2-reportlab cairosvg fonttools
 ```
 
 Define the CEWE path (the directory where your CEWE album software is installed. You can recognize it by the many `.so` files and some subdirs like `Resources`). Put this directory name into a file named `cewe_folder.txt`.
@@ -99,14 +86,30 @@ Example with my CEWE software in /opt/CEWE :
 echo "/opt/CEWE" > cewe_folder.txt
 ```
 
-Define some additional fonts (`name = /path/to/file.ttf`) into a file named `additional_fonts.txt`
+Install - additional_fonts.txt
+------------------------------
+Create another text file called ``additional_fonts.txt``.
+This can be left empty, but to get the correct fonts in the pdf you should specify them here.
+
+Add single font files or whole directories with `.ttf` files in it:
+
+Windows font file and directory paths:
+```
+C:\Windows\Fonts\BOD_R.TTF
+C:\Windows\Fonts\
+```
+
+Example for linux font file and directory paths:
+```
+/usr/share/fonts/truetype/lato/Lato-Heavy.ttf
+/home/myusername/.local/share/fonts/
+```
 
 This will create an empty file :
 ```
 touch additional_fonts.txt
 ```
 
-You can edit additional_fonts.txt and add the fonts you want.
 
 Install - continued
 -------------------
