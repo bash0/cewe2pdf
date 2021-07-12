@@ -1036,7 +1036,7 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
         print('Could not extract keyAccount tag in file: {}, reason {}'.format(keyAccountFileName, ex))
 
 
-def convertMcf(mcfname, keepDoublePages: bool):
+def convertMcf(mcfname, keepDoublePages: bool, pageNumbers):
     global passepartoutFolders  # pylint: disable=global-statement
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
@@ -1212,9 +1212,9 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 else:
                     page = None # if we find no empty page with an area tag, we need to set this to None to prevent an exception later.
 
-                # Look for the the frist page and set it up for processing
+                # Look for the the first page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
-                if len(realFirstPageList) > 0:
+                if len(realFirstPageList) > 0 and (pageNumbers is None or 0 in pageNumbers):
                     # we need to do run parseInputPage twico for one output page in the PDF.
                     # The background needs to be drawn first, or it would obscure any other other elements.
                     pagetype = 'singleside'
@@ -1227,6 +1227,9 @@ def convertMcf(mcfname, keepDoublePages: bool):
                 oddpage = (pageNumber % 2) == 1
                 page = getPageElementForPageNumber(fotobook, n)
                 pagetype = 'normal'
+
+            if pageNumbers is not None and not pageNumber in pageNumbers:
+                continue
 
             if page is not None:
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
@@ -1274,6 +1277,9 @@ if __name__ == '__main__':
     parser.add_argument('--keepDoublePages', dest='keepDoublePages', action='store_const',
                         const=True, default=False,
                         help='Each page in the .pdf will be a double-sided page, instead of a normal single page.')
+    parser.add_argument('--pages', dest='pages', action='store',
+                        default=None,
+                        help='Page numbers to render, e.g. 1,2,4-9')
     parser.add_argument('inputFile', type=str, nargs='?',
                         help='the mcf input file. If not given, the first .mcf in the current directory is used.')
 
@@ -1290,5 +1296,28 @@ if __name__ == '__main__':
         parser.parse_args(['-h'])
         sys.exit(1)
 
+    pageNumbers = None
+    if args.pages is not None:
+        pageNumbers = []
+        for expr in args.pages.split(','):
+            expr = expr.strip()
+            if expr.isnumeric():
+                pageNumbers.append(int(expr))#simple number "23"
+            elif expr.find('-') > -1:
+                #page range: 23-42
+                fromTo = expr.split('-', 2)
+                if not fromTo[0].isnumeric() or not fromTo[1].isnumeric():
+                    print('Invalid page range: ' + expr)
+                    sys.exit(1)
+                pageFrom = int(fromTo[0])
+                pageTo   = int(fromTo[1])
+                if pageTo < pageFrom:
+                    print('Invalid page range: ' + expr)
+                    sys.exit(1)
+                pageNumbers = pageNumbers + list(range(pageFrom, pageTo + 1))
+            else:
+                print('Invalid page number: ' + expr)
+                sys.exit(1)
+
     # if we have a file name, let's convert it
-    resultFlag = convertMcf(args.inputFile, args.keepDoublePages)
+    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers)
