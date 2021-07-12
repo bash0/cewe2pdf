@@ -1111,6 +1111,20 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
 
     # Load additional fonts
     additional_fonts = {}
+    if cewe_folder is not None:
+        try:
+            from fontTools import ttLib
+            ttfFiles = glob.glob(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts', '*.ttf'))
+            for ttfFile in ttfFiles:
+                font = ttLib.TTFont(ttfFile)
+                fontName = font['name'].getName(1, 3, 1, 1033)
+                if fontName is not None:
+                    additional_fonts[fontName.toUnicode()] = ttfFile
+                else:
+                    print('Could not get name of font: ' + ttfFile)
+        except ImportError:
+            print('Package "python3-fonttools" is not installed.')
+            print('Cannot load load cewe-provided fonts')
     try:
         configFontFileName = findFileInDirs('additional_fonts.txt', (mcfBaseFolder, os.path.curdir))
         with open(configFontFileName, 'r') as fp:
