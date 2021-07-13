@@ -51,6 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # extend the search path so Cairo will find its dlls.
 # only needed when the program is frozen (i.e. compiled).
 import sys
+import glob
 import logging
 import os.path
 import os
@@ -299,18 +300,19 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             print("Error can't find passepartout for {}".format(passepartoutid))
         else:
             pptXmlFileName = passepartoutDict[passepartoutid]
-            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName)
+            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName, passepartoutid)
             frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
             maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
-            print("Using clipart file: {}".format(frameClipartFileName))
+            print("Using mask file: {}".format(maskClipartFileName))
             # draw the passepartout clipart file.
             # ToDo: apply the masking
             frameAlpha = 255
             # Adjust the position of the real image depending on the frame
-            frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
-            frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
-            imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
-            imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
+            if pptXmlInfo.fotoarea_x is not None:
+                frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
+                frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
+                imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
+                imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
 
     # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
     # to get from .mcf units are divided by the scale factor to get to image pixel units.
@@ -982,13 +984,25 @@ def readClipArtConfigXML(baseFolder):
         print('Cliparts will not be available.')
         return
 
+    loadClipartConfigXML(xmlFileName)
+
+def readClipArtDownloads():
+    dotMcfPath = os.path.expanduser("~/.mcf/hps/");
+    if not os.path.exists(dotMcfPath):
+        print("~/.mcf not found")
+        return
+
+    for file in glob.glob(dotMcfPath + "/*/addons/*/cliparts/v1/decorations/*.xml"):
+        loadClipartConfigXML(file)
+
+def loadClipartConfigXML(xmlFileName):
     clipArtXml = open(xmlFileName, 'rb')
     xmlInfo = etree.parse(xmlFileName)
     clipArtXml.close()
 
     for decoration in xmlInfo.findall('decoration'):
         clipartElement = decoration.find('clipart')
-        fileName = clipartElement.get('file')
+        fileName = os.path.join(os.path.dirname(xmlFileName), clipartElement.get('file'))
         designElementId = int(clipartElement.get('designElementId'))    # assume these IDs are always integers.
         clipartDict[designElementId] = fileName
     return
@@ -1023,6 +1037,7 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
 
 
 def convertMcf(mcfname, keepDoublePages: bool):
+    global passepartoutFolders  # pylint: disable=global-statement
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
     mcfBaseFolder = str(mcfPathObj.parent)
@@ -1048,6 +1063,11 @@ def convertMcf(mcfname, keepDoublePages: bool):
         cewe_file.close()
         baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
         backgroundLocations = baseBackgroundLocations
+
+        dotMcfPath = os.path.expanduser("~/.mcf/hps/");
+        if os.path.exists(dotMcfPath):
+            passepartoutFolders = glob.glob(dotMcfPath + "/*/addons/") + [cewe_folder + "Resources/photofun/decorations"]
+            backgroundLocations = backgroundLocations + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/backgrounds/")) + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/"))
     except: # noqa: E722
         print('Cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
@@ -1093,7 +1113,6 @@ def convertMcf(mcfname, keepDoublePages: bool):
             pptout_rawFolder.append(cewe_folder)    # add the base folder
             pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
             pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment vars pylint: disable=unnecessary-lambda
-            global passepartoutFolders  # pylint: disable=global-statement
             passepartoutFolders = pptout_filtered2
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
@@ -1161,6 +1180,7 @@ def convertMcf(mcfname, keepDoublePages: bool):
 
     # generate a list of available clip-arts
     readClipArtConfigXML(cewe_folder)
+    readClipArtDownloads()
 
     for n in range(pageCount):
         try:
