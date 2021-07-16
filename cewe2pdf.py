@@ -117,7 +117,7 @@ pdf_flowableList = []
 clipartDict = dict()    # a dictionary for clipart element IDs to file name
 clipartPathList = tuple()
 passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
-passepartoutFolders = None # global variable with the folders for passepartout frames
+passepartoutFolders = tuple() # global variable with the folders for passepartout frames
 
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
@@ -971,7 +971,7 @@ def getBaseClipartLocations(baseFolder):
     )
     return baseClipartLocations
 
-def readClipArtConfigXML(baseFolder):
+def readClipArtConfigXML(baseFolder, keyaccountFolder):
     """Parse the configuration XML file and generate a dictionary of designElementId to fileName
     currently only cliparts_default.xml is supported !"""
     global clipartPathList  # pylint: disable=global-statement
@@ -979,20 +979,17 @@ def readClipArtConfigXML(baseFolder):
     xmlConfigFileName = 'cliparts_default.xml'
     try:
         xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
+        loadClipartConfigXML(xmlFileName)
     except: # noqa: E722
         print('Could not load clipart definition file: {}'.format(xmlConfigFileName))
         print('Cliparts will not be available.')
         return
 
-    loadClipartConfigXML(xmlFileName)
-
-def readClipArtDownloads():
-    dotMcfPath = os.path.expanduser("~/.mcf/hps/");
-    if not os.path.exists(dotMcfPath):
-        print("~/.mcf not found")
+    if keyaccountFolder is None:
+        print("No downloaded clipart folder found")
         return
 
-    for file in glob.glob(dotMcfPath + "/*/addons/*/cliparts/v1/decorations/*.xml"):
+    for file in glob.glob(os.path.join(keyaccountFolder, "addons", "*", "cliparts", "v1", "decorations", "*.xml")):
         loadClipartConfigXML(file)
 
 def loadClipartConfigXML(xmlFileName):
@@ -1007,7 +1004,7 @@ def loadClipartConfigXML(xmlFileName):
         clipartDict[designElementId] = fileName
     return
 
-def getBaseBackgroundLocations(basefolder):
+def getBaseBackgroundLocations(basefolder, keyaccountFolder):
     # create a tuple of places (folders) where background resources would be found by default
     baseBackgroundLocations = (
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds'),
@@ -1015,21 +1012,16 @@ def getBaseBackgroundLocations(basefolder):
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
     )
+    if keyaccountFolder is not None:
+        baseBackgroundLocations = baseBackgroundLocations + tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1", "backgrounds"))) + tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1")))
+
     return baseBackgroundLocations
 
 
 def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
     os.environ['CEWE_FOLDER'] = cewe_folder
     try:
-        keyAccountFileName = os.path.join(cewe_folder, "Resources", "config", "keyaccount.xml")
-        katree = etree.parse(keyAccountFileName)
-        karoot = katree.getroot()
-        ka = karoot.find('keyAccount').text # that's the official installed value
-        # see if he has a .ini file override for the keyaccount
-        inika = defaultConfigSection.get('keyaccount')
-        if inika is not None:
-            print('ini file overrides keyaccount from {} to {}'.format(ka, inika))
-            ka = inika
+        ka = getKeyaccountNumber(cewe_folder, defaultConfigSection)
         # put the value into the environment so that it can be substituted in later config elements
         os.environ['KEYACCOUNT'] = ka.strip()
     except Exception as ex:
@@ -1061,13 +1053,9 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
         cewe_file = open(configFolderFileName, 'r')
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
-        baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
-        backgroundLocations = baseBackgroundLocations
+        keyaccountFolder = getKeyaccountDataFolder(cewe_folder)
 
-        dotMcfPath = os.path.expanduser("~/.mcf/hps/");
-        if os.path.exists(dotMcfPath):
-            passepartoutFolders = glob.glob(dotMcfPath + "/*/addons/") + [cewe_folder + "Resources/photofun/decorations"]
-            backgroundLocations = backgroundLocations + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/backgrounds/")) + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/"))
+        backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
     except: # noqa: E722
         print('Cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
@@ -1085,11 +1073,12 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
+            keyaccountFolder = getKeyaccountDataFolder(cewe_folder, defaultConfigSection)
 
             # set the cewe folder and key account number into the environment for use in other config files
             SetEnvironmentVariables(cewe_folder, defaultConfigSection)
 
-            baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
+            baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
 
             # add any extra background folders, substituting environment variables
             xbg = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()  # newline separated list of folders
@@ -1114,6 +1103,9 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
             pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
             pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment vars pylint: disable=unnecessary-lambda
             passepartoutFolders = pptout_filtered2
+
+    if keyaccountFolder is not None:
+        passepartoutFolders = passepartoutFolders + tuple(glob.glob(os.path.join(keyaccountFolder, "addons"))) + tuple([os.path.join(cewe_folder, "Resources", "photofun", "decorations")])
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
@@ -1179,8 +1171,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
     imagedir = fotobook.get('imagedir')
 
     # generate a list of available clip-arts
-    readClipArtConfigXML(cewe_folder)
-    readClipArtDownloads()
+    readClipArtConfigXML(cewe_folder, keyaccountFolder)
 
     for n in range(pageCount):
         try:
@@ -1263,6 +1254,47 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
         if os.path.exists(tmpFileName):
             os.remove(tmpFileName)
     return True
+
+
+def getHpsDataFolder():
+    #linux + macosx
+    dotMcfFolder = os.path.expanduser("~/.mcf/hps/");
+    if os.path.exists(dotMcfFolder):
+        return dotMcfFolder
+
+    #windows
+    winHpsFolder = os.path.expandvars("${PROGRAMDATA}/hps/")
+    if os.path.exists(winHpsFolder):
+        return winHpsFolder
+
+    return None
+
+
+def getKeyaccountDataFolder(cewe_folder, defaultConfigSection = None):
+    hpsFolder = getHpsDataFolder()
+    if hpsFolder is None:
+        return None
+
+    keyaccountFolder = os.path.join(hpsFolder, getKeyaccountNumber(cewe_folder, defaultConfigSection))
+    if os.path.exists(keyaccountFolder):
+        return keyaccountFolder
+    return None
+
+
+def getKeyaccountNumber(cewe_folder, defaultConfigSection):
+    keyAccountFileName = os.path.join(cewe_folder, "Resources", "config", "keyaccount.xml")
+    katree = etree.parse(keyAccountFileName)
+    karoot = katree.getroot()
+    ka = karoot.find('keyAccount').text # that's the official installed value
+    # see if he has a .ini file override for the keyaccount
+    if defaultConfigSection is None:
+        return ka.strip()
+
+    inika = defaultConfigSection.get('keyaccount')
+    if inika is not None:
+        print('ini file overrides keyaccount from {} to {}'.format(ka, inika))
+        ka = inika
+    return ka.strip()
 
 
 if __name__ == '__main__':
