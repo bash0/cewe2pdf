@@ -1154,6 +1154,9 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                 p = line.split(" = ", 1)
                 fontname = p[0]
                 fontfile = os.path.expandvars(p[1].strip())
+                if not os.path.exists(fontfile):
+                    print('Error: Custom additional font file does not exist: ' + fontfile)
+                    continue
                 additional_fonts[fontname] = fontfile
             fp.close()
     except: # noqa: E722
