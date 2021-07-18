@@ -1271,7 +1271,7 @@ if __name__ == '__main__':
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
         pass
 
-    parser = argparse.ArgumentParser(description='nConvert a foto-book from .mcf file format to .pdf',
+    parser = argparse.ArgumentParser(description='Convert a photo-book from .mcf file format to .pdf',
                                      epilog="Example:\n   python cewe2pdf.py c:\\path\\to\\my\\files\\my_nice_fotobook.mcf",
                                      formatter_class=CustomArgFormatter)
     parser.add_argument('--keepDoublePages', dest='keepDoublePages', action='store_const',
