@@ -1088,6 +1088,10 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
             print('\n'.join(map('Used configuration in: {}'.format, filesread)))
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
+            if 'cewe_folder' not in defaultConfigSection:
+                print('Error: You must create cewe_folder.txt or modify cewe2pdf.ini')
+                sys.exit(1)
+
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
             keyaccountFolder = getKeyaccountDataFolder(cewe_folder, defaultConfigSection)
 
