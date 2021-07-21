@@ -1036,7 +1036,7 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
         print('Could not extract keyAccount tag in file: {}, reason {}'.format(keyAccountFileName, ex))
 
 
-def convertMcf(mcfname, keepDoublePages: bool, pageNumbers):
+def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
     global passepartoutFolders  # pylint: disable=global-statement
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
