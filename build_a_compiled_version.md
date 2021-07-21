@@ -40,7 +40,7 @@ This will generate two directories (build and dist). The final .exe is located i
 
 6. Make sure that near the top of cewe2pdf.py the current directory is added to the os.environ["PATH"]. This must happen before cairosvg is first imported from clpFile.py
 
-7. Start dist\cewe2pdf\cewe2pdf.exe to see if it starts without error. Remember that you will need to have a cewe2pdf.ini and an additional_fonts.txt file next to your .mcf file and its associated directory.
+7. start dist\cewe2pdf\cewe2pdf.exe to see if it starts without error
 
 ## Method 2: py2exe
     pip install py2exe

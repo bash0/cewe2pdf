@@ -88,7 +88,7 @@ class ClpFile(object):
         # create a byte buffer that can be used like a file and use it as the output of svg2png.
         tmpMemFile = BytesIO()
         # Step 1.
-        cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile, unsafe=True)
+        cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile)
         tmpMemFile.seek(0)
         tempImage = PIL.Image.open(tmpMemFile)
         origWidth = tempImage.width
@@ -99,7 +99,7 @@ class ClpFile(object):
         # Step 3.
         scaleMax = max(scale_x, scale_y)
         tmpMemFile = BytesIO()
-        cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile, scale=scaleMax, unsafe=True)
+        cairosvg.svg2png(bytestring=self.svgData, write_to=tmpMemFile, scale=scaleMax)
         # Step 4.
         tmpMemFile.seek(0)
         tempImage = PIL.Image.open(tmpMemFile)
@@ -128,17 +128,7 @@ class ClpFile(object):
         #  if the .svg is fully filled by the mask, then only a black rectangle with RGA (=no background!) is returned.
         #  if the mask does not fully fill the mask, then an RGBA image is returned. In this case, use the alpha value directly.
         if maskImgPng.mode == "RGBA":
-            # an RGBA image mask does not always use transparency
-            # some images still use white to indicate transparent parts
-            # to support both transparent and white RGBA svg masks,
-            # convert transparency to white and use white as alpha channel.
-            #alphaChannel = maskImgPng.getchannel("A")
-            #maskImgPng.paste("white", None, "RGBA")
-
-            white = PIL.Image.new("RGBA", maskImgPng.size, "WHITE")
-            white.paste(maskImgPng, (0, 0), maskImgPng)
-            alphaChannel = white.convert('L')
-            alphaChannel = PIL.ImageOps.invert(alphaChannel)
+            alphaChannel = maskImgPng.getchannel("A")
         elif maskImgPng.mode == "RGB":
             # convert image to gray-scale and use that as alpha channel.
             # we need to invert, otherwise black whould be transparent.

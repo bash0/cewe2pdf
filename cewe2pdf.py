@@ -51,7 +51,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # extend the search path so Cairo will find its dlls.
 # only needed when the program is frozen (i.e. compiled).
 import sys
-import glob
 import logging
 import os.path
 import os
@@ -300,19 +299,18 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             print("Error can't find passepartout for {}".format(passepartoutid))
         else:
             pptXmlFileName = passepartoutDict[passepartoutid]
-            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName, passepartoutid)
+            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName)
             frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
             maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
-            print("Using mask file: {}".format(maskClipartFileName))
+            print("Using clipart file: {}".format(frameClipartFileName))
             # draw the passepartout clipart file.
             # ToDo: apply the masking
             frameAlpha = 255
             # Adjust the position of the real image depending on the frame
-            if pptXmlInfo.fotoarea_x is not None:
-                frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
-                frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
-                imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
-                imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
+            frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
+            frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
+            imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
+            imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
 
     # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
     # to get from .mcf units are divided by the scale factor to get to image pixel units.
@@ -984,25 +982,13 @@ def readClipArtConfigXML(baseFolder):
         print('Cliparts will not be available.')
         return
 
-    loadClipartConfigXML(xmlFileName)
-
-def readClipArtDownloads():
-    dotMcfPath = os.path.expanduser("~/.mcf/hps/");
-    if not os.path.exists(dotMcfPath):
-        print("~/.mcf not found")
-        return
-
-    for file in glob.glob(dotMcfPath + "/*/addons/*/cliparts/v1/decorations/*.xml"):
-        loadClipartConfigXML(file)
-
-def loadClipartConfigXML(xmlFileName):
     clipArtXml = open(xmlFileName, 'rb')
     xmlInfo = etree.parse(xmlFileName)
     clipArtXml.close()
 
     for decoration in xmlInfo.findall('decoration'):
         clipartElement = decoration.find('clipart')
-        fileName = os.path.join(os.path.dirname(xmlFileName), clipartElement.get('file'))
+        fileName = clipartElement.get('file')
         designElementId = int(clipartElement.get('designElementId'))    # assume these IDs are always integers.
         clipartDict[designElementId] = fileName
     return
@@ -1036,8 +1022,7 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
         print('Could not extract keyAccount tag in file: {}, reason {}'.format(keyAccountFileName, ex))
 
 
-def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
-    global passepartoutFolders  # pylint: disable=global-statement
+def convertMcf(mcfname, keepDoublePages: bool):
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
     mcfBaseFolder = str(mcfPathObj.parent)
@@ -1063,11 +1048,6 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
         cewe_file.close()
         baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder)
         backgroundLocations = baseBackgroundLocations
-
-        dotMcfPath = os.path.expanduser("~/.mcf/hps/");
-        if os.path.exists(dotMcfPath):
-            passepartoutFolders = glob.glob(dotMcfPath + "/*/addons/") + [cewe_folder + "Resources/photofun/decorations"]
-            backgroundLocations = backgroundLocations + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/backgrounds/")) + tuple(glob.glob(dotMcfPath + "/*/addons/*/backgrounds/v1/"))
     except: # noqa: E722
         print('Cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
@@ -1113,6 +1093,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
             pptout_rawFolder.append(cewe_folder)    # add the base folder
             pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
             pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment vars pylint: disable=unnecessary-lambda
+            global passepartoutFolders  # pylint: disable=global-statement
             passepartoutFolders = pptout_filtered2
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
@@ -1180,7 +1161,6 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
 
     # generate a list of available clip-arts
     readClipArtConfigXML(cewe_folder)
-    readClipArtDownloads()
 
     for n in range(pageCount):
         try:
@@ -1212,9 +1192,9 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
                 else:
                     page = None # if we find no empty page with an area tag, we need to set this to None to prevent an exception later.
 
-                # Look for the the first page and set it up for processing
+                # Look for the the frist page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
-                if len(realFirstPageList) > 0 and (pageNumbers is None or 0 in pageNumbers):
+                if len(realFirstPageList) > 0:
                     # we need to do run parseInputPage twico for one output page in the PDF.
                     # The background needs to be drawn first, or it would obscure any other other elements.
                     pagetype = 'singleside'
@@ -1227,9 +1207,6 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
                 oddpage = (pageNumber % 2) == 1
                 page = getPageElementForPageNumber(fotobook, n)
                 pagetype = 'normal'
-
-            if pageNumbers is not None and not pageNumber in pageNumbers:
-                continue
 
             if page is not None:
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
@@ -1277,9 +1254,6 @@ if __name__ == '__main__':
     parser.add_argument('--keepDoublePages', dest='keepDoublePages', action='store_const',
                         const=True, default=False,
                         help='Each page in the .pdf will be a double-sided page, instead of a normal single page.')
-    parser.add_argument('--pages', dest='pages', action='store',
-                        default=None,
-                        help='Page numbers to render, e.g. 1,2,4-9')
     parser.add_argument('inputFile', type=str, nargs='?',
                         help='the mcf input file. If not given, the first .mcf in the current directory is used.')
 
@@ -1296,28 +1270,5 @@ if __name__ == '__main__':
         parser.parse_args(['-h'])
         sys.exit(1)
 
-    pageNumbers = None
-    if args.pages is not None:
-        pageNumbers = []
-        for expr in args.pages.split(','):
-            expr = expr.strip()
-            if expr.isnumeric():
-                pageNumbers.append(int(expr))#simple number "23"
-            elif expr.find('-') > -1:
-                #page range: 23-42
-                fromTo = expr.split('-', 2)
-                if not fromTo[0].isnumeric() or not fromTo[1].isnumeric():
-                    print('Invalid page range: ' + expr)
-                    sys.exit(1)
-                pageFrom = int(fromTo[0])
-                pageTo   = int(fromTo[1])
-                if pageTo < pageFrom:
-                    print('Invalid page range: ' + expr)
-                    sys.exit(1)
-                pageNumbers = pageNumbers + list(range(pageFrom, pageTo + 1))
-            else:
-                print('Invalid page number: ' + expr)
-                sys.exit(1)
-
     # if we have a file name, let's convert it
-    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers)
+    resultFlag = convertMcf(args.inputFile, args.keepDoublePages)
