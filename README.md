@@ -2,7 +2,7 @@ cewe2pdf
 ========
 
 A python script to turn cewe photobooks into pdf documents.
-The CEWE pdf export is achieved by interpreting the mcf xml-files 
+The CEWE pdf export is achieved by interpreting the mcf xml-files
 and compiling a pdf document which looks like the cewe photo book.
 
 There are many unsupported options, so an exact conversion cannot be guaranteed. The script is mostly based on reverse-engineering and guessing. It is not meeting any official specifications. So don't be surprised if one or another feature doesn't work. However, improvements are always appreciated.
@@ -55,7 +55,7 @@ The contents can, for example, be of the form:
 ```
 [DEFAULT]
 cewe_folder = C:\Program Files\Elkjop fotoservice_6.3\elkjop fotoservice
-extraBackgroundFolders = 
+extraBackgroundFolders =
 	C:/ProgramData/hps/5026/addons/447/backgrounds/v1/backgrounds
 	C:/ProgramData/hps/5026/addons/448/backgrounds/v1/backgrounds
 fontFamilies =
@@ -99,14 +99,14 @@ Example with my CEWE software in /opt/CEWE :
 echo "/opt/CEWE" > cewe_folder.txt
 ```
 
-Define some additionnal fonts (`name = /path/to/file.ttf`) into a file named `additionnal_fonts.txt`
+Define some additional fonts (`name = /path/to/file.ttf`) into a file named `additional_fonts.txt`
 
 This will create an empty file :
 ```
-touch additionnal_fonts.txt
+touch additional_fonts.txt
 ```
 
-You can edit additionnal_fonts.txt and add the fonts you want.
+You can edit additional_fonts.txt and add the fonts you want.
 
 Install - continued
 -------------------
