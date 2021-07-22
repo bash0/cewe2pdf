@@ -1030,6 +1030,9 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
         print('Could not extract keyAccount tag in file: {}, reason {}'.format(getKeyAccountFileName(cewe_folder), ex))
 
 
+def getOutputFileName(mcfname):
+    return mcfname + '.pdf'
+
 def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     global passepartoutFolders  # pylint: disable=global-statement
     # Get the folder in which the .mcf file is
@@ -1045,6 +1048,17 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     if fotobook.tag != 'fotobook':
         print(mcfname + 'is not a valid mcf file. Exiting.')
         sys.exit(1)
+    
+	# check output file is acceptable before we do any processing
+    outputFileName = getOutputFileName(mcfname)
+    if os.path.exists(outputFileName):
+        if os.path.isfile(outputFileName):
+            if not os.access(outputFileName, os.W_OK):
+                print("Existing output file '%s' is not writable" % (outputFileName))
+                sys.exit(1)
+        else:
+            print("Existing output '%s' is not a file" % (outputFileName))
+            sys.exit(1)
 
     # a null default configuration section means that some capabilities will be missing!
     defaultConfigSection = None
@@ -1148,7 +1162,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     pagesize = reportlab.lib.pagesizes.A4
     if fotobook.get('productname') in formats:
         pagesize = formats[fotobook.get('productname')]
-    pdf = canvas.Canvas(mcfname + '.pdf', pagesize=pagesize)
+    pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
 
     # Add additional fonts. We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
     for curFontName in list(additional_fonts):
