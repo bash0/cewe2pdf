@@ -1013,7 +1013,9 @@ def getBaseBackgroundLocations(basefolder, keyaccountFolder):
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
     )
     if keyaccountFolder is not None:
-        baseBackgroundLocations = baseBackgroundLocations + tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1", "backgrounds"))) + tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1")))
+        baseBackgroundLocations = baseBackgroundLocations + \
+            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1", "backgrounds"))) + \
+            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1")))
 
     return baseBackgroundLocations
 
@@ -1025,10 +1027,10 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
         # put the value into the environment so that it can be substituted in later config elements
         os.environ['KEYACCOUNT'] = ka.strip()
     except Exception as ex:
-        print('Could not extract keyAccount tag in file: {}, reason {}'.format(keyAccountFileName, ex))
+        print('Could not extract keyAccount tag in file: {}, reason {}'.format(getKeyAccountFileName(cewe_folder), ex))
 
 
-def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
+def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     global passepartoutFolders  # pylint: disable=global-statement
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
@@ -1105,7 +1107,9 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
             passepartoutFolders = pptout_filtered2
 
     if keyaccountFolder is not None:
-        passepartoutFolders = passepartoutFolders + tuple(glob.glob(os.path.join(keyaccountFolder, "addons"))) + tuple([os.path.join(cewe_folder, "Resources", "photofun", "decorations")])
+        passepartoutFolders = passepartoutFolders + \
+            tuple(glob.glob(os.path.join(keyaccountFolder, "addons"))) + \
+            tuple([os.path.join(cewe_folder, "Resources", "photofun", "decorations")])
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
@@ -1219,7 +1223,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
                 page = getPageElementForPageNumber(fotobook, n)
                 pagetype = 'normal'
 
-            if pageNumbers is not None and not pageNumber in pageNumbers:
+            if pageNumbers is not None and pageNumber not in pageNumbers:
                 continue
 
             if page is not None:
@@ -1257,12 +1261,12 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers = None):
 
 
 def getHpsDataFolder():
-    #linux + macosx
-    dotMcfFolder = os.path.expanduser("~/.mcf/hps/");
+    # linux + macosx
+    dotMcfFolder = os.path.expanduser("~/.mcf/hps/")
     if os.path.exists(dotMcfFolder):
         return dotMcfFolder
 
-    #windows
+    # windows
     winHpsFolder = os.path.expandvars("${PROGRAMDATA}/hps/")
     if os.path.exists(winHpsFolder):
         return winHpsFolder
@@ -1270,7 +1274,7 @@ def getHpsDataFolder():
     return None
 
 
-def getKeyaccountDataFolder(cewe_folder, defaultConfigSection = None):
+def getKeyaccountDataFolder(cewe_folder, defaultConfigSection=None):
     hpsFolder = getHpsDataFolder()
     if hpsFolder is None:
         return None
@@ -1281,8 +1285,13 @@ def getKeyaccountDataFolder(cewe_folder, defaultConfigSection = None):
     return None
 
 
-def getKeyaccountNumber(cewe_folder, defaultConfigSection):
+def getKeyAccountFileName(cewe_folder):
     keyAccountFileName = os.path.join(cewe_folder, "Resources", "config", "keyaccount.xml")
+    return keyAccountFileName
+
+
+def getKeyaccountNumber(cewe_folder, defaultConfigSection):
+    keyAccountFileName = getKeyAccountFileName(cewe_folder)
     katree = etree.parse(keyAccountFileName)
     karoot = katree.getroot()
     ka = karoot.find('keyAccount').text # that's the official installed value
@@ -1334,15 +1343,15 @@ if __name__ == '__main__':
         for expr in args.pages.split(','):
             expr = expr.strip()
             if expr.isnumeric():
-                pageNumbers.append(int(expr))#simple number "23"
+                pageNumbers.append(int(expr)) # simple number "23"
             elif expr.find('-') > -1:
-                #page range: 23-42
+                # page range: 23-42
                 fromTo = expr.split('-', 2)
                 if not fromTo[0].isnumeric() or not fromTo[1].isnumeric():
                     print('Invalid page range: ' + expr)
                     sys.exit(1)
                 pageFrom = int(fromTo[0])
-                pageTo   = int(fromTo[1])
+                pageTo = int(fromTo[1])
                 if pageTo < pageFrom:
                     print('Invalid page range: ' + expr)
                     sys.exit(1)

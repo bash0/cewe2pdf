@@ -132,8 +132,8 @@ class ClpFile(object):
             # some images still use white to indicate transparent parts
             # to support both transparent and white RGBA svg masks,
             # convert transparency to white and use white as alpha channel.
-            #alphaChannel = maskImgPng.getchannel("A")
-            #maskImgPng.paste("white", None, "RGBA")
+            #  alphaChannel = maskImgPng.getchannel("A")
+            #  maskImgPng.paste("white", None, "RGBA")
 
             white = PIL.Image.new("RGBA", maskImgPng.size, "WHITE")
             white.paste(maskImgPng, (0, 0), maskImgPng)

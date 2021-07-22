@@ -64,7 +64,7 @@ class Passepartout(object):
             # decoration_type is often "fading", so typeElement is then looking for <fading .../>
             typeElement = decoration.find(decoration_type)
             if typeElement is None:
-                continue;
+                continue
             # assume these IDs are always integers.
             designElementId = decoration.get('designElementId')
             if designElementId is None:
