@@ -67,6 +67,8 @@ from math import sqrt, floor
 
 from pathlib import Path
 
+from fontTools import ttLib
+
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
@@ -1048,7 +1050,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     if fotobook.tag != 'fotobook':
         print(mcfname + 'is not a valid mcf file. Exiting.')
         sys.exit(1)
-    
+
 	# check output file is acceptable before we do any processing
     outputFileName = getOutputFileName(mcfname)
     if os.path.exists(outputFileName):
@@ -1088,6 +1090,10 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
             print('\n'.join(map('Used configuration in: {}'.format, filesread)))
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
+            if 'cewe_folder' not in defaultConfigSection:
+                print('Error: You must create cewe_folder.txt or modify cewe2pdf.ini')
+                sys.exit(1)
+
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
             keyaccountFolder = getKeyaccountDataFolder(cewe_folder, defaultConfigSection)
 
@@ -1128,35 +1134,82 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
     # Load additional fonts
+    ttfFiles = []
+    fontDirs = []
     additional_fonts = {}
+    additional_fontFamilies = {}
     if cewe_folder is not None:
-        try:
-            from fontTools import ttLib
-            ttfFiles = glob.glob(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts', '*.ttf'))
-            for ttfFile in ttfFiles:
-                font = ttLib.TTFont(ttfFile)
-                fontName = font['name'].getName(1, 3, 1, 1033)
-                if fontName is not None:
-                    additional_fonts[fontName.toUnicode()] = ttfFile
-                else:
-                    print('Could not get name of font: ' + ttfFile)
-        except ImportError:
-            print('Package "python3-fonttools" is not installed.')
-            print('Cannot load load cewe-provided fonts')
+        fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
+
     try:
         configFontFileName = findFileInDirs('additional_fonts.txt', (mcfBaseFolder, os.path.curdir))
         with open(configFontFileName, 'r') as fp:
             for line in fp:
-                p = line.split(" = ", 1)
-                fontname = p[0]
-                fontfile = os.path.expandvars(p[1].strip())
-                additional_fonts[fontname] = fontfile
+                line = line.strip()
+                if line.find(" = ") != -1:
+                    # Old "font name = /path/to/file" format
+                    p = line.split(" = ", 1)
+                    path = os.path.expandvars(p[1])
+                else:
+                    path = os.path.expandvars(line)
+
+                if not os.path.exists(path):
+                    print('Error: Custom additional font file does not exist: ' + path)
+                    continue
+                if os.path.isdir(path):
+                    fontDirs.append(path)
+                else:
+                    ttfFiles.append(path)
             fp.close()
-    except: # noqa: E722
+    except ValueError: # noqa: E722
         print('cannot find additional fonts (define them in additional_fonts.txt)')
         print('Content example:')
-        print('Vera = /tmp/vera.ttf')
-        print('Separator is " = " (space equal space)')
+        print('/tmp/vera.ttf')
+
+    if len(fontDirs) > 0:
+        for fontDir in fontDirs:
+            ttfFiles.extend(sorted(glob.glob(os.path.join(fontDir, '*.ttf'))))
+
+    if len(ttfFiles) > 0:
+        ttfFiles = list(dict.fromkeys(ttfFiles))# remove duplicates
+        for ttfFile in ttfFiles:
+            font = ttLib.TTFont(ttfFile)
+            fontFamily = font['name'].getName(1, 3, 1, 1033)#Arial
+            fontSubFamily = font['name'].getName(2, 3, 1, 1033)#Regular, Bold, Bold Italic
+            if fontFamily is None:
+                print('Could not get family (name) of font: ' + ttfFile)
+                continue
+            if fontSubFamily is None:
+                print('Could not get subfamily of font: ' + ttfFile)
+                continue
+
+            fontFamily = fontFamily.toUnicode()
+            fontSubFamily = fontSubFamily.toUnicode()
+
+            if fontSubFamily == "Medium" or fontSubFamily == "Regular":
+                fontName = fontFamily
+            else:
+                fontName = fontFamily + " " + fontSubFamily
+            additional_fonts[fontName] = ttfFile
+
+            if fontFamily not in additional_fontFamilies:
+                additional_fontFamilies[fontFamily] = {
+                    "normal": None,
+                    "bold": None,
+                    "italic": None,
+                    "boldItalic": None
+                }
+            if fontSubFamily == "Medium" or fontSubFamily == "Regular":
+                additional_fontFamilies[fontFamily]["normal"] = fontName
+            elif fontSubFamily == "Bold":
+                additional_fontFamilies[fontFamily]["bold"] = fontName
+            elif fontSubFamily == "Italic" or fontSubFamily == "Medium Italic":
+                additional_fontFamilies[fontFamily]["italic"] = fontName
+            elif fontSubFamily == "Bold Italic":
+                additional_fontFamilies[fontFamily]["boldItalic"] = fontName
+            else:
+                additional_fonts[fontFamily] = ttfFile
+                print("Unhandled font subfamily: " + fontName + " " + fontSubFamily)
 
     # create pdf
     pagesize = reportlab.lib.pagesizes.A4
@@ -1172,6 +1225,13 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         except:# noqa: E722
             print("Failed to register font '%s' (from %s)" % (curFontName, additional_fonts[curFontName]))
             del additional_fonts[curFontName]    # remove this item from the font list, so it won't be used later and cause problems.
+
+    if len(additional_fontFamilies) > 0:
+        for familyName, fontfamily in additional_fontFamilies.items():
+            for key, value in dict(fontfamily).items():
+                if value is None:
+                    del fontfamily[key]
+            pdfmetrics.registerFontFamily(familyName, **fontfamily)
 
     if defaultConfigSection is not None:
         # the reportlab manual says:
