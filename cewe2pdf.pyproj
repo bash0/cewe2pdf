@@ -28,8 +28,10 @@
     <Content Include="build_a_compiled_version.md" />
     <Content Include="cewe2pdf.ini" />
     <Content Include="CLP file format.txt" />
+    <Content Include="loggerconfig.yaml" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
+    <Content Include="tests\additional_fonts.txt" />
     <Content Include="tests\cewe2pdf.ini" />
     <Content Include="tests\unittest_fotobook.mcf" />
     <Content Include="tests\unittest_fotobook.mcf.pdf" />
