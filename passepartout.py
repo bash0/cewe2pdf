@@ -13,6 +13,7 @@ import os
 import os.path
 import cairosvg
 import PIL
+import logging
 from PIL.ExifTags import TAGS
 from io import BytesIO
 from clpFile import ClpFile
@@ -20,6 +21,7 @@ from typing import List, Set, Dict, Tuple, Optional
 from lxml import etree
 from typing import NamedTuple
 
+configlogger = logging.getLogger("cewe2pdf.config")
 
 class Passepartout(object):
     def __init__(self):
@@ -53,7 +55,7 @@ class Passepartout(object):
         try:
             xmlInfo = etree.parse(xmlFileName)
         except: # noqa: E722
-            print("Error while parsing. Maybe not valid XML:{}".format(xmlFileName))
+            logging.error("Maybe not valid XML:{}".format(xmlFileName))
             return None
         finally:
             clipArtXml.close()
@@ -106,7 +108,7 @@ class Passepartout(object):
         passepartoutIdDict = dict()
 
         if directoryList is None:
-            print("Error: no directories passed to Passepartout.buildElementIdIndex!")
+            configlogger.error("No directories passed to Passepartout.buildElementIdIndex!")
             return passepartoutIdDict
 
         if isinstance(directoryList, tuple):
@@ -115,7 +117,7 @@ class Passepartout(object):
         if not isinstance(directoryList, list):
             directoryList = [directoryList]
 
-        print("Refreshing decoration designElementId index.")
+        configlogger.info("Refreshing decoration designElementId index.")
 
         # generate list of .xml files
         xmlFileList = []
@@ -125,7 +127,7 @@ class Passepartout(object):
                 for filename in (f for f in filenames if f.endswith(ext)):
                     xmlFileList.append(os.path.join(dirpath, filename))
                     # print(os.path.join(dirpath, filename))
-        print("Found {:d} XML files.".format(len(xmlFileList)))
+        configlogger.info("Found {:d} XML files.".format(len(xmlFileList)))
 
         # load each .xml file and extract the information
         for curXmlFile in xmlFileList:
