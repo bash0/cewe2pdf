@@ -249,10 +249,8 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 # pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
             except Exception as ex:
                 if bgPath not in bg_notFoundDirList:
-                    logging.error('cannot find background or error when adding to pdf', bgPath, '\n', ex.args[0])
-                    exc_type, exc_obj, exc_tb = sys.exc_info() # exc_obj pylint: disable=unused-variable
-                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                    logging.error('', (exc_type, fname, exc_tb.tb_lineno))
+                    logging.error("Could not find background or error when adding to pdf")
+                    logging.exception('Exception')
                 bg_notFoundDirList.add(bgPath)
     return
 
@@ -724,10 +722,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception as ex:
-                logging.error('Exception:', ex.args[0])
-                exc_type, exc_obj, exc_tb = sys.exc_info() # exc_obj pylint: disable=unused-variable
-                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                logging.error('', (exc_type, fname, exc_tb.tb_lineno))
+                logging.exception('Exception')
 
     # Add a frame object that can contain multiple paragraphs
     leftPad = f * tablelmarg
@@ -1355,11 +1350,8 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
 
         except Exception as ex:
             # if one page fails: continue with next one
+            logging.exception("Exception")
             logging.error('error on page %i:' % (n, ), '\n', ex.args[0])
-            exc_type, exc_obj, exc_tb = sys.exc_info() # exc_obj pylint: disable=unused-variable
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            logging.error('', (exc_type, fname, exc_tb.tb_lineno))
-            traceback.print_tb(exc_tb)  # show a stack trace to see in which function the error occured
 
     # save final output pdf
     pdf.save()
