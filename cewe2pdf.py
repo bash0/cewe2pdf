@@ -180,7 +180,7 @@ def findFileInDirs(filenames, paths):
             if os.path.exists(testPath):
                 return testPath
 
-    logging.info('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
+    logging.debug('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
     raise ValueError('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
 
 
@@ -374,7 +374,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
                 quality=image_quality)
 
     # place image
-    logging.debug('image', imageTag.get('filename'))
+    logging.debug("image: {}".format(imageTag.get('filename')))
     pdf.translate(img_transx, transy)   # we need to go to the center for correct rotation
     pdf.rotate(-areaRot)   # rotation around center of area
     # calculate the non-symmetric shift of the center, given the left pos and the width.
@@ -626,7 +626,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 tablelmarg = floor(float(tablestyle['margin-left'].strip("px")))
                 tablermarg = floor(float(tablestyle['margin-right'].strip("px")))
             except: # noqa: E722
-                logging.warning('Ignoring invalid table margin settings ' + tableStyleAttrib)
+                logging.warning("Ignoring invalid table margin settings {}".format(tableStyleAttrib))
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
@@ -713,7 +713,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
 
                 else:
-                    logging.warning('Ignoring unhandled tag ' + item.tag)
+                    logging.warning("Ignoring unhandled tag {}".format(item.tag))
 
             # try to create a paragraph with the current text and style. Catch errors.
             try:
@@ -830,7 +830,7 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
         fileName = clipartDict[clipartID]
     # verify preconditions to avoid exception loading the clip art file, which would break the page count
     if not fileName:
-        logging.error("Problem getting file name for clipart ID:", clipartID)
+        logging.error("Problem getting file name for clipart ID: {}".format(clipartID))
         return
 
     colorreplacements = []
@@ -856,7 +856,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
 
     clipart = loadClipart(fileName)
     if len(clipart.svgData) <= 0:
-        logging.error('Clipart file could not be loaded:', fileName)
+        logging.error("Clipart file could not be loaded: {}".format(fileName))
         # avoiding exception in the processing below here
         return
 
@@ -866,7 +866,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     clipart.convertToPngInBuffer(new_w, new_h, alpha)  # so we can access the pngMemFile later
 
     # place image
-    logging.debug('Clipart file:', fileName)
+    logging.debug("Clipart file: {}".format(fileName))
     pdf.translate(img_transx, transy)
     pdf.rotate(-areaRot)
     pdf.drawImage(ImageReader(clipart.pngMemFile),
@@ -1061,7 +1061,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     mcffile.close()
     fotobook = mcf.getroot()
     if fotobook.tag != 'fotobook':
-        logging.error(mcfname + 'is not a valid mcf file. Exiting.')
+        logging.error(mcfname + ' is not a valid mcf file. Exiting.')
         sys.exit(1)
 
 	# check output file is acceptable before we do any processing
