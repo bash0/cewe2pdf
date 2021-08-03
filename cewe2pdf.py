@@ -52,7 +52,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # only needed when the program is frozen (i.e. compiled).
 import sys
 import glob
+
 import logging
+import logging.config
+import yaml
+
 import os.path
 import os
 import tempfile
@@ -91,7 +95,14 @@ if hasattr(sys, 'frozen'):
     if dllpath not in os.environ:
         os.environ["PATH"] += os.pathsep + dllpath
 
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+if os.path.exists('loggerconfig.yaml'):
+    with open('loggerconfig.yaml', 'r') as f:
+        config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
+else:
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+
+configlogger = logging.getLogger("cewe2pdf.config")
 
 # ### settings ####
 image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
@@ -155,9 +166,8 @@ def findFileByExtInDirs(filebase, extList, paths):
             if os.path.exists(testPath):
                 return testPath
 
-    prtStr = 'Could not find %s [%s] in paths %s' % (
-        filebase, ' '.join(extList), ', '.join(paths))
-    print(prtStr)
+    prtStr = 'Could not find %s [%s] in paths %s' % (filebase, ' '.join(extList), ', '.join(paths))
+    logging.info(prtStr)
     raise ValueError(prtStr)
 
 
@@ -170,7 +180,7 @@ def findFileInDirs(filenames, paths):
             if os.path.exists(testPath):
                 return testPath
 
-    print('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
+    logging.info('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
     raise ValueError('Could not find %s in %s paths' % (filenames, ', '.join(paths)))
 
 
@@ -196,22 +206,22 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
             backgroundFading = 0 # backgroundFading not used yet pylint: disable=unused-variable
             if "fading" in backgroundTag.attrib:
                 if float(backgroundTag.get('fading')) != 0:
-                    print('value of background attribute not supported: fading = %s' % backgroundTag.get(
+                    logging.warning('value of background attribute not supported: fading = %s' % backgroundTag.get(
                         'fading'))
             backgroundHue = 0 # backgroundHue not used yet pylint: disable=unused-variable
             if "hue" in backgroundTag.attrib:
                 if float(backgroundTag.get('hue')) != 0:
-                    print(
+                    logging.warning(
                         'value of background attribute not supported: hue =  %s' % backgroundTag.get('hue'))
             backgroundRotation = 0 # backgroundRotation not used yet pylint: disable=unused-variable
             if "rotation" in backgroundTag.attrib:
                 if float(backgroundTag.get('rotation')) != 0:
-                    print('value of background attribute not supported: rotation =  %s' % backgroundTag.get(
+                    logging.warning('value of background attribute not supported: rotation =  %s' % backgroundTag.get(
                         'rotation'))
             backgroundType = 1 # backgroundType not used yet pylint: disable=unused-variable
             if "type" in backgroundTag.attrib:
                 if int(backgroundTag.get('type')) != 1:
-                    print(
+                    logging.warning(
                         'value of background attribute not supported: type =  %s' % backgroundTag.get('type'))
             try:
                 bgPath = ""
@@ -224,7 +234,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                     ax = -areaWidth / 2.
                 else:
                     ax = 0
-                print("Reading background file: {}".format(bgPath))
+                logging.debug("Reading background file: {}".format(bgPath))
                 # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
                 imObj = PIL.Image.open(bgPath)
                 # create a in-memory byte array of the image file
@@ -239,10 +249,10 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 # pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
             except Exception as ex:
                 if bgPath not in bg_notFoundDirList:
-                    print('cannot find background or error when adding to pdf', bgPath, '\n', ex.args[0])
+                    logging.error('cannot find background or error when adding to pdf', bgPath, '\n', ex.args[0])
                     exc_type, exc_obj, exc_tb = sys.exc_info() # exc_obj pylint: disable=unused-variable
                     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                    print('', (exc_type, fname, exc_tb.tb_lineno))
+                    logging.error('', (exc_type, fname, exc_tb.tb_lineno))
                 bg_notFoundDirList.add(bgPath)
     return
 
@@ -285,12 +295,12 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     imgCropWidth_mcfunit = areaWidth
     imgCropHeight_mcfunit = areaHeight
     if passepartoutid is not None:
-        print('Frames (passepartout) are not fully implemented ()', passepartoutid)
+        logging.warning('Frames (passepartout) are not fully implemented {}'.format(passepartoutid))
         # re-generate the index of designElementId to .xml files, if it does not exist
         passepartoutid = int(passepartoutid)    # we need to work with a number below
         global passepartoutDict # pylint: disable=global-statement
         if passepartoutDict is None:
-            print("Regenerating passepartout index from .XML files.")
+            configlogger.info("Regenerating passepartout index from .XML files.")
             global passepartoutFolders  # pylint: disable=global-statement
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
         # read information from .xml file
@@ -299,13 +309,13 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         except: # noqa: E722
             pptXmlFileName = None
         if pptXmlFileName is None:
-            print("Error can't find passepartout for {}".format(passepartoutid))
+            logging.error("Can't find passepartout for {}".format(passepartoutid))
         else:
             pptXmlFileName = passepartoutDict[passepartoutid]
             pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName, passepartoutid)
             frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
             maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
-            print("Using mask file: {}".format(maskClipartFileName))
+            logging.debug("Using mask file: {}".format(maskClipartFileName))
             # draw the passepartout clipart file.
             # ToDo: apply the masking
             frameAlpha = 255
@@ -366,7 +376,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
                 quality=image_quality)
 
     # place image
-    print('image', imageTag.get('filename'))
+    logging.debug('image', imageTag.get('filename'))
     pdf.translate(img_transx, transy)   # we need to go to the center for correct rotation
     pdf.rotate(-areaRot)   # rotation around center of area
     # calculate the non-symmetric shift of the center, given the left pos and the width.
@@ -471,7 +481,7 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
         elif spanfamily in additional_fonts:
             spanfont = spanfamily
         if spanfamily != spanfont:
-            print("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
+            logging.warning("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
 
     if 'font-weight' in spanstyle:
         try:
@@ -618,7 +628,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 tablelmarg = floor(float(tablestyle['margin-left'].strip("px")))
                 tablermarg = floor(float(tablestyle['margin-right'].strip("px")))
             except: # noqa: E722
-                print('Ignoring invalid table margin settings ' + tableStyleAttrib)
+                logging.warning('Ignoring invalid table margin settings ' + tableStyleAttrib)
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
@@ -705,7 +715,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                         paragraphText = AppendText(paragraphText, html.escape(span.tail))
 
                 else:
-                    print('Ignoring unhandled tag ' + item.tag)
+                    logging.warning('Ignoring unhandled tag ' + item.tag)
 
             # try to create a paragraph with the current text and style. Catch errors.
             try:
@@ -714,10 +724,10 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception as ex:
-                print('Error:', ex.args[0])
+                logging.error('Exception:', ex.args[0])
                 exc_type, exc_obj, exc_tb = sys.exc_info() # exc_obj pylint: disable=unused-variable
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                print('', (exc_type, fname, exc_tb.tb_lineno))
+                logging.error('', (exc_type, fname, exc_tb.tb_lineno))
 
     # Add a frame object that can contain multiple paragraphs
     leftPad = f * tablelmarg
@@ -743,7 +753,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
         availableTextHeight -= neededTextHeight
         if neededTextWidth > availableTextWidth:
             # I have never seen this happen, but check anyway
-            print('Warning: A set of paragraphs too wide for its frame. INTERNAL ERROR!')
+            logging.error('A set of paragraphs too wide for its frame. INTERNAL ERROR!')
             finalTotalWidth = neededTextWidth + leftPad + rightPad
 
     if finalTotalHeight > frameHeight:
@@ -754,9 +764,9 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
         #  not where the user expects it - increasing the width would almost be more sensible!
         # Another suspected cause is in the use of multiple font sizes in one text. Perhaps the
         #  line scale (interline space) gets confused by this?
-        print('Warning: A set of paragraphs would not fit inside its frame. Frame height is increased to prevent loss of text.')
-        print(' Try widening the text box just slightly to avoid an unexpected word wrap, or increasing the height yourself')
-        print(' Most recent paragraph text: {}'.format(paragraphText))
+        logging.warning('A set of paragraphs would not fit inside its frame. Frame height is increased to prevent loss of text.')
+        logging.warning(' Try widening the text box just slightly to avoid an unexpected word wrap, or increasing the height yourself')
+        logging.warning(' Most recent paragraph text: {}'.format(paragraphText))
         frameHeight = finalTotalHeight
     if finalTotalWidth > frameWidth:
         frameWidth = finalTotalWidth
@@ -791,7 +801,7 @@ def loadClipart(fileName) -> ClpFile:
         if not filePath.exists():
             filePath = filePath.parent.joinpath(filePath.stem+".clp")
             if not filePath.exists():
-                print("Error: missing .clp: {}".format(fileName))
+                logging.error("Missing .clp: {}".format(fileName))
                 return ClpFile("")   # return an empty ClpFile
     else:
         pathObj = Path(fileName)
@@ -800,7 +810,7 @@ def loadClipart(fileName) -> ClpFile:
             filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
             filePath = Path(filePath)
         except Exception as ex:
-            print("Error: {}, {}".format(baseFileName, ex))
+            logging.error(" {}, {}".format(baseFileName, ex))
             return ClpFile("")   # return an empty ClpFile
 
     if filePath.suffix == '.clp':
@@ -825,7 +835,7 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
         fileName = clipartDict[clipartID]
     # verify preconditions to avoid exception loading the clip art file, which would break the page count
     if not fileName:
-        print("Problem getting file name for clipart ID:", clipartID)
+        logging.error("Problem getting file name for clipart ID:", clipartID)
         return
 
     colorreplacements = []
@@ -851,7 +861,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
 
     clipart = loadClipart(fileName)
     if len(clipart.svgData) <= 0:
-        print('Clipart file could not be loaded:', fileName)
+        logging.error('Clipart file could not be loaded:', fileName)
         # avoiding exception in the processing below here
         return
 
@@ -861,7 +871,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     clipart.convertToPngInBuffer(new_w, new_h, alpha)  # so we can access the pngMemFile later
 
     # place image
-    print('Clipart file:', fileName)
+    logging.debug('Clipart file:', fileName)
     pdf.translate(img_transx, transy)
     pdf.rotate(-areaRot)
     pdf.drawImage(ImageReader(clipart.pngMemFile),
@@ -936,7 +946,7 @@ def processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBa
 def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
         page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
         bg_notFoundDirList, additional_fonts):
-    print('parsing page', page.get('pagenr'), ' of ', pageCount)
+    logging.info('parsing page {}  of {}'.format(page.get('pagenr'), pageCount))
 
     bundlesize = page.find("./bundlesize")
     if bundlesize is not None:
@@ -983,12 +993,12 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
         xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
         loadClipartConfigXML(xmlFileName)
     except: # noqa: E722
-        print('Could not load clipart definition file: {}'.format(xmlConfigFileName))
-        print('Cliparts will not be available.')
+        configlogger.error('Could not load clipart definition file: {}'.format(xmlConfigFileName))
+        configlogger.error('Cliparts will not be available.')
         return
 
     if keyaccountFolder is None:
-        print("No downloaded clipart folder found")
+        configlogger.error("No downloaded clipart folder found")
         return
 
     for file in glob.glob(os.path.join(keyaccountFolder, "addons", "*", "cliparts", "v1", "decorations", "*.xml")):
@@ -1029,11 +1039,19 @@ def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
         # put the value into the environment so that it can be substituted in later config elements
         os.environ['KEYACCOUNT'] = ka.strip()
     except Exception as ex:
-        print('Could not extract keyAccount tag in file: {}, reason {}'.format(getKeyAccountFileName(cewe_folder), ex))
+        logging.error('Could not extract keyAccount tag in file: {}, reason {}'.format(getKeyAccountFileName(cewe_folder), ex))
 
 
 def getOutputFileName(mcfname):
     return mcfname + '.pdf'
+
+#def configureLogging():
+#    import logging
+#    import logging.config
+#    import yaml
+#    with open('loggerconfig.yaml', 'r') as f:
+#        config = yaml.safe_load(f.read())
+#        logging.config.dictConfig(config)
 
 def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     global passepartoutFolders  # pylint: disable=global-statement
@@ -1048,7 +1066,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     mcffile.close()
     fotobook = mcf.getroot()
     if fotobook.tag != 'fotobook':
-        print(mcfname + 'is not a valid mcf file. Exiting.')
+        logging.error(mcfname + 'is not a valid mcf file. Exiting.')
         sys.exit(1)
 
 	# check output file is acceptable before we do any processing
@@ -1056,18 +1074,17 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     if os.path.exists(outputFileName):
         if os.path.isfile(outputFileName):
             if not os.access(outputFileName, os.W_OK):
-                print("Existing output file '%s' is not writable" % (outputFileName))
+                logging.error("Existing output file '%s' is not writable" % (outputFileName))
                 sys.exit(1)
         else:
-            print("Existing output '%s' is not a file" % (outputFileName))
+            logging.error("Existing output '%s' is not a file" % (outputFileName))
             sys.exit(1)
 
     # a null default configuration section means that some capabilities will be missing!
     defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
-        configFolderFileName = findFileInDirs(
-            'cewe_folder.txt', (mcfBaseFolder, os.path.curdir))
+        configFolderFileName = findFileInDirs('cewe_folder.txt', (mcfBaseFolder, os.path.curdir))
         cewe_file = open(configFolderFileName, 'r')
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
@@ -1075,7 +1092,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
 
         backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
     except: # noqa: E722
-        print('Cannot find cewe installation folder from cewe_folder.txt, trying cewe2pdf.ini from current directory and from .mcf directory.')
+        logging.info('Trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
         # Try to read the .ini first from the current directory, and second from the directory where the .mcf file is.
         # Order of the files is important, because config entires are
@@ -1083,15 +1100,15 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         # We want the config file in the .mcf directory to be the most important file.
         filesread = configuration.read(['cewe2pdf.ini', os.path.join(mcfBaseFolder, 'cewe2pdf.ini')])
         if len(filesread) < 1:
-            print('Cannot find cewe installation folder cewe_folder from cewe2pdf.ini')
+            logging.warning('Cannot find cewe installation folder cewe_folder from cewe2pdf.ini')
             cewe_folder = None
         else:
             # Give the user feedback which config-file is used, in case there is a problem.
-            print('\n'.join(map('Used configuration in: {}'.format, filesread)))
+            logging.info('Using configuration in: ' + ', '.join(map('{}'.format, filesread)))
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             if 'cewe_folder' not in defaultConfigSection:
-                print('Error: You must create cewe_folder.txt or modify cewe2pdf.ini')
+                logging.error('Error: You must create cewe_folder.txt or modify cewe2pdf.ini')
                 sys.exit(1)
 
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
@@ -1143,9 +1160,12 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
 
     try:
         configFontFileName = findFileInDirs('additional_fonts.txt', (mcfBaseFolder, os.path.curdir))
+        logging.info('Using fonts from: ' + configFontFileName)
         with open(configFontFileName, 'r') as fp:
             for line in fp:
                 line = line.strip()
+                if line.startswith("#"):
+                    continue
                 if line.find(" = ") != -1:
                     # Old "font name = /path/to/file" format
                     p = line.split(" = ", 1)
@@ -1154,7 +1174,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                     path = os.path.expandvars(line)
 
                 if not os.path.exists(path):
-                    print('Error: Custom additional font file does not exist: ' + path)
+                    configlogger.error('Custom additional font file does not exist: ' + path)
                     continue
                 if os.path.isdir(path):
                     fontDirs.append(path)
@@ -1162,9 +1182,9 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                     ttfFiles.append(path)
             fp.close()
     except ValueError: # noqa: E722
-        print('cannot find additional fonts (define them in additional_fonts.txt)')
-        print('Content example:')
-        print('/tmp/vera.ttf')
+        configlogger.error('cannot find additional fonts (define them in additional_fonts.txt)')
+        configlogger.error('Content example:')
+        configlogger.error('/tmp/vera.ttf')
 
     if len(fontDirs) > 0:
         for fontDir in fontDirs:
@@ -1177,10 +1197,10 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
             fontFamily = font['name'].getName(1, 3, 1, 1033)#Arial
             fontSubFamily = font['name'].getName(2, 3, 1, 1033)#Regular, Bold, Bold Italic
             if fontFamily is None:
-                print('Could not get family (name) of font: ' + ttfFile)
+                configlogger.warning('Could not get family (name) of font: ' + ttfFile)
                 continue
             if fontSubFamily is None:
-                print('Could not get subfamily of font: ' + ttfFile)
+                configlogger.warning('Could not get subfamily of font: ' + ttfFile)
                 continue
 
             fontFamily = fontFamily.toUnicode()
@@ -1209,36 +1229,32 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                 additional_fontFamilies[fontFamily]["boldItalic"] = fontName
             else:
                 additional_fonts[fontFamily] = ttfFile
-                print("Unhandled font subfamily: " + fontName + " " + fontSubFamily)
-
-    # create pdf
-    pagesize = reportlab.lib.pagesizes.A4
-    if fotobook.get('productname') in formats:
-        pagesize = formats[fotobook.get('productname')]
-    pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
+                configlogger.warning("Unhandled font subfamily: " + fontName + " " + fontSubFamily)
 
     # Add additional fonts. We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
+    logging.info("Registering %s fonts" % len(additional_fonts))
     for curFontName in list(additional_fonts):
         try:
             pdfmetrics.registerFont(TTFont(curFontName, additional_fonts[curFontName]))
-            print("Successfully registered '%s' from '%s'" % (curFontName, additional_fonts[curFontName]))
+            configlogger.info("Registered '%s' from '%s'" % (curFontName, additional_fonts[curFontName]))
         except:# noqa: E722
-            print("Failed to register font '%s' (from %s)" % (curFontName, additional_fonts[curFontName]))
+            configlogger.error("Failed to register font '%s' (from %s)" % (curFontName, additional_fonts[curFontName]))
             del additional_fonts[curFontName]    # remove this item from the font list, so it won't be used later and cause problems.
 
+    # the reportlab manual says:
+    #  Before using the TT Fonts in Platypus we should add a mapping from the family name to the individual font
+    #  names that describe the behaviour under the <b> and <i> attributes.
+    #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
+    #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
     if len(additional_fontFamilies) > 0:
         for familyName, fontfamily in additional_fontFamilies.items():
             for key, value in dict(fontfamily).items():
                 if value is None:
                     del fontfamily[key]
             pdfmetrics.registerFontFamily(familyName, **fontfamily)
+            configlogger.info("Registered font family '%s'" % (familyName))
 
     if defaultConfigSection is not None:
-        # the reportlab manual says:
-        #  Before using the TT Fonts in Platypus we should add a mapping from the family name to the individual font
-        #  names that describe the behaviour under the <b> and <i> attributes.
-        #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
-        #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
         ff = defaultConfigSection.get('FontFamilies', '').splitlines()  # newline separated list of folders
         fontFamilies = filter(lambda bg: (len(bg) != 0), ff)
         for fontfamily in fontFamilies:
@@ -1251,19 +1267,28 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                     italic=members[3],
                     boldItalic=members[4]
                     )
+                configlogger.info("Registered explicit font family '%s'" % (members[0]))
             else:
-                print('Invalid FontFamily line ignored (!= 5 comma-separated strings): ' + fontfamily)
+                configlogger.error('Invalid FontFamily line ignored (!= 5 comma-separated strings): ' + fontfamily)
+
+    logging.info("Ended font registration")
 
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
     if articleConfigElement is None:
-        print(mcfname + ' is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
+        logging.error(mcfname + ' is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
     pageCount = int(articleConfigElement.get('normalpages')) + 2    # maximum number of pages
     imagedir = fotobook.get('imagedir')
 
     # generate a list of available clip-arts
     readClipArtConfigXML(cewe_folder, keyaccountFolder)
+
+    # create pdf
+    pagesize = reportlab.lib.pagesizes.A4
+    if fotobook.get('productname') in formats:
+        pagesize = formats[fotobook.get('productname')]
+    pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
 
     for n in range(pageCount):
         try:
@@ -1330,10 +1355,10 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
 
         except Exception as ex:
             # if one page fails: continue with next one
-            print('error on page %i:' % (n, ), '\n', ex.args[0])
+            logging.error('error on page %i:' % (n, ), '\n', ex.args[0])
             exc_type, exc_obj, exc_tb = sys.exc_info() # exc_obj pylint: disable=unused-variable
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print('', (exc_type, fname, exc_tb.tb_lineno))
+            logging.error('', (exc_type, fname, exc_tb.tb_lineno))
             traceback.print_tb(exc_tb)  # show a stack trace to see in which function the error occured
 
     # save final output pdf
@@ -1389,7 +1414,7 @@ def getKeyaccountNumber(cewe_folder, defaultConfigSection):
 
     inika = defaultConfigSection.get('keyaccount')
     if inika is not None:
-        print('ini file overrides keyaccount from {} to {}'.format(ka, inika))
+        logging.warning('ini file overrides keyaccount from {} to {}'.format(ka, inika))
         ka = inika
     return ka.strip()
 
@@ -1436,16 +1461,16 @@ if __name__ == '__main__':
                 # page range: 23-42
                 fromTo = expr.split('-', 2)
                 if not fromTo[0].isnumeric() or not fromTo[1].isnumeric():
-                    print('Invalid page range: ' + expr)
+                    logging.error('Invalid page range: ' + expr)
                     sys.exit(1)
                 pageFrom = int(fromTo[0])
                 pageTo = int(fromTo[1])
                 if pageTo < pageFrom:
-                    print('Invalid page range: ' + expr)
+                    logging.error('Invalid page range: ' + expr)
                     sys.exit(1)
                 pageNumbers = pageNumbers + list(range(pageFrom, pageTo + 1))
             else:
-                print('Invalid page number: ' + expr)
+                logging.error('Invalid page number: ' + expr)
                 sys.exit(1)
 
     # if we have a file name, let's convert it
