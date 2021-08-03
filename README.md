@@ -19,7 +19,7 @@ Download or clone this cewe2pdf repository into a folder of your choice.
 The easiest way to start this Python script, is to install the latest python version.
 Then from the start-menu open your pyhthon promt and install the dependencies
 ```
-pip install lxml reportlab pillow cairosvg fonttools
+pip install lxml reportlab pillow cairosvg fonttools pyyaml
 ```
 
 If you have installed the Anaconda Pyhton distribution, there is one catch:
@@ -35,7 +35,7 @@ Make sure you have all the dependencies installed by executing:
 ```
 conda install lxml
 conda uninstall reportlab pillow
-pip install reportlab pillow fonttools
+pip install reportlab pillow fonttools pyyaml
 ```
 There does not appear to be a "binaries only" installation for GTK+ or Cairographics, which means you'll have to build it yourself.
 
@@ -71,7 +71,7 @@ Ensure the python dependancies are installed.
 
 On Fedora :
 ```
-sudo dnf install python2-lxml python2-reportlab cairosvg fonttools
+sudo dnf install python2-lxml python2-reportlab cairosvg fonttools pyyaml
 ```
 
 Define the CEWE path (the directory where your CEWE album software is installed. You can recognize it by the many `.so` files and some subdirs like `Resources`). Put this directory name into a file named `cewe_folder.txt`.
