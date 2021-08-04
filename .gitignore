@@ -59,3 +59,4 @@ nosetests.xml
 /tests/unittest_fotobook.mcf.20210725.pdf
 /Output/cewe2pdfsetup.exe
 /cewe2pdf.iss
+/tests/testClipart/testClipart.mcf.pdf

@@ -5,13 +5,13 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>tests\test_simpleBook.py</StartupFile>
+    <StartupFile>tests\testClipart\test_drawClipart.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <InterpreterId>CondaEnv|CondaEnv|anaconda3</InterpreterId>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
     <CommandLineArguments>D:\Users\pete\Source\GitHub\cewe2pdf\tests\unittest_fotobook.mcf</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
@@ -23,6 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include=".flake8" />
+    <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
     <Content Include="build_a_compiled_version.md" />
@@ -33,6 +34,24 @@
     <Content Include="requirements.txt" />
     <Content Include="tests\additional_fonts.txt" />
     <Content Include="tests\cewe2pdf.ini" />
+    <Content Include="tests\Resources\config\keyaccount.xml" />
+    <Content Include="tests\Resources\photofun\backgrounds\201.jpg" />
+    <Content Include="tests\Resources\photofun\backgrounds\448.jpg" />
+    <Content Include="tests\Resources\photofun\decorations\circle.clp" />
+    <Content Include="tests\Resources\photofun\decorations\cliparts_default.xml" />
+    <Content Include="tests\Resources\photofun\decorations\customClipart1.clp" />
+    <Content Include="tests\Resources\photofun\decorations\customClipart2.clp" />
+    <Content Include="tests\Resources\photofun\decorations\original circle.svg" />
+    <Content Include="tests\Resources\photofun\decorations\original customClipart1.svg" />
+    <Content Include="tests\Resources\photofun\decorations\original customClipart2.svg" />
+    <Content Include="tests\Resources\photofun\decorations\rect_cream.svg" />
+    <Content Include="tests\testClipart\cewe2pdf.ini" />
+    <Content Include="tests\testClipart\testClipart.mcf" />
+    <Content Include="tests\testClipart\__pycache__\test_drawClipart.cpython-37-pytest-5.4.1.pyc" />
+    <Content Include="tests\testFontDoesNotExist\additional_fonts.txt" />
+    <Content Include="tests\testFontDoesNotExist\cewe2pdf.ini" />
+    <Content Include="tests\testFontDoesNotExist\testFontDoesNotExist.mcf" />
+    <Content Include="tests\testFontDoesNotExist\__pycache__\test_fontDoesNotExist.cpython-37-pytest-5.4.1.pyc" />
     <Content Include="tests\unittest_fotobook.mcf" />
     <Content Include="tests\unittest_fotobook.mcf.pdf" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\20200306_111748.jpg" />
@@ -50,10 +69,21 @@
     <Compile Include="clpFile.py" />
     <Compile Include="passepartout.py" />
     <Compile Include="processManyMcfs.py" />
+    <Compile Include="tests\testClipart\test_drawClipart.py" />
+    <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\test_simpleBook.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="tests" />
+    <Folder Include="tests\Resources\" />
+    <Folder Include="tests\Resources\config\" />
+    <Folder Include="tests\Resources\photofun\" />
+    <Folder Include="tests\Resources\photofun\backgrounds\" />
+    <Folder Include="tests\Resources\photofun\decorations\" />
+    <Folder Include="tests\testClipart\" />
+    <Folder Include="tests\testClipart\__pycache__\" />
+    <Folder Include="tests\testFontDoesNotExist\" />
+    <Folder Include="tests\testFontDoesNotExist\__pycache__\" />
     <Folder Include="tests\unittest_fotobook_mcf-Dateien" />
   </ItemGroup>
   <ItemGroup>
@@ -74,27 +104,12 @@
 		  https://github.com/microsoft/PTVS/blob/81762d2f2c259b39c46c9ea6d3968c2ec065e370/Python/Product/PythonTools/PythonTools/Project/CustomCommand.cs#L329
 		and I don't believe the code is ever actually used even if the regex locates it!
 		-->
-    <Flake8ErrorRegex>
-      <![CDATA[^(?<filename>.+):(?<line>\d+):(?<column>\d+): (?<message>E\d+ .+)$]]>
-    </Flake8ErrorRegex>
-    <Flake8WarningRegex>
-      <![CDATA[^(?<filename>.+):(?<line>\d+):(?<column>\d+): (?<message>W\d+ .+)$]]>
-    </Flake8WarningRegex>
-    <Flake8MessageRegex>
-      <![CDATA[^(?<filename>.+):(?<line>\d+):(?<column>\d+): (?<message>F\d+ .+)$]]>
-    </Flake8MessageRegex>
+    <Flake8ErrorRegex><![CDATA[^(?<filename>.+):(?<line>\d+):(?<column>\d+): (?<message>E\d+ .+)$]]></Flake8ErrorRegex>
+    <Flake8WarningRegex><![CDATA[^(?<filename>.+):(?<line>\d+):(?<column>\d+): (?<message>W\d+ .+)$]]></Flake8WarningRegex>
+    <Flake8MessageRegex><![CDATA[^(?<filename>.+):(?<line>\d+):(?<column>\d+): (?<message>F\d+ .+)$]]></Flake8MessageRegex>
   </PropertyGroup>
   <Target Name="RunFlake8Command" Label="Run Flake8" Returns="@(Commands)">
-    <CreatePythonCommandItem Target="flake8" 
-    		TargetType="module" 
-		Arguments="" 
-		WorkingDirectory="$(MSBuildProjectDirectory)" 
-		ExecuteIn="output" 
-		RequiredPackages="flake8" 
-		ErrorRegex="$(Flake8ErrorRegex)" 
-		WarningRegex="$(Flake8WarningRegex)" 
-		MessageRegex="$(Flake8MessageRegex)"
-		>
+    <CreatePythonCommandItem Target="flake8" TargetType="module" Arguments="" WorkingDirectory="$(MSBuildProjectDirectory)" ExecuteIn="output" RequiredPackages="flake8" ErrorRegex="$(Flake8ErrorRegex)" WarningRegex="$(Flake8WarningRegex)" MessageRegex="$(Flake8MessageRegex)">
       <Output TaskParameter="Command" ItemName="Commands" />
     </CreatePythonCommandItem>
   </Target>
