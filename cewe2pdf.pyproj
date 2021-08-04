@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>tests\testClipart\test_drawClipart.py</StartupFile>
+    <StartupFile>tests\test_simpleBook.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -45,6 +45,7 @@
     <Content Include="tests\Resources\photofun\decorations\original customClipart1.svg" />
     <Content Include="tests\Resources\photofun\decorations\original customClipart2.svg" />
     <Content Include="tests\Resources\photofun\decorations\rect_cream.svg" />
+    <Content Include="tests\test.webp" />
     <Content Include="tests\testClipart\cewe2pdf.ini" />
     <Content Include="tests\testClipart\testClipart.mcf" />
     <Content Include="tests\testClipart\__pycache__\test_drawClipart.cpython-37-pytest-5.4.1.pyc" />
@@ -72,6 +73,7 @@
     <Compile Include="tests\testClipart\test_drawClipart.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\test_simpleBook.py" />
+    <Compile Include="tests\test_webp_loading.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="tests" />
