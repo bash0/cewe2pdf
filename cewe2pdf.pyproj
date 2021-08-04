@@ -70,6 +70,7 @@
     <Compile Include="clpFile.py" />
     <Compile Include="passepartout.py" />
     <Compile Include="processManyMcfs.py" />
+    <Compile Include="runAllTests.py" />
     <Compile Include="tests\testClipart\test_drawClipart.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\test_simpleBook.py" />
