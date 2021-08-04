@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- diese Datei enthaelt die notwendigen konfigurationen des clients -->
+<!-- Haende weg, wenn Sie nicht wissen, was Sie tun! -->
+<!-- Fehlkonfiguration kann dazu fuehren, dass das Programm unerwartetes Verhalten zeigt -->
+
+<config>
+
+	<!-- M K V -->
+<!--
+	<keyAccount>5026</keyAccount>
+	<client id="38" id_win="38" id_mac="37" id_linux="36" />
+	<generic>true</generic>
+-->
+
+	<!-- M K V  alle Produkte-->
+<!--
+	<keyAccount>5026</keyAccount>
+	<client id="38" id_win="38" id_mac="37" id_linux="36" />
+	<generic showPartnerSelectionAtStartup="true">true</generic>
+-->
+
+	<!-- "Normale" Fotowelt -->
+
+	<keyAccount>5026</keyAccount>
+	<client id="38" id_win="38" id_mac="37" id_linux="36" />
+	<generic>false</generic>
+
+
+	<!-- Fotoschau Standalone -->
+<!--
+	<keyAccount>5026</keyAccount>
+	<client id="38" id_win="38" id_mac="37" id_linux="36" />
+	<generic>false</generic>
+-->
+
+	<!-- Anzahl Filialen des Keyaccounts (Für Filialauswahl): one, few, many -->
+	<outlets>many</outlets>
+
+	<!-- Mögliche Bestellwege des Keyaccounts: cd, net or both -->
+	<orderways>BOTH</orderways>
+
+	<!-- Code des Landes, in dem das Programm läuft: Wichtig für Adressfelder -->
+	<country>161</country> <!-- 82 ist deutsch, 224 ist UK -->
+
+	<!-- Sprache der Anwendung (ISO-Code fuer ORDER.TXT) -->
+	<language>no</language>
+
+	<!-- FULL LOCALE z.B. fuer die Erzeugung eines gültigen Ländercodes gegenüber CEWE MYPHOTOS -->
+	<full_locale>no_NO</full_locale>
+</config>
