@@ -131,6 +131,7 @@ clipartDict = dict()    # a dictionary for clipart element IDs to file name
 clipartPathList = tuple()
 passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
 passepartoutFolders = tuple() # global variable with the folders for passepartout frames
+fontSubstitutions = list() # used to avoid repeated messages
 
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
@@ -465,6 +466,18 @@ def Dequote(s):
         return s[1:-1]
     return s
 
+def noteFontSubstitution(family, replacement):
+    fontSubstitutionPair = family + "/" + replacement
+    fontSubsNotedAlready = fontSubstitutionPair in fontSubstitutions 
+    if not fontSubsNotedAlready:
+        fontSubstitutions.append(fontSubstitutionPair)
+    if logging.root.isEnabledFor(logging.DEBUG):
+        # At DEBUG level we log all font substitutions, making it easier to find them in the mcf
+        logging.debug("Using font family = '%s' (wanted %s)" % (replacement, family))
+        return
+    # At other logging levels we simply log the first font substitution
+    if not fontSubsNotedAlready:
+        logging.warning("Using font family = '%s' (wanted %s)" % (replacement, family))
 
 def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
     spanfont = dfltfont
@@ -479,7 +492,7 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
         elif spanfamily in additional_fonts:
             spanfont = spanfamily
         if spanfamily != spanfont:
-            logging.warning("Using font family = '%s' (wanted %s)" % (spanfont, spanfamily))
+            noteFontSubstitution(spanfamily, spanfont)
 
     if 'font-weight' in spanstyle:
         try:
@@ -604,6 +617,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
         bodyfont = family
     else:
         bodyfont = 'Helvetica'
+        noteFontSubstitution(family, bodyfont)
 
     try:
         bweight = int(Dequote(bstyle['font-weight']))
