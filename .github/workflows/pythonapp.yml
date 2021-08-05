@@ -27,4 +27,5 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
-        pytest
+        # find and run tests, capturing stdout and stderr for the log
+        pytest --capture=tee-sys

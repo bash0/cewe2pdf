@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>tests\test_simpleBook.py</StartupFile>
+    <StartupFile>runAllTests.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -23,6 +23,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include=".flake8" />
+    <Content Include=".github\workflows\build_pyinstaller_release.yml" />
+    <Content Include=".github\workflows\pythonapp.yml" />
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
@@ -77,6 +79,8 @@
     <Compile Include="tests\test_webp_loading.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include=".github\" />
+    <Folder Include=".github\workflows\" />
     <Folder Include="tests" />
     <Folder Include="tests\Resources\" />
     <Folder Include="tests\Resources\config\" />
