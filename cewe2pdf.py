@@ -1007,6 +1007,10 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
         return
 
     if keyaccountFolder is None:
+        # In "production" this is definitely an error, although for unit tests (in particular when
+        # run on the checkin build where CEWE is not installed and there is definitely no downloaded 
+        # stuff from the installation) it isn't really an error because there is a local folder
+        # tests/Resources/photofun/decorations with the clipart files needed for the tests.
         configlogger.error("No downloaded clipart folder found")
         return
 
@@ -1041,29 +1045,36 @@ def getBaseBackgroundLocations(basefolder, keyaccountFolder):
     return baseBackgroundLocations
 
 
-def SetEnvironmentVariables(cewe_folder, defaultConfigSection):
+def SetEnvironmentVariables(cewe_folder, keyAccountNumber):
+    # put values into the environment so that it can be substituted in later
+    # config elements in the ini file, eg as ${CEWE_FOLDER} 
     os.environ['CEWE_FOLDER'] = cewe_folder
-    try:
-        ka = getKeyaccountNumber(cewe_folder, defaultConfigSection)
-        # put the value into the environment so that it can be substituted in later config elements
-        os.environ['KEYACCOUNT'] = ka.strip()
-    except Exception as ex:
-        logging.error('Could not extract keyAccount tag in file: {}, reason {}'.format(getKeyAccountFileName(cewe_folder), ex))
+    os.environ['KEYACCOUNT'] = keyAccountNumber
 
 
 def getOutputFileName(mcfname):
     return mcfname + '.pdf'
 
-#def configureLogging():
-#    import logging
-#    import logging.config
-#    import yaml
-#    with open('loggerconfig.yaml', 'r') as f:
-#        config = yaml.safe_load(f.read())
-#        logging.config.dictConfig(config)
+
+def checkCeweFolder(cewe_folder):
+    if os.path.exists(cewe_folder):
+        logging.info('cewe_folder is {}'.format(cewe_folder))
+    else:
+        logging.error('cewe_folder {} not found'.format(cewe_folder))
+        sys.exit(1)
 
 def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
+    global clipartPathList  # pylint: disable=global-statement
+    global fontSubstitutions  # pylint: disable=global-statement
+    global passepartoutDict  # pylint: disable=global-statement
     global passepartoutFolders  # pylint: disable=global-statement
+
+    clipartDict = dict()    # a dictionary for clipart element IDs to file name
+    clipartPathList = tuple()
+    passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
+    passepartoutFolders = tuple() # global variable with the folders for passepartout frames
+    fontSubstitutions = list() # used to avoid repeated messages
+
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
     mcfBaseFolder = str(mcfPathObj.parent)
@@ -1097,7 +1108,9 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         cewe_file = open(configFolderFileName, 'r')
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
-        keyaccountFolder = getKeyaccountDataFolder(cewe_folder)
+        checkCeweFolder(cewe_folder)
+        keyAccountNumber = getKeyaccountNumber(cewe_folder)
+        keyaccountFolder = getKeyaccountDataFolder(cewe_folder, keyAccountNumber)
 
         backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
     except: # noqa: E722
@@ -1121,10 +1134,14 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                 sys.exit(1)
 
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
-            keyaccountFolder = getKeyaccountDataFolder(cewe_folder, defaultConfigSection)
+            checkCeweFolder(cewe_folder)
 
-            # set the cewe folder and key account number into the environment for use in other config files
-            SetEnvironmentVariables(cewe_folder, defaultConfigSection)
+            keyAccountNumber = getKeyaccountNumber(cewe_folder, defaultConfigSection)
+
+            # set the cewe folder and key account number into the environment for later use in the config files
+            SetEnvironmentVariables(cewe_folder, keyAccountNumber)
+            
+            keyaccountFolder = getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection)
 
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
 
@@ -1393,15 +1410,29 @@ def getHpsDataFolder():
     return None
 
 
-def getKeyaccountDataFolder(cewe_folder, defaultConfigSection=None):
+def getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection = None):
+    # for testing (in particular on checkin on github where no cewe product is installed)
+    # we may want to have a specially constructed local key account data folder
+    if defaultConfigSection is not None:
+        inihps = defaultConfigSection.get('hpsFolder')
+        if inihps is not None:
+            if os.path.exists(inihps):
+                logging.info('ini file overrides hps folder to {}'.format(inihps))
+                return inihps.strip()
+            else:
+                logging.error('ini file hpsFolder {} does not exist - ignored'.format(inihps))
+    
     hpsFolder = getHpsDataFolder()
     if hpsFolder is None:
-        return None
+        logging.warning('No installed hps data folder found')
 
-    keyaccountFolder = os.path.join(hpsFolder, getKeyaccountNumber(cewe_folder, defaultConfigSection))
-    if os.path.exists(keyaccountFolder):
-        return keyaccountFolder
-    return None
+    kadf = os.path.join(hpsFolder, keyAccountNumber)
+    if os.path.exists(kadf):
+        logging.info('Installed key account data folder at {}'.format(kadf))
+        return kadf
+    else:
+        logging.error('Installed key account data folder {} not found'.format(kadf))
+        return None
 
 
 def getKeyAccountFileName(cewe_folder):
@@ -1409,20 +1440,23 @@ def getKeyAccountFileName(cewe_folder):
     return keyAccountFileName
 
 
-def getKeyaccountNumber(cewe_folder, defaultConfigSection):
+def getKeyaccountNumber(cewe_folder, defaultConfigSection = None):
     keyAccountFileName = getKeyAccountFileName(cewe_folder)
-    katree = etree.parse(keyAccountFileName)
-    karoot = katree.getroot()
-    ka = karoot.find('keyAccount').text # that's the official installed value
-    # see if he has a .ini file override for the keyaccount
-    if defaultConfigSection is None:
+    try:
+        katree = etree.parse(keyAccountFileName)
+        karoot = katree.getroot()
+        ka = karoot.find('keyAccount').text # that's the official installed value
+        # see if he has a .ini file override for the keyaccount
+        if defaultConfigSection is not None:
+            inika = defaultConfigSection.get('keyaccount')
+            if inika is not None:
+                logging.info('ini file overrides keyaccount from {} to {}'.format(ka, inika))
+                ka = inika
         return ka.strip()
-
-    inika = defaultConfigSection.get('keyaccount')
-    if inika is not None:
-        logging.warning('ini file overrides keyaccount from {} to {}'.format(ka, inika))
-        ka = inika
-    return ka.strip()
+    except Exception as ex:
+        logging.error('Could not extract keyAccount tag in file: {}'.format(keyAccountFileName))
+        logging.exception('Exception')
+        return 0
 
 
 if __name__ == '__main__':
