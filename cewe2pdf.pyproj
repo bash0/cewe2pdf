@@ -82,6 +82,8 @@
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
     <Folder Include="tests" />
+    <Folder Include="tests\hps\" />
+    <Folder Include="tests\hps\5026\" />
     <Folder Include="tests\Resources\" />
     <Folder Include="tests\Resources\config\" />
     <Folder Include="tests\Resources\photofun\" />

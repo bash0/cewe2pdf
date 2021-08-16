@@ -1058,10 +1058,9 @@ def getOutputFileName(mcfname):
 
 def checkCeweFolder(cewe_folder):
     if os.path.exists(cewe_folder):
-        logging.info('cewe_folder is {}'.format(cewe_folder))
+        logging.info("cewe_folder is {}".format(cewe_folder))
     else:
-        logging.error('cewe_folder {} not found'.format(cewe_folder))
-        sys.exit(1)
+        logging.error("cewe_folder {} not found. This must be a test run which doesn't need it!".format(cewe_folder))
 
 def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     global clipartPathList  # pylint: disable=global-statement
@@ -1452,11 +1451,10 @@ def getKeyaccountNumber(cewe_folder, defaultConfigSection = None):
             if inika is not None:
                 logging.info('ini file overrides keyaccount from {} to {}'.format(ka, inika))
                 ka = inika
-        return ka.strip()
     except Exception as ex:
-        logging.error('Could not extract keyAccount tag in file: {}'.format(keyAccountFileName))
-        logging.exception('Exception')
-        return 0
+        ka = "0"
+        logging.error('Could not extract keyAccount tag in file: {}, using {}'.format(keyAccountFileName, ka))
+    return ka.strip()
 
 
 if __name__ == '__main__':

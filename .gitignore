@@ -60,3 +60,4 @@ nosetests.xml
 /Output/cewe2pdfsetup.exe
 /cewe2pdf.iss
 /tests/testClipart/testClipart.mcf.pdf
+/tests/pdf-parser.py
