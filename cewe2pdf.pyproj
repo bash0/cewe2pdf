@@ -36,6 +36,7 @@
     <Content Include="requirements.txt" />
     <Content Include="tests\additional_fonts.txt" />
     <Content Include="tests\cewe2pdf.ini" />
+    <Content Include="tests\hps\5026\.gitkeep" />
     <Content Include="tests\Resources\config\keyaccount.xml" />
     <Content Include="tests\Resources\photofun\backgrounds\201.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\448.jpg" />
