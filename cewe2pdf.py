@@ -1424,6 +1424,7 @@ def getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection 
     hpsFolder = getHpsDataFolder()
     if hpsFolder is None:
         logging.warning('No installed hps data folder found')
+        return None
 
     kadf = os.path.join(hpsFolder, keyAccountNumber)
     if os.path.exists(kadf):
