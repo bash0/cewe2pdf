@@ -1,21 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <decorations>
-  <decoration type="clipart"> 
-  	<categories>
-  		<category>category-test1</category>
-  	</categories>
-  	<clipart file="circle.svg" designElementId="123" designElementType="clipart"/>
-  </decoration>
-  <decoration type="clipart"> 
-  	<categories>
-  		<category>category-test2</category>
-  	</categories>
-  	<clipart file="customClipart2.svg" designElementId="1234" designElementType="clipart"/>
-  </decoration>  
-  <decoration type="clipart"> 
-  	<categories>
-  		<category>category-test3</category>
-  	</categories>
-  	<clipart file="customClipart1.svg" designElementId="12345" designElementType="clipart"/>
-  </decoration>
+	<decoration type="clipart">
+		<categories>
+			<category>category-test1</category>
+		</categories>
+		<clipart file="circle.svg" designElementId="123" designElementType="clipart"/>
+	</decoration>
+	<decoration type="clipart">
+		<categories>
+			<category>category-test2</category>
+		</categories>
+		<clipart file="customClipart2.svg" designElementId="1234" designElementType="clipart"/>
+	</decoration>
+	<decoration type="clipart">
+		<categories>
+			<category>category-test3</category>
+		</categories>
+		<clipart file="customClipart1.svg" designElementId="12345" designElementType="clipart"/>
+	</decoration>
+	
+	<decoration type="clipart">
+		<categories>
+			<category>category-forms</category>
+		</categories>
+		<clipart file="11744-CLIP-CC.svg" designElementId="121605" designElementType="clipart"/>
+	</decoration>
+	<decoration type="clipart">
+		<categories>
+			<category>category-colours</category>
+		</categories>
+		<clipart file="rect_lightyellow.svg" designElementId="63504" designElementType="clipart"/>
+	</decoration>
+	<decoration type="clipart">
+		<categories>
+			<category>category-colours</category>
+		</categories>
+		<clipart file="rect_terracotta.svg" designElementId="63539" designElementType="clipart"/>
+	</decoration>
+	<decoration type="clipart">
+		<categories>
+			<category>category-animals</category>
+		</categories>
+		<clipart file="5351-Clip-GD.svg" designElementType="clipart" designElementId="68859"/>
+	</decoration>
+	<decoration type="clipart">
+		<categories>
+			<category>category-birthday</category>
+		</categories>
+		<clipart file="7065-CLIP-SF.svg" designElementId="104304" designElementType="clipart"/>
+	</decoration>
+	<decoration type="clipart">
+		<categories>
+			<category>category-colours</category>
+		</categories>
+		<clipart file="rect_white.svg" designElementType="clipart" designElementId="63544" ratio="1"/>
+	</decoration>
 </decorations>
