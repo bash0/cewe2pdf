@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><decorations>
+  <decoration designElementId="125186" id="12809-DECO-ZZ" type="fading">
+    <categories>
+      
+    <category>Rahmen</category></categories>
+    <fading designElementType="passepartout" file="12809-DECO-ZZ-mask.svg" keepAspectRatio="1" ratio="0.68">
+      <clipart designElementType="clipart" file="12809-DECO-ZZ-clip.svg" ratio="0.68"/>
+      <fotoarea height="0.8687" width="0.9073" x="0.04" y="0.06"/>
+    </fading>
+  </decoration>
+</decorations>

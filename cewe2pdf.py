@@ -814,9 +814,14 @@ def loadClipart(fileName) -> ClpFile:
                 return ClpFile("")   # return an empty ClpFile
     else:
         pathObj = Path(fileName)
+        # the name can actually be "correct", but its stem may not be in the clipartPathList. This will 
+        # happen at least for passepartout clip masks when we're using a local test hps structure rather 
+        # than an installed cewe_folder. For that reason we add the file's own folder to the clipartPathList
+        # before searching for a clp or svg file matching the stem
         baseFileName = pathObj.stem
+        fileFolder = pathObj.parent
         try:
-            filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], clipartPathList)
+            filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], (fileFolder,) + clipartPathList)
             filePath = Path(filePath)
         except Exception as ex:
             logging.error(" {}, {}".format(baseFileName, ex))
@@ -1014,7 +1019,8 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
         configlogger.error("No downloaded clipart folder found")
         return
 
-    for file in glob.glob(os.path.join(keyaccountFolder, "addons", "*", "cliparts", "v1", "decorations", "*.xml")):
+    addonclipartxmls = os.path.join(keyaccountFolder, "addons", "*", "cliparts", "v1", "decorations", "*.xml");
+    for file in glob.glob(addonclipartxmls):
         loadClipartConfigXML(file)
 
 def loadClipartConfigXML(xmlFileName):
@@ -1170,7 +1176,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
 
     if keyaccountFolder is not None:
         passepartoutFolders = passepartoutFolders + \
-            tuple(glob.glob(os.path.join(keyaccountFolder, "addons"))) + \
+            tuple([os.path.join(keyaccountFolder, "addons")]) + \
             tuple([os.path.join(cewe_folder, "Resources", "photofun", "decorations")])
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
@@ -1415,11 +1421,12 @@ def getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection 
     if defaultConfigSection is not None:
         inihps = defaultConfigSection.get('hpsFolder')
         if inihps is not None:
-            if os.path.exists(inihps):
-                logging.info('ini file overrides hps folder to {}'.format(inihps))
-                return inihps.strip()
+            inikadf = os.path.join(inihps, keyAccountNumber)
+            if os.path.exists(inikadf):
+                logging.info('ini file overrides hps folder, key account folder set to {}'.format(inikadf))
+                return inikadf.strip()
             else:
-                logging.error('ini file hpsFolder {} does not exist - ignored'.format(inihps))
+                logging.error('ini file overrides hps folder, but key account folder {} does not exist. Using defaults'.format(inikadf))
     
     hpsFolder = getHpsDataFolder()
     if hpsFolder is None:

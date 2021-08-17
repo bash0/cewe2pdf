@@ -7,3 +7,10 @@ FranklinGothic = C:\Windows\Fonts\framd.ttf
 Calibri = C:\Windows\Fonts\calibri.ttf
 Segoe UI Symbol = C:\Windows\Fonts\seguisym.ttf
 Function = ${CEWE_FOLDER}\Resources\photofun\fonts\Function-Light.ttf
+
+# For testing on the checkin build it would be really nice if we could upload
+# the ttf files for the fonts our tests use. Unfortunately ...
+# https://docs.microsoft.com/en-us/typography/fonts/font-faq
+# Apart from the document embedding rights described previously, you may not redistribute the Windows fonts.
+# You may not copy them to other computers or servers, and you may not convert them to other formats, including
+# bitmap formats, or modify them.
