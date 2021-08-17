@@ -1195,8 +1195,10 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         with open(configFontFileName, 'r') as fp:
             for line in fp:
                 line = line.strip()
+                if not line:
+                    continue # ignore empty lines
                 if line.startswith("#"):
-                    continue
+                    continue # ignore comments
                 if line.find(" = ") != -1:
                     # Old "font name = /path/to/file" format
                     p = line.split(" = ", 1)
