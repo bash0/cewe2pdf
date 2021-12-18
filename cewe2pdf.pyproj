@@ -35,6 +35,7 @@
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="tests\additional_fonts.txt" />
+    <Content Include="tests\cewe2pdf-local.ini" />
     <Content Include="tests\cewe2pdf.ini" />
     <Content Include="tests\hps\5026\.gitkeep" />
     <Content Include="tests\hps\5026\addons\121285\cliparts\v1\decorations\12089-CLIP-GOLD-GD.clp" />
