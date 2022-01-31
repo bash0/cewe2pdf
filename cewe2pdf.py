@@ -1396,6 +1396,12 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
 
     pdf = []
 
+    # force the release of objects which might be holding on to picture file references
+    # so that they will not prevent the removal of the files as we clean up and exit
+    import gc
+    objectscollected = gc.collect()
+    logging.info('GC collected objects : {}'.format(objectscollected))
+
     # clean up temp files
     for tmpFileName in tempFileList:
         if os.path.exists(tmpFileName):
