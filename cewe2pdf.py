@@ -1416,8 +1416,15 @@ def getHpsDataFolder():
         return dotMcfFolder
 
     # windows
+    # from some time around september 2022 (07.02.05) the key account folder seems to have been moved
+    # (or perhaps added to on a per user basis?) from ${PROGRAMDATA}/hps/ to ${LOCALAPPDATA}/CEWE/hps/
+    winHpsFolder = os.path.expandvars("${LOCALAPPDATA}/CEWE/hps/")
+    if os.path.exists(winHpsFolder):
+        return winHpsFolder
+    # check for the older location
     winHpsFolder = os.path.expandvars("${PROGRAMDATA}/hps/")
     if os.path.exists(winHpsFolder):
+        logging.info('hps data folder found at old location {}'.format(winHpsFolder))
         return winHpsFolder
 
     return None
