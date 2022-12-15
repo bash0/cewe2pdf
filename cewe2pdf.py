@@ -1389,7 +1389,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         except Exception as ex:
             # if one page fails: continue with next one
             logging.exception("Exception")
-            logging.error('error on page %i:' % (n, ), '\n', ex.args[0])
+            logging.error('error on page {}: {}'.format(n, ex.args[0]))
 
     # save final output pdf
     pdf.save()
