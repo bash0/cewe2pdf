@@ -515,8 +515,9 @@ def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle, 
     if 'color' in fstyle:
         paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])
 
-    if bgColorAttrib is not None:
-        paragraphText = AppendText(paragraphText, ' backcolor=' + bgColorAttrib)
+    # This old strategy doesn't interpret alpha values correctly, background is now done in processAreaTextTag
+    #    if bgColorAttrib is not None:
+    #        paragraphText = AppendText(paragraphText, ' backcolor=' + bgColorAttrib)
 
     paragraphText = AppendText(paragraphText, '>')
 
@@ -649,7 +650,12 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     backgroundColor = None
     backgroundColorAttrib = area.get('backgroundcolor')
     if backgroundColorAttrib is not None:
-        backgroundColor = reportlab.lib.colors.HexColor(backgroundColorAttrib)
+        # Reorder for alpha value - CEWE uses #AARRGGBB, expected #RRGGBBAA
+        backgroundColorInt = int(backgroundColorAttrib)
+        backgroundColorRGB = backgroundColorInt & 0x00FFFFFF
+        backgroundColorA = (backgroundColorInt & 0xFF000000) >> 24
+        backgroundColorRGBA = (backgroundColorRGB << 8) + backgroundColorA
+        backgroundColor = reportlab.lib.colors.HexColor(backgroundColorRGBA, False, True)
 
     # set default para style in case there are no spans to set it
     pdf_styleN = CreateParagraphStyle(backgroundColor, reportlab.lib.colors.black, bodyfont, bodyfs)
