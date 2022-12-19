@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>runAllTests.py</StartupFile>
+    <StartupFile>tests\test_simpleBook.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -15,6 +15,7 @@
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
     <CommandLineArguments>D:\Users\pete\Source\GitHub\cewe2pdf\tests\unittest_fotobook.mcf</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -45,6 +46,7 @@
     <Content Include="tests\hps\5026\addons\125186\masks\v1\decorations\12809-DECO-ZZ.xml" />
     <Content Include="tests\hps\5026\addons\63488\cliparts\v1\decorations\rect_cream.clp" />
     <Content Include="tests\hps\5026\addons\63488\cliparts\v1\decorations\rect_cream.xml" />
+    <Content Include="tests\ReadMe.txt" />
     <Content Include="tests\Resources\config\keyaccount.xml" />
     <Content Include="tests\Resources\photofun\backgrounds\201.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\448.jpg" />
