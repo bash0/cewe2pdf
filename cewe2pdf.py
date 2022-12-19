@@ -515,7 +515,8 @@ def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle, 
     if 'color' in fstyle:
         paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])
 
-    # This old strategy doesn't interpret alpha values correctly, background is now done in processAreaTextTag
+    # This old strategy doesn't interpret background alpha values correctly, background is 
+    # now done in processAreaTextTag (credit seaeagle1, changeset 687fe50)
     #    if bgColorAttrib is not None:
     #        paragraphText = AppendText(paragraphText, ' backcolor=' + bgColorAttrib)
 
