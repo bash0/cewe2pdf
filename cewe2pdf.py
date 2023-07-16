@@ -685,6 +685,17 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
 
         else:
             paragraphText = '<para autoLeading="max">'
+
+            # there might be untagged text preceding a span. We have to add that to paragraphText
+            # first - but we must not terminate the paragraph and add it to the flowable because
+            # the first span just continues that leading text
+            if not p.text is None:
+                paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
+                    additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                usefs = maxfs if maxfs > 0 else bodyfs
+                pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
+
+            # now run round the htmlspans
             for item in htmlspans:
                 if item.tag == 'br':
                     br = item

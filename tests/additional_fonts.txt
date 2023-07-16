@@ -1,7 +1,9 @@
 # All fonts delivered by CEWE are added automatically
 # Adding the entire windows fonts directory is definitely overkill, so just pick the ones we want
 Arial = C:\WINDOWS\FONTS\ARIAL.TTF
+Arial Narrow = C:\WINDOWS\FONTS\ARIALN.TTF
 Arial Rounded MT Bold = C:\WINDOWS\FONTS\ARLRDBD.TTF
+Calibri = C:\Windows\Fonts\CALIBRI.TTF
 CalligraphScript = C:\Windows\Fonts\PALSCRI.TTF
 FranklinGothic = C:\Windows\Fonts\framd.ttf
 Calibri = C:\Windows\Fonts\calibri.ttf
