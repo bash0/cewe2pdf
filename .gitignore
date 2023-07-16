@@ -67,3 +67,4 @@ nosetests.xml
 /tests/pdf-parser.py
 /pageperimage.pdf
 
+/tests/unittest_fotobook.mcf.pdf
