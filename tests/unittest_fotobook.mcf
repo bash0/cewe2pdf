@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="9fa4c67d-eb1c-468b-ba1c-000dd7bd74dc" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="35e22dbc-382c-46ab-a95e-f25e11c71a28" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.0.1" createdWithHPSVersionBuild="20191025" projectID="69675965-93ed-4a07-b25f-7dc31eedcc67" projectIDCreatedEpoch="1575196183"/>
-    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.2.5" programversionBuild="20220628" savetime="2023-07-16 20:51"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.2.5" programversionBuild="20220628" savetime="2023-07-16 21:29"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
     <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
         <outline width="0"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNRIGHT,ALIGNABSOLUTE" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Calibri,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNLEFT" IndentMargin="2" VerticalIndentMargin="2" backgroundColor="#00000000" font="Arial Narrow,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
         <bundlesize height="2750" width="4290"/>
@@ -29,18 +29,18 @@
                 <cutout left="-10.25" scale="4.60938" top="0"/>
             </image>
         </area>
+        <area areatype="spinetextarea">
+            <position height="106" left="820" rotation="270" top="1322" width="2650" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:8pt; font-weight:600; font-style:normal;"><table style="-qt-table-type: root; margin-top:7px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#df1900;">Front title	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Amsterdam - Baltimore - Casablanca - Danemark - Edison -<br /></span><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#1b7dd4;">  Subtitle	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Florida - Gallipoli - Havanna - Italia - Jerusalem</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Stafford,8,-1,5,75,0,0,0,0,0" foregroundColor="#ffffffff" hasOutline="0" lineHeight="100"/>
+            </text>
+        </area>
         <area areatype="textarea">
             <position height="550" left="2398.19" rotation="0" top="200" width="1691.62" zposition="7000"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="title"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:12pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Front title</span></p></td></tr></table></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
-            </text>
-        </area>
-        <area areatype="spinetextarea">
-            <position height="106" left="820" rotation="270" top="1322" width="2650" zposition="7000"/>
-            <decoration/>
-            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:8pt; font-weight:600; font-style:normal;"><table style="-qt-table-type: root; margin-top:7px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#df1900;">Front title	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Amsterdam - Baltimore - Casablanca - Danemark - Edison -<br /></span><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#1b7dd4;">  Subtitle	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Florida - Gallipoli - Havanna - Italia - Jerusalem</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Stafford,8,-1,5,75,0,0,0,0,0" foregroundColor="#ffffffff" hasOutline="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -240,7 +240,7 @@
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="5"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">kk centred text with border gg</span></p></td></tr></table></body></html>]]><outline color="#ff000000" width="0"/>
-                <textFormat Alignment="ALIGNHCENTER,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -249,7 +249,7 @@
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="5"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:22px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">kk centred single text over multiple lines with border gg</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNHCENTER,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -266,8 +266,8 @@
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:10pt; color:#000000;">A gray image, itself with a blue border, then with added red border to the image in Cewe editor</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNRIGHT,ALIGNABSOLUTE" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Calibri,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:10pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">A gray image, itself with a blue border, then with added red border to the image in Cewe editor</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNABSOLUTE,ALIGNRIGHT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Calibri,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -276,7 +276,7 @@
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:10pt; font-weight:400; font-style:normal;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">A grey image, itself with a blue border, then with added red border to the image in Cewe editor</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNRIGHT,ALIGNABSOLUTE" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNABSOLUTE,ALIGNRIGHT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -305,7 +305,7 @@
                 <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
             </decoration>
             <image filename="safecontainer:/20200306_111748.jpg" useABK="1">
-                <cutout left="-0.0111087" scale="0.324043" top="0"/>
+                <cutout left="-0.0118493" scale="0.324043" top="0"/>
             </image>
         </area>
         <area areatype="clipartarea">
@@ -377,7 +377,7 @@
             <designElementIDs passepartout="125186"/>
             <decoration/>
             <image filename="safecontainer:/20200320_124632.jpg" passepartoutDesignElementId="125186" useABK="1">
-                <cutout left="-86.8323" scale="0.169986" top="0"/>
+                <cutout left="-86.8331" scale="0.169986" top="0"/>
                 <ClipartConfiguration applySpotColor="0"/>
             </image>
         </area>
@@ -396,6 +396,18 @@
                 <ClipartConfiguration applySpotColor="0">
                     <colors>
                         <color source="#bd9641" target="#000000"/>
+                    </colors>
+                </ClipartConfiguration>
+            </clipart>
+        </area>
+        <area areatype="clipartarea" layoutContent="1">
+            <position height="66.7707" left="1459.14" rotation="90" top="534.843" width="782.75" zposition="112"/>
+            <designElementIDs clipart="63457"/>
+            <decoration/>
+            <clipart designElementId="63457">
+                <ClipartConfiguration applySpotColor="0">
+                    <colors>
+                        <color source="#000000" target="#df1900"/>
                     </colors>
                 </ClipartConfiguration>
             </clipart>
@@ -584,17 +596,17 @@
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships>
-        <foto id="safecontainer:/img3.png"/>
         <foto id="safecontainer:/img.png"/>
-        <foto id="safecontainer:/img2.png"/>
-        <foto id="safecontainer:/20200320_124632.jpg"/>
-        <foto id="safecontainer:/img4.png"/>
+        <foto id="safecontainer:/img6.png"/>
+        <foto id="safecontainer:/img5.png"/>
+        <foto id="safecontainer:/img3.png"/>
+        <foto id="safecontainer:/GreySquareBlueBorder.jpg"/>
         <foto id="file:///D:/Users/pete/Pictures/PhotoAlbumWork/PhotoAlbum2020/Album Candidates/20200306_111748.jpg">
             <foto id="safecontainer:/20200306_111748.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
         </foto>
-        <foto id="safecontainer:/img6.png"/>
-        <foto id="safecontainer:/GreySquareBlueBorder.jpg"/>
-        <foto id="safecontainer:/img5.png"/>
+        <foto id="safecontainer:/img2.png"/>
+        <foto id="safecontainer:/20200320_124632.jpg"/>
+        <foto id="safecontainer:/img4.png"/>
     </fotoRelationships>
-    <statistics assistantUsed="0" countPauses="29" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="211380" fotosAdded="9" fotosRemoved="5" pauseTime="166187" sessionsUsed="40"/>
+    <statistics assistantUsed="0" countPauses="29" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="212707" fotosAdded="9" fotosRemoved="5" pauseTime="166187" sessionsUsed="41"/>
 </fotobook>
