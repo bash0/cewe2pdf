@@ -874,8 +874,8 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
     for clipconfig in clipartElement.findall('ClipartConfiguration'):
         for clipcolors in clipconfig.findall('colors'):
             for clipcolor in clipcolors.findall('color'):
-                source = '#'+clipcolor.get('source').upper()[3:9]
-                target = '#'+clipcolor.get('target').upper()[3:9]
+                source = '#'+clipcolor.get('source').upper()[1:7]
+                target = '#'+clipcolor.get('target').upper()[1:7]
                 replacement = (source, target)
                 colorreplacements.append(replacement)
 

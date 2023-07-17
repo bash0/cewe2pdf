@@ -179,18 +179,22 @@ class ClpFile(object):
         The color must be a string, and it must be exactly as it appears in the .SVG file as text.
         """
 
-        # the colors are in the form of: style="fill:#112233", or style="opacity:0.40;fill:#112233"
-        # Maybe a regex would be better, as not to replace arbitrary text
-
+        # the colors are in the form of: style="fill:#112233"
+        #   or style="opacity:0.40;fill:#112233",
+        #   or style="stroke:#112233"
+        #   and potentially mixed in with the other keywords which are possible in the style spec
+        
         for curReplacement in colorReplacementList:
             # print (curReplacement)
-            oldColorString = 'fill:'+curReplacement[0]
-            newColorString = 'fill:'+curReplacement[1]
-            # a general replace would look like this:
-            #     re.sub("(style=\".*?)(fill:\#[0-9a-fA-F]+)(.*?\")", r"\1"+XXX+r"\3", self.svgData)
-            self.svgData = re.sub("(style=\".*?)("+oldColorString+")(.*?\")", r"\1"+newColorString+r"\3", self.svgData.decode()).encode(encoding="utf-8")
             # Old, simple, but buggy code: self.svgData = self.svgData.replace(oldColorString.encode(encoding="utf-8"),newColorString.encode(encoding="utf-8") )
-
+            # A general replace would look like this:
+            #     re.sub("(style=\".*?)(fill:\#[0-9a-fA-F]+)(.*?\")", r"\1"+XXX+r"\3", self.svgData)
+            # This does the replacements "fairly carefully" for both fill and stroke
+            colorkeys = ("fill", "stroke")
+            for colorkey in colorkeys:
+                oldColorString = colorkey+':'+curReplacement[0]
+                newColorString = colorkey+':'+curReplacement[1]
+                self.svgData = re.sub("(style=\".*?)("+oldColorString+")(.*?\")", r"\1"+newColorString+r"\3", self.svgData.decode(),flags=re.MULTILINE).encode(encoding="utf-8")
         return self
 
     @staticmethod
