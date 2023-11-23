@@ -1087,16 +1087,17 @@ def checkCeweFolder(cewe_folder):
         logging.error("cewe_folder {} not found. This must be a test run which doesn't need it!".format(cewe_folder))
 
 def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
+    global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
     global fontSubstitutions  # pylint: disable=global-statement
     global passepartoutDict  # pylint: disable=global-statement
     global passepartoutFolders  # pylint: disable=global-statement
-
+    
     clipartDict = dict()    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
+    fontSubstitutions = list() # used to avoid repeated messages
     passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
     passepartoutFolders = tuple() # global variable with the folders for passepartout frames
-    fontSubstitutions = list() # used to avoid repeated messages
 
     # Get the folder in which the .mcf file is
     mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
