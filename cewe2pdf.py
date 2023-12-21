@@ -1231,6 +1231,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     if keyaccountFolder is not None:
         passepartoutFolders = passepartoutFolders + \
             tuple([os.path.join(keyaccountFolder, "addons")]) + \
+            tuple([os.path.join(keyaccountFolder, "photofun", "decorations")]) + \
             tuple([os.path.join(cewe_folder, "Resources", "photofun", "decorations")])
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
