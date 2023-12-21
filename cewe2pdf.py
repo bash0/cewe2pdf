@@ -1024,10 +1024,23 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
     try:
         xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
         loadClipartConfigXML(xmlFileName)
+        configlogger.info('{} listed {} cliparts'.format(xmlFileName,len(clipartDict)))
     except: # noqa: E722
-        configlogger.error('Could not load clipart definition file: {}'.format(xmlConfigFileName))
-        configlogger.error('Cliparts will not be available.')
-        return
+        configlogger.warning('Could not locate and load the clipart definition file: {}'.format(xmlConfigFileName))
+        configlogger.warning('Trying a search for cliparts instead')
+        # cliparts_default.xml went missing in 7.3.4 so we have to go looking for all the individual xml
+        # files, which still seem to be there and have the same format as cliparts_default.xml, and see
+        # if we can build our internal dictionary from them.
+        decorations = os.path.join(baseFolder, 'Resources', 'photofun', 'decorations')
+        for (root, dirs, file) in os.walk(decorations):
+            for f in file:
+                if f.endswith(".xml"):
+                    loadClipartConfigXML(os.path.join(root, f))
+        numberClipartsLocated = len(clipartDict)
+        if numberClipartsLocated > 0:
+            configlogger.warning('{} clipart xmls found'.format(numberClipartsLocated))
+        else:
+            configlogger.error('No clipart xmls found, no delivered cliparts will be available.')
 
     if keyaccountFolder is None:
         # In "production" this is definitely an error, although for unit tests (in particular when
@@ -1036,18 +1049,32 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
         # tests/Resources/photofun/decorations with the clipart files needed for the tests.
         configlogger.error("No downloaded clipart folder found")
         return
-
+    
+    # from (at least) 7.3.4 the addon cliparts might be in more than one structure, so ... first the older layout
     addonclipartxmls = os.path.join(keyaccountFolder, "addons", "*", "cliparts", "v1", "decorations", "*.xml");
     for file in glob.glob(addonclipartxmls):
         loadClipartConfigXML(file)
+    
+    # then the newer layout
+    currentClipartCount = len(clipartDict)
+    xmlfiles = glob.glob(os.path.join(keyaccountFolder, 'photofun', 'decorations', "*", "*", "*.xml"))
+    for xmlfile in xmlfiles:
+        loadClipartConfigXML(xmlfile)
+    numberClipartsLocated = len(clipartDict) - currentClipartCount
+    if numberClipartsLocated > 0:
+        configlogger.warning('{} local clipart xmls found'.format(numberClipartsLocated))
+
+
 
 def loadClipartConfigXML(xmlFileName):
     clipArtXml = open(xmlFileName, 'rb')
     xmlInfo = etree.parse(xmlFileName)
     clipArtXml.close()
-
     for decoration in xmlInfo.findall('decoration'):
         clipartElement = decoration.find('clipart')
+        # we might be reading a decoration definition that is not clipart, just ignore those
+        if clipartElement is None:
+            continue
         fileName = os.path.join(os.path.dirname(xmlFileName), clipartElement.get('file'))
         designElementId = int(clipartElement.get('designElementId'))    # assume these IDs are always integers.
         clipartDict[designElementId] = fileName
@@ -1061,10 +1088,17 @@ def getBaseBackgroundLocations(basefolder, keyaccountFolder):
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
     )
+    
+    # at some point the base cewe organisation of the backgrounds has been changed
+    baseBackgroundLocations = baseBackgroundLocations + \
+        tuple(glob.glob(os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', "*", "*/")))
+    
+    # and then the key account may have added some more backgrounds ...
     if keyaccountFolder is not None:
         baseBackgroundLocations = baseBackgroundLocations + \
-            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1", "backgrounds"))) + \
-            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1")))
+            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1", "backgrounds/"))) + \
+            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1/"))) + \
+            tuple(glob.glob(os.path.join(keyaccountFolder, "photofun", "backgrounds", "*", "*/"))) # from 7.3.4 onwards, I think
 
     return baseBackgroundLocations
 
@@ -1135,9 +1169,10 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         checkCeweFolder(cewe_folder)
         keyAccountNumber = getKeyaccountNumber(cewe_folder)
         keyaccountFolder = getKeyaccountDataFolder(cewe_folder, keyAccountNumber)
-
         backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
+        
     except: # noqa: E722
+        # arrives here if the original cewe_folder.txt file is missing, which we really expect it to be these days.
         logging.info('Trying cewe2pdf.ini from current directory and from .mcf directory.')
         configuration = configparser.ConfigParser()
         # Try to read the .ini first from the current directory, and second from the directory where the .mcf file is.
