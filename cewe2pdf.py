@@ -84,16 +84,31 @@ from reportlab.lib.styles import ParagraphStyle
 
 from lxml import etree
 
+# import pil and work around a breaking change in pil 10.0.0, see 
+#   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
 import PIL
+from pkg_resources import parse_version
+if parse_version(PIL.__version__)>=parse_version('10.0.0'):
+    pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
+else:
+    pil_antialias = PIL.Image.ANTIALIAS
+
 from clpFile import ClpFile  # for clipart .CLP and .SVG files
 from passepartout import Passepartout
 
-if hasattr(sys, 'frozen'):
-    # This is needed for compiled, i.e. frozen programs on Windows to find their dlls.
-    # this _may_ pose a security risk, as normally on Linux the current path is on the path
-    dllpath = os.path.dirname(os.path.realpath(sys.argv[0]))
-    if dllpath not in os.environ:
-        os.environ["PATH"] += os.pathsep + dllpath
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    # Running in a PyInstaller bundle, ref https://pyinstaller.org/en/stable/runtime-information.html#run-time-information
+	# Add the local directory to the PATH. This is needed for compiled (i.e. frozen)
+	#  programs on Windows to find dlls (cairo dlls, in particular).
+    realpath = os.path.realpath(sys.argv[0])
+    exename = os.path.basename(realpath)
+    dllpath = os.path.dirname(realpath)
+    print("Frozen python {} running from {}".format(exename, dllpath))
+    if dllpath not in os.environ["PATH"]:
+        print("Adding {} to PATH".format(dllpath))
+        if not os.environ["PATH"].endswith(os.pathsep):
+            os.environ["PATH"] += os.pathsep
+        os.environ["PATH"] += dllpath
 
 if os.path.exists('loggerconfig.yaml'):
     with open('loggerconfig.yaml', 'r') as f:
@@ -356,7 +371,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     factor = sqrt(new_w * new_h / float(im.size[0] * im.size[1]))
     if factor <= 0.8:
         im = im.resize(
-            (new_w, new_h), PIL.Image.ANTIALIAS)
+            (new_w, new_h), pil_antialias)
     im.load()
 
     # apply the frame mask from the passepartout to the image

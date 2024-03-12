@@ -1,26 +1,33 @@
 # Building a "compiled" cewe2pdf.exe
-Pyhton calls this freezing instead of compiling. So the cewe2pdf is freezed.
+Python calls this freezing instead of compiling. So the cewe2pdf is freezed.
 
 ## Method 1: using pyinstaller
+
+Reference: https://pyinstaller.org/en/stable/
 
     conda install pyinstaller
     pyinstaller cewe2pdf.py
 
-This will generate two directories (build and dist). The final .exe is located in dist/cewe2pdf. But it does not work yet.
+This creates quite a lot of output, including warnings and even tracebacks from exceptions, but don't worry - it will generate two directories (build and dist). The final .exe is located in dist/cewe2pdf. But it does not work yet.
 
 1. Create the folowing directories:
     - dist/cewe2pdf/cssselect2
     - dist/cewe2pdf/cairocffi
+    - dist/cewe2pdf/cairosvg
     - dist/cewe2pdf/tinycss2
 
 2. Go to your anaconda3\Lib\site-packages\ folder and copy the VERSION files into the respective folder you created in the last step.
 
-3. Copy the VERSION file from anaconda3\Lib\site-packages\cairosvg to dist\cewe2pdf
-
-4. Copy the following files from C:\\...\anaconda3\Library\bin to dist\cewe2pdf:
+3. Copy the following files from C:\\...\anaconda3\Library\bin to dist\cewe2pdf:
     - cairo.dll
+    - zlib1.dll
     - libpng16.dll
-    - zlib.dll
+    - freetype.dll
+    - fontconfig.dll
+    - bz2.dll
+    - expat.dll
+    - libcharset.dll
+    - libiconv.dll
     - api-ms-win-crt-runtime-l1-1-0.dll 
     - api-ms-win-crt-heap-l1-1-0.dll
     - api-ms-win-crt-stdio-l1-1-0.dll
@@ -32,15 +39,19 @@ This will generate two directories (build and dist). The final .exe is located i
     - api-ms-win-crt-time-l1-1-0.dll
     - api-ms-win-crt-environment-l1-1-0.dll
     
-    These is cairo.dll and its dependencies. You can look them up yourself using the dumpbin command from Visual Studio Compiler Tools: 
+    Actually this description may well be a bit simplified. What you're looking for is cairo.dll and all its dependencies, and those might not be in the anaconda bin directory. You might, for example, have used the github vcpkg (https://github.com/microsoft/vcpkg?tab=readme-ov-file#quick-start-windows) to install cairo, thereby adding e.g. D:\Users\xxxx\Source\GitHub\vcpkg\installed\x64-windows\bin to the path. To find the cairo dependencies you can then run:
+        
+    "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\dumpbin.exe" /dependents D:\Users\xxxx\Source\GitHub\vcpkg\installed\x64-windows\bin\cairo.dll
     
-        dumpbin /dependents C:\anaconda3\Library\bin\cairo.dll
+    An alternative dependencies tool is the modern Dependencies program, see https://github.com/lucasg/Dependencies?tab=readme-ov-file
 
-5. The program should work now, if not copy all the other files as well from C:\\...\anaconda3\Library\bin to dist\cewe2pdf
+    Unfortunately these static dependency analysis programs will still not find all the dependencies, because some are dynamically loaded. One way to discover the full list is to load the constructed cewe2pdf.exe into Visual Studio and run it (which should work ok because the cairo stuff will be in the path on your development machine!) Then you can examine the Output window to discover which dlls were loaded.
 
-6. Make sure that near the top of cewe2pdf.py the current directory is added to the os.environ["PATH"]. This must happen before cairosvg is first imported from clpFile.py
+4. Make sure (done near the top of cewe2pdf.py) the current directory is added to the os.environ["PATH"]. This must happen before cairosvg is first imported from clpFile.py
 
-7. Start dist\cewe2pdf\cewe2pdf.exe to see if it starts without error. Remember that you will need to have a cewe2pdf.ini and an additional_fonts.txt file next to your .mcf file and its associated directory.
+5. Start dist\cewe2pdf\cewe2pdf.exe to see if it starts without error.
+   
+6. Remember that you will need a **cewe2pdf.ini** file next to your .mcf file. And maybe an **additional_fonts.txt** and a **loggerconfig.yaml** file.
 
 ## Method 2: py2exe
     pip install py2exe
