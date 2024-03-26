@@ -87,7 +87,7 @@ from lxml import etree
 # import pil and work around a breaking change in pil 10.0.0, see 
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
 import PIL
-from pkg_resources import parse_version
+from packaging.version import parse as parse_version
 if parse_version(PIL.__version__)>=parse_version('10.0.0'):
     pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
 else:
