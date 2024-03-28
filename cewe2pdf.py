@@ -502,7 +502,8 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
                     item.get('style').lstrip(' ').rstrip(';').split('; ')])
     if 'font-family' in spanstyle:
         spanfamily = spanstyle['font-family'].strip("'")
-        if spanfamily in pdf.getAvailableFonts():
+        availableFonts = pdf.getAvailableFonts()
+        if spanfamily in availableFonts:
             spanfont = spanfamily
         elif spanfamily in additional_fonts:
             spanfont = spanfamily
@@ -1297,24 +1298,39 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         ttfFiles = list(dict.fromkeys(ttfFiles))# remove duplicates
         for ttfFile in ttfFiles:
             font = ttLib.TTFont(ttfFile)
-            fontFamily = font['name'].getName(1, 3, 1, 1033)#Arial
-            fontSubFamily = font['name'].getName(2, 3, 1, 1033)#Regular, Bold, Bold Italic
+
+            # see eg https://learn.microsoft.com/en-us/typography/opentype/spec/name#name-ids
+            fontFamily = font['name'].getDebugName(1) # eg Arial
+            fontSubFamily = font['name'].getDebugName(2) # eg Regular, Bold, Bold Italic
+            fullFontName = font['name'].getDebugName(4) # eg usually a combo of 1 and 2
             if fontFamily is None:
                 configlogger.warning('Could not get family (name) of font: ' + ttfFile)
                 continue
             if fontSubFamily is None:
                 configlogger.warning('Could not get subfamily of font: ' + ttfFile)
                 continue
+            if fullFontName is None:
+                configlogger.warning('Could not get full font name: ' + ttfFile)
+                continue
 
-            fontFamily = fontFamily.toUnicode()
-            fontSubFamily = fontSubFamily.toUnicode()
-
-            if fontSubFamily == "Medium" or fontSubFamily == "Regular":
-                fontName = fontFamily
-            else:
-                fontName = fontFamily + " " + fontSubFamily
+            # Cewe offers the users "fonts" which really name a "font family" (so that you can then use 
+            # the B or I buttons to get bold or italic.)  The mcf file contains those (family) names.
+            # So we're going to register (with pdfmetrics):
+            #   (1) a lookup between the cewe font (family) name and up to four fontNames (for R,B,I,BI)
+            #   (2) a lookup between these four fontNames and the ttf file implementing the font
+            # Observe that these fontNames are used only internally in this code, to create the one-to-four
+            #  connection between the cewe font (family) name and the ttf files. The names used to be created
+            #  in code, but now we just use the official full font name
+            # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined 
+            #  because the fullFontName is the same for all three of them, namely FranklinGothic, rather than 
+            #  including the subfamily names which are Regular, Medium, Medium Italic
+            if fullFontName == "FranklinGothic" and not fontSubFamily == "Regular":
+                fullFontName = fontFamily + " " + fontSubFamily
+            
+            fontName = fullFontName   
             additional_fonts[fontName] = ttfFile
 
+            # first time we see a family we create an empty entry from that family to the R,B,I,BI font names
             if fontFamily not in additional_fontFamilies:
                 additional_fontFamilies[fontFamily] = {
                     "normal": None,
@@ -1322,20 +1338,26 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                     "italic": None,
                     "boldItalic": None
                 }
-            if fontSubFamily == "Medium" or fontSubFamily == "Regular":
+                
+            # then try some heuristics to guess which fonts in a potentially large font family can be 
+            # used to represent the more limited set of four fonts offered by cewe. We should perhaps
+            # prefer a particular name (eg in case both Light and Regular exist) but for now the last
+            # font in each weight wins   
+            if fontSubFamily == "Regular" or fontSubFamily == "Light" or fontSubFamily == "Roman":
                 additional_fontFamilies[fontFamily]["normal"] = fontName
-            elif fontSubFamily == "Bold":
+            elif fontSubFamily == "Medium" or fontSubFamily == "Bold" or fontSubFamily == "Heavy" or fontSubFamily == "Xbold" or fontSubFamily == "Demibold" or fontSubFamily == "Demibold Roman":
                 additional_fontFamilies[fontFamily]["bold"] = fontName
-            elif fontSubFamily == "Italic" or fontSubFamily == "Medium Italic":
+            elif fontSubFamily == "Italic" or fontSubFamily == "Light Italic" or fontSubFamily == "Oblique":
                 additional_fontFamilies[fontFamily]["italic"] = fontName
-            elif fontSubFamily == "Bold Italic":
+            elif fontSubFamily == "Medium Italic" or fontSubFamily == "Bold Italic" or fontSubFamily == "BoldItalic" or fontSubFamily == "Heavy Italic" or fontSubFamily == "Bold Oblique" or fontSubFamily == "Demibold Italic":
                 additional_fontFamilies[fontFamily]["boldItalic"] = fontName
             else:
+                configlogger.warning("Unhandled font subfamily: " + fontName + " / " + fontSubFamily)
+                additional_fontFamilies[fontFamily]["normal"] = fontFamily
                 additional_fonts[fontFamily] = ttfFile
-                configlogger.warning("Unhandled font subfamily: " + fontName + " " + fontSubFamily)
 
-    # Add additional fonts. We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
     logging.info("Registering %s fonts" % len(additional_fonts))
+    # We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
     for curFontName in list(additional_fonts):
         try:
             pdfmetrics.registerFont(TTFont(curFontName, additional_fonts[curFontName]))
@@ -1349,30 +1371,50 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     #  names that describe the behaviour under the <b> and <i> attributes.
     #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
     #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
-    if len(additional_fontFamilies) > 0:
-        for familyName, fontfamily in additional_fontFamilies.items():
-            for key, value in dict(fontfamily).items():
-                if value is None:
-                    del fontfamily[key]
-            pdfmetrics.registerFontFamily(familyName, **fontfamily)
-            configlogger.info("Registered font family '%s'" % (familyName))
-
+    
+    # That's the fonts registered and known to the pdf system. Now for the font families...
+    # FIRST we register families explicitly defined in the .ini configuration, because they are
+    # potentially providing correct definitions for families that our code does not correctly 
+    # identify - FranklinGothic being a good example
+    explicitlyRegisteredFamilyNames = []     
     if defaultConfigSection is not None:
         ff = defaultConfigSection.get('FontFamilies', '').splitlines()  # newline separated list of folders
-        fontFamilies = filter(lambda bg: (len(bg) != 0), ff)
-        for fontfamily in fontFamilies:
-            members = fontfamily.split(",")
+        explicitFontFamilies = filter(lambda bg: (len(bg) != 0), ff)
+        for explicitFontFamily in explicitFontFamilies:
+            members = explicitFontFamily.split(",")
             if len(members) == 5:
-                pdfmetrics.registerFontFamily(
-                    members[0],
-                    normal=members[1],
-                    bold=members[2],
-                    italic=members[3],
-                    boldItalic=members[4]
-                    )
-                configlogger.info("Registered explicit font family '%s'" % (members[0]))
+                m_familyname = members[0].strip()
+                m_n = members[1].strip()
+                m_b = members[2].strip()
+                m_i = members[3].strip()
+                m_bi = members[4].strip()
+                pdfmetrics.registerFontFamily(m_familyname, normal=m_n, bold=m_b, italic=m_i, boldItalic=m_bi)
+                explicitlyRegisteredFamilyNames.append(m_familyname)
+                configlogger.info("Registered configured fontfamily '{}': '{}','{}','{}','{}'".format(m_familyname,m_n,m_b,m_i,m_bi))
             else:
-                configlogger.error('Invalid FontFamily line ignored (!= 5 comma-separated strings): ' + fontfamily)
+                configlogger.error('Invalid FontFamily line ignored (!= 5 comma-separated strings): ' + explicitFontFamily)
+
+    # Now we can register the families we have "observed" and built up as we read the font files, 
+    #  but ignoring anything family name which was registered explicitly from configuration            
+    if len(additional_fontFamilies) > 0:
+        for familyName, fontFamily in additional_fontFamilies.items():
+            if fontFamily['normal'] == None:
+                if fontFamily['italic'] != None:
+                    alternateNormal = 'italic'
+                elif fontFamily['bold'] != None:
+                    alternateNormal = 'bold'
+                elif fontFamily['boldItalic'] != None:
+                    alternateNormal = 'boldItalic'
+                fontFamily['normal'] = fontFamily[alternateNormal]
+                configlogger.warning("Font family '{}' has no normal font, chosen {} from {}".format(familyName,fontFamily['normal'], alternateNormal))
+            for key, value in dict(fontFamily).items(): # looping through normal, bold, italic, bold italic
+                if value is None:
+                    del fontFamily[key]
+            if not familyName in explicitlyRegisteredFamilyNames:
+                pdfmetrics.registerFontFamily(familyName, **fontFamily)
+                configlogger.info("Registered fontfamily '{}': {}".format(familyName,fontFamily))
+            else:
+                configlogger.info("Font family '%s' was already registered from configuration file" % (familyName))
 
     logging.info("Ended font registration")
 
