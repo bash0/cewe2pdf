@@ -1299,17 +1299,18 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         for ttfFile in ttfFiles:
             font = ttLib.TTFont(ttfFile)
 
-            # see eg https://learn.microsoft.com/en-us/typography/opentype/spec/name#name-ids
+            # See https://learn.microsoft.com/en-us/typography/opentype/spec/name#name-ids
+            # The dp4 fontviewer shows the contents of ttf files https://us.fontviewer.de/
             fontFamily = font['name'].getDebugName(1) # eg Arial
             fontSubFamily = font['name'].getDebugName(2) # eg Regular, Bold, Bold Italic
-            fullFontName = font['name'].getDebugName(4) # eg usually a combo of 1 and 2
+            fontFullName = font['name'].getDebugName(4) # eg usually a combo of 1 and 2
             if fontFamily is None:
                 configlogger.warning('Could not get family (name) of font: ' + ttfFile)
                 continue
             if fontSubFamily is None:
                 configlogger.warning('Could not get subfamily of font: ' + ttfFile)
                 continue
-            if fullFontName is None:
+            if fontFullName is None:
                 configlogger.warning('Could not get full font name: ' + ttfFile)
                 continue
 
@@ -1322,13 +1323,12 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
             #  connection between the cewe font (family) name and the ttf files. The names used to be created
             #  in code, but now we just use the official full font name
             # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined 
-            #  because the fullFontName is the same for all three of them, namely FranklinGothic, rather than 
+            #  because the fontFullName is identical for all three of them, namely FranklinGothic, rather than 
             #  including the subfamily names which are Regular, Medium, Medium Italic
-            if fullFontName == "FranklinGothic" and not fontSubFamily == "Regular":
-                fullFontName = fontFamily + " " + fontSubFamily
+            if fontFullName == "FranklinGothic" and not fontSubFamily == "Regular":
+                fontFullName = fontFamily + " " + fontSubFamily
             
-            fontName = fullFontName   
-            additional_fonts[fontName] = ttfFile
+            additional_fonts[fontFullName] = ttfFile
 
             # first time we see a family we create an empty entry from that family to the R,B,I,BI font names
             if fontFamily not in additional_fontFamilies:
@@ -1342,17 +1342,31 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
             # then try some heuristics to guess which fonts in a potentially large font family can be 
             # used to represent the more limited set of four fonts offered by cewe. We should perhaps
             # prefer a particular name (eg in case both Light and Regular exist) but for now the last
-            # font in each weight wins   
-            if fontSubFamily == "Regular" or fontSubFamily == "Light" or fontSubFamily == "Roman":
-                additional_fontFamilies[fontFamily]["normal"] = fontName
-            elif fontSubFamily == "Medium" or fontSubFamily == "Bold" or fontSubFamily == "Heavy" or fontSubFamily == "Xbold" or fontSubFamily == "Demibold" or fontSubFamily == "Demibold Roman":
-                additional_fontFamilies[fontFamily]["bold"] = fontName
-            elif fontSubFamily == "Italic" or fontSubFamily == "Light Italic" or fontSubFamily == "Oblique":
-                additional_fontFamilies[fontFamily]["italic"] = fontName
-            elif fontSubFamily == "Medium Italic" or fontSubFamily == "Bold Italic" or fontSubFamily == "BoldItalic" or fontSubFamily == "Heavy Italic" or fontSubFamily == "Bold Oblique" or fontSubFamily == "Demibold Italic":
-                additional_fontFamilies[fontFamily]["boldItalic"] = fontName
+            # font in each weight wins  
+            if   (fontSubFamily == "Regular" or 
+                  fontSubFamily == "Light" or 
+                  fontSubFamily == "Roman"):
+                additional_fontFamilies[fontFamily]["normal"] = fontFullName
+            elif (fontSubFamily == "Bold" or 
+                  fontSubFamily == "Medium" or 
+                  fontSubFamily == "Heavy" or 
+                  fontSubFamily == "Xbold" or 
+                  fontSubFamily == "Demibold" or 
+                  fontSubFamily == "Demibold Roman"):
+                additional_fontFamilies[fontFamily]["bold"] = fontFullName
+            elif (fontSubFamily == "Italic" or 
+                  fontSubFamily == "Light Italic" or 
+                  fontSubFamily == "Oblique"):
+                additional_fontFamilies[fontFamily]["italic"] = fontFullName
+            elif (fontSubFamily == "Bold Italic" or 
+                  fontSubFamily == "Medium Italic" or 
+                  fontSubFamily == "BoldItalic" or 
+                  fontSubFamily == "Heavy Italic" or 
+                  fontSubFamily == "Bold Oblique" or 
+                  fontSubFamily == "Demibold Italic"):
+                additional_fontFamilies[fontFamily]["boldItalic"] = fontFullName
             else:
-                configlogger.warning("Unhandled font subfamily: " + fontName + " / " + fontSubFamily)
+                configlogger.warning("Unhandled font subfamily: " + fontFullName + " / " + fontSubFamily)
                 additional_fontFamilies[fontFamily]["normal"] = fontFamily
                 additional_fonts[fontFamily] = ttfFile
 
@@ -1395,7 +1409,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                 configlogger.error('Invalid FontFamily line ignored (!= 5 comma-separated strings): ' + explicitFontFamily)
 
     # Now we can register the families we have "observed" and built up as we read the font files, 
-    #  but ignoring anything family name which was registered explicitly from configuration            
+    #  but ignoring any family name which was registered explicitly from configuration            
     if len(additional_fontFamilies) > 0:
         for familyName, fontFamily in additional_fontFamilies.items():
             if fontFamily['normal'] == None:
