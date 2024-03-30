@@ -1325,8 +1325,17 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
             # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined 
             #  because the fontFullName is identical for all three of them, namely FranklinGothic, rather than 
             #  including the subfamily names which are Regular, Medium, Medium Italic
-            if fontFullName == "FranklinGothic" and not fontSubFamily == "Regular":
-                fontFullName = fontFamily + " " + fontSubFamily
+            if (fontFullName == fontFamily) and not (fontSubFamily == "Regular" or fontSubFamily == "Light" or fontSubFamily == "Roman"):
+                # We have a non-"normal" subfamily where the full font name which is not different from the family name.
+                # That may be a slightly dubious font definition, and it seems to cause us trouble. First, warn about it,
+                # in case people have actually used these rather "special" fonts:
+                configlogger.warning("fontFullName == fontFamily '{}' for a non-regular subfamily '{}'. A bit strange!".format(fontFullName, fontSubFamily))
+                # Some of the special cases really are special and probably OK, but CEWE FranklinGothic 
+                # is a case in point where I think the definition is just wrong, and we can successfully
+                # fix it, in combination with a manual FontFamilies defintion in the .ini file:
+                if fontFamily == "FranklinGothic":
+                    fontFullName = fontFamily + " " + fontSubFamily
+                    configlogger.warning("  constructed fontFullName '{}' for '{}' '{}'".format(fontFullName, fontFamily, fontSubFamily))
             
             additional_fonts[fontFullName] = ttfFile
 
@@ -1366,7 +1375,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                   fontSubFamily == "Demibold Italic"):
                 additional_fontFamilies[fontFamily]["boldItalic"] = fontFullName
             else:
-                configlogger.warning("Unhandled font subfamily: " + fontFullName + " / " + fontSubFamily)
+                configlogger.warning("Unhandled fontSubFamily '{}', using fontFamily '{}' as the regular font name".format(fontSubFamily,fontFamily))
                 additional_fontFamilies[fontFamily]["normal"] = fontFamily
                 additional_fonts[fontFamily] = ttfFile
 
@@ -1388,8 +1397,10 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     
     # That's the fonts registered and known to the pdf system. Now for the font families...
     # FIRST we register families explicitly defined in the .ini configuration, because they are
-    # potentially providing correct definitions for families that our code does not correctly 
-    # identify - FranklinGothic being a good example
+    # potentially providing correct definitions for families which are not correctly identified by 
+    # the normal heuristic family setup above  - the "fixed" FranklinGothic being a good example:
+    # fontFamilies =
+	#   FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
     explicitlyRegisteredFamilyNames = []     
     if defaultConfigSection is not None:
         ff = defaultConfigSection.get('FontFamilies', '').splitlines()  # newline separated list of folders
@@ -1404,9 +1415,9 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
                 m_bi = members[4].strip()
                 pdfmetrics.registerFontFamily(m_familyname, normal=m_n, bold=m_b, italic=m_i, boldItalic=m_bi)
                 explicitlyRegisteredFamilyNames.append(m_familyname)
-                configlogger.info("Registered configured fontfamily '{}': '{}','{}','{}','{}'".format(m_familyname,m_n,m_b,m_i,m_bi))
+                configlogger.warning("Using configured font family '{}': '{}','{}','{}','{}'".format(m_familyname,m_n,m_b,m_i,m_bi))
             else:
-                configlogger.error('Invalid FontFamily line ignored (!= 5 comma-separated strings): ' + explicitFontFamily)
+                configlogger.error('Invalid FontFamilies line ignored (!= 5 comma-separated strings): ' + explicitFontFamily)
 
     # Now we can register the families we have "observed" and built up as we read the font files, 
     #  but ignoring any family name which was registered explicitly from configuration            
