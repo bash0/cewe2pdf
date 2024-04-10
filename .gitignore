@@ -68,3 +68,4 @@ nosetests.xml
 /pageperimage.pdf
 
 /tests/unittest_fotobook.mcf.pdf
+/tests/unittest_fotobook.mcfx.pdf
