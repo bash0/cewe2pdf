@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="cewe2pdf.py" />
     <Compile Include="clpFile.py" />
+    <Compile Include="mcfx.py" />
     <Compile Include="passepartout.py" />
     <Compile Include="processManyMcfs.py" />
     <Compile Include="runAllTests.py" />

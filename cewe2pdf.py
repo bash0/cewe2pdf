@@ -73,6 +73,8 @@ from pathlib import Path
 
 from fontTools import ttLib
 
+from mcfx import unpackMcfx
+
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
@@ -88,6 +90,7 @@ from lxml import etree
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
 import PIL
 from packaging.version import parse as parse_version
+
 if parse_version(PIL.__version__)>=parse_version('10.0.0'):
     pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
 else:
@@ -1135,8 +1138,8 @@ def checkCeweFolder(cewe_folder):
         logging.info("cewe_folder is {}".format(cewe_folder))
     else:
         logging.error("cewe_folder {} not found. This must be a test run which doesn't need it!".format(cewe_folder))
-
-def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
+    
+def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
     global fontSubstitutions  # pylint: disable=global-statement
@@ -1149,22 +1152,37 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
     passepartoutFolders = tuple() # global variable with the folders for passepartout frames
 
-    # Get the folder in which the .mcf file is
-    mcfPathObj = Path(mcfname).resolve()    # convert it to an absolute path
+    # check for new format (version 7.3.?, ca 2023, issue https://github.com/bash0/cewe2pdf/issues/119)
+    mcfxFormat = albumname.endswith(".mcfx")
+    if mcfxFormat:
+        albumPathObj = Path(albumname).resolve()
+        unpackedFolder, mcfxmlname = unpackMcfx(albumPathObj)
+    else:
+        unpackedFolder = None
+        mcfxmlname = albumname
+    
+    # we'll need the album folder to find config files
+    albumBaseFolder = str(Path(albumname).resolve().parent)
+    
+    # we'll need the mcf folder to find mcf relative image file names
+    mcfPathObj = Path(mcfxmlname).resolve()
     mcfBaseFolder = str(mcfPathObj.parent)
-
+        
     # parse the input mcf xml file
     # read file as binary, so UTF-8 encoding is preserved for xml-parser
-    mcffile = open(mcfname, 'rb')
+    mcffile = open(mcfxmlname, 'rb')
     mcf = etree.parse(mcffile)
     mcffile.close()
     fotobook = mcf.getroot()
     if fotobook.tag != 'fotobook':
-        logging.error(mcfname + ' is not a valid mcf file. Exiting.')
+        invalidmsg = "Cannot process invalid mcf file {}".format(mcfxmlname)
+        if mcfxFormat:
+            invalidmsg = invalidmsg + " (unpacked from {})".format(albumname)
+        logging.error(invalidmsg)
         sys.exit(1)
 
 	# check output file is acceptable before we do any processing
-    outputFileName = getOutputFileName(mcfname)
+    outputFileName = getOutputFileName(albumname)
     if os.path.exists(outputFileName):
         if os.path.isfile(outputFileName):
             if not os.access(outputFileName, os.W_OK):
@@ -1178,7 +1196,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
-        configFolderFileName = findFileInDirs('cewe_folder.txt', (mcfBaseFolder, os.path.curdir))
+        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir))
         cewe_file = open(configFolderFileName, 'r')
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
@@ -1189,13 +1207,13 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         
     except: # noqa: E722
         # arrives here if the original cewe_folder.txt file is missing, which we really expect it to be these days.
-        logging.info('Trying cewe2pdf.ini from current directory and from .mcf directory.')
+        logging.info('Trying cewe2pdf.ini from current directory and from the album directory.')
         configuration = configparser.ConfigParser()
         # Try to read the .ini first from the current directory, and second from the directory where the .mcf file is.
         # Order of the files is important, because config entires are
         #  overwritten when they appear in the later config files.
         # We want the config file in the .mcf directory to be the most important file.
-        filesread = configuration.read(['cewe2pdf.ini', os.path.join(mcfBaseFolder, 'cewe2pdf.ini')])
+        filesread = configuration.read(['cewe2pdf.ini', os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
         if len(filesread) < 1:
             logging.warning('Cannot find cewe installation folder cewe_folder from cewe2pdf.ini')
             cewe_folder = None
@@ -1261,7 +1279,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
         fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
 
     try:
-        configFontFileName = findFileInDirs('additional_fonts.txt', (mcfBaseFolder, os.path.curdir))
+        configFontFileName = findFileInDirs('additional_fonts.txt', (albumBaseFolder, os.path.curdir))
         logging.info('Using fonts from: ' + configFontFileName)
         with open(configFontFileName, 'r') as fp:
             for line in fp:
@@ -1446,7 +1464,7 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
     if articleConfigElement is None:
-        logging.error(mcfname + ' is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
+        logging.error(albumname + ' is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
     pageCount = int(articleConfigElement.get('normalpages')) + 2    # maximum number of pages
     imagedir = fotobook.get('imagedir')
@@ -1543,6 +1561,9 @@ def convertMcf(mcfname, keepDoublePages: bool, pageNumbers=None):
     for tmpFileName in tempFileList:
         if os.path.exists(tmpFileName):
             os.remove(tmpFileName)
+    if not unpackedFolder is None:
+        unpackedFolder.cleanup()
+    
     return True
 
 
