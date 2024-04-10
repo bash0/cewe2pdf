@@ -122,6 +122,14 @@ else:
 
 configlogger = logging.getLogger("cewe2pdf.config")
 
+# make it possible for PIL.Image to open .heic files if the album editor stores them directly
+# ref https://github.com/bash0/cewe2pdf/issues/130
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+except Exception as ex:
+    logging.warning("{}: direct use of .heic images is not available".format(ex.msg)) 
+
 # ### settings ####
 image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 image_res = 150  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
