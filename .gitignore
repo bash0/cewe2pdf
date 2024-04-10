@@ -69,3 +69,4 @@ nosetests.xml
 
 /tests/unittest_fotobook.mcf.pdf
 /tests/unittest_fotobook.mcfx.pdf
+/tests/unittest_fotobook.mcf20240410.pdf
