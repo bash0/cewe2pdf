@@ -16,8 +16,9 @@ from pdfrw import PdfReader
 from cewe2pdf import convertMcf
 
 def tryToBuildBook(keepDoublePages):
-    inFile = str(Path(Path.cwd(), 'tests', 'unittest_fotobook.mcf'))
-    outFile = str(Path(Path.cwd(), 'tests', 'unittest_fotobook.mcf.pdf'))
+    infilename = 'unittest_fotobook.mcf' # or 'unittest_fotobook.mcfx'
+    inFile = str(Path(Path.cwd(), 'tests', infilename))
+    outFile = str(Path(Path.cwd(), 'tests', infilename + '.pdf'))
     if os.path.exists(outFile) == True:
         os.remove(outFile)
     assert os.path.exists(outFile) == False
