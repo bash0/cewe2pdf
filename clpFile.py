@@ -187,7 +187,7 @@ class ClpFile(object):
         #   or style="stroke:#112233"
         #   and potentially mixed in with the other keywords which are possible in the style spec
         
-        # In the investigation of issue https://github.com/bash0/cewe2pdf/issues/85 I found one clipart
+        # In the investigation of issue https://github.com/bash0/cewe2pdf/issues/85 I found a clipart (1134365)
         # which has no <g> grouping element surrounding the <path>, and thus no fill or stroke attributes
         # in the grouping, which is where cewe seem to put these. In this case everything in the svg is 
         # rendered in black, so we need only to check if there is requested replacement for black
@@ -201,7 +201,20 @@ class ClpFile(object):
                     self.svgData = svgDataText.replace('<path ', '<path fill="{}" stroke="{}" '.
                         format(curReplacement[1],curReplacement[1]))
                     return self
-        
+        # More issue #85 stuff. This is for clipart 129188, 14466-CLIP-EMBOSS-GD.xml and similar.
+        # It's a hollow figure with no fill and a black frame        
+        if ('fill="none"' in svgDataText) and (not "stroke" in svgDataText):
+            for curReplacement in colorReplacementList:
+                if (curReplacement[0] == "#000000"):
+                    self.svgData = svgDataText.replace('fill="none"', 'fill="none" stroke="{}" '.
+                        format(curReplacement[1]))
+                    return self
+        # As long as we continue to make assumptions that the cliparts are so simple that we 
+        # can textually find and replace fill and stroke, then we're surely going to find more 
+        # cliparts that we don't recolour properly, in particular when recolouring black which 
+        # seems to be specified by the *absence* of the colour keyword.        
+        # But parsing svg is a much bigger job!
+
         for curReplacement in colorReplacementList:
             # print (curReplacement)
             # Old, simple, but buggy code: self.svgData = self.svgData.replace(oldColorString.encode(encoding="utf-8"),newColorString.encode(encoding="utf-8") )
