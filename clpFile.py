@@ -179,10 +179,28 @@ class ClpFile(object):
         The color must be a string, and it must be exactly as it appears in the .SVG file as text.
         """
 
+        if len(colorReplacementList) < 1:
+            return
+
         # the colors are in the form of: style="fill:#112233"
         #   or style="opacity:0.40;fill:#112233",
         #   or style="stroke:#112233"
         #   and potentially mixed in with the other keywords which are possible in the style spec
+        
+        # In the investigation of issue https://github.com/bash0/cewe2pdf/issues/85 I found one clipart
+        # which has no <g> grouping element surrounding the <path>, and thus no fill or stroke attributes
+        # in the grouping, which is where cewe seem to put these. In this case everything in the svg is 
+        # rendered in black, so we need only to check if there is requested replacement for black
+        # I observe (https://www.geeksforgeeks.org/svg-path-element/) that it is possible to use fill and  
+        # stroke in the path itself, so my hack for #85 is to add both fill and stroke to the path itself
+        # if neither is present anywhere in the svgdata 
+        svgDataText = self.svgData.decode()
+        if (not "fill" in svgDataText) and (not "stroke" in svgDataText):
+            for curReplacement in colorReplacementList:
+                if (curReplacement[0] == "#000000"):
+                    self.svgData = svgDataText.replace('<path ', '<path fill="{}" stroke="{}" '.
+                        format(curReplacement[1],curReplacement[1]))
+                    return self
         
         for curReplacement in colorReplacementList:
             # print (curReplacement)
