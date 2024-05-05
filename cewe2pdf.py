@@ -1662,13 +1662,13 @@ if __name__ == '__main__':
                         default=None,
                         help='Page numbers to render, e.g. 1,2,4-9')
     parser.add_argument('inputFile', type=str, nargs='?',
-                        help='the mcf input file. If not given, the first .mcf in the current directory is used.')
+                        help='the mcf input file. If not given, the first .mcf/.mcfx in the current directory is used.')
 
     args = parser.parse_args()
 
     # if no file name was given, search for the first .mcf file in the current directory
     if args.inputFile is None:
-        fnames = [i for i in os.listdir('.') if i.endswith('.mcf')]
+        fnames = [i for i in os.listdir('.') if i.endswith('.mcf') or i.endswith('.mcfx')]
         if len(fnames) > 0:
             args.inputFile = fnames[0]
 
