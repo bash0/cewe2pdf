@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # In this file it is permitted to catch exceptions on a broad basis since there
@@ -11,7 +11,7 @@
 Create pdf files from CEWE .mcf photo books (cewe-fotobuch)
 version 0.11 (Dec 2019)
 
-This script reads CEWE .mcf files using the lxml library
+This script reads CEWE .mcf and .mcfx files using the lxml library
 and compiles a pdf file using the reportlab python pdf library.
 Execute from same path as .mcf file!
 
@@ -86,12 +86,12 @@ from reportlab.lib.styles import ParagraphStyle
 
 from lxml import etree
 
-# import pil and work around a breaking change in pil 10.0.0, see 
+# import pil and work around a breaking change in pil 10.0.0, see
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
 import PIL
 from packaging.version import parse as parse_version
 
-if parse_version(PIL.__version__)>=parse_version('10.0.0'):
+if parse_version(PIL.__version__)>=parse_version('9.1.0'):
     pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
 else:
     pil_antialias = PIL.Image.ANTIALIAS
@@ -128,7 +128,7 @@ try:
     from pillow_heif import register_heif_opener
     register_heif_opener()
 except Exception as ex:
-    logging.warning("{}: direct use of .heic images is not available".format(ex.msg)) 
+    logging.warning("{}: direct use of .heic images is not available".format(ex.msg))
 
 # ### settings ####
 image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
@@ -494,7 +494,7 @@ def Dequote(s):
 
 def noteFontSubstitution(family, replacement):
     fontSubstitutionPair = family + "/" + replacement
-    fontSubsNotedAlready = fontSubstitutionPair in fontSubstitutions 
+    fontSubsNotedAlready = fontSubstitutionPair in fontSubstitutions
     if not fontSubsNotedAlready:
         fontSubstitutions.append(fontSubstitutionPair)
     if logging.root.isEnabledFor(logging.DEBUG):
@@ -542,7 +542,7 @@ def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle, 
     if 'color' in fstyle:
         paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])
 
-    # This old strategy doesn't interpret background alpha values correctly, background is 
+    # This old strategy doesn't interpret background alpha values correctly, background is
     # now done in processAreaTextTag (credit seaeagle1, changeset 687fe50)
     #    if bgColorAttrib is not None:
     #        paragraphText = AppendText(paragraphText, ' backcolor=' + bgColorAttrib)
@@ -859,8 +859,8 @@ def loadClipart(fileName) -> ClpFile:
                 return ClpFile("")   # return an empty ClpFile
     else:
         pathObj = Path(fileName)
-        # the name can actually be "correct", but its stem may not be in the clipartPathList. This will 
-        # happen at least for passepartout clip masks when we're using a local test hps structure rather 
+        # the name can actually be "correct", but its stem may not be in the clipartPathList. This will
+        # happen at least for passepartout clip masks when we're using a local test hps structure rather
         # than an installed cewe_folder. For that reason we add the file's own folder to the clipartPathList
         # before searching for a clp or svg file matching the stem
         baseFileName = pathObj.stem
@@ -1071,17 +1071,17 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
 
     if keyaccountFolder is None:
         # In "production" this is definitely an error, although for unit tests (in particular when
-        # run on the checkin build where CEWE is not installed and there is definitely no downloaded 
+        # run on the checkin build where CEWE is not installed and there is definitely no downloaded
         # stuff from the installation) it isn't really an error because there is a local folder
         # tests/Resources/photofun/decorations with the clipart files needed for the tests.
         configlogger.error("No downloaded clipart folder found")
         return
-    
+
     # from (at least) 7.3.4 the addon cliparts might be in more than one structure, so ... first the older layout
     addonclipartxmls = os.path.join(keyaccountFolder, "addons", "*", "cliparts", "v1", "decorations", "*.xml");
     for file in glob.glob(addonclipartxmls):
         loadClipartConfigXML(file)
-    
+
     # then the newer layout
     currentClipartCount = len(clipartDict)
     xmlfiles = glob.glob(os.path.join(keyaccountFolder, 'photofun', 'decorations', "*", "*", "*.xml"))
@@ -1115,11 +1115,11 @@ def getBaseBackgroundLocations(basefolder, keyaccountFolder):
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
         os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
     )
-    
+
     # at some point the base cewe organisation of the backgrounds has been changed
     baseBackgroundLocations = baseBackgroundLocations + \
         tuple(glob.glob(os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', "*", "*/")))
-    
+
     # and then the key account may have added some more backgrounds ...
     if keyaccountFolder is not None:
         baseBackgroundLocations = baseBackgroundLocations + \
@@ -1132,7 +1132,7 @@ def getBaseBackgroundLocations(basefolder, keyaccountFolder):
 
 def SetEnvironmentVariables(cewe_folder, keyAccountNumber):
     # put values into the environment so that it can be substituted in later
-    # config elements in the ini file, eg as ${CEWE_FOLDER} 
+    # config elements in the ini file, eg as ${CEWE_FOLDER}
     os.environ['CEWE_FOLDER'] = cewe_folder
     os.environ['KEYACCOUNT'] = keyAccountNumber
 
@@ -1146,36 +1146,38 @@ def checkCeweFolder(cewe_folder):
         logging.info("cewe_folder is {}".format(cewe_folder))
     else:
         logging.error("cewe_folder {} not found. This must be a test run which doesn't need it!".format(cewe_folder))
-    
-def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
+
+def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None):
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
     global fontSubstitutions  # pylint: disable=global-statement
     global passepartoutDict  # pylint: disable=global-statement
     global passepartoutFolders  # pylint: disable=global-statement
-    
+
     clipartDict = dict()    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
     fontSubstitutions = list() # used to avoid repeated messages
     passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
     passepartoutFolders = tuple() # global variable with the folders for passepartout frames
 
+    albumTitle, dummy = os.path.splitext(os.path.basename(albumname))
+
     # check for new format (version 7.3.?, ca 2023, issue https://github.com/bash0/cewe2pdf/issues/119)
     mcfxFormat = albumname.endswith(".mcfx")
     if mcfxFormat:
         albumPathObj = Path(albumname).resolve()
-        unpackedFolder, mcfxmlname = unpackMcfx(albumPathObj)
+        unpackedFolder, mcfxmlname = unpackMcfx(albumPathObj, mcfxTmpDir)
     else:
         unpackedFolder = None
         mcfxmlname = albumname
-    
+
     # we'll need the album folder to find config files
     albumBaseFolder = str(Path(albumname).resolve().parent)
-    
+
     # we'll need the mcf folder to find mcf relative image file names
     mcfPathObj = Path(mcfxmlname).resolve()
     mcfBaseFolder = str(mcfPathObj.parent)
-        
+
     # parse the input mcf xml file
     # read file as binary, so UTF-8 encoding is preserved for xml-parser
     mcffile = open(mcfxmlname, 'rb')
@@ -1204,7 +1206,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
     defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
-        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir))
+        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
         cewe_file = open(configFolderFileName, 'r')
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
@@ -1212,7 +1214,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
         keyAccountNumber = getKeyaccountNumber(cewe_folder)
         keyaccountFolder = getKeyaccountDataFolder(cewe_folder, keyAccountNumber)
         backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
-        
+
     except: # noqa: E722
         # arrives here if the original cewe_folder.txt file is missing, which we really expect it to be these days.
         logging.info('Trying cewe2pdf.ini from current directory and from the album directory.')
@@ -1241,7 +1243,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
 
             # set the cewe folder and key account number into the environment for later use in the config files
             SetEnvironmentVariables(cewe_folder, keyAccountNumber)
-            
+
             keyaccountFolder = getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection)
 
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
@@ -1287,7 +1289,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
         fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
 
     try:
-        configFontFileName = findFileInDirs('additional_fonts.txt', (albumBaseFolder, os.path.curdir))
+        configFontFileName = findFileInDirs('additional_fonts.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
         logging.info('Using fonts from: ' + configFontFileName)
         with open(configFontFileName, 'r') as fp:
             for line in fp:
@@ -1340,7 +1342,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
                 configlogger.warning('Could not get full font name: ' + ttfFile)
                 continue
 
-            # Cewe offers the users "fonts" which really name a "font family" (so that you can then use 
+            # Cewe offers the users "fonts" which really name a "font family" (so that you can then use
             # the B or I buttons to get bold or italic.)  The mcf file contains those (family) names.
             # So we're going to register (with pdfmetrics):
             #   (1) a lookup between the cewe font (family) name and up to four fontNames (for R,B,I,BI)
@@ -1348,21 +1350,24 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
             # Observe that these fontNames are used only internally in this code, to create the one-to-four
             #  connection between the cewe font (family) name and the ttf files. The names used to be created
             #  in code, but now we just use the official full font name
-            # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined 
-            #  because the fontFullName is identical for all three of them, namely FranklinGothic, rather than 
+            # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined
+            #  because the fontFullName is identical for all three of them, namely FranklinGothic, rather than
             #  including the subfamily names which are Regular, Medium, Medium Italic
             if (fontFullName == fontFamily) and not (fontSubFamily == "Regular" or fontSubFamily == "Light" or fontSubFamily == "Roman"):
                 # We have a non-"normal" subfamily where the full font name which is not different from the family name.
                 # That may be a slightly dubious font definition, and it seems to cause us trouble. First, warn about it,
                 # in case people have actually used these rather "special" fonts:
                 configlogger.warning("fontFullName == fontFamily '{}' for a non-regular subfamily '{}'. A bit strange!".format(fontFullName, fontSubFamily))
-                # Some of the special cases really are special and probably OK, but CEWE FranklinGothic 
+                # Some of the special cases really are special and probably OK, but CEWE FranklinGothic
                 # is a case in point where I think the definition is just wrong, and we can successfully
                 # fix it, in combination with a manual FontFamilies defintion in the .ini file:
                 if fontFamily == "FranklinGothic":
                     fontFullName = fontFamily + " " + fontSubFamily
                     configlogger.warning("  constructed fontFullName '{}' for '{}' '{}'".format(fontFullName, fontFamily, fontSubFamily))
-            
+
+            if fontSubFamily == "Regular"  and fontFullName == fontFamily + " Regular":
+                fontFullName = fontFamily
+
             additional_fonts[fontFullName] = ttfFile
 
             # first time we see a family we create an empty entry from that family to the R,B,I,BI font names
@@ -1373,31 +1378,31 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
                     "italic": None,
                     "boldItalic": None
                 }
-                
-            # then try some heuristics to guess which fonts in a potentially large font family can be 
+
+            # then try some heuristics to guess which fonts in a potentially large font family can be
             # used to represent the more limited set of four fonts offered by cewe. We should perhaps
             # prefer a particular name (eg in case both Light and Regular exist) but for now the last
-            # font in each weight wins  
-            if   (fontSubFamily == "Regular" or 
-                  fontSubFamily == "Light" or 
+            # font in each weight wins
+            if   (fontSubFamily == "Regular" or
+                  fontSubFamily == "Light" or
                   fontSubFamily == "Roman"):
                 additional_fontFamilies[fontFamily]["normal"] = fontFullName
-            elif (fontSubFamily == "Bold" or 
-                  fontSubFamily == "Medium" or 
-                  fontSubFamily == "Heavy" or 
-                  fontSubFamily == "Xbold" or 
-                  fontSubFamily == "Demibold" or 
+            elif (fontSubFamily == "Bold" or
+                  fontSubFamily == "Medium" or
+                  fontSubFamily == "Heavy" or
+                  fontSubFamily == "Xbold" or
+                  fontSubFamily == "Demibold" or
                   fontSubFamily == "Demibold Roman"):
                 additional_fontFamilies[fontFamily]["bold"] = fontFullName
-            elif (fontSubFamily == "Italic" or 
-                  fontSubFamily == "Light Italic" or 
+            elif (fontSubFamily == "Italic" or
+                  fontSubFamily == "Light Italic" or
                   fontSubFamily == "Oblique"):
                 additional_fontFamilies[fontFamily]["italic"] = fontFullName
-            elif (fontSubFamily == "Bold Italic" or 
-                  fontSubFamily == "Medium Italic" or 
-                  fontSubFamily == "BoldItalic" or 
-                  fontSubFamily == "Heavy Italic" or 
-                  fontSubFamily == "Bold Oblique" or 
+            elif (fontSubFamily == "Bold Italic" or
+                  fontSubFamily == "Medium Italic" or
+                  fontSubFamily == "BoldItalic" or
+                  fontSubFamily == "Heavy Italic" or
+                  fontSubFamily == "Bold Oblique" or
                   fontSubFamily == "Demibold Italic"):
                 additional_fontFamilies[fontFamily]["boldItalic"] = fontFullName
             else:
@@ -1420,14 +1425,14 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
     #  names that describe the behaviour under the <b> and <i> attributes.
     #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
     #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
-    
+
     # That's the fonts registered and known to the pdf system. Now for the font families...
     # FIRST we register families explicitly defined in the .ini configuration, because they are
-    # potentially providing correct definitions for families which are not correctly identified by 
+    # potentially providing correct definitions for families which are not correctly identified by
     # the normal heuristic family setup above  - the "fixed" FranklinGothic being a good example:
     # fontFamilies =
 	#   FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
-    explicitlyRegisteredFamilyNames = []     
+    explicitlyRegisteredFamilyNames = []
     if defaultConfigSection is not None:
         ff = defaultConfigSection.get('FontFamilies', '').splitlines()  # newline separated list of folders
         explicitFontFamilies = filter(lambda bg: (len(bg) != 0), ff)
@@ -1445,8 +1450,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
             else:
                 configlogger.error('Invalid FontFamilies line ignored (!= 5 comma-separated strings): ' + explicitFontFamily)
 
-    # Now we can register the families we have "observed" and built up as we read the font files, 
-    #  but ignoring any family name which was registered explicitly from configuration            
+    # Now we can register the families we have "observed" and built up as we read the font files,
+    #  but ignoring any family name which was registered explicitly from configuration
     if len(additional_fontFamilies) > 0:
         for familyName, fontFamily in additional_fontFamilies.items():
             if fontFamily['normal'] == None:
@@ -1485,6 +1490,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
     if fotobook.get('productname') in formats:
         pagesize = formats[fotobook.get('productname')]
     pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
+    pdf.setTitle(albumTitle)
 
     for n in range(pageCount):
         try:
@@ -1571,7 +1577,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
             os.remove(tmpFileName)
     if not unpackedFolder is None:
         unpackedFolder.cleanup()
-    
+
     return True
 
 
@@ -1608,7 +1614,7 @@ def getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection 
                 return inikadf.strip()
             else:
                 logging.error('ini file overrides hps folder, but key account folder {} does not exist. Using defaults'.format(inikadf))
-    
+
     hpsFolder = getHpsDataFolder()
     if hpsFolder is None:
         logging.warning('No installed hps data folder found')
@@ -1652,7 +1658,7 @@ if __name__ == '__main__':
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
         pass
 
-    parser = argparse.ArgumentParser(description='Convert a photo-book from .mcf file format to .pdf',
+    parser = argparse.ArgumentParser(description='Convert a photo-book from .mcf/.mcfx file format to .pdf',
                                      epilog="Example:\n   python cewe2pdf.py c:\\path\\to\\my\\files\\my_nice_fotobook.mcf",
                                      formatter_class=CustomArgFormatter)
     parser.add_argument('--keepDoublePages', dest='keepDoublePages', action='store_const',
@@ -1661,14 +1667,17 @@ if __name__ == '__main__':
     parser.add_argument('--pages', dest='pages', action='store',
                         default=None,
                         help='Page numbers to render, e.g. 1,2,4-9')
+    parser.add_argument('--tmp-dir', dest='mcfxTmpDir', action='store',
+                        default=None,
+                        help='Directory for .mcfx file extraction')
     parser.add_argument('inputFile', type=str, nargs='?',
-                        help='the mcf input file. If not given, the first .mcf in the current directory is used.')
+                        help='the mcf input file. If not given, the first .mcf/.mcfx in the current directory is used.')
 
     args = parser.parse_args()
 
     # if no file name was given, search for the first .mcf file in the current directory
     if args.inputFile is None:
-        fnames = [i for i in os.listdir('.') if i.endswith('.mcf')]
+        fnames = [i for i in os.listdir('.') if i.endswith('.mcf') or i.endswith('.mcfx')]
         if len(fnames) > 0:
             args.inputFile = fnames[0]
 
@@ -1700,5 +1709,9 @@ if __name__ == '__main__':
                 logging.error('Invalid page number: ' + expr)
                 sys.exit(1)
 
+    mcfxTmpDir = None
+    if args.mcfxTmpDir is not None:
+        mcfxTmpDir = os.path.abspath(args.mcfxTmpDir)
+
     # if we have a file name, let's convert it
-    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers)
+    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers, mcfxTmpDir)
