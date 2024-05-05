@@ -1363,6 +1363,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
                     fontFullName = fontFamily + " " + fontSubFamily
                     configlogger.warning("  constructed fontFullName '{}' for '{}' '{}'".format(fontFullName, fontFamily, fontSubFamily))
 
+            if fontSubFamily == "Regular"  and fontFullName == fontFamily + " Regular":
+                fontFullName = fontFamily
+
             additional_fonts[fontFullName] = ttfFile
 
             # first time we see a family we create an empty entry from that family to the R,B,I,BI font names
