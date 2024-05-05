@@ -11,7 +11,7 @@
 Create pdf files from CEWE .mcf photo books (cewe-fotobuch)
 version 0.11 (Dec 2019)
 
-This script reads CEWE .mcf files using the lxml library
+This script reads CEWE .mcf and .mcfx files using the lxml library
 and compiles a pdf file using the reportlab python pdf library.
 Execute from same path as .mcf file!
 
@@ -1652,7 +1652,7 @@ if __name__ == '__main__':
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
         pass
 
-    parser = argparse.ArgumentParser(description='Convert a photo-book from .mcf file format to .pdf',
+    parser = argparse.ArgumentParser(description='Convert a photo-book from .mcf/.mcfx file format to .pdf',
                                      epilog="Example:\n   python cewe2pdf.py c:\\path\\to\\my\\files\\my_nice_fotobook.mcf",
                                      formatter_class=CustomArgFormatter)
     parser.add_argument('--keepDoublePages', dest='keepDoublePages', action='store_const',

@@ -151,11 +151,6 @@ touch additional_fonts.txt
 
 If your CEWE software uses `.xmcf` files for your projects, you can simply still use this. The `.xmcf` file format is just an archive of the `*.mcf` file, the `<album>_mcf-Dateien` folder and a few other files. Right click the `.xmcf` file and your os should give you an open to open the archive. Copy the relevant files out of it, and you should be all set for the next steps.
 
-.mcfx Files
------------
-
-If your CEWE software (probably from about 7.3.x onwards) uses `.mcfx` files to store the album, you can still use this. The `.mcfx` file format packs the `*.mcf` file, the content of the `<album>_mcf-Dateien` folder and a few other files into a single database file. You can unpack those for yourself (see the notes in issue https://github.com/bash0/cewe2pdf/issues/119) or you can instead simply use "Save as" in the album editor to save to the .mcf format which cewe2pdf can use.
-
 Install - continued
 -------------------
 
@@ -164,7 +159,7 @@ At this point, you should have these files in your current directory :
 * `cewe2pdf.py`
 * `cewe_folder.txt`
 * `additional_fonts.txt`
-* your `*.mcf` file
+* your `*.mcf` or `.mcfx` file
 * a directory named `<album>_mcf-Datein`
 
 How to use
