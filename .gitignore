@@ -59,15 +59,7 @@ nosetests.xml
 /tests/test_font_does_not_exist.mcf.pdf
 /tests/testClipart/testClipart.mcf.pdf
 /tests/testFontDoesNotExist/testFontDoesNotExist.mcf.pdf
-/tests/unittest_fotobook.mcf.20200516.pdf
-/tests/unittest_fotobook.mcf.20201217.pdf
-/tests/unittest_fotobook.mcf.20210202.pdf
-/tests/unittest_fotobook.mcf.20210725.pdf
-/tests/unittest_fotobook.mcf.20210805.pdf
-/tests/unittest_fotobook.mcf.20211218.pdf
-/tests/unittest_fotobook.mcf.20231221.pdf
-/tests/unittest_fotobook.mcf.20240410.pdf
-/tests/unittest_fotobook.mcf.20240505.pdf
+/tests/unittest_fotobook.mcf.202*.pdf
 /tests/unittest_fotobook.mcf.pdf
 /tests/unittest_fotobook.mcfx.pdf
 /tests/unittest_fotobook_mcf-Dateien/folderid.xml
