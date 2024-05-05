@@ -89,14 +89,19 @@ Follow the steps outlined for Linux on linking to the software (most likely it w
 Install - Linux
 ---------------
 
-Copy the script where your album is (`*.mcf` file)
+Download the repository into a folder of your choice.
 
-Ensure the python dependancies are installed.
+Ensure the python dependencies are installed.
 
 On Fedora :
 
 ```
-sudo dnf install python2-lxml python2-reportlab cairosvg fonttools pyyaml
+sudo dnf install python3-lxml python3-reportlab python-cairosvg fonttools python3-pyyaml
+```
+
+On Debian:
+```
+sudo apt install python3-cairosvg python3-fonttools python3-lxml python3-packaging python3-pillow python3-reportlab python3-yaml
 ```
 
 Define the CEWE path (the directory where your CEWE album software is installed. You can recognize it by the many `.so` files and some subdirs like `Resources`). Put this directory name into a file named `cewe_folder.txt`.
