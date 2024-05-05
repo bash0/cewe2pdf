@@ -14,7 +14,7 @@ sys.path.append('..')
 sys.path.append('.')
 from pathlib import Path
 import os, os.path
-from pdfrw import PdfReader
+from pikepdf import Pdf
 
 
 from cewe2pdf import convertMcf
@@ -30,8 +30,8 @@ def tryToBuildBook(keepDoublePages):
 
     #check the pdf contents
     # we could also test more sophisticated things, like colors or compare images.
-    readerObj = PdfReader(outFile)
-    numPages =  len(readerObj.pages)
+    readPdf = Pdf.open(outFile)
+    numPages =  len(readPdf.pages)
     assert numPages == 6
 
     #os.remove(outFile)
