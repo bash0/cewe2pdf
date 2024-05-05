@@ -20,13 +20,21 @@ def writeTofile(data, filename):
     # logging.info("Writing {}".format(filename))
     with open(filename, 'wb') as file:
         file.write(data)
-    
-def unpackMcfx(mcfxPath: Path):
+
+def unpackMcfx(mcfxPath: Path, tempdirPath):
     mcfname = ""
     curdir = os.getcwd();
-    tempdir = tempfile.TemporaryDirectory()
+
+    tempdir = None
+    if tempdirPath is not None:
+        if not os.path.exists(tempdirPath):
+            os.mkdir(tempdirPath)
+    else:
+        tempdir = tempfile.TemporaryDirectory()
+        tempdirPath = tempdir.name
+
     try:
-        os.chdir(tempdir.name) # somewhere like C:\Users\pete\AppData\Local\Temp\tmpshi3s9di
+        os.chdir(tempdirPath) # somewhere like C:\Users\pete\AppData\Local\Temp\tmpshi3s9di
         logging.info("Unpacking mcfx to {}".format(os.getcwd()))
 
         fullname = mcfxPath.resolve()
@@ -40,13 +48,19 @@ def unpackMcfx(mcfxPath: Path):
         for row in record:
             filename = row[0]
             filecontent = row[1]
-            writeTofile(filecontent, filename)
+            lastchange = row[2] / 1000
             if filename.endswith(".mcf"):
                 if mcfname:
                     logging.error("Exiting: found more than one mcf file in the mcfx database!")
                     sys.exit(1)
-                mcfname = Path(tempdir.name) / filename
-            
+                mcfname = Path(tempdirPath) / filename
+
+            if os.path.exists(filename) and lastchange < os.path.getmtime(filename):
+                #not changed since last extraction
+                continue
+
+            writeTofile(filecontent, filename)
+
         cursor.close()
 
     except sqlite3.Error as error:

@@ -1147,7 +1147,7 @@ def checkCeweFolder(cewe_folder):
     else:
         logging.error("cewe_folder {} not found. This must be a test run which doesn't need it!".format(cewe_folder))
 
-def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
+def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None):
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
     global fontSubstitutions  # pylint: disable=global-statement
@@ -1164,7 +1164,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
     mcfxFormat = albumname.endswith(".mcfx")
     if mcfxFormat:
         albumPathObj = Path(albumname).resolve()
-        unpackedFolder, mcfxmlname = unpackMcfx(albumPathObj)
+        unpackedFolder, mcfxmlname = unpackMcfx(albumPathObj, mcfxTmpDir)
     else:
         unpackedFolder = None
         mcfxmlname = albumname
@@ -1664,6 +1664,9 @@ if __name__ == '__main__':
     parser.add_argument('--pages', dest='pages', action='store',
                         default=None,
                         help='Page numbers to render, e.g. 1,2,4-9')
+    parser.add_argument('--tmp-dir', dest='mcfxTmpDir', action='store',
+                        default=None,
+                        help='Directory for .mcfx file extraction')
     parser.add_argument('inputFile', type=str, nargs='?',
                         help='the mcf input file. If not given, the first .mcf/.mcfx in the current directory is used.')
 
@@ -1703,5 +1706,9 @@ if __name__ == '__main__':
                 logging.error('Invalid page number: ' + expr)
                 sys.exit(1)
 
+    mcfxTmpDir = None
+    if args.mcfxTmpDir is not None:
+        mcfxTmpDir = os.path.abspath(args.mcfxTmpDir)
+
     # if we have a file name, let's convert it
-    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers)
+    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers, mcfxTmpDir)
