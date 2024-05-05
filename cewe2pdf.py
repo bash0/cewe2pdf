@@ -91,7 +91,7 @@ from lxml import etree
 import PIL
 from packaging.version import parse as parse_version
 
-if parse_version(PIL.__version__)>=parse_version('10.0.0'):
+if parse_version(PIL.__version__)>=parse_version('9.1.0'):
     pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
 else:
     pil_antialias = PIL.Image.ANTIALIAS
