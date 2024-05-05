@@ -1204,7 +1204,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
     defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
-        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir))
+        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
         cewe_file = open(configFolderFileName, 'r')
         cewe_folder = cewe_file.read().strip()
         cewe_file.close()
@@ -1287,7 +1287,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None):
         fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
 
     try:
-        configFontFileName = findFileInDirs('additional_fonts.txt', (albumBaseFolder, os.path.curdir))
+        configFontFileName = findFileInDirs('additional_fonts.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
         logging.info('Using fonts from: ' + configFontFileName)
         with open(configFontFileName, 'r') as fp:
             for line in fp:
