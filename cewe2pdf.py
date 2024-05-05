@@ -1160,6 +1160,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
     passepartoutFolders = tuple() # global variable with the folders for passepartout frames
 
+    albumTitle, dummy = os.path.splitext(os.path.basename(albumname))
+
     # check for new format (version 7.3.?, ca 2023, issue https://github.com/bash0/cewe2pdf/issues/119)
     mcfxFormat = albumname.endswith(".mcfx")
     if mcfxFormat:
@@ -1488,6 +1490,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     if fotobook.get('productname') in formats:
         pagesize = formats[fotobook.get('productname')]
     pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
+    pdf.setTitle(albumTitle)
 
     for n in range(pageCount):
         try:
