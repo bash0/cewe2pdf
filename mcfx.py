@@ -38,6 +38,7 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
         logging.info("Unpacking mcfx to {}".format(os.getcwd()))
 
         fullname = mcfxPath.resolve()
+        mcfxMtime = os.path.getmtime(fullname)
         connection = sqlite3.connect(fullname)
         cursor = connection.cursor()
         logging.info("Connected to mcfx database")
@@ -49,6 +50,8 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
             filename = row[0]
             filecontent = row[1]
             lastchange = row[2] / 1000
+            if lastchange == 0:
+                lastchange = mcfxMtime
             if filename.endswith(".mcf"):
                 if mcfname:
                     logging.error("Exiting: found more than one mcf file in the mcfx database!")
