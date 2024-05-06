@@ -71,6 +71,8 @@ from math import sqrt, floor
 
 from pathlib import Path
 
+from os import getenv
+
 from fontTools import ttLib
 
 from mcfx import unpackMcfx
@@ -86,12 +88,12 @@ from reportlab.lib.styles import ParagraphStyle
 
 from lxml import etree
 
+from otf import getTtfsFromOtfs, otf_to_ttf
+
 # import pil and work around a breaking change in pil 10.0.0, see
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
 import PIL
 from packaging.version import parse as parse_version
-
-from otf import getTtfsFromOtfs, otf_to_ttf, user_data_dir
 
 if parse_version(PIL.__version__)>=parse_version('9.1.0'):
     pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
@@ -1149,7 +1151,8 @@ def checkCeweFolder(cewe_folder):
     else:
         logging.error("cewe_folder {} not found. This must be a test run which doesn't need it!".format(cewe_folder))
 
-def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None):
+
+def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None):
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
     global fontSubstitutions  # pylint: disable=global-statement
@@ -1327,8 +1330,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             #   see https://github.com/bash0/cewe2pdf/issues/133
             otfFiles = sorted(glob.glob(os.path.join(fontDir, '*.otf')))
             if len(otfFiles) > 0:
-                appdatadir = user_data_dir()
-                ttfsFromOtfs = getTtfsFromOtfs(otfFiles,appdatadir)
+                ttfsFromOtfs = getTtfsFromOtfs(otfFiles,appDataDir)
                 ttfFiles.extend(ttfsFromOtfs)
 
     if len(ttfFiles) > 0:
@@ -1680,6 +1682,9 @@ if __name__ == '__main__':
     parser.add_argument('--tmp-dir', dest='mcfxTmpDir', action='store',
                         default=None,
                         help='Directory for .mcfx file extraction')
+    parser.add_argument('--appdata-dir', dest='appDataDir',
+                        default=None,
+                        help='Directory for persistent app data, eg ttf fonts converted from otf fonts')
     parser.add_argument('inputFile', type=str, nargs='?',
                         help='the mcf input file. If not given, the first .mcf/.mcfx in the current directory is used.')
 
@@ -1722,6 +1727,10 @@ if __name__ == '__main__':
     mcfxTmpDir = None
     if args.mcfxTmpDir is not None:
         mcfxTmpDir = os.path.abspath(args.mcfxTmpDir)
+        
+    appDataDir = None
+    if args.appDataDir is not None:
+        appDataDir = os.path.abspath(args.appDataDir)
 
     # if we have a file name, let's convert it
-    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers, mcfxTmpDir)
+    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers, mcfxTmpDir, appDataDir)

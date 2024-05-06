@@ -9,11 +9,12 @@ import sys
 import tempfile
 
 from pathlib import Path
-from os import getenv
 from cu2qu.pens import Cu2QuPen
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, newTable
+
+from pathutils import appdata_dir
 
 log = logging.getLogger("cewe2pdf.config")
 
@@ -24,28 +25,6 @@ POST_FORMAT = 2.0
 # assuming the input contours' direction is correctly set (counter-clockwise),
 # we just flip it to clockwise
 REVERSE_DIRECTION = True
-
-def user_data_dir():
-    r"""
-    Get OS specific data directory path for cewe2pdf.
-    Typical user data directories are:
-        macOS:    ~/Library/Application Support/cewe2pdf
-        Unix:     ~/.local/share/cewe2pdf   # or in $XDG_DATA_HOME, if defined
-        Win 10:   C:\Users\<username>\AppData\Local\cewe2pdf
-    :return: full path to the user-specific data dir
-    """
-    # get os specific path
-    if sys.platform.startswith("win"):
-        os_path = getenv("LOCALAPPDATA")
-    elif sys.platform.startswith("darwin"):
-        os_path = "~/Library/Application Support"
-    else:
-        # linux
-        os_path = getenv("XDG_DATA_HOME", "~/.local/share")
-
-    # join with cewe2pdf dir
-    path = Path(os_path) / "cewe2pdf"
-    return path.expanduser()
 
 
 def glyphs_to_quadratic(
@@ -107,13 +86,12 @@ def otf_to_ttf(ttFont, post_format=POST_FORMAT, **kwargs):
 
 def getTtfsFromOtfs(otfFiles, ttfdirPath = None):
     resultingTtfFiles = []
-    ttfdir = None
-    if ttfdirPath is not None:
-        if not os.path.exists(ttfdirPath):
-            os.mkdir(ttfdirPath)
-    else:
-        ttfdir = tempfile.TemporaryDirectory()
-        ttfdirPath = ttfdir.name
+    
+    if ttfdirPath is None:
+        ttfdirPath = appdata_dir()
+        
+    if not os.path.exists(ttfdirPath):
+        os.mkdir(ttfdirPath)
 
     for otfFile in otfFiles:
         if "LiebeGerda-BoldItalic" in otfFile:
