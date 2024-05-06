@@ -91,6 +91,8 @@ from lxml import etree
 import PIL
 from packaging.version import parse as parse_version
 
+from otf import getTtfsFromOtfs, otf_to_ttf, user_data_dir
+
 if parse_version(PIL.__version__)>=parse_version('9.1.0'):
     pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
 else:
@@ -1321,6 +1323,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     if len(fontDirs) > 0:
         for fontDir in fontDirs:
             ttfFiles.extend(sorted(glob.glob(os.path.join(fontDir, '*.ttf'))))
+            # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf 
+            #   see https://github.com/bash0/cewe2pdf/issues/133
+            otfFiles = sorted(glob.glob(os.path.join(fontDir, '*.otf')))
+            if len(otfFiles) > 0:
+                appdatadir = user_data_dir()
+                ttfsFromOtfs = getTtfsFromOtfs(otfFiles,appdatadir)
+                ttfFiles.extend(ttfsFromOtfs)
 
     if len(ttfFiles) > 0:
         ttfFiles = list(dict.fromkeys(ttfFiles))# remove duplicates
@@ -1366,6 +1375,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     configlogger.warning("  constructed fontFullName '{}' for '{}' '{}'".format(fontFullName, fontFamily, fontSubFamily))
 
             if fontSubFamily == "Regular"  and fontFullName == fontFamily + " Regular":
+                configlogger.warning(f"Revised regular fontFullName '{fontFullName}' to '{fontFamily}'")
                 fontFullName = fontFamily
 
             additional_fonts[fontFullName] = ttfFile
