@@ -86,10 +86,10 @@ def otf_to_ttf(ttFont, post_format=POST_FORMAT, **kwargs):
 
 def getTtfsFromOtfs(otfFiles, ttfdirPath = None):
     resultingTtfFiles = []
-    
+
     if ttfdirPath is None:
         ttfdirPath = appdata_dir()
-        
+
     if not os.path.exists(ttfdirPath):
         os.mkdir(ttfdirPath)
 
@@ -115,7 +115,7 @@ def getTtfsFromOtfs(otfFiles, ttfdirPath = None):
                 reverse_direction=REVERSE_DIRECTION, # options.reverse_direction
             )
             font.save(ttfFile)
-        
+
         resultingTtfFiles.append(ttfFile)
-            
+
     return resultingTtfFiles
