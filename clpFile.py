@@ -7,6 +7,7 @@ from pathlib import Path
 import os
 import cairosvg
 import PIL
+from PIL import Image
 from PIL import ImageOps
 from PIL.ExifTags import TAGS
 from io import BytesIO
@@ -52,7 +53,7 @@ class ClpFile(object):
         outFile.write(self.svgData)
         outFile.close()
 
-    def convertToPngInBuffer(self, width:int = None, height:int = None, alpha:int = 128):
+    def convertToPngInBuffer(self, width:int = None, height:int = None, alpha:int = 128, flipX = False, flipY = False):
         """convert the SVG to a PNG file, but only in memory"""
 
         # create a byte buffer that can be used like a file and use it as the output of svg2png.
@@ -70,6 +71,11 @@ class ClpFile(object):
                     if (pixels[i, j] != 0):
                         pixels[i, j] = alpha
             scaledImage.putalpha(alphamask)
+
+        if flipX:
+            scaledImage = scaledImage.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+        if flipY:
+            scaledImage = scaledImage.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
         scaledImage.save(self.pngMemFile, 'png')
         self.pngMemFile.seek(0)

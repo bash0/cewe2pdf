@@ -424,7 +424,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     if frameClipartFileName is not None:
         # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
         # already has these transformations applied. So don't do it twice.
-        insertClipartFile(frameClipartFileName, [], 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0)
+        insertClipartFile(frameClipartFileName, [], 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False)
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
@@ -902,6 +902,8 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
         return
 
     colorreplacements = []
+    flipX = False
+    flipY = False
     for clipconfig in clipartElement.findall('ClipartConfiguration'):
         for clipcolors in clipconfig.findall('colors'):
             for clipcolor in clipcolors.findall('color'):
@@ -909,11 +911,16 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
                 target = '#'+clipcolor.get('target').upper()[1:7]
                 replacement = (source, target)
                 colorreplacements.append(replacement)
+        mirror = clipconfig.get('mirror')
+        if mirror is not None:
+            #cewe developers have a different understanding of x and y :)
+            if mirror == "y" or mirror == "both": flipX = True
+            if mirror == "x" or mirror == "both": flipY = True
 
-    insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot)
+    insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY)
 
 
-def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot):
+def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY):
     img_transx = transx
 
     res = image_res # use the foreground resolution setting for clipart
@@ -931,7 +938,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     if len(colorreplacements) > 0:
         clipart.replaceColors(colorreplacements)
 
-    clipart.convertToPngInBuffer(new_w, new_h, alpha)  # so we can access the pngMemFile later
+    clipart.convertToPngInBuffer(new_w, new_h, alpha, flipX, flipY)  # so we can access the pngMemFile later
 
     # place image
     logging.debug("Clipart file: {}".format(fileName))
