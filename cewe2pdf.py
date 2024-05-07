@@ -1326,7 +1326,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     if len(fontDirs) > 0:
         for fontDir in fontDirs:
             ttfFiles.extend(sorted(glob.glob(os.path.join(fontDir, '*.ttf'))))
-            # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf 
+            # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf
             #   see https://github.com/bash0/cewe2pdf/issues/133
             otfFiles = sorted(glob.glob(os.path.join(fontDir, '*.otf')))
             if len(otfFiles) > 0:
@@ -1727,7 +1727,7 @@ if __name__ == '__main__':
     mcfxTmpDir = None
     if args.mcfxTmpDir is not None:
         mcfxTmpDir = os.path.abspath(args.mcfxTmpDir)
-        
+
     appDataDir = None
     if args.appDataDir is not None:
         appDataDir = os.path.abspath(args.appDataDir)
