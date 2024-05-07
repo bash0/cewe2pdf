@@ -87,7 +87,9 @@
     <Compile Include="cewe2pdf.py" />
     <Compile Include="clpFile.py" />
     <Compile Include="mcfx.py" />
+    <Compile Include="otf.py" />
     <Compile Include="passepartout.py" />
+    <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
     <Compile Include="runAllTests.py" />
     <Compile Include="tests\testClipart\test_drawClipart.py" />

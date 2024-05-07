@@ -185,13 +185,18 @@ usage: cewe2pdf [-h] [--keepDoublePages] [inputFile]
 Convert a foto-book from .mcf file format to .pdf
 
 positional arguments:
-  inputFile          the mcf input file. If not given, the first .mcf in the
+  inputFile          the album input file. If not given, the first .mcf/.mcfx in the
                      current directory is used. (default: None)
 
 optional arguments:
   -h, --help         show this help message and exit
   --keepDoublePages  Each page in the .pdf will be a double-sided page,
                      instead of a normal single page. (default: False)
+  --tmp-dir          A directory for unpacking a .mcfx album. A default temporary
+                     directory is used if none is specified
+  --appdata-dir      A directory for the application to store data which is persistent
+                     between runs, in particular TrueType font files which the program
+                     automatically creates from OpenType font files which it finds.
 
 Example:
    python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
@@ -211,7 +216,7 @@ pyinstaller cewe2pdf.py --onefile
 To run the unit-test you also need to install
 
 ```
-pip install pytest pdfrw
+pip install pytest pikepdf
 ```
 
 You can then call pytest from the working directory or use the runAllTests.py file.
