@@ -7,6 +7,7 @@ from pathlib import Path
 import os
 import cairosvg
 import PIL
+from PIL import Image
 from PIL import ImageOps
 from PIL.ExifTags import TAGS
 from io import BytesIO
@@ -52,7 +53,7 @@ class ClpFile(object):
         outFile.write(self.svgData)
         outFile.close()
 
-    def convertToPngInBuffer(self, width:int = None, height:int = None, alpha:int = 128):
+    def convertToPngInBuffer(self, width:int = None, height:int = None, alpha:int = 128, flipX = False, flipY = False):
         """convert the SVG to a PNG file, but only in memory"""
 
         # create a byte buffer that can be used like a file and use it as the output of svg2png.
@@ -70,6 +71,11 @@ class ClpFile(object):
                     if (pixels[i, j] != 0):
                         pixels[i, j] = alpha
             scaledImage.putalpha(alphamask)
+
+        if flipX:
+            scaledImage = scaledImage.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+        if flipY:
+            scaledImage = scaledImage.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
         scaledImage.save(self.pngMemFile, 'png')
         self.pngMemFile.seek(0)
@@ -187,15 +193,15 @@ class ClpFile(object):
         #   or style="opacity:0.40;fill:#112233",
         #   or style="stroke:#112233"
         #   and potentially mixed in with the other keywords which are possible in the style spec
-        
+
         # In the investigation of issue https://github.com/bash0/cewe2pdf/issues/85 I found a clipart (1134365)
         # which has no <g> grouping element surrounding the <path>, and thus no fill or stroke style attributes
-        # in the grouping, which is where cewe seem to put these. In this case everything in the svg is 
+        # in the grouping, which is where cewe seem to put these. In this case everything in the svg is
         # rendered in black, so we need only to check if there is requested replacement for black and if
         # so we add in a stroke defintion for the new color. We could add fill too, but that seems a bit odd.
-        # I observe (https://www.geeksforgeeks.org/svg-path-element/) that it is possible to use fill and  
-        # stroke in the path itself, so my hack for #85 is to add to the path itself if neither is present 
-        # anywhere in the svgdata 
+        # I observe (https://www.geeksforgeeks.org/svg-path-element/) that it is possible to use fill and
+        # stroke in the path itself, so my hack for #85 is to add to the path itself if neither is present
+        # anywhere in the svgdata
         svgDataText = self.svgData.decode()
         if (not "fill" in svgDataText) and (not "stroke" in svgDataText):
             for curReplacement in colorReplacementList:
@@ -205,17 +211,17 @@ class ClpFile(object):
                     return self
         # More issue #85 stuff. This is for clipart 129188, 14466-CLIP-EMBOSS-GD.xml and similar.
         # It's a hollow figure with no fill and a black rectangular frame. This will hopefully fix
-        # a more general case of an unfilled frame with a color replacement for the frame        
+        # a more general case of an unfilled frame with a color replacement for the frame
         if ('fill="none"' in svgDataText) and (not "stroke" in svgDataText):
             for curReplacement in colorReplacementList:
                 if (curReplacement[0] == "#000000"):
                     self.svgData = svgDataText.replace('fill="none"', 'fill="none" stroke="{}" '.
                         format(curReplacement[1]))
                     return self
-        # As long as we continue to make assumptions that the cliparts are so simple that we 
-        # can textually find and replace fill and stroke, then we're surely going to find more 
-        # cliparts that we don't recolour properly, in particular when recolouring black which 
-        # seems to be specified by the *absence* of the colour keyword.        
+        # As long as we continue to make assumptions that the cliparts are so simple that we
+        # can textually find and replace fill and stroke, then we're surely going to find more
+        # cliparts that we don't recolour properly, in particular when recolouring black which
+        # seems to be specified by the *absence* of the colour keyword.
         # But parsing svg is a much bigger job!
 
         for curReplacement in colorReplacementList:
