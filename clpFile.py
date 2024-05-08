@@ -225,6 +225,10 @@ class ClpFile(object):
         # But parsing svg is a much bigger job!
 
         for curReplacement in colorReplacementList:
+            if curReplacement[0] == curReplacement[1]:
+                # color was not changed
+                continue
+
             # print (curReplacement)
             # Old, simple, but buggy code: self.svgData = self.svgData.replace(oldColorString.encode(encoding="utf-8"),newColorString.encode(encoding="utf-8") )
             # A general replace would look like this:
