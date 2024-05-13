@@ -952,8 +952,8 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
 
 
 def processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw):
-    if keepDoublePages and oddpage == 1 and pagetype == 'normal':
-        # if we are in double-page mode, all the images are already drawn by the even pages.
+    if keepDoublePages and oddpage == 0 and pagetype == 'normal':
+        # if we are in double-page mode, all the images are drawn by the odd pages.
         return
 
     # switch pack to the page element for the even page to get the elements
