@@ -136,8 +136,8 @@ except Exception as ex:
 
 # ### settings ####
 image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
-image_res = 150  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
-bg_res = 100  # dpi The resolution of background images will be reduced to this value, if it is higher.
+image_res = 300  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
+bg_res = 300  # dpi The resolution of background images will be reduced to this value, if it is higher.
 # ##########
 
 # .mcf units are 0.1 mm
@@ -952,8 +952,8 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     pdf.translate(-img_transx, -transy)
 
 
-def processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw):
-    if keepDoublePages and oddpage == 0 and pagetype == 'normal':
+def processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage):
+    if keepDoublePages and oddpage == 0 and pagetype == 'normal' and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
 
@@ -1016,7 +1016,7 @@ def processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBa
 
 def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
         page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
-        bg_notFoundDirList, additional_fonts):
+        bg_notFoundDirList, additional_fonts, lastpage):
     logging.info('parsing page {}  of {}'.format(page.get('pagenr'), pageCount))
 
     bundlesize = page.find("./bundlesize")
@@ -1043,7 +1043,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw)
 
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
-    processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw)
+    processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
 
 def getBaseClipartLocations(baseFolder):
     # create a tuple of places (folders) where background resources would be found by default
@@ -1548,9 +1548,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     # we need to do run parseInputPage twico for one output page in the PDF.
                     # The background needs to be drawn first, or it would obscure any other other elements.
                     pagetype = 'singleside'
+                    lastpage = False
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
-                        bg_notFoundDirList, additional_fonts)
+                        bg_notFoundDirList, additional_fonts, lastpage)
                 pagetype = 'emptypage'
             else:
                 pageNumber = n
@@ -1562,9 +1563,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 continue
 
             if page is not None:
+                lastpage = (n == pageCount - 2)
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
-                    bg_notFoundDirList, additional_fonts)
+                    bg_notFoundDirList, additional_fonts, lastpage)
 
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
