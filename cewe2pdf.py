@@ -1568,8 +1568,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             # finish the page and start a new one.
             # If "keepDoublePages" was active, we only start a new page, after the odd pages.
             if ((keepDoublePages is False)
-                or ((not (keepDoublePages is True and oddpage is True and pagetype == 'normal'))
-                    and (not (keepDoublePages is True and n == (pageCount - 1) and pagetype == 'cover'))
+                or ((not (oddpage is False and pagetype == 'normal'))
+                    and (not (n == (pageCount - 1) and pagetype == 'cover'))
                    )
                ):
                 pdf.showPage()
