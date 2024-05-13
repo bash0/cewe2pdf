@@ -257,12 +257,13 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
             try:
                 bgPath = ""
                 bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
-                areaWidth = pw*2
+                areaWidth = pw
                 if keepDoublePages:
-                    areaWidth = pw
+                    areaWidth = pw/2.
                 areaHeight = ph
-                if pagetype != 'singleside' and oddpage and not keepDoublePages:
-                    ax = -areaWidth / 2.
+
+                if keepDoublePages and backgroundTag.get('alignment') == "3":
+                    ax = areaWidth
                 else:
                     ax = 0
                 logging.debug("Reading background file: {}".format(bgPath))
