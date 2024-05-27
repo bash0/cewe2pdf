@@ -244,6 +244,15 @@ class ClpFile(object):
                     "(style=\".*?)("+oldColorString+")(.*?\")", r"\1"+newColorString+r"\3", self.svgData.decode(),flags=re.MULTILINE)
                 self.svgData = replacement.encode(encoding="utf-8")
                 subsmade += subcount
+
+            # handle: <path fill="#5E0B23" d="M218.23,..."/>
+            attributes = ("fill")
+            for attribute in attributes:
+                replacement, subcount = re.subn(
+                    attribute+"=\""+curReplacement[0]+"\"", r""+attribute+"=\""+curReplacement[1]+"\"", self.svgData.decode(),flags=re.MULTILINE)
+                self.svgData = replacement.encode(encoding="utf-8")
+                subsmade += subcount
+
             if (subsmade == 0):
                 logging.warning("Clipart color substitution defined but not made from {} to {}".format(curReplacement[0],curReplacement[1]))
         return self
