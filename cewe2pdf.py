@@ -1080,19 +1080,20 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
         loadClipartConfigXML(xmlFileName)
         configlogger.info('{} listed {} cliparts'.format(xmlFileName,len(clipartDict)))
     except: # noqa: E722
-        configlogger.warning('Could not locate and load the clipart definition file: {}'.format(xmlConfigFileName))
-        configlogger.warning('Trying a search for cliparts instead')
+        configlogger.info('Could not locate and load the clipart definition file: {}'.format(xmlConfigFileName))
+        configlogger.info('Trying a search for cliparts instead')
         # cliparts_default.xml went missing in 7.3.4 so we have to go looking for all the individual xml
         # files, which still seem to be there and have the same format as cliparts_default.xml, and see
         # if we can build our internal dictionary from them.
         decorations = os.path.join(baseFolder, 'Resources', 'photofun', 'decorations')
+        configlogger.info('clipart xml path: {}'.format(decorations))
         for (root, dirs, file) in os.walk(decorations):
             for f in file:
                 if f.endswith(".xml"):
                     loadClipartConfigXML(os.path.join(root, f))
         numberClipartsLocated = len(clipartDict)
         if numberClipartsLocated > 0:
-            configlogger.warning('{} clipart xmls found'.format(numberClipartsLocated))
+            configlogger.info('{} clipart xmls found'.format(numberClipartsLocated))
         else:
             configlogger.error('No clipart xmls found, no delivered cliparts will be available.')
 
@@ -1111,13 +1112,17 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
 
     # then the newer layout
     currentClipartCount = len(clipartDict)
-    xmlfiles = glob.glob(os.path.join(keyaccountFolder, 'photofun', 'decorations', "*", "*", "*.xml"))
+    localDecorations = os.path.join(keyaccountFolder, 'photofun', 'decorations')
+    xmlfiles = glob.glob(os.path.join(localDecorations, "*", "*", "*.xml"))
+    configlogger.info('local clipart xml path: {}'.format(localDecorations))
     for xmlfile in xmlfiles:
         loadClipartConfigXML(xmlfile)
     numberClipartsLocated = len(clipartDict) - currentClipartCount
     if numberClipartsLocated > 0:
-        configlogger.warning('{} local clipart xmls found'.format(numberClipartsLocated))
+        configlogger.info('{} local clipart xmls found'.format(numberClipartsLocated))
 
+    if len(clipartDict) == 0:
+        configlogger.error('No cliparts found')
 
 
 def loadClipartConfigXML(xmlFileName):
