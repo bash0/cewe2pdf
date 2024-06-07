@@ -236,12 +236,12 @@ class ClpFile(object):
             # This does the replacements "fairly carefully" for both fill and stroke. As an attempt
             # at a "sanity" check we insist that each color replacement should be used at least once
             subsmade = 0
-            colorkeys = ("fill", "stroke")
+            colorkeys = ("fill", "stop-color", "stroke")
             for colorkey in colorkeys:
                 oldColorString = colorkey+':'+curReplacement[0]
                 newColorString = colorkey+':'+curReplacement[1]
                 replacement, subcount = re.subn(
-                    "(style=\".*?)("+oldColorString+")(.*?\")", r"\1"+newColorString+r"\3", self.svgData.decode(),flags=re.MULTILINE)
+                    "(style=\".*?)("+oldColorString+")(.*?\")", r"\1"+newColorString+r"\3", self.svgData.decode(),flags=re.MULTILINE|re.IGNORECASE)
                 self.svgData = replacement.encode(encoding="utf-8")
                 subsmade += subcount
 
