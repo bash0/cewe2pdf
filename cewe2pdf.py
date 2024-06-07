@@ -136,8 +136,8 @@ except Exception as ex:
 
 # ### settings ####
 image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
-image_res = 300  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
-bg_res = 300  # dpi The resolution of background images will be reduced to this value, if it is higher.
+image_res = 150  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
+bg_res = 150  # dpi The resolution of background images will be reduced to this value, if it is higher.
 # ##########
 
 # .mcf units are 0.1 mm
@@ -162,6 +162,21 @@ clipartPathList = tuple()
 passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
 passepartoutFolders = tuple() # global variable with the folders for passepartout frames
 fontSubstitutions = list() # used to avoid repeated messages
+
+
+def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
+    returnValue = minimumValue
+    try:
+        # eg getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
+        returnValue = int(configSection.get(itemName, defaultValue))
+    except ValueError:
+        logging.error(f'Invalid configuration value supplied for {itemName}')
+        returnValue = int(defaultValue)
+    if returnValue < minimumValue:
+        logging.error(f'Configuration value supplied for {itemName} is less than {minimumValue}, using {minimumValue}')
+        returnValue = minimumValue
+    return returnValue
+
 
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
@@ -1284,6 +1299,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
             pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment vars pylint: disable=unnecessary-lambda
             passepartoutFolders = pptout_filtered2
+
+            # read resolution options
+            image_res = getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
+            bg_res = getConfigurationInt(defaultConfigSection, 'pdfBackgroundResolution', '150', 100)
+
+        logging.info(f'Using image resolution {image_res}, background resolution {bg_res}')
 
     if keyaccountFolder is not None:
         passepartoutFolders = passepartoutFolders + \
