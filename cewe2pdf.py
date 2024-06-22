@@ -340,7 +340,6 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     imgCropWidth_mcfunit = areaWidth
     imgCropHeight_mcfunit = areaHeight
     if passepartoutid is not None:
-        logging.warning('Frames (passepartout) are not fully implemented {}'.format(passepartoutid))
         # re-generate the index of designElementId to .xml files, if it does not exist
         passepartoutid = int(passepartoutid)    # we need to work with a number below
         global passepartoutDict # pylint: disable=global-statement
