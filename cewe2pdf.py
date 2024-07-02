@@ -95,6 +95,8 @@ from otf import getTtfsFromOtfs, otf_to_ttf
 import PIL
 from packaging.version import parse as parse_version
 
+from pathutils import localfont_dir
+
 if parse_version(PIL.__version__)>=parse_version('9.1.0'):
     pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
 else:
@@ -143,7 +145,6 @@ bg_res = 150  # dpi The resolution of background images will be reduced to this 
 # .mcf units are 0.1 mm
 # Tabs seem to be in 8mm pitch
 tab_pitch = 80
-line_scale = 1.1
 
 # definitions
 formats = {"ALB82": reportlab.lib.pagesizes.A4,
@@ -466,12 +467,18 @@ def AppendBreak(paragraphText, parachild):
     return paragraphText
 
 
+def lineScaleForFont(font):
+    if font in fontLineScales:
+        return fontLineScales[font]
+    return 1.1
+
+
 def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
     parastyle = ParagraphStyle(None, None,
         alignment=reportlab.lib.enums.TA_LEFT,  # will often be overridden
         fontSize=fontsize,
         fontName=font,
-        leading=fontsize*line_scale,  # line spacing (text + leading)
+        leading=fontsize*lineScaleForFont(font),  # line spacing (text + leading)
         borderPadding=0,
         borderWidth=0,
         leftIndent=0,
@@ -727,7 +734,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
-            pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
+            pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
 
         else:
@@ -740,7 +747,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
                     additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
                 usefs = maxfs if maxfs > 0 else bodyfs
-                pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
+                pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
 
             # now run round the htmlspans
             for item in htmlspans:
@@ -750,7 +757,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                     # but if it is not there then an empty paragraph goes missing :-(
                     paragraphText += '&nbsp;</para>'
                     usefs = maxfs if maxfs > 0 else bodyfs
-                    pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
+                    pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
@@ -778,7 +785,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                             # terminate the current pdf para and add it to the flow
                             paragraphText += '</para>'
                             usefs = maxfs if maxfs > 0 else bodyfs
-                            pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
+                            pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
                             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
@@ -798,7 +805,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
             try:
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
-                pdf_styleN.leading = usefs * line_scale  # line spacing (text + leading)
+                pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception as ex:
                 logging.exception('Exception')
@@ -1186,6 +1193,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     global fontSubstitutions  # pylint: disable=global-statement
     global passepartoutDict  # pylint: disable=global-statement
     global passepartoutFolders  # pylint: disable=global-statement
+    global fontLineScales  # pylint: disable=global-statement
 
     clipartDict = dict()    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
@@ -1322,10 +1330,17 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # Load additional fonts
     ttfFiles = []
     fontDirs = []
+    fontLineScales = {}
     additional_fonts = {}
     additional_fontFamilies = {}
+
     if cewe_folder is not None:
         fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
+
+    # if a user has installed fonts locally on his machine, then we need to look there as well
+    localFontFolder = localfont_dir()
+    if os.path.exists(localFontFolder):
+        fontDirs.append(localFontFolder)
 
     try:
         configFontFileName = findFileInDirs('additional_fonts.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
@@ -1517,6 +1532,23 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 configlogger.info("Registered fontfamily '{}': {}".format(familyName,fontFamily))
             else:
                 configlogger.info("Font family '%s' was already registered from configuration file" % (familyName))
+
+    # Read and record non-standard line scale values for specified fonts
+    if defaultConfigSection is not None:
+        ff = defaultConfigSection.get('fontLineScales', '').splitlines()  # newline separated list of fontname : line_scale
+        specifiedLineScales = filter(lambda bg: (len(bg) != 0), ff)
+        for specifiedLineScale in specifiedLineScales:
+            scaleItems = specifiedLineScale.split(":")
+            if len(scaleItems) == 2:
+                fontName = scaleItems[0].strip()
+                try:
+                    scale = float(scaleItems[1].strip())
+                    fontLineScales[fontName] = scale
+                    configlogger.info(f"Font {fontName} uses non-standard line scale {fontLineScales[fontName]}")
+                except ValueError:
+                    configlogger.error(f"Invalid line scale value {scaleItems[1]} ignored for {fontName}")
+            else:
+                configlogger.error(f"Invalid lineScales entry ignored (should be 'FontName: Scale'): {specifiedLineScale}")
 
     logging.info("Ended font registration")
 
