@@ -4,20 +4,25 @@ formatters:
     format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     datefmt: '%H:%M:%S'
 handlers:
-  console:
+  consoleEverything:
     class: logging.StreamHandler
     level: DEBUG
     formatter: simple
     stream: ext://sys.stdout
+  consoleWarningOrWorse:
+    class: logging.StreamHandler
+    level: WARNING
+    formatter: simple
+    stream: ext://sys.stdout
 loggers:
   cewe2pdf.config:
-    level: WARNING
-    handlers: [console]
+    handlers: [consoleWarningOrWorse]
+    level: DEBUG
     propagate: no
   PIL.PngImagePlugin:
     level: WARNING
-    handlers: [console]
+    handlers: [consoleEverything]
     propagate: no
 root:
   level: INFO
-  handlers: [console]
+  handlers: [consoleEverything]

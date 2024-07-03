@@ -128,6 +128,16 @@ else:
 
 configlogger = logging.getLogger("cewe2pdf.config")
 
+# create log output handlers which count messages at each level
+from messageCounterHandler import MsgCounterHandler
+rootMessageCountHandler = MsgCounterHandler()
+rootMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
+logging.getLogger().addHandler(rootMessageCountHandler)
+
+configMessageCountHandler = MsgCounterHandler()
+configMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
+configlogger.addHandler(configMessageCountHandler)
+
 # make it possible for PIL.Image to open .heic files if the album editor stores them directly
 # ref https://github.com/bash0/cewe2pdf/issues/130
 try:
@@ -1656,6 +1666,11 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             os.remove(tmpFileName)
     if not unpackedFolder is None:
         unpackedFolder.cleanup()
+
+    # print log count summaries
+    print("Total message counts, including messages suppressed by logger configuration")
+    print(f"Config: {configMessageCountHandler.messageCountText()}")
+    print(f"Root:   {rootMessageCountHandler.messageCountText()}")
 
     return True
 
