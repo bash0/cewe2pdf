@@ -1660,17 +1660,40 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     objectscollected = gc.collect()
     logging.info('GC collected objects : {}'.format(objectscollected))
 
+    # print log count summaries
+    print("Total message counts, including messages suppressed by logger configuration")
+    print(f"cewe2pdf.config: {configMessageCountHandler.messageCountText()}")
+    print(f"root:            {rootMessageCountHandler.messageCountText()}")
+
+    # if he has specified "normal" values for the number of messages of each kind, then warn if we do not see that number
+    if defaultConfigSection is not None:
+        # the expectedLoggingMessageCounts section is one or more newline separated list of
+        #   loggername: levelname[count], ...
+        # e.g.
+        #   root: CRITICAL[0], ERROR[0], WARNING[4],  INFO[38],  DEBUG[0]
+        # Any loggername that is missing is not checked, any logging level that is missing on a line is not checked
+        ff = defaultConfigSection.get('expectedLoggingMessageCounts', '').splitlines()
+        loggerdefs = filter(lambda bg: (len(bg) != 0), ff)
+        for loggerdef in loggerdefs:
+            items = loggerdef.split(":")
+            if len(items) == 2:
+                loggerName = items[0].strip()
+                leveldefs = items[1].strip() # a comma separated list of levelname[count]
+                if loggerName == configlogger.name:
+                    configMessageCountHandler.checkCounts(loggerName,leveldefs)
+                elif loggerName == logging.getLogger().name:
+                    rootMessageCountHandler.checkCounts(loggerName,leveldefs)
+                else:
+                    print(f"Invalid expectedLoggingMessageCounts logger name, entry ignored: {loggerdef}")
+            else:
+                print(f"Invalid expectedLoggingMessageCounts entry ignored: {loggerdef}")
+
     # clean up temp files
     for tmpFileName in tempFileList:
         if os.path.exists(tmpFileName):
             os.remove(tmpFileName)
     if not unpackedFolder is None:
         unpackedFolder.cleanup()
-
-    # print log count summaries
-    print("Total message counts, including messages suppressed by logger configuration")
-    print(f"Config: {configMessageCountHandler.messageCountText()}")
-    print(f"Root:   {rootMessageCountHandler.messageCountText()}")
 
     return True
 
