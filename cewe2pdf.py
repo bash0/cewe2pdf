@@ -1670,8 +1670,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         # the expectedLoggingMessageCounts section is one or more newline separated list of
         #   loggername: levelname[count], ...
         # e.g.
-        #   root: CRITICAL[0], ERROR[0], WARNING[4],  INFO[38],  DEBUG[0]
-        # Any loggername that is missing is not checked, any logging level that is missing on a line is not checked
+        #   root: WARNING[4], INFO[38]
+        # Any loggername that is missing is not checked, any logging level that is missing is expected to have 0 messages
         ff = defaultConfigSection.get('expectedLoggingMessageCounts', '').splitlines()
         loggerdefs = filter(lambda bg: (len(bg) != 0), ff)
         for loggerdef in loggerdefs:
