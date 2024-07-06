@@ -1514,9 +1514,22 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 m_b = members[2].strip()
                 m_i = members[3].strip()
                 m_bi = members[4].strip()
-                pdfmetrics.registerFontFamily(m_familyname, normal=m_n, bold=m_b, italic=m_i, boldItalic=m_bi)
-                explicitlyRegisteredFamilyNames.append(m_familyname)
-                configlogger.warning("Using configured font family '{}': '{}','{}','{}','{}'".format(m_familyname,m_n,m_b,m_i,m_bi))
+                # using font names here which are not already registered as fonts will cause crashes
+                # later, so check for that before registering the family
+                fontsOk = True
+                msg = ""
+                for fontToCheck in (m_n, m_b, m_i, m_bi):
+                    if not fontToCheck in additional_fonts:
+                        if fontsOk:
+                            msg = f"Configured font family {m_familyname} ignored because of unregistered fonts: "
+                        msg += f"{fontToCheck} "
+                        fontsOk = False
+                if not fontsOk:
+                    configlogger.error(msg)
+                else:
+                    pdfmetrics.registerFontFamily(m_familyname, normal=m_n, bold=m_b, italic=m_i, boldItalic=m_bi)
+                    explicitlyRegisteredFamilyNames.append(m_familyname)
+                    configlogger.warning("Using configured font family '{}': '{}','{}','{}','{}'".format(m_familyname,m_n,m_b,m_i,m_bi))
             else:
                 configlogger.error('Invalid FontFamilies line ignored (!= 5 comma-separated strings): ' + explicitFontFamily)
 
