@@ -36,7 +36,12 @@ class MsgCounterHandler(logging.Handler):
         # dictionary of the expected number of messages at each level. We start with expected 0
         # for all levels, and then override with the entries from the leveldefs string
         expected = {logging.CRITICAL: 0, logging.ERROR: 0, logging.WARNING: 0, logging.INFO: 0, logging.DEBUG: 0}
-        levelNamesMapping = logging.getLevelNamesMapping()
+
+        # logging.getLevelNamesMapping() is not available until Python 3.11, ref
+        #  https://www.andy-pearce.com/blog/posts/2023/Jan/whats-new-in-python-311-improved-modules-ii/
+        # 3.11 is not on the github workflow, and perhaps not in other users environments, so ...
+        levelNamesMapping = { 'CRITICAL': 50, 'DEBUG': 10, 'ERROR': 40, 'FATAL': 50, 'INFO': 20, 'NOTSET': 0, 'WARN': 30, 'WARNING': 30 }
+
         levelspecs = leveldefs.split(",")
         for levelspec in levelspecs:
             # parse out the level name and count
