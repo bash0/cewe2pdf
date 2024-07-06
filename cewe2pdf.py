@@ -128,6 +128,16 @@ else:
 
 configlogger = logging.getLogger("cewe2pdf.config")
 
+# create log output handlers which count messages at each level
+from messageCounterHandler import MsgCounterHandler
+rootMessageCountHandler = MsgCounterHandler()
+rootMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
+logging.getLogger().addHandler(rootMessageCountHandler)
+
+configMessageCountHandler = MsgCounterHandler()
+configMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
+configlogger.addHandler(configMessageCountHandler)
+
 # make it possible for PIL.Image to open .heic files if the album editor stores them directly
 # ref https://github.com/bash0/cewe2pdf/issues/130
 try:
@@ -1649,6 +1659,34 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     import gc
     objectscollected = gc.collect()
     logging.info('GC collected objects : {}'.format(objectscollected))
+
+    # print log count summaries
+    print("Total message counts, including messages suppressed by logger configuration")
+    print(f"cewe2pdf.config: {configMessageCountHandler.messageCountText()}")
+    print(f"root:            {rootMessageCountHandler.messageCountText()}")
+
+    # if he has specified "normal" values for the number of messages of each kind, then warn if we do not see that number
+    if defaultConfigSection is not None:
+        # the expectedLoggingMessageCounts section is one or more newline separated list of
+        #   loggername: levelname[count], ...
+        # e.g.
+        #   root: WARNING[4], INFO[38]
+        # Any loggername that is missing is not checked, any logging level that is missing is expected to have 0 messages
+        ff = defaultConfigSection.get('expectedLoggingMessageCounts', '').splitlines()
+        loggerdefs = filter(lambda bg: (len(bg) != 0), ff)
+        for loggerdef in loggerdefs:
+            items = loggerdef.split(":")
+            if len(items) == 2:
+                loggerName = items[0].strip()
+                leveldefs = items[1].strip() # a comma separated list of levelname[count]
+                if loggerName == configlogger.name:
+                    configMessageCountHandler.checkCounts(loggerName,leveldefs)
+                elif loggerName == logging.getLogger().name:
+                    rootMessageCountHandler.checkCounts(loggerName,leveldefs)
+                else:
+                    print(f"Invalid expectedLoggingMessageCounts logger name, entry ignored: {loggerdef}")
+            else:
+                print(f"Invalid expectedLoggingMessageCounts entry ignored: {loggerdef}")
 
     # clean up temp files
     for tmpFileName in tempFileList:
