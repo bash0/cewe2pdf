@@ -1230,14 +1230,20 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     # parse the input mcf xml file
     # read file as binary, so UTF-8 encoding is preserved for xml-parser
-    mcffile = open(mcfxmlname, 'rb')
-    mcf = etree.parse(mcffile)
-    mcffile.close()
+    try:
+        mcffile = open(mcfxmlname, 'rb')
+        mcf = etree.parse(mcffile)
+        mcffile.close()
+    except Exception as e:
+        invalidmsg = f"Cannot open mcf file {mcfxmlname}"
+        if mcfxFormat: invalidmsg = invalidmsg + f" (unpacked from {albumname})"
+        logging.error(invalidmsg + f": {repr(e)}")
+        sys.exit(1)
+
     fotobook = mcf.getroot()
     if fotobook.tag != 'fotobook':
-        invalidmsg = "Cannot process invalid mcf file {}".format(mcfxmlname)
-        if mcfxFormat:
-            invalidmsg = invalidmsg + " (unpacked from {})".format(albumname)
+        invalidmsg = f"Cannot process invalid mcf file (root tag is not 'fotobook'): {mcfxmlname}"
+        if mcfxFormat: invalidmsg = invalidmsg + f" (unpacked from {albumname})"
         logging.error(invalidmsg)
         sys.exit(1)
 
@@ -1788,8 +1794,10 @@ if __name__ == '__main__':
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
         pass
 
+    epilogText = "Example:\n   python cewe2pdf.py"
+    exampleFile = r"c:\path\to\my\files\my_nice_fotobook.mcf"
     parser = argparse.ArgumentParser(description='Convert a photo-book from .mcf/.mcfx file format to .pdf',
-                                     epilog="Example:\n   python cewe2pdf.py c:\\path\\to\\my\\files\\my_nice_fotobook.mcf",
+                                     epilog=f"{epilogText} {exampleFile}\n \n",
                                      formatter_class=CustomArgFormatter)
     parser.add_argument('--keepDoublePages', dest='keepDoublePages', action='store_const',
                         const=True, default=False,
@@ -1804,18 +1812,19 @@ if __name__ == '__main__':
                         default=None,
                         help='Directory for persistent app data, eg ttf fonts converted from otf fonts')
     parser.add_argument('inputFile', type=str, nargs='?',
-                        help='the mcf input file. If not given, the first .mcf/.mcfx in the current directory is used.')
+                        help='Just one mcf(x) input file must be specified')
 
     args = parser.parse_args()
 
-    # if no file name was given, search for the first .mcf file in the current directory
     if args.inputFile is None:
-        fnames = [i for i in os.listdir('.') if i.endswith('.mcf') or i.endswith('.mcfx')]
-        if len(fnames) > 0:
-            args.inputFile = fnames[0]
-
-    # if inputFile name is still empty, we have to throw an error
-    if args.inputFile is None:
+        # from July 2024 you must specify a file name. Check if there are any obvious candidates
+        # which we could use in an example text
+        fnames = [i for i in os.listdir(os.curdir) if os.path.isfile(i) and (i.endswith('.mcf') or i.endswith('.mcfx'))]
+        if len(fnames) >= 1:
+            # There is one or more mcf(x) file! Show him how to specify the first such file as an example.
+            exampleFile = os.path.join(os.getcwd(), fnames[0])
+            if ' ' in exampleFile: exampleFile = f'\"{exampleFile}\"'
+            parser.epilog = f"{epilogText} {exampleFile}\n \n"
         parser.parse_args(['-h'])
         sys.exit(1)
 
@@ -1850,5 +1859,5 @@ if __name__ == '__main__':
     if args.appDataDir is not None:
         appDataDir = os.path.abspath(args.appDataDir)
 
-    # if we have a file name, let's convert it
+    # convert the file
     resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers, mcfxTmpDir, appDataDir)

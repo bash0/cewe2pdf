@@ -62,11 +62,36 @@ The contents can, for example, be of the form:
 ```
 [DEFAULT]
 cewe_folder = C:\Program Files\Elkjop fotoservice_6.3\elkjop fotoservice
-extraBackgroundFolders =
- C:/ProgramData/hps/5026/addons/447/backgrounds/v1/backgrounds
- C:/ProgramData/hps/5026/addons/448/backgrounds/v1/backgrounds
+
+# Define font families where the defaults don't work properly. Take a good look
+# at the full font diagnostics if you suspect issues with the choice of fonts
 fontFamilies =
- Bodoni,Bodoni,BodoniB,BodoniI,BodoniBI
+ FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
+
+# Define the output resolutions, the default 300 is ok for printing, 150 for screen display only
+pdfImageResolution = 150
+pdfBackgroundResolution = 150
+
+# Define line scale (line spacing, essentially) for fonts where the default 1.1 (110%) is not acceptable
+fontLineScales =
+	Crafty Girls: 1.43
+
+# These possibilities are seldom needed in the latest versions of the program
+#extraBackgroundFolders =
+#	${PROGRAMDATA}/hps/${KEYACCOUNT}/addons/447/backgrounds/v1/backgrounds
+#	tests/Resources/photofun/backgrounds
+#extraClipArts =
+#	63488, ${LOCALAPPDATA}/CEWE/hps/${KEYACCOUNT}/photofun/decorations/63488/rect_cream/rect_cream.clp
+#	121285, ${LOCALAPPDATA}/CEWE/hps/${KEYACCOUNT}/photofun/decorations/121285/12089-clip-gold-gd/12089-clip-gold-gd.clp
+#passepartoutFolders=${PROGRAMDATA}/hps
+
+# Define the numbers of logging messages of various levels that are "usual" for your
+# installation. This allows the program to tell you if there are differences in a run
+# and therefore give you a hint that something needs your attention.
+#expectedLoggingMessageCounts =
+#	cewe2pdf.config: WARNING[32], INFO[669]
+#	root:            ERROR[2], WARNING[4], INFO[38]
+
 ```
 
 Install - MacOS
@@ -151,21 +176,26 @@ touch additional_fonts.txt
 
 If your CEWE software uses `.xmcf` files for your projects, you can simply still use this. The `.xmcf` file format is just an archive of the `*.mcf` file, the `<album>_mcf-Dateien` folder and a few other files. Right click the `.xmcf` file and your os should give you an open to open the archive. Copy the relevant files out of it, and you should be all set for the next steps.
 
+.mcfx Files
+-----------
+
+If your CEWE software uses `.mcfx` files for your projects, you can specify the file name directly on the command line. The `.mcfx` file format is actually an sql database containing an `*.mcf` file and the related image files. `cewe2pdf` will create a temporary directory, unpack the the `.mcfx` there, process the result, and then delete the temporary directory again 
+
 Install - continued
 -------------------
 
 At this point, you should have these files in your current directory :
 
 * `cewe2pdf.py`
-* `cewe_folder.txt`
+* `cewe2pdf.ini` (or the older `cewe_folder.txt`)
 * `additional_fonts.txt`
-* your `*.mcf` or `.mcfx` file
-* a directory named `<album>_mcf-Datein`
+* your `*.mcf` or `.mcfx` album file
+  * a directory named `<album>_mcf-Datein` if you are using `*.mcf`
 
 How to use
 ----------
 
-Just run `cewe2pdf.py` and you will find a new pdf file to appear in your current directory.
+Run `cewe2pdf.py` with the name of your album file and an equivalent pdf file will be created beside the album file.
 Example:
 
 ```
@@ -180,27 +210,25 @@ currently cewe2pdf supports the following options. They are shown if you run
 ```python cewe2pdf.py --help```
 
 ```
-usage: cewe2pdf [-h] [--keepDoublePages] [inputFile]
+usage: cewe2pdf.py [-h] [--keepDoublePages] [--pages PAGES] [--tmp-dir MCFXTMPDIR] [--appdata-dir APPDATADIR]
+                   [inputFile]
 
-Convert a foto-book from .mcf file format to .pdf
+Convert a photo-book from .mcf/.mcfx file format to .pdf
 
 positional arguments:
-  inputFile          the album input file. If not given, the first .mcf/.mcfx in the
-                     current directory is used. (default: None)
+  inputFile             Just one mcf(x) input file must be specified (default: None)
 
-optional arguments:
-  -h, --help         show this help message and exit
-  --keepDoublePages  Each page in the .pdf will be a double-sided page,
-                     instead of a normal single page. (default: False)
-  --tmp-dir          A directory for unpacking a .mcfx album. A default temporary
-                     directory is used if none is specified
-  --appdata-dir      A directory for the application to store data which is persistent
-                     between runs, in particular TrueType font files which the program
-                     automatically creates from OpenType font files which it finds.
+options:
+  -h, --help            show this help message and exit
+  --keepDoublePages     Each page in the .pdf will be a double-sided page, instead of a normal single page. (default:
+                        False)
+  --pages PAGES         Page numbers to render, e.g. 1,2,4-9 (default: None)
+  --tmp-dir MCFXTMPDIR  Directory for .mcfx file extraction (default: None)
+  --appdata-dir APPDATADIR
+                        Directory for persistent app data, eg ttf fonts converted from otf fonts (default: None)
 
 Example:
    python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
-
 ```
 
 Development
