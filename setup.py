@@ -9,7 +9,7 @@
 # > python setup.py py2exe
 
 from distutils.core import setup
-import py2exe
+# import py2exe
 
 setup(console=['cewe2pdf.py'],
       options={"py2exe": {
