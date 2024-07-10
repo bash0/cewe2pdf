@@ -61,7 +61,6 @@ import os.path
 import os
 import tempfile
 import html
-import traceback
 
 import argparse  # to parse arguments
 import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
@@ -70,8 +69,6 @@ from io import BytesIO
 from math import sqrt, floor
 
 from pathlib import Path
-
-from os import getenv
 
 from fontTools import ttLib
 
@@ -88,7 +85,9 @@ from reportlab.lib.styles import ParagraphStyle
 
 from lxml import etree
 
-from otf import getTtfsFromOtfs, otf_to_ttf
+from otf import getTtfsFromOtfs
+
+from messageCounterHandler import MsgCounterHandler
 
 # import pil and work around a breaking change in pil 10.0.0, see
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
@@ -97,7 +96,7 @@ from packaging.version import parse as parse_version
 
 from pathutils import localfont_dir
 
-if parse_version(PIL.__version__)>=parse_version('9.1.0'):
+if parse_version(PIL.__version__) >= parse_version('9.1.0'):
     pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
 else:
     pil_antialias = PIL.Image.ANTIALIAS
@@ -107,8 +106,8 @@ from passepartout import Passepartout
 
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
     # Running in a PyInstaller bundle, ref https://pyinstaller.org/en/stable/runtime-information.html#run-time-information
-	# Add the local directory to the PATH. This is needed for compiled (i.e. frozen)
-	#  programs on Windows to find dlls (cairo dlls, in particular).
+    # Add the local directory to the PATH. This is needed for compiled (i.e. frozen)
+    #  programs on Windows to find dlls (cairo dlls, in particular).
     realpath = os.path.realpath(sys.argv[0])
     exename = os.path.basename(realpath)
     dllpath = os.path.dirname(realpath)
@@ -129,7 +128,6 @@ else:
 configlogger = logging.getLogger("cewe2pdf.config")
 
 # create log output handlers which count messages at each level
-from messageCounterHandler import MsgCounterHandler
 rootMessageCountHandler = MsgCounterHandler()
 rootMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
 logging.getLogger().addHandler(rootMessageCountHandler)
@@ -246,7 +244,8 @@ def getPageElementForPageNumber(fotobook, pageNumber):
 
 
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
-def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw):
+def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
+                      keepDoublePages, oddpage, pagetype, pdf, ph, pw):
     if pagetype == "emptypage":  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
         return
     if backgroundTags is not None and len(backgroundTags) > 0:
@@ -260,22 +259,22 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 and backgroundTag.get('designElementId') is not None):
             bg = backgroundTag.get('designElementId')
             # example: fading="0" hue="270" rotation="0" type="1"
-            backgroundFading = 0 # backgroundFading not used yet pylint: disable=unused-variable
+            backgroundFading = 0 # backgroundFading not used yet pylint: disable=unused-variable # noqa: F841
             if "fading" in backgroundTag.attrib:
                 if float(backgroundTag.get('fading')) != 0:
                     logging.warning('value of background attribute not supported: fading = %s' % backgroundTag.get(
                         'fading'))
-            backgroundHue = 0 # backgroundHue not used yet pylint: disable=unused-variable
+            backgroundHue = 0 # backgroundHue not used yet pylint: disable=unused-variable # noqa: F841
             if "hue" in backgroundTag.attrib:
                 if float(backgroundTag.get('hue')) != 0:
                     logging.warning(
                         'value of background attribute not supported: hue =  %s' % backgroundTag.get('hue'))
-            backgroundRotation = 0 # backgroundRotation not used yet pylint: disable=unused-variable
+            backgroundRotation = 0 # backgroundRotation not used yet pylint: disable=unused-variable # noqa: F841
             if "rotation" in backgroundTag.attrib:
                 if float(backgroundTag.get('rotation')) != 0:
                     logging.warning('value of background attribute not supported: rotation =  %s' % backgroundTag.get(
                         'rotation'))
-            backgroundType = 1 # backgroundType not used yet pylint: disable=unused-variable
+            backgroundType = 1 # backgroundType not used yet pylint: disable=unused-variable # noqa: F841
             if "type" in backgroundTag.attrib:
                 if int(backgroundTag.get('type')) != 1:
                     logging.warning(
@@ -305,7 +304,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 pdf.drawImage(ImageReader(
                     memFileHandle), f * ax, 0, width=f * areaWidth, height=f * areaHeight)
                 # pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
-            except Exception as ex:
+            except Exception:
                 if bgPath not in bg_notFoundDirList:
                     logging.error("Could not find background or error when adding to pdf")
                     logging.exception('Exception')
@@ -313,7 +312,8 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
     return
 
 
-def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy):
+def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir,
+                        keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy):
     # open raw image file
     if imageTag.get('filename') is None:
         return
@@ -666,7 +666,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
 
 
-def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy):
+def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy): # noqa: C901 (too complex)
     # note: it would be better to use proper html processing here
     htmlxml = etree.XML(textTag.text)
     body = htmlxml.find('.//body')
@@ -752,7 +752,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
             # there might be untagged text preceding a span. We have to add that to paragraphText
             # first - but we must not terminate the paragraph and add it to the flowable because
             # the first span just continues that leading text
-            if not p.text is None:
+            if p.text is not None:
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
                     additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
                 usefs = maxfs if maxfs > 0 else bodyfs
@@ -816,7 +816,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 usefs = maxfs if maxfs > 0 else bodyfs
                 pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
-            except Exception as ex:
+            except Exception:
                 logging.exception('Exception')
 
     # Add a frame object that can contain multiple paragraphs
@@ -945,9 +945,11 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
                 colorreplacements.append(replacement)
         mirror = clipconfig.get('mirror')
         if mirror is not None:
-            #cewe developers have a different understanding of x and y :)
-            if mirror == "y" or mirror == "both": flipX = True
-            if mirror == "x" or mirror == "both": flipY = True
+            # cewe developers have a different understanding of x and y :)
+            if mirror == "y" or mirror == "both":
+                flipX = True
+            if mirror == "x" or mirror == "both":
+                flipY = True
 
     insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY)
 
@@ -983,7 +985,8 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     pdf.translate(-img_transx, -transy)
 
 
-def processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage):
+def processElements(additional_fonts, fotobook, imagedir,
+                    keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage):
     if keepDoublePages and oddpage == 0 and pagetype == 'normal' and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
@@ -1122,7 +1125,7 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
         return
 
     # from (at least) 7.3.4 the addon cliparts might be in more than one structure, so ... first the older layout
-    addonclipartxmls = os.path.join(keyaccountFolder, "addons", "*", "cliparts", "v1", "decorations", "*.xml");
+    addonclipartxmls = os.path.join(keyaccountFolder, "addons", "*", "cliparts", "v1", "decorations", "*.xml")
     for file in glob.glob(addonclipartxmls):
         loadClipartConfigXML(file)
 
@@ -1196,7 +1199,7 @@ def checkCeweFolder(cewe_folder):
         logging.error("cewe_folder {} not found. This must be a test run which doesn't need it!".format(cewe_folder))
 
 
-def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None):
+def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None): # noqa: C901 (too complex)
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
     global fontSubstitutions  # pylint: disable=global-statement
@@ -1236,18 +1239,20 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         mcffile.close()
     except Exception as e:
         invalidmsg = f"Cannot open mcf file {mcfxmlname}"
-        if mcfxFormat: invalidmsg = invalidmsg + f" (unpacked from {albumname})"
+        if mcfxFormat:
+            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
         logging.error(invalidmsg + f": {repr(e)}")
         sys.exit(1)
 
     fotobook = mcf.getroot()
     if fotobook.tag != 'fotobook':
         invalidmsg = f"Cannot process invalid mcf file (root tag is not 'fotobook'): {mcfxmlname}"
-        if mcfxFormat: invalidmsg = invalidmsg + f" (unpacked from {albumname})"
+        if mcfxFormat:
+            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
         logging.error(invalidmsg)
         sys.exit(1)
 
-	# check output file is acceptable before we do any processing
+    # check output file is acceptable before we do any processing
     outputFileName = getOutputFileName(albumname)
     if os.path.exists(outputFileName):
         if os.path.isfile(outputFileName):
@@ -1440,7 +1445,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     fontFullName = fontFamily + " " + fontSubFamily
                     configlogger.warning("  constructed fontFullName '{}' for '{}' '{}'".format(fontFullName, fontFamily, fontSubFamily))
 
-            if fontSubFamily == "Regular"  and fontFullName == fontFamily + " Regular":
+            if fontSubFamily == "Regular" and fontFullName == fontFamily + " Regular":
                 configlogger.warning(f"Revised regular fontFullName '{fontFullName}' to '{fontFamily}'")
                 fontFullName = fontFamily
 
@@ -1459,30 +1464,16 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             # used to represent the more limited set of four fonts offered by cewe. We should perhaps
             # prefer a particular name (eg in case both Light and Regular exist) but for now the last
             # font in each weight wins
-            if   (fontSubFamily == "Regular" or
-                  fontSubFamily == "Light" or
-                  fontSubFamily == "Roman"):
+            if fontSubFamily in {"Regular", "Light", "Roman"}:
                 additional_fontFamilies[fontFamily]["normal"] = fontFullName
-            elif (fontSubFamily == "Bold" or
-                  fontSubFamily == "Medium" or
-                  fontSubFamily == "Heavy" or
-                  fontSubFamily == "Xbold" or
-                  fontSubFamily == "Demibold" or
-                  fontSubFamily == "Demibold Roman"):
+            elif fontSubFamily in {"Bold", "Medium", "Heavy", "Xbold", "Demibold", "Demibold Roman"}:
                 additional_fontFamilies[fontFamily]["bold"] = fontFullName
-            elif (fontSubFamily == "Italic" or
-                  fontSubFamily == "Light Italic" or
-                  fontSubFamily == "Oblique"):
+            elif fontSubFamily in {"Italic", "Light Italic", "Oblique"}:
                 additional_fontFamilies[fontFamily]["italic"] = fontFullName
-            elif (fontSubFamily == "Bold Italic" or
-                  fontSubFamily == "Medium Italic" or
-                  fontSubFamily == "BoldItalic" or
-                  fontSubFamily == "Heavy Italic" or
-                  fontSubFamily == "Bold Oblique" or
-                  fontSubFamily == "Demibold Italic"):
+            elif fontSubFamily in {"Bold Italic", "Medium Italic", "BoldItalic", "Heavy Italic", "Bold Oblique", "Demibold Italic"}:
                 additional_fontFamilies[fontFamily]["boldItalic"] = fontFullName
             else:
-                configlogger.warning("Unhandled fontSubFamily '{}', using fontFamily '{}' as the regular font name".format(fontSubFamily,fontFamily))
+                configlogger.warning(f"Unhandled fontSubFamily '{fontSubFamily}', using fontFamily '{fontFamily}' as the regular font name")
                 additional_fontFamilies[fontFamily]["normal"] = fontFamily
                 additional_fonts[fontFamily] = ttfFile
 
@@ -1507,7 +1498,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # potentially providing correct definitions for families which are not correctly identified by
     # the normal heuristic family setup above  - the "fixed" FranklinGothic being a good example:
     # fontFamilies =
-	#   FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
+    #   FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
     explicitlyRegisteredFamilyNames = []
     if defaultConfigSection is not None:
         ff = defaultConfigSection.get('FontFamilies', '').splitlines()  # newline separated list of folders
@@ -1525,7 +1516,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 fontsOk = True
                 msg = ""
                 for fontToCheck in (m_n, m_b, m_i, m_bi):
-                    if not fontToCheck in additional_fonts:
+                    if fontToCheck not in additional_fonts:
                         if fontsOk:
                             msg = f"Configured font family {m_familyname} ignored because of unregistered fonts: "
                         msg += f"{fontToCheck} "
@@ -1543,19 +1534,19 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     #  but ignoring any family name which was registered explicitly from configuration
     if len(additional_fontFamilies) > 0:
         for familyName, fontFamily in additional_fontFamilies.items():
-            if fontFamily['normal'] == None:
-                if fontFamily['italic'] != None:
+            if fontFamily['normal'] is None:
+                if fontFamily['italic'] is not None:
                     alternateNormal = 'italic'
-                elif fontFamily['bold'] != None:
+                elif fontFamily['bold'] is not None:
                     alternateNormal = 'bold'
-                elif fontFamily['boldItalic'] != None:
+                elif fontFamily['boldItalic'] is not None:
                     alternateNormal = 'boldItalic'
                 fontFamily['normal'] = fontFamily[alternateNormal]
                 configlogger.warning("Font family '{}' has no normal font, chosen {} from {}".format(familyName,fontFamily['normal'], alternateNormal))
             for key, value in dict(fontFamily).items(): # looping through normal, bold, italic, bold italic
                 if value is None:
                     del fontFamily[key]
-            if not familyName in explicitlyRegisteredFamilyNames:
+            if familyName not in explicitlyRegisteredFamilyNames:
                 pdfmetrics.registerFontFamily(familyName, **fontFamily)
                 configlogger.info("Registered fontfamily '{}': {}".format(familyName,fontFamily))
             else:
@@ -1711,7 +1702,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     for tmpFileName in tempFileList:
         if os.path.exists(tmpFileName):
             os.remove(tmpFileName)
-    if not unpackedFolder is None:
+    if unpackedFolder is not None:
         unpackedFolder.cleanup()
 
     return True
@@ -1738,7 +1729,7 @@ def getHpsDataFolder():
     return None
 
 
-def getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection = None):
+def getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection=None):
     # for testing (in particular on checkin on github where no cewe product is installed)
     # we may want to have a specially constructed local key account data folder
     if defaultConfigSection is not None:
@@ -1770,7 +1761,7 @@ def getKeyAccountFileName(cewe_folder):
     return keyAccountFileName
 
 
-def getKeyaccountNumber(cewe_folder, defaultConfigSection = None):
+def getKeyaccountNumber(cewe_folder, defaultConfigSection=None):
     keyAccountFileName = getKeyAccountFileName(cewe_folder)
     try:
         katree = etree.parse(keyAccountFileName)
@@ -1782,7 +1773,7 @@ def getKeyaccountNumber(cewe_folder, defaultConfigSection = None):
             if inika is not None:
                 logging.info('ini file overrides keyaccount from {} to {}'.format(ka, inika))
                 ka = inika
-    except Exception as ex:
+    except Exception:
         ka = "0"
         logging.error('Could not extract keyAccount tag in file: {}, using {}'.format(keyAccountFileName, ka))
     return ka.strip()
@@ -1823,7 +1814,8 @@ if __name__ == '__main__':
         if len(fnames) >= 1:
             # There is one or more mcf(x) file! Show him how to specify the first such file as an example.
             exampleFile = os.path.join(os.getcwd(), fnames[0])
-            if ' ' in exampleFile: exampleFile = f'\"{exampleFile}\"'
+            if ' ' in exampleFile:
+                exampleFile = f'\"{exampleFile}\"'
             parser.epilog = f"{epilogText} {exampleFile}\n \n"
         parser.parse_args(['-h'])
         sys.exit(1)
