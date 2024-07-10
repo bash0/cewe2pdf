@@ -11,13 +11,13 @@
 from pathlib import Path
 import os
 import os.path
-# import cairosvg
-# import PIL
+import cairosvg
+import PIL
 import logging
-# from PIL.ExifTags import TAGS
-# from io import BytesIO
-# from clpFile import ClpFile
-from typing import List # Set, Dict, Tuple, Optional
+from PIL.ExifTags import TAGS
+from io import BytesIO
+from clpFile import ClpFile
+from typing import List, Set, Dict, Tuple, Optional
 from lxml import etree
 from typing import NamedTuple
 

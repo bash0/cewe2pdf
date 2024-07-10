@@ -23,7 +23,7 @@ def writeTofile(data, filename):
 
 def unpackMcfx(mcfxPath: Path, tempdirPath):
     mcfname = ""
-    curdir = os.getcwd()
+    curdir = os.getcwd();
 
     tempdir = None
     if tempdirPath is not None:
@@ -59,7 +59,7 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
                 mcfname = Path(tempdirPath) / filename
 
             if os.path.exists(filename) and lastchange < os.path.getmtime(filename):
-                # not changed since last extraction
+                #not changed since last extraction
                 continue
 
             writeTofile(filecontent, filename)

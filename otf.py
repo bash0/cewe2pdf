@@ -5,7 +5,10 @@
 
 import logging
 import os
+import sys
+import tempfile
 
+from pathlib import Path
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -81,7 +84,7 @@ def otf_to_ttf(ttFont, post_format=POST_FORMAT, **kwargs):
     ttFont.sfntVersion = "\000\001\000\000"
 
 
-def getTtfsFromOtfs(otfFiles, ttfdirPath=None):
+def getTtfsFromOtfs(otfFiles, ttfdirPath = None):
     resultingTtfFiles = []
 
     if ttfdirPath is None:
@@ -92,7 +95,7 @@ def getTtfsFromOtfs(otfFiles, ttfdirPath=None):
 
     for otfFile in otfFiles:
         if "LiebeGerda-BoldItalic" in otfFile:
-            log.info("LiebeGerda-BoldItalic not available: the otf->ttf conversion hangs!")
+            log.info(f"LiebeGerda-BoldItalic not available: the otf->ttf conversion hangs!")
             continue # the conversion code hangs on this font!
         ttfFile = makeOutputFileName(
             otfFile,
@@ -104,7 +107,7 @@ def getTtfsFromOtfs(otfFiles, ttfdirPath=None):
             log.info(f"Accepting otf->ttf font conversion: {ttfFile}")
         else:
             log.warning(f"One-time font conversion otf->ttf: {ttfFile}")
-            font = TTFont(otfFile, fontNumber=0) # options.face_index
+            font = TTFont(otfFile, fontNumber=0) #options.face_index
             otf_to_ttf(
                 font,
                 post_format=POST_FORMAT, # options.post_format

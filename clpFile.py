@@ -4,11 +4,12 @@
 
 import logging
 from pathlib import Path
+import os
 import cairosvg
 import PIL
 from PIL import Image
-# from PIL import ImageOps
-# from PIL.ExifTags import TAGS
+from PIL import ImageOps
+from PIL.ExifTags import TAGS
 from io import BytesIO
 import re
 
@@ -52,7 +53,7 @@ class ClpFile(object):
         outFile.write(self.svgData)
         outFile.close()
 
-    def convertToPngInBuffer(self, width:int = None, height:int = None, alpha:int = 128, flipX = False, flipY = False): # noqa: E251
+    def convertToPngInBuffer(self, width:int = None, height:int = None, alpha:int = 128, flipX = False, flipY = False):
         """convert the SVG to a PNG file, but only in memory"""
 
         # create a byte buffer that can be used like a file and use it as the output of svg2png.
@@ -202,7 +203,7 @@ class ClpFile(object):
         # stroke in the path itself, so my hack for #85 is to add to the path itself if neither is present
         # anywhere in the svgdata
         svgDataText = self.svgData.decode()
-        if ("fill" not in svgDataText) and ("stroke" not in svgDataText):
+        if (not "fill" in svgDataText) and (not "stroke" in svgDataText):
             for curReplacement in colorReplacementList:
                 if (curReplacement[0] == "#000000"):
                     self.svgData = svgDataText.replace('<path ', '<path fill="{}" stroke="{}" '.
@@ -211,7 +212,7 @@ class ClpFile(object):
         # More issue #85 stuff. This is for clipart 129188, 14466-CLIP-EMBOSS-GD.xml and similar.
         # It's a hollow figure with no fill and a black rectangular frame. This will hopefully fix
         # a more general case of an unfilled frame with a color replacement for the frame
-        if ('fill="none"' in svgDataText) and ("stroke" not in svgDataText):
+        if ('fill="none"' in svgDataText) and (not "stroke" in svgDataText):
             for curReplacement in colorReplacementList:
                 if (curReplacement[0] == "#000000"):
                     self.svgData = svgDataText.replace('fill="none"', 'fill="none" stroke="{}" '.
@@ -240,7 +241,7 @@ class ClpFile(object):
                 oldColorString = colorkey+':'+curReplacement[0]
                 newColorString = colorkey+':'+curReplacement[1]
                 replacement, subcount = re.subn(
-                    "(style=\".*?)("+oldColorString+")(.*?\")", r"\1"+newColorString+r"\3", self.svgData.decode(),flags=re.MULTILINE | re.IGNORECASE)
+                    "(style=\".*?)("+oldColorString+")(.*?\")", r"\1"+newColorString+r"\3", self.svgData.decode(),flags=re.MULTILINE|re.IGNORECASE)
                 self.svgData = replacement.encode(encoding="utf-8")
                 subsmade += subcount
 
