@@ -21,6 +21,7 @@ def writeTofile(data, filename):
     with open(filename, 'wb') as file:
         file.write(data)
 
+
 def unpackMcfx(mcfxPath: Path, tempdirPath):
     mcfname = ""
     curdir = os.getcwd()
@@ -30,18 +31,19 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
         if not os.path.exists(tempdirPath):
             os.mkdir(tempdirPath)
     else:
-        tempdir = tempfile.TemporaryDirectory()
+        # we actually return the tempdir resource so keep pylint quiet here
+        tempdir = tempfile.TemporaryDirectory() #pylint: disable=consider-using-with
         tempdirPath = tempdir.name
 
     try:
         os.chdir(tempdirPath) # somewhere like C:\Users\pete\AppData\Local\Temp\tmpshi3s9di
-        logging.info("Unpacking mcfx to {}".format(os.getcwd()))
+        logging.info(f"Unpacking mcfx to {os.getcwd()}")
 
         fullname = mcfxPath.resolve()
         mcfxMtime = os.path.getmtime(fullname)
         connection = sqlite3.connect(fullname)
         cursor = connection.cursor()
-        logging.info("Connected to mcfx database")
+        logging.info(r"Connected to mcfx database")
 
         sql_fetch_blob_query = """SELECT * from Files"""
         cursor.execute(sql_fetch_blob_query)
@@ -54,7 +56,7 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
                 lastchange = mcfxMtime
             if filename.endswith(".mcf"):
                 if mcfname:
-                    logging.error("Exiting: found more than one mcf file in the mcfx database!")
+                    logging.error(r"Exiting: found more than one mcf file in the mcfx database!")
                     sys.exit(1)
                 mcfname = Path(tempdirPath) / filename
 
@@ -67,19 +69,19 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
         cursor.close()
 
     except sqlite3.Error as error:
-        logging.error("Exiting: failure to read image data: {}".format(error))
+        logging.error(f"Exiting: failure to read image data: {error}")
         sys.exit(1)
 
     finally:
         if connection:
             connection.close()
-            logging.info("Disconnected from mcfx database")
+            logging.info(r"Disconnected from mcfx database")
         os.chdir(curdir)
 
         if not mcfname:
-            logging.error("Exiting: no mcf file found in mcfx")
+            logging.error(r"Exiting: no mcf file found in mcfx")
 
-        logging.info("returned to cwd {}, mcfname {}".format(os.getcwd(), mcfname))
+        logging.info(f"returned to cwd {os.getcwd()}, mcfname {mcfname}")
 
     # return tempdir so that we can use cleanup() when we're done with it
     return (tempdir, mcfname)
