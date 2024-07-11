@@ -32,7 +32,7 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
             os.mkdir(tempdirPath)
     else:
         # we actually return the tempdir resource so keep pylint quiet here
-        tempdir = tempfile.TemporaryDirectory() #pylint: disable=consider-using-with
+        tempdir = tempfile.TemporaryDirectory() # pylint: disable=consider-using-with
         tempdirPath = tempdir.name
 
     try:
