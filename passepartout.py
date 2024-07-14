@@ -18,12 +18,12 @@ import logging
 # from io import BytesIO
 # from clpFile import ClpFile
 from typing import List # Set, Dict, Tuple, Optional
-from lxml import etree
 from typing import NamedTuple
+from lxml import etree
 
 configlogger = logging.getLogger("cewe2pdf.config")
 
-class Passepartout(object):
+class Passepartout():
     def __init__(self):
         return
 
@@ -51,14 +51,15 @@ class Passepartout(object):
     def extractAllInfosFromXml(xmlFileName: str):
         # read information from xml file about passepartout
 
-        clipArtXml = open(xmlFileName, 'rb')
         try:
-            xmlInfo = etree.parse(xmlFileName)
-        except: # noqa: E722
-            logging.error("Maybe not valid XML:{}".format(xmlFileName))
+            with open(xmlFileName, 'rb') as clipArtXml:
+                xmlInfo = etree.parse(clipArtXml)
+        except IOError as ioe:
+            logging.error(f"I/O error({ioe.errno}): {ioe.strerror}")
             return None
-        finally:
-            clipArtXml.close()
+        except Exception as e: # handle other exceptions such as attribute errors
+            logging.error(f"Error: {e}")
+            return None
 
         for decoration in xmlInfo.findall('decoration'):
             decoration_id = decoration.get('id')
@@ -105,7 +106,7 @@ class Passepartout(object):
         #  designElementId to .xml file
 
         # a dictionary for passepartout element IDs to file name
-        passepartoutIdDict = dict()
+        passepartoutIdDict = {}
 
         if directoryList is None:
             configlogger.error("No directories passed to Passepartout.buildElementIdIndex!")
@@ -127,7 +128,7 @@ class Passepartout(object):
                 for filename in (f for f in filenames if f.endswith(ext)):
                     xmlFileList.append(os.path.join(dirpath, filename))
                     # print(os.path.join(dirpath, filename))
-        configlogger.info("Found {:d} XML files.".format(len(xmlFileList)))
+        configlogger.info(f"Found {len(xmlFileList):d} XML files.")
 
         # load each .xml file and extract the information
         for curXmlFile in xmlFileList:
