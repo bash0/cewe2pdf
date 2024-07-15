@@ -6,8 +6,9 @@
 #    pylint: disable=bare-except,broad-except
 # We're not quite at the level of documenting all the classes and functions yet :-)
 #    pylint: disable=missing-function-docstring,missing-class-docstring,missing-module-docstring
-# It'll be a while before we refactor this file ...
-#    pylint: disable=too-many-lines
+# It'll be a while before we refactor this file, but when we do then these should be reenabled again!
+#    pylint: disable=too-many-lines,too-many-statements,too-many-arguments,too-many-locals
+#    pylint: disable=too-many-nested-blocks,too-many-branches
 # Until we standardize on f strings ...
 #    pylint: disable=consider-using-f-string
 
@@ -102,9 +103,12 @@ from pathutils import localfont_dir
 from otf import getTtfsFromOtfs
 
 if parse_version(PIL.__version__) >= parse_version('9.1.0'):
-    pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
+    # PIL.Image.LANCZOS was claimed closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
+    # although you can find text which claims the latter is best (and also that the two LANCZOS
+    # definitions are in fact identical!)
+    pil_antialias = PIL.Image.LANCZOS  # pylint: disable=no-member
 else:
-    pil_antialias = PIL.Image.ANTIALIAS
+    pil_antialias = PIL.Image.ANTIALIAS  # pylint: disable=no-member
 
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
     # Running in a PyInstaller bundle, ref https://pyinstaller.org/en/stable/runtime-information.html#run-time-information
@@ -143,13 +147,13 @@ configlogger.addHandler(configMessageCountHandler)
 try:
     from pillow_heif import register_heif_opener # the absence of heif handling is handled so pylint: disable=import-error
     register_heif_opener()
-except Exception as ex:
-    logging.warning("{}: direct use of .heic images is not available".format(ex.msg))
+except ModuleNotFoundError as heifex:
+    logging.warning(f"{heifex.msg}: direct use of .heic images is not available")
 
 # ### settings ####
-image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 image_res = 150  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
 bg_res = 150  # dpi The resolution of background images will be reduced to this value, if it is higher.
+image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # ##########
 
 # .mcf units are 0.1 mm
@@ -173,6 +177,8 @@ clipartPathList = tuple[str]()
 passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
 passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
 fontSubstitutions = list[str]() # used to avoid repeated messages
+fontLineScales = {} # mapping fontnames to linescale where the standard value is not ok
+
 
 def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
     returnValue = minimumValue
@@ -190,28 +196,28 @@ def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
 
 def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
-    if im.format != 'JPEG' and im.format != 'MPO':
+    if im.format not in ('JPEG', 'MPO'):
         return im
     exifdict = im._getexif()
     if exifdict is not None and 274 in list(exifdict.keys()):
         orientation = exifdict[274]
-
+        # The PIL.Image values must be dynamic in some way so disable pylint no-member
         if orientation == 2:
-            im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
+            im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT) # pylint: disable=no-member
         elif orientation == 3:
-            im = im.transpose(PIL.Image.ROTATE_180)
+            im = im.transpose(PIL.Image.ROTATE_180) # pylint: disable=no-member
         elif orientation == 4:
-            im = im.transpose(PIL.Image.FLIP_TOP_BOTTOM)
+            im = im.transpose(PIL.Image.FLIP_TOP_BOTTOM) # pylint: disable=no-member
         elif orientation == 5:
-            im = im.transpose(PIL.Image.FLIP_TOP_BOTTOM)
-            im = im.transpose(PIL.Image.ROTATE_90)
+            im = im.transpose(PIL.Image.FLIP_TOP_BOTTOM) # pylint: disable=no-member
+            im = im.transpose(PIL.Image.ROTATE_90) # pylint: disable=no-member
         elif orientation == 6:
-            im = im.transpose(PIL.Image.ROTATE_270)
+            im = im.transpose(PIL.Image.ROTATE_270) # pylint: disable=no-member
         elif orientation == 7:
-            im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
-            im = im.transpose(PIL.Image.ROTATE_90)
+            im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT) # pylint: disable=no-member
+            im = im.transpose(PIL.Image.ROTATE_90) # pylint: disable=no-member
         elif orientation == 8:
-            im = im.transpose(PIL.Image.ROTATE_90)
+            im = im.transpose(PIL.Image.ROTATE_90) # pylint: disable=no-member
     return im
 
 
@@ -349,6 +355,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     maskClipartFileName = None
     frameDeltaX_mcfunit = 0
     frameDeltaY_mcfunit = 0
+    frameAlpha = 255
     imgCropWidth_mcfunit = areaWidth
     imgCropHeight_mcfunit = areaHeight
     if passepartoutid is not None:
@@ -374,7 +381,6 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             logging.debug("Using mask file: {}".format(maskClipartFileName))
             # draw the passepartout clipart file.
             # ToDo: apply the masking
-            frameAlpha = 255
             # Adjust the position of the real image depending on the frame
             if pptXmlInfo.fotoarea_x is not None:
                 frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
@@ -425,7 +431,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     jpeg = tempfile.NamedTemporaryFile()
     # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
     jpeg.close()
-    if im.mode == 'RGBA' or im.mode == 'P':
+    if im.mode in ('RGBA', 'P'):
         im.save(jpeg.name, "PNG")
     else:
         im.save(jpeg.name, "JPEG",
@@ -778,8 +784,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                     span = item
                     spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additional_fonts, bodyfont, bodyfs, bweight)
 
-                    if spanfs > maxfs:
-                        maxfs = spanfs
+                    maxfs = max(maxfs, spanfs)
 
                     paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, spanfont, spanfs, spanweight, spanstyle, bstyle)
 
@@ -859,8 +864,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
         logging.warning(' Try widening the text box just slightly to avoid an unexpected word wrap, or increasing the height yourself')
         logging.warning(' Most recent paragraph text: {}'.format(paragraphText))
         frameHeight = finalTotalHeight
-    if finalTotalWidth > frameWidth:
-        frameWidth = finalTotalWidth
+    frameWidth = max(frameWidth, finalTotalWidth)
 
     newFrame = Frame(frameBottomLeft_x, frameBottomLeft_y,
         frameWidth, frameHeight,
@@ -947,9 +951,9 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
         mirror = clipconfig.get('mirror')
         if mirror is not None:
             # cewe developers have a different understanding of x and y :)
-            if mirror == "y" or mirror == "both":
+            if mirror in ('y', 'both'):
                 flipX = True
-            if mirror == "x" or mirror == "both":
+            if mirror in ('x', 'both'):
                 flipY = True
 
     insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY)
@@ -1106,11 +1110,11 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
         # files, which still seem to be there and have the same format as cliparts_default.xml, and see
         # if we can build our internal dictionary from them.
         decorations = os.path.join(baseFolder, 'Resources', 'photofun', 'decorations')
-        configlogger.info('clipart xml path: {}'.format(decorations))
-        for (root, dirs, file) in os.walk(decorations):
-            for f in file:
-                if f.endswith(".xml"):
-                    loadClipartConfigXML(os.path.join(root, f))
+        configlogger.info(f'clipart xml path: {decorations}')
+        for (root, dirs, files) in os.walk(decorations): # walk returns a 3-tuple so pylint: disable=unused-variable
+            for decorationfile in files:
+                if decorationfile.endswith(".xml"):
+                    loadClipartConfigXML(os.path.join(root, decorationfile))
         numberClipartsLocated = len(clipartDict)
         if numberClipartsLocated > 0:
             configlogger.info('{} clipart xmls found'.format(numberClipartsLocated))
@@ -1157,7 +1161,6 @@ def loadClipartConfigXML(xmlFileName):
         fileName = os.path.join(os.path.dirname(xmlFileName), clipartElement.get('file'))
         designElementId = int(clipartElement.get('designElementId'))    # assume these IDs are always integers.
         clipartDict[designElementId] = fileName
-    return
 
 def getBaseBackgroundLocations(basefolder, keyaccountFolder):
     # create a tuple of places (folders) where background resources would be found by default
@@ -1207,12 +1210,14 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     global passepartoutDict  # pylint: disable=global-statement
     global passepartoutFolders  # pylint: disable=global-statement
     global fontLineScales  # pylint: disable=global-statement
+    global image_res  # pylint: disable=global-statement
+    global bg_res  # pylint: disable=global-statement
 
-    clipartDict = dict()    # a dictionary for clipart element IDs to file name
+    clipartDict = {}    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
-    fontSubstitutions = list() # used to avoid repeated messages
+    fontSubstitutions = [] # used to avoid repeated messages
     passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
-    passepartoutFolders = tuple() # global variable with the folders for passepartout frames
+    passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
 
     albumTitle, dummy = os.path.splitext(os.path.basename(albumname))
 
@@ -1264,8 +1269,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             logging.error("Existing output '%s' is not a file" % (outputFileName))
             sys.exit(1)
 
-    image_res = bg_res = 150 # default resolutions for pdf
-
     # a null default configuration section means that some capabilities will be missing!
     defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
@@ -1276,7 +1279,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         cewe_file.close()
         checkCeweFolder(cewe_folder)
         keyAccountNumber = getKeyaccountNumber(cewe_folder)
-        keyaccountFolder = getKeyaccountDataFolder(cewe_folder, keyAccountNumber)
+        keyaccountFolder = getKeyaccountDataFolder(keyAccountNumber)
         backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
 
     except: # noqa: E722
@@ -1308,7 +1311,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             # set the cewe folder and key account number into the environment for later use in the config files
             SetEnvironmentVariables(cewe_folder, keyAccountNumber)
 
-            keyaccountFolder = getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection)
+            keyaccountFolder = getKeyaccountDataFolder(keyAccountNumber, defaultConfigSection)
 
             baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
 
@@ -1436,7 +1439,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined
             #  because the fontFullName is identical for all three of them, namely FranklinGothic, rather than
             #  including the subfamily names which are Regular, Medium, Medium Italic
-            if (fontFullName == fontFamily) and not (fontSubFamily == "Regular" or fontSubFamily == "Light" or fontSubFamily == "Roman"):
+            if (fontFullName == fontFamily) and not fontSubFamily in ('Regular', 'Light', 'Roman'):
                 # We have a non-"normal" subfamily where the full font name which is not different from the family name.
                 # That may be a slightly dubious font definition, and it seems to cause us trouble. First, warn about it,
                 # in case people have actually used these rather "special" fonts:
@@ -1544,8 +1547,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     alternateNormal = 'bold'
                 elif fontFamily['boldItalic'] is not None:
                     alternateNormal = 'boldItalic'
-                fontFamily['normal'] = fontFamily[alternateNormal]
-                configlogger.warning("Font family '{}' has no normal font, chosen {} from {}".format(familyName,fontFamily['normal'], alternateNormal))
+                else:
+                    alternateNormal = ''
+                    configlogger.error(f"Font family '{familyName}' has no normal font and no alternate. The font will not be available")
+                if alternateNormal:
+                    fontFamily['normal'] = fontFamily[alternateNormal]
+                    configlogger.warning(f"Font family '{familyName}' has no normal font, chosen {fontFamily['normal']} from {alternateNormal}")
             for key, value in dict(fontFamily).items(): # looping through normal, bold, italic, bold italic
                 if value is None:
                     del fontFamily[key]
@@ -1594,14 +1601,14 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     for n in range(pageCount):
         try:
-            if (n == 0) or (n == pageCount - 1):
+            if (n == 0) or (n == pageCount - 1): # numeric comparisons read best like this so pylint: disable=consider-using-in
                 pageNumber = 0
                 page = [i for i in
                         fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']")
                         + fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
                         if (i.find("./area") is not None)
                         ][0]
-                oddpage = (n == 0)
+                oddpage = (n == 0) # bool assign is clearer with parens so pylint: disable=superfluous-parens
                 pagetype = 'cover'
                 # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
                 if ((keepDoublePages is True) and (n == (pageCount - 1))):
@@ -1643,7 +1650,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 continue
 
             if page is not None:
-                lastpage = (n == pageCount - 2)
+                lastpage = (n == pageCount - 2) # bool assign is clearer with parens so pylint: disable=superfluous-parens
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
                     bg_notFoundDirList, additional_fonts, lastpage)
@@ -1657,10 +1664,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                ):
                 pdf.showPage()
 
-        except Exception as ex:
+        except Exception as pageex:
             # if one page fails: continue with next one
             logging.exception("Exception")
-            logging.error('error on page {}: {}'.format(n, ex.args[0]))
+            logging.error(f'error on page {n}: {pageex.args[0]}')
 
     # save final output pdf
     pdf.save()
@@ -1731,7 +1738,7 @@ def getHpsDataFolder():
     return None
 
 
-def getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection=None):
+def getKeyaccountDataFolder(keyAccountNumber, defaultConfigSection=None):
     # for testing (in particular on checkin on github where no cewe product is installed)
     # we may want to have a specially constructed local key account data folder
     if defaultConfigSection is not None:
@@ -1741,8 +1748,7 @@ def getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection=
             if os.path.exists(inikadf):
                 logging.info('ini file overrides hps folder, key account folder set to {}'.format(inikadf))
                 return inikadf.strip()
-            else:
-                logging.error('ini file overrides hps folder, but key account folder {} does not exist. Using defaults'.format(inikadf))
+            logging.error('ini file overrides hps folder, but key account folder {} does not exist. Using defaults'.format(inikadf))
 
     hpsFolder = getHpsDataFolder()
     if hpsFolder is None:
@@ -1753,9 +1759,8 @@ def getKeyaccountDataFolder(cewe_folder, keyAccountNumber, defaultConfigSection=
     if os.path.exists(kadf):
         logging.info('Installed key account data folder at {}'.format(kadf))
         return kadf
-    else:
-        logging.error('Installed key account data folder {} not found'.format(kadf))
-        return None
+    logging.error('Installed key account data folder {} not found'.format(kadf))
+    return None
 
 
 def getKeyAccountFileName(cewe_folder):
