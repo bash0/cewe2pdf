@@ -4,15 +4,17 @@
 
 import logging
 from pathlib import Path
+from io import BytesIO
+import re
 import cairosvg
 import PIL
 from PIL import Image
 # from PIL import ImageOps
 # from PIL.ExifTags import TAGS
-from io import BytesIO
-import re
 
-class ClpFile(object):
+class ClpFile():
+    _invalidContent = r"? illegal clp content"
+
     def __init__(self, clpFileName:str = ""):
         """Constructor with file name will open and read .CLP file"""
         self.svgData: bytes = bytes()   # the byte representation of the SVG file
@@ -31,13 +33,13 @@ class ClpFile(object):
 
         inFilePath = Path(fileName)
         # open and read the whole file to memory
-        fileClp = open(inFilePath, "rt")
-        contents = fileClp.read()
-        fileClp.close()
+        contents = ClpFile._invalidContent
+        with open(inFilePath, "rt") as fileClp: # pylint: disable=unspecified-encoding
+            contents = fileClp.read()
 
         # check the header
         if contents[0] != 'a':
-            raise Exception("A .cpl file should start with character 'a', but instead it was: {} ({})".format(contents[0], hex(ord(contents[0]))))
+            raise ValueError(f"A .clp file should start with character 'a', but instead it was: {contents[0]} ({hex(ord(contents[0]))})")
         # start after the header and remove all invalid characters
         invalidChars = 'ghijklmnopqrstuvwxyz'
         hexData = contents[1:].translate({ord(i): None for i in invalidChars})
@@ -48,9 +50,8 @@ class ClpFile(object):
 
     def saveToSVG(self, outfileName):
         """save internal SVG data to a file"""
-        outFile = open(outfileName, "wb")
-        outFile.write(self.svgData)
-        outFile.close()
+        with open(outfileName, "wb") as outFile: # pylint: disable=unspecified-encoding
+            outFile.write(self.svgData)
 
     def convertToPngInBuffer(self, width:int = None, height:int = None, alpha:int = 128, flipX = False, flipY = False): # noqa: E251
         """convert the SVG to a PNG file, but only in memory"""
@@ -161,16 +162,14 @@ class ClpFile(object):
 
     def savePNGfromBufferToFile(self, fileName) -> None:
         """ write the internal PNG buffer to a file """
-        outFile = open(fileName,"wb")
-        outFile.write(self.pngMemFile.read())
-        outFile.close()
+        with open(fileName,"wb") as outFile:
+            outFile.write(self.pngMemFile.read())
         self.pngMemFile.seek(0) # reset file pointer back to the start for other function calls
 
     def loadFromSVG(self, inputFileSVG:str):
         # read SVG file into memory
-        svgFile = open(inputFileSVG,"rb") # input file should be UTF-8 encoded
-        self.svgData = svgFile.read()
-        svgFile.close()
+        with open(inputFileSVG,"rb") as svgFile: # input file should be UTF-8 encoded, but we read in binary mode
+            self.svgData = svgFile.read()
         return self
 
     def replaceColors(self, colorReplacementList):
@@ -186,7 +185,7 @@ class ClpFile(object):
         """
 
         if len(colorReplacementList) < 1:
-            return
+            return self
 
         # the colors are in the form of: style="fill:#112233"
         #   or style="opacity:0.40;fill:#112233",
@@ -204,18 +203,16 @@ class ClpFile(object):
         svgDataText = self.svgData.decode()
         if ("fill" not in svgDataText) and ("stroke" not in svgDataText):
             for curReplacement in colorReplacementList:
-                if (curReplacement[0] == "#000000"):
-                    self.svgData = svgDataText.replace('<path ', '<path fill="{}" stroke="{}" '.
-                        format(curReplacement[1],curReplacement[1]))
+                if curReplacement[0] == "#000000":
+                    self.svgData = svgDataText.replace('<path ', f'<path fill="{curReplacement[1]}" stroke="{curReplacement[1]}" ')
                     return self
         # More issue #85 stuff. This is for clipart 129188, 14466-CLIP-EMBOSS-GD.xml and similar.
         # It's a hollow figure with no fill and a black rectangular frame. This will hopefully fix
         # a more general case of an unfilled frame with a color replacement for the frame
         if ('fill="none"' in svgDataText) and ("stroke" not in svgDataText):
             for curReplacement in colorReplacementList:
-                if (curReplacement[0] == "#000000"):
-                    self.svgData = svgDataText.replace('fill="none"', 'fill="none" stroke="{}" '.
-                        format(curReplacement[1]))
+                if curReplacement[0] == "#000000":
+                    self.svgData = svgDataText.replace('fill="none"', f'fill="none" stroke="{curReplacement[1]}" ')
                     return self
         # As long as we continue to make assumptions that the cliparts are so simple that we
         # can textually find and replace fill and stroke, then we're surely going to find more
@@ -245,15 +242,15 @@ class ClpFile(object):
                 subsmade += subcount
 
             # handle: <path fill="#5E0B23" d="M218.23,..."/>
-            attributes = ("fill")
+            attributes = ("fill") # pylint: disable=superfluous-parens
             for attribute in attributes:
                 replacement, subcount = re.subn(
                     attribute+"=\""+curReplacement[0]+"\"", r""+attribute+"=\""+curReplacement[1]+"\"", self.svgData.decode(),flags=re.MULTILINE)
                 self.svgData = replacement.encode(encoding="utf-8")
                 subsmade += subcount
 
-            if (subsmade == 0):
-                logging.warning("Clipart color substitution defined but not made from {} to {}".format(curReplacement[0],curReplacement[1]))
+            if subsmade == 0:
+                logging.warning(f"Clipart color substitution defined but not made from {curReplacement[0]} to {curReplacement[1]}")
         return self
 
     @staticmethod
@@ -265,19 +262,18 @@ class ClpFile(object):
             outputFileCLP = Path(inFilePath.parent).joinpath(inFilePath.stem + ".clp")
 
         # read SVG into memory
-        svgFile = open(inFilePath,"rt")
-        contents = svgFile.read()
-        svgFile.close()
+        contents = ClpFile._invalidContent
+        with open(inFilePath,"rt") as svgFile: # pylint: disable=unspecified-encoding
+            contents = svgFile.read()
 
         # convert input string to its byte representation using utf-8 encoding.
         # and convert that to a hex string,
         tempCLPdata = contents.encode('utf-8').hex()
 
         # write CLP file by just adding the header
-        outFile = open(outputFileCLP,"wb")
-        outFile.write('a'.encode('ASCII'))
-        outFile.write(tempCLPdata.encode('utf-8'))
-        outFile.close()
+        with open(outputFileCLP,"wb") as outFile:
+            outFile.write('a'.encode('ASCII'))
+            outFile.write(tempCLPdata.encode('utf-8'))
 
 
 # if __name__ == '__main__':

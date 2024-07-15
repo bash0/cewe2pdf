@@ -7,12 +7,12 @@ class MsgCounterHandler(logging.Handler):
     levelToCountDict = None
 
     def __init__(self, *args, **kwargs):
-        super(MsgCounterHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.levelToCountDict = {}
 
     def emit(self, record):
         ln = record.levelname
-        if (ln not in self.levelToCountDict):
+        if ln not in self.levelToCountDict:
             self.levelToCountDict[ln] = 0
         self.levelToCountDict[ln] += 1
 
@@ -24,7 +24,7 @@ class MsgCounterHandler(logging.Handler):
                   logging.getLevelName(logging.WARNING),
                   logging.getLevelName(logging.INFO),
                   logging.getLevelName(logging.DEBUG)):
-            if (ln in self.levelToCountDict):
+            if ln in self.levelToCountDict:
                 if text:
                     text += ", "
                 text += f"{ln}[{self.levelToCountDict[ln]}]"
@@ -47,7 +47,7 @@ class MsgCounterHandler(logging.Handler):
             matches = re.findall(r"(\w+)\[(\d+)\]",levelspec.strip())
             if len(matches) == 1:
                 levelname = matches[0][0].upper()
-                if levelname in levelNamesMapping.keys():
+                if levelname in levelNamesMapping:
                     level = levelNamesMapping[levelname]
                     levelcount = int(matches[0][1])
                     expected[level] = levelcount
@@ -56,9 +56,9 @@ class MsgCounterHandler(logging.Handler):
 
         # now run through all the expected counts, including the initial entries with 0 expected which have not
         # been overridden by the configuration entries and check that the actuals are the same as the expected
-        for level in expected.keys():
-            levelname = logging._levelToName[level]
-            if levelname in self.levelToCountDict.keys():
+        for level in expected: # I need both the key and the item so pylint: disable=consider-using-dict-items
+            levelname = logging.getLevelName(level)
+            if levelname in self.levelToCountDict:
                 actualcount = self.levelToCountDict[levelname]
             else:
                 actualcount = 0
