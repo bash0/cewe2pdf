@@ -11,14 +11,8 @@
 from pathlib import Path
 import os
 import os.path
-# import cairosvg
-# import PIL
 import logging
-# from PIL.ExifTags import TAGS
-# from io import BytesIO
-# from clpFile import ClpFile
-from typing import List # Set, Dict, Tuple, Optional
-from typing import NamedTuple
+from dataclasses import dataclass
 from lxml import etree
 
 configlogger = logging.getLogger("cewe2pdf.config")
@@ -27,7 +21,8 @@ class Passepartout():
     def __init__(self):
         return
 
-    class decorationXmlInfo(NamedTuple):
+    @dataclass
+    class decorationXmlInfo(): # pylint: disable=too-many-instance-attributes
         srcXmlFile: str
         designElementId: int
         decoration_id: str
@@ -101,7 +96,7 @@ class Passepartout():
         return None
 
     @staticmethod
-    def buildElementIdIndex(directoryList: List[str]) -> dict:
+    def buildElementIdIndex(directoryList: list[str]) -> dict:
         # go through directories and search for .xml files and build a dictionary of
         #  designElementId to .xml file
 
