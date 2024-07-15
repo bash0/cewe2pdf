@@ -6,6 +6,10 @@
 #    pylint: disable=bare-except,broad-except
 # We're not quite at the level of documenting all the classes and functions yet :-)
 #    pylint: disable=missing-function-docstring,missing-class-docstring,missing-module-docstring
+# It'll be a while before we refactor this file ...
+#    pylint: disable=too-many-lines
+# Until we standardize on f strings ...
+#    pylint: disable=consider-using-f-string
 
 '''
 Create pdf files from CEWE .mcf photo books (cewe-fotobuch)
@@ -55,12 +59,13 @@ import glob
 
 import logging
 import logging.config
-import yaml
 
 import os.path
 import os
 import tempfile
 import html
+
+import gc
 
 import argparse  # to parse arguments
 import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
@@ -72,8 +77,6 @@ from pathlib import Path
 
 from fontTools import ttLib
 
-from mcfx import unpackMcfx
-
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
@@ -83,26 +86,25 @@ from reportlab.platypus import Paragraph, Frame, Table
 from reportlab.lib.styles import ParagraphStyle
 # from reportlab.lib.styles import getSampleStyleSheet
 
-from lxml import etree
-
-from otf import getTtfsFromOtfs
-
-from messageCounterHandler import MsgCounterHandler
-
 # import pil and work around a breaking change in pil 10.0.0, see
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
 import PIL
-from packaging.version import parse as parse_version
 
+from packaging.version import parse as parse_version
+from lxml import etree
+import yaml
+
+from clpFile import ClpFile  # for clipart .CLP and .SVG files
+from mcfx import unpackMcfx
+from messageCounterHandler import MsgCounterHandler
+from passepartout import Passepartout
 from pathutils import localfont_dir
+from otf import getTtfsFromOtfs
 
 if parse_version(PIL.__version__) >= parse_version('9.1.0'):
     pil_antialias = PIL.Image.LANCZOS # closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
 else:
     pil_antialias = PIL.Image.ANTIALIAS
-
-from clpFile import ClpFile  # for clipart .CLP and .SVG files
-from passepartout import Passepartout
 
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
     # Running in a PyInstaller bundle, ref https://pyinstaller.org/en/stable/runtime-information.html#run-time-information
@@ -119,8 +121,8 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         os.environ["PATH"] += dllpath
 
 if os.path.exists('loggerconfig.yaml'):
-    with open('loggerconfig.yaml', 'r') as f:
-        config = yaml.safe_load(f.read())
+    with open('loggerconfig.yaml', 'r') as loggeryaml:
+        config = yaml.safe_load(loggeryaml.read())
         logging.config.dictConfig(config)
 else:
     logging.basicConfig(stream=sys.stderr, level=logging.INFO)
@@ -139,7 +141,7 @@ configlogger.addHandler(configMessageCountHandler)
 # make it possible for PIL.Image to open .heic files if the album editor stores them directly
 # ref https://github.com/bash0/cewe2pdf/issues/130
 try:
-    from pillow_heif import register_heif_opener
+    from pillow_heif import register_heif_opener # the absence of heif handling is handled so pylint: disable=import-error
     register_heif_opener()
 except Exception as ex:
     logging.warning("{}: direct use of .heic images is not available".format(ex.msg))
@@ -166,12 +168,11 @@ tempFileList = []  # we need to remove all this temporary files at the end
 # pdf_styleN = pdf_styles['Normal']
 pdf_flowableList = []
 
-clipartDict = dict()    # a dictionary for clipart element IDs to file name
-clipartPathList = tuple()
-passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
-passepartoutFolders = tuple() # global variable with the folders for passepartout frames
-fontSubstitutions = list() # used to avoid repeated messages
-
+clipartDict = dict[int, str]()    # a dictionary for clipart element IDs to file name
+clipartPathList = tuple[str]()
+passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
+passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
+fontSubstitutions = list[str]() # used to avoid repeated messages
 
 def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
     returnValue = minimumValue
@@ -255,7 +256,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 backgroundTag = curTag
                 break
 
-        if (backgroundTag is not None and cewe_folder is not None
+        if (cewe_folder and backgroundTag is not None
                 and backgroundTag.get('designElementId') is not None):
             bg = backgroundTag.get('designElementId')
             # example: fading="0" hue="270" rotation="0" type="1"
@@ -1263,6 +1264,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             logging.error("Existing output '%s' is not a file" % (outputFileName))
             sys.exit(1)
 
+    image_res = bg_res = 150 # default resolutions for pdf
+
     # a null default configuration section means that some capabilities will be missing!
     defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
@@ -1286,15 +1289,15 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         # We want the config file in the .mcf directory to be the most important file.
         filesread = configuration.read(['cewe2pdf.ini', os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
         if len(filesread) < 1:
-            logging.warning('Cannot find cewe installation folder cewe_folder from cewe2pdf.ini')
-            cewe_folder = None
+            logging.error('You must create cewe_folder.txt or cewe2pdf.ini to specify the cewe_folder')
+            sys.exit(1)
         else:
             # Give the user feedback which config-file is used, in case there is a problem.
             logging.info('Using configuration in: ' + ', '.join(map('{}'.format, filesread)))
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             if 'cewe_folder' not in defaultConfigSection:
-                logging.error('Error: You must create cewe_folder.txt or modify cewe2pdf.ini')
+                logging.error('You must create cewe_folder.txt or modify cewe2pdf.ini')
                 sys.exit(1)
 
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
@@ -1337,7 +1340,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             image_res = getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
             bg_res = getConfigurationInt(defaultConfigSection, 'pdfBackgroundResolution', '150', 100)
 
-        logging.info(f'Using image resolution {image_res}, background resolution {bg_res}')
+    logging.info(f'Using image resolution {image_res}, background resolution {bg_res}')
 
     if keyaccountFolder is not None:
         passepartoutFolders = passepartoutFolders + \
@@ -1354,7 +1357,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     additional_fonts = {}
     additional_fontFamilies = {}
 
-    if cewe_folder is not None:
+    if cewe_folder:
         fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
 
     # if a user has installed fonts locally on his machine, then we need to look there as well
@@ -1666,7 +1669,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     # force the release of objects which might be holding on to picture file references
     # so that they will not prevent the removal of the files as we clean up and exit
-    import gc
     objectscollected = gc.collect()
     logging.info('GC collected objects : {}'.format(objectscollected))
 
