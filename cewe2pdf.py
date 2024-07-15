@@ -125,7 +125,7 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         os.environ["PATH"] += dllpath
 
 if os.path.exists('loggerconfig.yaml'):
-    with open('loggerconfig.yaml', 'r') as loggeryaml:
+    with open('loggerconfig.yaml', 'r') as loggeryaml: # this works on all relevant platforms so pylint: disable=unspecified-encoding
         config = yaml.safe_load(loggeryaml.read())
         logging.config.dictConfig(config)
 else:
@@ -252,7 +252,7 @@ def getPageElementForPageNumber(fotobook, pageNumber):
 
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
-                      keepDoublePages, oddpage, pagetype, pdf, ph, pw):
+                      keepDoublePages, pagetype, pdf, ph, pw):
     if pagetype == "emptypage":  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
         return
     if backgroundTags is not None and len(backgroundTags) > 0:
@@ -364,7 +364,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         global passepartoutDict # pylint: disable=global-statement
         if passepartoutDict is None:
             configlogger.info("Regenerating passepartout index from .XML files.")
-            global passepartoutFolders  # pylint: disable=global-statement
+            # the folder list may in fact be modified by buildElementIdIndex so disable pylint complaints
+            global passepartoutFolders # pylint: disable=global-statement,global-variable-not-assigned
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
         # read information from .xml file
         try:
@@ -428,7 +429,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         im = maskClp.applyAsAlphaMaskToFoto(im)
 
     # re-compress image
-    jpeg = tempfile.NamedTemporaryFile()
+    jpeg = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
     # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
     jpeg.close()
     if im.mode in ('RGBA', 'P'):
@@ -575,7 +576,7 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
     return spanfont, spanfs, spanweight, spanstyle
 
 
-def AppendSpanStart(paragraphText, bgColorAttrib, font, fsize, fweight, fstyle, outerstyle):
+def AppendSpanStart(paragraphText, font, fsize, fweight, fstyle, outerstyle):
     """
     Remember this is not really HTML, though it looks that way.
     See 6.2 Paragraph XML Markup Tags in the reportlabs user guide.
@@ -612,9 +613,9 @@ def AppendSpanEnd(paragraphText, weight, style, outerstyle):
     return paragraphText
 
 
-def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle, bgColorAttrib):
+def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle):
     pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additional_fonts, bodyfont, bodyfs, bweight)
-    paragraphText = AppendSpanStart(paragraphText, bgColorAttrib, pfont, pfs, pweight, pstyle, bstyle)
+    paragraphText = AppendSpanStart(paragraphText, pfont, pfs, pweight, pstyle, bstyle)
     if text is None:
         paragraphText = AppendText(paragraphText, "")
     else:
@@ -747,7 +748,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
         if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
-                additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                additional_fonts, bodyfont, bodyfs, bweight, bstyle)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
             pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
@@ -761,7 +762,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
             # the first span just continues that leading text
             if p.text is not None:
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
-                    additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                    additional_fonts, bodyfont, bodyfs, bweight, bstyle)
                 usefs = maxfs if maxfs > 0 else bodyfs
                 pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
 
@@ -778,7 +779,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
                     paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf,
-                        additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                        additional_fonts, bodyfont, bodyfs, bweight, bstyle)
 
                 elif item.tag == 'span':
                     span = item
@@ -786,7 +787,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
 
                     maxfs = max(maxfs, spanfs)
 
-                    paragraphText = AppendSpanStart(paragraphText, backgroundColorAttrib, spanfont, spanfs, spanweight, spanstyle, bstyle)
+                    paragraphText = AppendSpanStart(paragraphText, spanfont, spanfs, spanweight, spanstyle, bstyle)
 
                     if span.text is not None:
                         paragraphText = AppendText(paragraphText, html.escape(span.text))
@@ -806,7 +807,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                             paragraphText = '<para autoLeading="max">'
                             # now add the tail text of each br in the span style
                             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf,
-                                additional_fonts, bodyfont, bodyfs, bweight, bstyle, backgroundColorAttrib)
+                                additional_fonts, bodyfont, bodyfs, bweight, bstyle)
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
@@ -1079,7 +1080,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     #  number for the background attribute if it is a original
     #  stock image, without filters.
     backgroundTags = page.findall('background')
-    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, oddpage, pagetype, pdf, ph, pw)
+    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, pagetype, pdf, ph, pw)
 
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
     processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
@@ -1150,17 +1151,20 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
 
 
 def loadClipartConfigXML(xmlFileName):
-    clipArtXml = open(xmlFileName, 'rb')
-    xmlInfo = etree.parse(xmlFileName)
-    clipArtXml.close()
-    for decoration in xmlInfo.findall('decoration'):
-        clipartElement = decoration.find('clipart')
-        # we might be reading a decoration definition that is not clipart, just ignore those
-        if clipartElement is None:
-            continue
-        fileName = os.path.join(os.path.dirname(xmlFileName), clipartElement.get('file'))
-        designElementId = int(clipartElement.get('designElementId'))    # assume these IDs are always integers.
-        clipartDict[designElementId] = fileName
+    try:
+        with open(xmlFileName, 'rb') as clipArtXml:
+            xmlInfo = etree.parse(clipArtXml)
+        for decoration in xmlInfo.findall('decoration'):
+            clipartElement = decoration.find('clipart')
+            # we might be reading a decoration definition that is not clipart, just ignore those
+            if clipartElement is None:
+                continue
+            fileName = os.path.join(os.path.dirname(xmlFileName), clipartElement.get('file'))
+            designElementId = int(clipartElement.get('designElementId'))    # assume these IDs are always integers.
+            clipartDict[designElementId] = fileName
+    except Exception as clpOpenEx:
+        logging.error(f"Cannot open clipart file {xmlFileName}: {repr(clpOpenEx)}")
+
 
 def getBaseBackgroundLocations(basefolder, keyaccountFolder):
     # create a tuple of places (folders) where background resources would be found by default
@@ -1240,9 +1244,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # parse the input mcf xml file
     # read file as binary, so UTF-8 encoding is preserved for xml-parser
     try:
-        mcffile = open(mcfxmlname, 'rb')
-        mcf = etree.parse(mcffile)
-        mcffile.close()
+        with open(mcfxmlname, 'rb') as mcffile:
+            mcf = etree.parse(mcffile)
     except Exception as e:
         invalidmsg = f"Cannot open mcf file {mcfxmlname}"
         if mcfxFormat:
@@ -1274,13 +1277,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # find cewe folder using the original cewe_folder.txt file
     try:
         configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
-        cewe_file = open(configFolderFileName, 'r')
-        cewe_folder = cewe_file.read().strip()
-        cewe_file.close()
-        checkCeweFolder(cewe_folder)
-        keyAccountNumber = getKeyaccountNumber(cewe_folder)
-        keyaccountFolder = getKeyaccountDataFolder(keyAccountNumber)
-        backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
+        with open(configFolderFileName, 'r') as cewe_file:  # this works on all relevant platforms so pylint: disable=unspecified-encoding
+            cewe_folder = cewe_file.read().strip()
+            checkCeweFolder(cewe_folder)
+            keyAccountNumber = getKeyaccountNumber(cewe_folder)
+            keyaccountFolder = getKeyaccountDataFolder(keyAccountNumber)
+            backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
 
     except: # noqa: E722
         # arrives here if the original cewe_folder.txt file is missing, which we really expect it to be these days.
@@ -1371,7 +1373,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     try:
         configFontFileName = findFileInDirs('additional_fonts.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
         logging.info('Using fonts from: ' + configFontFileName)
-        with open(configFontFileName, 'r') as fp:
+        with open(configFontFileName, 'r') as fp: # this works on all relevant platforms so pylint: disable=unspecified-encoding
             for line in fp:
                 line = line.strip()
                 if not line:
@@ -1827,13 +1829,13 @@ if __name__ == '__main__':
         parser.parse_args(['-h'])
         sys.exit(1)
 
-    pageNumbers = None
+    pages = None
     if args.pages is not None:
-        pageNumbers = []
+        pages = []
         for expr in args.pages.split(','):
             expr = expr.strip()
             if expr.isnumeric():
-                pageNumbers.append(int(expr)) # simple number "23"
+                pages.append(int(expr)) # simple number "23"
             elif expr.find('-') > -1:
                 # page range: 23-42
                 fromTo = expr.split('-', 2)
@@ -1845,18 +1847,18 @@ if __name__ == '__main__':
                 if pageTo < pageFrom:
                     logging.error('Invalid page range: ' + expr)
                     sys.exit(1)
-                pageNumbers = pageNumbers + list(range(pageFrom, pageTo + 1))
+                pages = pages + list(range(pageFrom, pageTo + 1))
             else:
                 logging.error('Invalid page number: ' + expr)
                 sys.exit(1)
 
-    mcfxTmpDir = None
-    if args.mcfxTmpDir is not None:
-        mcfxTmpDir = os.path.abspath(args.mcfxTmpDir)
+    mcfxTmp = None
+    if args.mcfxTmp is not None:
+        mcfxTmp = os.path.abspath(args.mcfxTmp)
 
-    appDataDir = None
-    if args.appDataDir is not None:
-        appDataDir = os.path.abspath(args.appDataDir)
+    appData = None
+    if args.appData is not None:
+        appData = os.path.abspath(args.appData)
 
     # convert the file
-    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pageNumbers, mcfxTmpDir, appDataDir)
+    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData)
