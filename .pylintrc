@@ -6,7 +6,7 @@
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code.
-extension-pkg-whitelist=
+extension-pkg-whitelist=lxml
 
 # Specify a score threshold to be exceeded before program exits with error.
 fail-under=10.0
@@ -68,7 +68,9 @@ disable=bad-inline-option,
         file-ignored,
         invalid-name,
         locally-disabled,
+        logging-format-interpolation,
         logging-fstring-interpolation,
+        logging-not-lazy,
         missing-class-docstring,
         missing-function-docstring,
         missing-module-docstring,
