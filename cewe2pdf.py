@@ -9,6 +9,8 @@
 # It'll be a while before we refactor this file, but when we do then these should be reenabled again!
 #    pylint: disable=too-many-lines,too-many-statements,too-many-arguments,too-many-locals
 #    pylint: disable=too-many-nested-blocks,too-many-branches
+# logging strings, we don't log enough to worry about lazy evaluation
+#    pylint: enable=logging-format-interpolation,logging-not-lazy
 
 '''
 Create pdf files from CEWE .mcf photo books (cewe-fotobuch)
@@ -1293,7 +1295,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             sys.exit(1)
         else:
             # Give the user feedback which config-file is used, in case there is a problem.
-            logging.info('Using configuration in: ' + str(filesread))
+            logging.info(f'Using configuration in: {str(filesread)}')
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             if 'cewe_folder' not in defaultConfigSection:
@@ -1367,7 +1369,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     try:
         configFontFileName = findFileInDirs('additional_fonts.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
-        logging.info('Using fonts from: ' + configFontFileName)
+        logging.info(f'Using fonts from: {configFontFileName}')
         with open(configFontFileName, 'r') as fp: # this works on all relevant platforms so pylint: disable=unspecified-encoding
             for line in fp:
                 line = line.strip()
@@ -1383,7 +1385,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     path = os.path.expandvars(line)
 
                 if not os.path.exists(path):
-                    configlogger.error('Custom additional font file does not exist: ' + path)
+                    configlogger.error(f'Custom additional font file does not exist: {path}')
                     continue
                 if os.path.isdir(path):
                     fontDirs.append(path)
@@ -1416,13 +1418,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             fontSubFamily = font['name'].getDebugName(2) # eg Regular, Bold, Bold Italic
             fontFullName = font['name'].getDebugName(4) # eg usually a combo of 1 and 2
             if fontFamily is None:
-                configlogger.warning('Could not get family (name) of font: ' + ttfFile)
+                configlogger.warning(f'Could not get family (name) of font: {ttfFile}')
                 continue
             if fontSubFamily is None:
-                configlogger.warning('Could not get subfamily of font: ' + ttfFile)
+                configlogger.warning(f'Could not get subfamily of font: {ttfFile}')
                 continue
             if fontFullName is None:
-                configlogger.warning('Could not get full font name: ' + ttfFile)
+                configlogger.warning(f'Could not get full font name: {ttfFile}')
                 continue
 
             # Cewe offers the users "fonts" which really name a "font family" (so that you can then use
@@ -1531,7 +1533,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     explicitlyRegisteredFamilyNames.append(m_familyname)
                     configlogger.warning(f"Using configured font family '{m_familyname}': '{m_n}','{m_b}','{m_i}','{m_bi}'")
             else:
-                configlogger.error('Invalid FontFamilies line ignored (!= 5 comma-separated strings): ' + explicitFontFamily)
+                configlogger.error(f'Invalid FontFamilies line ignored (!= 5 comma-separated strings): {explicitFontFamily}')
 
     # Now we can register the families we have "observed" and built up as we read the font files,
     #  but ignoring any family name which was registered explicitly from configuration
@@ -1581,7 +1583,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # extract properties
     articleConfigElement = fotobook.find('articleConfig')
     if articleConfigElement is None:
-        logging.error(albumname + ' is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
+        logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
     pageCount = int(articleConfigElement.get('normalpages')) + 2    # maximum number of pages
     imagedir = fotobook.get('imagedir')
@@ -1835,16 +1837,16 @@ if __name__ == '__main__':
                 # page range: 23-42
                 fromTo = expr.split('-', 2)
                 if not fromTo[0].isnumeric() or not fromTo[1].isnumeric():
-                    logging.error('Invalid page range: ' + expr)
+                    logging.error(f'Invalid page range: {expr}')
                     sys.exit(1)
                 pageFrom = int(fromTo[0])
                 pageTo = int(fromTo[1])
                 if pageTo < pageFrom:
-                    logging.error('Invalid page range: ' + expr)
+                    logging.error(f'Invalid page range: {expr}')
                     sys.exit(1)
                 pages = pages + list(range(pageFrom, pageTo + 1))
             else:
-                logging.error('Invalid page number: ' + expr)
+                logging.error(f'Invalid page number: {expr}')
                 sys.exit(1)
 
     mcfxTmp = None
