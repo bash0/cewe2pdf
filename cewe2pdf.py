@@ -198,9 +198,10 @@ def autorot(im):
     # some cameras return JPEG in MPO container format. Just use the first image.
     if im.format not in ('JPEG', 'MPO'):
         return im
-    exifdict = im._getexif()
-    if exifdict is not None and 274 in list(exifdict.keys()):
-        orientation = exifdict[274]
+    ExifRotationTag = 274
+    exifdict = im.getexif()
+    if exifdict is not None and ExifRotationTag in list(exifdict.keys()):
+        orientation = exifdict[ExifRotationTag]
         # The PIL.Image values must be dynamic in some way so disable pylint no-member
         if orientation == 2:
             im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT) # pylint: disable=no-member
@@ -844,8 +845,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     # Go through all flowables and test if the fit in the frame. If not increase the frame height.
     # To solve the problem, that if each paragraph will fit indivdually, and also all together,
     # we need to keep track of the total summed height+
-    for j in range(len(pdf_flowableList)):
-        neededTextWidth, neededTextHeight = pdf_flowableList[j].wrap(availableTextWidth, availableTextHeight)
+    for flowableListItem in pdf_flowableList:
+        neededTextWidth, neededTextHeight = flowableListItem.wrap(availableTextWidth, availableTextHeight)
         finalTotalHeight += neededTextHeight
         availableTextHeight -= neededTextHeight
         if neededTextWidth > availableTextWidth:
