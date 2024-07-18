@@ -7,7 +7,7 @@ and compiling a pdf document which looks like the cewe photo book.
 
 There are many unsupported options, so an exact conversion cannot be guaranteed. The script is mostly based on reverse-engineering and guessing. It is not meeting any official specifications. So don't be surprised if one or another feature doesn't work. However, improvements are always appreciated.
 
-You will need underlying Cairographics (<https://www.cairographics.org/>) support installed on your machine for the handling of clip art. How you get this will depend on your platform, but if you have the GTK+ toolkit installed (<https://www.gtk.org/docs/installations/>) that should do it. An alternative way to get Cairo installed is to use vcpkg (https://learn.microsoft.com/en-gb/vcpkg/get_started/overview and https://vcpkg.io/en/). For Windows users just seeking a 'cairo.dll' to add to %WINDIR%\System32, take a look at [this project] (https://github.com/preshing/cairo-windows) for binary releases.
+You will need underlying Cairographics (<https://www.cairographics.org/>) support installed on your machine for the handling of clip art. How you get this will depend on your platform, but if you have the GTK+ toolkit installed (<https://www.gtk.org/docs/installations/>) that should do it. An alternative way to get Cairo installed is to use vcpkg (https://learn.microsoft.com/en-gb/vcpkg/get_started/overview and https://vcpkg.io/en/). For Windows users just seeking a 'cairo.dll' to add to %WINDIR%\System32, take a look at [this project](https://github.com/preshing/cairo-windows) for binary releases.
 
 tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf exportieren, cewe Fotobuch pdf, mcf in pdf umwandeln, aus CEW-Fotobuch ein pdf machen, cewe Fotobuch pdf
 
