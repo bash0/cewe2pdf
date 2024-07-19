@@ -1802,10 +1802,10 @@ if __name__ == '__main__':
     parser.add_argument('--pages', dest='pages', action='store',
                         default=None,
                         help='Page numbers to render, e.g. 1,2,4-9')
-    parser.add_argument('--tmp-dir', dest='mcfxTmpDir', action='store',
+    parser.add_argument('--tmp-dir', dest='mcfxTmp', action='store',
                         default=None,
                         help='Directory for .mcfx file extraction')
-    parser.add_argument('--appdata-dir', dest='appDataDir',
+    parser.add_argument('--appdata-dir', dest='appData',
                         default=None,
                         help='Directory for persistent app data, eg ttf fonts converted from otf fonts')
     parser.add_argument('inputFile', type=str, nargs='?',
