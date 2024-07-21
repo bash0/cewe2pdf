@@ -10,7 +10,7 @@ from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, newTable
-
+from fontTools.cu2qu import errors # not used here, but this makes sure that pyinstaller gets it
 from pathutils import appdata_dir
 
 log = logging.getLogger("cewe2pdf.config")
