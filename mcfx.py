@@ -60,6 +60,16 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
                     sys.exit(1)
                 mcfname = Path(tempdirPath) / filename
 
+                # try turn the blob of bytes into a string, since an mcf is supposed to be xml
+                try:
+                    notused = str(filecontent, encoding='utf-8')
+                except UnicodeDecodeError as decodeEx:
+                    if decodeEx.reason == "invalid start byte" and decodeEx.object[decodeEx.start-1] == 0:
+                        # Then we've (probably, based on experimentation!) reached the end of the xml string
+                        # and there is junk in the buffer after that. Shorten the amount of data to be stored
+                        # in the actual xml file...
+                        filecontent = filecontent[:decodeEx.start-1]
+
             if os.path.exists(filename) and lastchange < os.path.getmtime(filename):
                 # not changed since last extraction
                 continue
@@ -69,7 +79,10 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
         cursor.close()
 
     except sqlite3.Error as error:
-        logging.error(f"Exiting: failure to read image data: {error}")
+        logging.error(f"Exiting: sqllite3 failed to read image or mcf data: {error}")
+        sys.exit(1)
+    except Exception as ex:
+        logging.error(f"Exiting: failure handling image or mcf data: {ex}")
         sys.exit(1)
 
     finally:
