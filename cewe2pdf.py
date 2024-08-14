@@ -238,6 +238,8 @@ def findFileByExtInDirs(filebase, extList, paths):
 # locate files in a directory with a pattern, with optional case sensitivity
 # eg: findFilesInDir(fontdir, '*.ttf')
 def findFilesInDir(dirpath: str, glob_pat: str, ignore_case: bool = True):
+    if not os.path.exists(dirpath):
+        return []
     rule = re.compile(fnmatch.translate(glob_pat), re.IGNORECASE) if ignore_case \
         else re.compile(fnmatch.translate(glob_pat))
     return [os.path.join(dirpath, n) for n in os.listdir(dirpath) if rule.match(n)]
