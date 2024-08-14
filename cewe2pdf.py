@@ -239,7 +239,7 @@ def findFileByExtInDirs(filebase, extList, paths):
 # eg: findFilesInDir(fontdir, '*.ttf')
 def findFilesInDir(dirpath: str, glob_pat: str, ignore_case: bool = True):
     rule = re.compile(fnmatch.translate(glob_pat), re.IGNORECASE) if ignore_case \
-            else re.compile(fnmatch.translate(glob_pat))
+        else re.compile(fnmatch.translate(glob_pat))
     return [os.path.join(dirpath, n) for n in os.listdir(dirpath) if rule.match(n)]
 
 
@@ -1419,10 +1419,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
             # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf
             #   see https://github.com/bash0/cewe2pdf/issues/133
-            otfFiles = sorted(glob.glob(os.path.join(fontDir, '*.otf')))
+            otfFiles = findFilesInDir(fontDir, '*.otf')
             if len(otfFiles) > 0:
                 ttfsFromOtfs = getTtfsFromOtfs(otfFiles,appDataDir)
-                ttfFiles.extend(ttfsFromOtfs)
+                ttfFiles.extend(sorted(ttfsFromOtfs))
 
     if len(ttfFiles) > 0:
         ttfFiles = list(dict.fromkeys(ttfFiles))# remove duplicates
@@ -1455,7 +1455,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined
             #  because the fontFullName is identical for all three of them, namely FranklinGothic, rather than
             #  including the subfamily names which are Regular, Medium, Medium Italic
-            if (fontFullName == fontFamily) and not fontSubFamily in ('Regular', 'Light', 'Roman'):
+            if (fontFullName == fontFamily) and fontSubFamily not in ('Regular', 'Light', 'Roman'):
                 # We have a non-"normal" subfamily where the full font name which is not different from the family name.
                 # That may be a slightly dubious font definition, and it seems to cause us trouble. First, warn about it,
                 # in case people have actually used these rather "special" fonts:
