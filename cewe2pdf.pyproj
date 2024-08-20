@@ -36,6 +36,7 @@
     <Content Include="loggerconfig.yaml" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
+    <Content Include="TestingOnWSL.md" />
     <Content Include="tests\additional_fonts.txt" />
     <Content Include="tests\cewe2pdf-local.ini" />
     <Content Include="tests\cewe2pdf.ini" />

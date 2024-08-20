@@ -57,12 +57,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # only needed when the program is frozen (i.e. compiled).
 import sys
 import glob
+import fnmatch
 
 import logging
 import logging.config
 
 import os.path
 import os
+import re
 import tempfile
 import html
 
@@ -228,10 +230,19 @@ def findFileByExtInDirs(filebase, extList, paths):
             testPath = os.path.join(p, filebase + ext)
             if os.path.exists(testPath):
                 return testPath
-
     prtStr = f"Could not find {filebase} [{' '.join(extList)}] in paths {', '.join(paths)}"
     logging.info(prtStr)
     raise ValueError(prtStr)
+
+
+# locate files in a directory with a pattern, with optional case sensitivity
+# eg: findFilesInDir(fontdir, '*.ttf')
+def findFilesInDir(dirpath: str, glob_pat: str, ignore_case: bool = True):
+    if not os.path.exists(dirpath):
+        return []
+    rule = re.compile(fnmatch.translate(glob_pat), re.IGNORECASE) if ignore_case \
+        else re.compile(fnmatch.translate(glob_pat))
+    return [os.path.join(dirpath, n) for n in os.listdir(dirpath) if rule.match(n)]
 
 
 def findFileInDirs(filenames, paths):
@@ -1399,13 +1410,21 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     if len(fontDirs) > 0:
         for fontDir in fontDirs:
-            ttfFiles.extend(sorted(glob.glob(os.path.join(fontDir, '*.ttf'))))
+            # this is what we really want to do to find extra ttf files:
+            #   ttfextras = glob.glob(os.path.join(fontDir, '*.ttf'))
+            # but case sensitivity is a problem which will kick in - at least - when executing
+            # a Linux subsystem on a Windows machine and file system. So we use a case insensitive
+            # alternative [until Python 3.12 when glob itself offers case insensitivity] Ref the
+            # discussion at https://stackoverflow.com/questions/8151300/ignore-case-in-glob-on-linux
+            ttfextras = findFilesInDir(fontDir, '*.ttf')
+            ttfFiles.extend(sorted(ttfextras))
+
             # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf
             #   see https://github.com/bash0/cewe2pdf/issues/133
-            otfFiles = sorted(glob.glob(os.path.join(fontDir, '*.otf')))
+            otfFiles = findFilesInDir(fontDir, '*.otf')
             if len(otfFiles) > 0:
                 ttfsFromOtfs = getTtfsFromOtfs(otfFiles,appDataDir)
-                ttfFiles.extend(ttfsFromOtfs)
+                ttfFiles.extend(sorted(ttfsFromOtfs))
 
     if len(ttfFiles) > 0:
         ttfFiles = list(dict.fromkeys(ttfFiles))# remove duplicates
@@ -1438,7 +1457,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined
             #  because the fontFullName is identical for all three of them, namely FranklinGothic, rather than
             #  including the subfamily names which are Regular, Medium, Medium Italic
-            if (fontFullName == fontFamily) and not fontSubFamily in ('Regular', 'Light', 'Roman'):
+            if (fontFullName == fontFamily) and fontSubFamily not in ('Regular', 'Light', 'Roman'):
                 # We have a non-"normal" subfamily where the full font name which is not different from the family name.
                 # That may be a slightly dubious font definition, and it seems to cause us trouble. First, warn about it,
                 # in case people have actually used these rather "special" fonts:

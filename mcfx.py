@@ -62,7 +62,7 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
 
                 # try turn the blob of bytes into a string, since an mcf is supposed to be xml
                 try:
-                    notused = str(filecontent, encoding='utf-8')
+                    notused = str(filecontent, encoding='utf-8') # noqa
                 except UnicodeDecodeError as decodeEx:
                     if decodeEx.reason == "invalid start byte" and decodeEx.object[decodeEx.start-1] == 0:
                         # Then we've (probably, based on experimentation!) reached the end of the xml string
