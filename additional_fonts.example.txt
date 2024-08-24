@@ -1,3 +1,4 @@
+# Copy as additional_fonts.txt and adapt to your needs.
 C:\Windows\Fonts\BOD_R.TTF
 ${CEWE_FOLDER}\Resources\photofun\fonts\Function-Light.ttf
 /home/cweiske/.local/share/fonts/

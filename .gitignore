@@ -43,8 +43,10 @@ nosetests.xml
 *.mcf~
 *.xml~
 
+/additional_fonts.txt
 /cewe_folder.txt
 /cewe2pdf - Copy.py
+/cewe2pdf.ini
 /cewe2pdf.iss
 /cewe2pdf.pyproj.user
 /cewe2pdf.spec
