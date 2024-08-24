@@ -66,3 +66,4 @@ nosetests.xml
 /tests/unittest_fotobook.mcfx.pdf
 /tests/unittest_fotobook_mcf-Dateien/folderid.xml
 /tests/unittest_fotobook_mcf-Dateien/identifier.xml
+/tests/test_bugfix_duplicate_closing_fotobook.mcfx.pdf

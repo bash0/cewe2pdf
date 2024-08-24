@@ -1253,7 +1253,20 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # content after b'<fotobook>...</fotobook>', either of or both: (i) a
     # remnant terminating xml fragment after a shrunk data.mcf, (ii) a sequence
     # of repeated 0xfb's. Cutting after the first occurrence of b'</fotobook>'
-    # therefore fixes both potential problems.
+    # therefore fixes both potential problems. In such a situation, looking into
+    # the .mcfx file (by sqlite3) shows that data.mcf much larger than
+    # data.mcf~, and data.mcf contains almost all of the .mcfx file but not the
+    # entire file. Setting the environment variable RETAIN_RAW_DATA_MCF will
+    # help debugging by retaining the extracted .mcf file.
+    try:
+        rawdatafile = os.environ["RETAIN_RAW_DATA_MCF"]
+        with open(mcfxmlname, 'rb') as mcfin:
+            with open(rawdatafile, 'wb') as mcfout:
+                mcfout.write(mcfin.read())
+                logging.info(f"Raw content of " + str(mcfxmlname) + " saved to " + rawdatafile)
+    except KeyError as error:
+        pass
+
     with open(mcfxmlname, 'rb') as mcfin:
         s = mcfin.read()
         p = s.find(b'</fotobook>')
@@ -1261,7 +1274,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             logging.error(f"malformed data.mcf")
             sys.exit(1)
     with open(mcfxmlname, 'wb') as mcfout:
+        logging.info(f"rewriting " + str(mcfxmlname))
         mcfout.write(s[:p+11])
+        logging.info(f"removed extra content from data.mcf (reduced from " + str(len(s)) + " to " + str(p+11) + " bytes)")
 
     # parse the input mcf xml file
     # read file as binary, so UTF-8 encoding is preserved for xml-parser
