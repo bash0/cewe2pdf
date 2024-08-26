@@ -1,5 +1,7 @@
 version: 1
 formatters:
+  mustsee:
+    format: '>>> %(message)s'
   simple:
     format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     datefmt: '%H:%M:%S'
@@ -14,10 +16,19 @@ handlers:
     level: WARNING
     formatter: simple
     stream: ext://sys.stdout
+  consoleMustSee:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: mustsee
+    stream: ext://sys.stdout
 loggers:
   cewe2pdf.config:
     handlers: [consoleWarningOrWorse]
     level: DEBUG
+    propagate: no
+  cewe2pdf.mustsee:
+    level: INFO
+    handlers: [consoleMustSee]
     propagate: no
   PIL.PngImagePlugin:
     level: WARNING
