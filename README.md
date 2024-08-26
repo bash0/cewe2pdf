@@ -56,7 +56,9 @@ C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
 
 Save the file and close it.
 
-Alternatively - indeed, preferably, if you want full functionality - you can move on to more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``. Here you can specify the location of the cewe folder, provide a comma separated list of locations for additional background images and define how the additional fonts you have specified (see below) are organised into families so that bold and italic texts are shown correctly.
+Alternatively - preferably, if you want full functionality - you use more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``. The program looks for files called ``cewe2pdf.ini`` first in the current directory and then in the album directory, reading both if it finds both. Later entries override previous entries of the same name. For normal use (i.e. creating a pdf album, rather than testing the code) the most reasonable strategy is to place a ``cewe2pdf.ini`` file with the album.
+
+In ``cewe2pdf.ini`` you can specify the location of the cewe folder, provide a comma separated list of locations for additional background images, define how the additional fonts you have specified (see below) are organised into families so that bold and italic texts are shown correctly and more.
 The contents can, for example, be of the form:
 
 ```
@@ -92,6 +94,22 @@ fontLineScales =
 #	cewe2pdf.config: WARNING[32], INFO[669]
 #	root:            ERROR[2], WARNING[4], INFO[38]
 
+```
+
+The code knows where to find the fonts delivered with the Cewe software, but if you use non-Cewe fonts then you must specify the location of those fonts. For historical reasons configuration of fonts is done with a separate (optional) file, ``additional_fonts.txt``. The code searches the album directory, the current directory and the location of the program itself to find ``additional_fonts.txt``; it uses only the **first** such file found. For normal use, it makes sense to place an ``additional_fonts.txt`` file with the album file. The  file should contain one line per font or font directory to be added. Both `.ttf` or `.otf` files are read.
+
+Example for Windows font file and directory paths:
+
+```
+C:\Windows\Fonts\BOD_R.TTF
+C:\Windows\Fonts\
+```
+
+Example for linux font file and directory paths:
+
+```
+/usr/share/fonts/truetype/lato/Lato-Heavy.ttf
+/home/myusername/.local/share/fonts/
 ```
 
 Install - MacOS
@@ -141,34 +159,6 @@ Example with my CEWE software in /opt/CEWE :
 
 ```
 echo "/opt/CEWE" > cewe_folder.txt
-```
-
-Install - additional_fonts.txt
-------------------------------
-
-Create another text file called ``additional_fonts.txt``.
-This can be left empty, but to get the correct fonts in the pdf you should specify them here.
-
-Add single font files or whole directories with `.ttf` files in it:
-
-Windows font file and directory paths:
-
-```
-C:\Windows\Fonts\BOD_R.TTF
-C:\Windows\Fonts\
-```
-
-Example for linux font file and directory paths:
-
-```
-/usr/share/fonts/truetype/lato/Lato-Heavy.ttf
-/home/myusername/.local/share/fonts/
-```
-
-This will create an empty file :
-
-```
-touch additional_fonts.txt
 ```
 
 .xmcf Files

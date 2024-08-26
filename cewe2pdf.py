@@ -133,6 +133,10 @@ if os.path.exists('loggerconfig.yaml'):
 else:
     logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
+# a logger for information we try to "insist" that the user sees
+mustsee = logging.getLogger("cewe2pdf.mustsee")
+
+# a logger for configuration, to distinguish that from logging in the album processing
 configlogger = logging.getLogger("cewe2pdf.config")
 
 # create log output handlers which count messages at each level
@@ -1210,7 +1214,7 @@ def getOutputFileName(mcfname):
 
 def checkCeweFolder(cewe_folder):
     if os.path.exists(cewe_folder):
-        logging.info(f"cewe_folder is {cewe_folder}")
+        mustsee.info(f"cewe_folder is {cewe_folder}")
     else:
         logging.error(f"cewe_folder {cewe_folder} not found. This must be a test run which doesn't need it!")
 
@@ -1306,7 +1310,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             sys.exit(1)
         else:
             # Give the user feedback which config-file is used, in case there is a problem.
-            logging.info(f'Using configuration in: {str(filesread)}')
+            mustsee.info(f'Using configuration files, in order: {str(filesread)}')
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             if 'cewe_folder' not in defaultConfigSection:
@@ -1353,7 +1357,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             image_res = getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
             bg_res = getConfigurationInt(defaultConfigSection, 'pdfBackgroundResolution', '150', 100)
 
-    logging.info(f'Using image resolution {image_res}, background resolution {bg_res}')
+    mustsee.info(f'Using image resolution {image_res}, background resolution {bg_res}')
 
     if keyaccountFolder is not None:
         passepartoutFolders = passepartoutFolders + \
@@ -1376,11 +1380,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # if a user has installed fonts locally on his machine, then we need to look there as well
     localFontFolder = localfont_dir()
     if os.path.exists(localFontFolder):
-        fontDirs.append(localFontFolder)
+        fontDirs.append(str(localFontFolder))
 
     try:
-        configFontFileName = findFileInDirs('additional_fonts.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
-        logging.info(f'Using fonts from: {configFontFileName}')
+        searchlocations = (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__)))
+        configFontFileName = findFileInDirs('additional_fonts.txt', searchlocations)
+        mustsee.info(f'Using additional font definitions from: {configFontFileName}')
         with open(configFontFileName, 'r') as fp: # this works on all relevant platforms so pylint: disable=unspecified-encoding
             for line in fp:
                 line = line.strip()
@@ -1403,12 +1408,15 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 else:
                     ttfFiles.append(path)
             fp.close()
-    except ValueError: # noqa: E722
-        configlogger.error('cannot find additional fonts (define them in additional_fonts.txt)')
+    except ValueError: # noqa: E722. This is a locally thrown exception
+        mustsee.info(f'No additional_fonts.txt found in {searchlocations}')
+    except: # noqa: E722
+        configlogger.error('Cannot read additional fonts from {configFontFileName}')
         configlogger.error('Content example:')
         configlogger.error('/tmp/vera.ttf')
 
     if len(fontDirs) > 0:
+        mustsee.info(f'Scanning for ttf/otf files in {str(fontDirs)}')
         for fontDir in fontDirs:
             # this is what we really want to do to find extra ttf files:
             #   ttfextras = glob.glob(os.path.join(fontDir, '*.ttf'))
@@ -1775,7 +1783,7 @@ def getKeyaccountDataFolder(keyAccountNumber, defaultConfigSection=None):
 
     kadf = os.path.join(hpsFolder, keyAccountNumber)
     if os.path.exists(kadf):
-        logging.info('Installed key account data folder at {kadf}')
+        mustsee.info(f'Installed key account data folder at {kadf}')
         return kadf
     logging.error(f'Installed key account data folder {kadf} not found')
     return None
