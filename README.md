@@ -1,18 +1,16 @@
-cewe2pdf
-========
+# cewe2pdf
 
-A python script to turn cewe photobooks into pdf documents.
+A program (a set of python scripts) to turn cewe photobooks into pdf documents.
 The CEWE pdf export is achieved by interpreting the mcf xml-files
 and compiling a pdf document which looks like the cewe photo book.
 
-There are many unsupported options, so an exact conversion cannot be guaranteed. The script is mostly based on reverse-engineering and guessing. It is not meeting any official specifications. So don't be surprised if one or another feature doesn't work. However, improvements are always appreciated.
+There are many capabilities in the Cewe album editor which are not supported by `cewe2pdf`, so an exact conversion cannot be guaranteed. The script is mostly based on reverse-engineering and guessing. It is not meeting any official specifications. So don't be surprised if one or another feature doesn't work. However, improvements are always appreciated!
 
-You will need underlying Cairographics (<https://www.cairographics.org/>) support installed on your machine for the handling of clip art. How you get this will depend on your platform, but if you have the GTK+ toolkit installed (<https://www.gtk.org/docs/installations/>) that should do it. An alternative way to get Cairo installed is to use vcpkg (https://learn.microsoft.com/en-gb/vcpkg/get_started/overview and https://vcpkg.io/en/). For Windows users just seeking a 'cairo.dll' to add to %WINDIR%\System32, take a look at [this project](https://github.com/preshing/cairo-windows) for binary releases.
+You will need underlying Cairographics (<https://www.cairographics.org/>) support installed on your machine for the handling of clip art. How you get this will depend on your platform, but if you have the GTK+ toolkit installed (<https://www.gtk.org/docs/installations/>) that should do it. 
 
 tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf exportieren, cewe Fotobuch pdf, mcf in pdf umwandeln, aus CEW-Fotobuch ein pdf machen, cewe Fotobuch pdf
 
-Install - Windows
------------------
+## Install - Windows
 
 Download or clone this cewe2pdf repository into a folder of your choice.
 
@@ -40,31 +38,54 @@ conda uninstall reportlab pillow
 pip install reportlab pillow fonttools pyyaml
 ```
 
-There does not appear to be a "binaries only" installation for GTK+ or Cairographics, which means you'll have to build it yourself.
+For Windows you can avoid the need to build Cairo graphics yourself by using vcpkg (https://learn.microsoft.com/en-gb/vcpkg/get_started/overview and https://vcpkg.io/en/). 
+For users just seeking a 'cairo.dll' to add to %WINDIR%\System32, you could also take a look at [this project](https://github.com/preshing/cairo-windows) for binary releases.
 
-## Install - Windows (continued)
-### cewe_folder.txt (deprecated)
-Go to the directory where cewe2pdf is installed and create a text file there with filename ``cewe_folder.txt``
-and use a text editor to write the installation directory of the CEWE software into the text file.
-For example, if you have the software branded for the company DM, called "dm-Fotowelt", then the file ``cewe_folder.txt`` might contain:
+## Install - MacOS
+
+Download the repository into a folder of your choice.
+
+Install the packages listed in `requirements.txt` into a Python environment.
+
+Install `cairo`, for example using the `brew` package manager. If you dont have `brew`installed, please do so [https://brew.sh/](https://brew.sh/). Then run
+
 ```
-C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
+brew install cairo
 ```
-Save the file and close it. Alternatively - indeed, preferably, if you want full functionality - use more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``, as described below
+
+as shown here [https://formulae.brew.sh/formula/cairo](https://formulae.brew.sh/formula/cairo).
+
+Follow the steps outlined for Linux on linking to the software (most likely it will be installed in `/Applications`) and creating the font file. The standard directory for fonts on MacOS is `~/Library/Fonts/`.
+
+## Install - Linux
+
+Download the repository into a folder of your choice. Ensure the python dependencies are installed.
+On Fedora :
+```
+sudo dnf install python3-lxml python3-reportlab python-cairosvg fonttools python3-pyyaml
+```
+On Debian:
+```
+sudo apt install python3-cairosvg python3-fonttools python3-lxml python3-packaging python3-pillow python3-reportlab python3-yaml
+```
+Locate the directory where your CEWE album software is installed. You can recognize it by the many `.so` files and some subdirs like `Resources`).
+Put this directory name into a configuration file ``cewe2pdf.ini`` (or, I guess, the now deprecated ``cewe_folder.txt``)
+
+## Configuration files
 
 ### cewe2pdf.ini
-If the now deprecated ``cewe_folder.txt`` file is not found, then the program looks for files called ``cewe2pdf.ini`` first in the current directory and then in the album directory, reading both if it finds both. Later entries override previous entries of the same name. 
+If a ``cewe_folder.txt`` (see below) file is not found, then the program looks for files called ``cewe2pdf.ini``, first in the current directory and then in the album directory, reading both if it finds both. Later entries override previous entries of the same name. 
 
 For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place a ``cewe2pdf.ini`` file with the album file, setting everything you need there, out of the way of future updates to the program repository.
 
-In ``cewe2pdf.ini`` you must specify the location of the cewe folder. You can
+In ``cewe2pdf.ini`` you **must** specify the location of the cewe folder. You can also
 * provide a list of locations for additional background images, cliparts, passepartouts (frames)
 * define how the additional fonts you have specified (see below) are organised into families so that bold and italic texts are shown correctly
 * define non-standard line spacing (linescale) for any fonts that need it
 * define output resolution for the pdf
 * and more
   
-The contents can, for example, be of the form:
+The contents might, for example, look like this:
 ```
 [DEFAULT]
 cewe_folder = C:\Program Files\Elkjop fotoservice_6.3\elkjop fotoservice
@@ -116,94 +137,46 @@ Example for linux font file and directory paths:
 /usr/share/fonts/truetype/lato/Lato-Heavy.ttf
 /home/myusername/.local/share/fonts/
 ```
-
-Install - MacOS
----------------
-
-Download the repository into a folder of your choice.
-
-Install the packages listed in `requirements.txt` into a Python environment.
-
-Install `cairo`, for example using the `brew` package manager. If you dont have `brew`installed, please do so [https://brew.sh/](https://brew.sh/). Then run
-
+### cewe_folder.txt (deprecated)
+Go to the directory where cewe2pdf is installed and create a text file there with filename ``cewe_folder.txt``
+and use a text editor to write the installation directory of the CEWE software into the text file.
+For example, if you have the software branded for the company DM, called "dm-Fotowelt", then the file ``cewe_folder.txt`` might contain:
 ```
-brew install cairo
+C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
 ```
+Save the file and close it. Alternatively - indeed, preferably, if you want full functionality! - use more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``, as described below
 
-as shown here [https://formulae.brew.sh/formula/cairo](https://formulae.brew.sh/formula/cairo).
+## Album files
+### .mcf
+`.mcf` is the format that Cewe has used for many years for albums, until the introduction of the newer `.mcfx` format around 2023. This is the format around which `cewe2pdf` has been developed; the file content is XML. There is always a folder `<album>_mcf-Dateien` associated with a `.mcf` file, containing the images used in the album.
 
-Follow the steps outlined for Linux on linking to the software (most likely it will be installed in `/Applications`) and creating the font file. The standard directory for fonts on MacOS is `~/Library/Fonts/`.
+### .mcfx
+If your CEWE software uses `.mcfx` files for your projects, you can specify the file name directly on the command line. The `.mcfx` file format is actually an sql database containing a single `.mcf` file and the related image files. `cewe2pdf` will create a temporary directory, unpack the the `.mcfx` there, process the result, and then delete the temporary directory again 
 
-Install - Linux
----------------
-
-Download the repository into a folder of your choice.
-
-Ensure the python dependencies are installed.
-
-On Fedora :
-
-```
-sudo dnf install python3-lxml python3-reportlab python-cairosvg fonttools python3-pyyaml
-```
-
-On Debian:
-```
-sudo apt install python3-cairosvg python3-fonttools python3-lxml python3-packaging python3-pillow python3-reportlab python3-yaml
-```
-
-Define the CEWE path (the directory where your CEWE album software is installed. You can recognize it by the many `.so` files and some subdirs like `Resources`). Put this directory name into a file named `cewe_folder.txt`.
-
-Example with my CEWE FOTOWELT is installed in /home/username/CEWE/CEWE FOTOWELT/ :
-
-```
-echo "/home/username/CEWE/CEWE FOTOWELT/" > cewe_folder.txt
-```
-
-Example with my CEWE software in /opt/CEWE :
-
-```
-echo "/opt/CEWE" > cewe_folder.txt
-```
-
-.xmcf Files
------------
-
+### .xmcf
 If your CEWE software uses `.xmcf` files for your projects, you can simply still use this. The `.xmcf` file format is just an archive of the `*.mcf` file, the `<album>_mcf-Dateien` folder and a few other files. Right click the `.xmcf` file and your os should give you an open to open the archive. Copy the relevant files out of it, and you should be all set for the next steps.
 
-.mcfx Files
------------
+## Using the program
+You should now have 
 
-If your CEWE software uses `.mcfx` files for your projects, you can specify the file name directly on the command line. The `.mcfx` file format is actually an sql database containing an `*.mcf` file and the related image files. `cewe2pdf` will create a temporary directory, unpack the the `.mcfx` there, process the result, and then delete the temporary directory again 
+* a program directory containing all the python code needed, the most important being `cewe2pdf.py`.
+* one or more album directories each containing
+  - one or more `*.mcf` or `.mcfx` album files
+    * a directory named `<album>_mcf-Datein` for each album, if you are using `*.mcf`
+  - a `cewe2pdf.ini` configuration file (or maybe the now deprecated `cewe_folder.txt`)
+  - an `additional_fonts.txt` configuration file
 
-Install - continued
--------------------
+It is not really a good idea to place your album files in the same directory as the program. Keep them separate so there is no confusion in keeping your version of the program up to date with your Github repository version.
 
-At this point, you should have these files in your current directory :
-
-* `cewe2pdf.py`
-* `cewe2pdf.ini` (or the older `cewe_folder.txt`)
-* `additional_fonts.txt`
-* your `*.mcf` or `.mcfx` album file
-  * a directory named `<album>_mcf-Datein` if you are using `*.mcf`
-
-How to use
-----------
+### Usage
 
 Run `cewe2pdf.py` with the name of your album file and an equivalent pdf file will be created beside the album file.
 Example:
-
 ```
-   python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
+python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
 ```
-
-Options
--------
-
-currently cewe2pdf supports the following options. They are shown if you run
-
-```python cewe2pdf.py --help```
-
+### Command line options
+`cewe2pdf` supports the following options, shown if you run ```python cewe2pdf.py --help```
 ```
 usage: cewe2pdf.py [-h] [--keepDoublePages] [--pages PAGES] [--tmp-dir MCFXTMPDIR] [--appdata-dir APPDATADIR]
                    [inputFile]
@@ -226,11 +199,9 @@ Example:
    python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
 ```
 
-Development
------------
+## Development
 
 To create a stand-alone compiled package, you can use
-
 ```
 pip install pyinstaller
 pyinstaller cewe2pdf.py --onefile
