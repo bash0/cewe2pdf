@@ -42,25 +42,29 @@ pip install reportlab pillow fonttools pyyaml
 
 There does not appear to be a "binaries only" installation for GTK+ or Cairographics, which means you'll have to build it yourself.
 
-Install - Windows (continued)
------------------------------
-
+## Install - Windows (continued)
+### cewe_folder.txt (deprecated)
 Go to the directory where cewe2pdf is installed and create a text file there with filename ``cewe_folder.txt``
 and use a text editor to write the installation directory of the CEWE software into the text file.
-Example
-if you have the software branded for the company DM, called "dm-Fotowelt", then the file ``cewe_folder.txt`` should contain:
-
+For example, if you have the software branded for the company DM, called "dm-Fotowelt", then the file ``cewe_folder.txt`` might contain:
 ```
 C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
 ```
+Save the file and close it. Alternatively - indeed, preferably, if you want full functionality - use more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``, as described below
 
-Save the file and close it.
+### cewe2pdf.ini
+If the now deprecated ``cewe_folder.txt`` file is not found, then the program looks for files called ``cewe2pdf.ini`` first in the current directory and then in the album directory, reading both if it finds both. Later entries override previous entries of the same name. 
 
-Alternatively - preferably, if you want full functionality - you use more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``. The program looks for files called ``cewe2pdf.ini`` first in the current directory and then in the album directory, reading both if it finds both. Later entries override previous entries of the same name. For normal use (i.e. creating a pdf album, rather than testing the code) the most reasonable strategy is to place a ``cewe2pdf.ini`` file with the album.
+For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place a ``cewe2pdf.ini`` file with the album file, setting everything you need there, out of the way of future updates to the program repository.
 
-In ``cewe2pdf.ini`` you can specify the location of the cewe folder, provide a comma separated list of locations for additional background images, define how the additional fonts you have specified (see below) are organised into families so that bold and italic texts are shown correctly and more.
+In ``cewe2pdf.ini`` you must specify the location of the cewe folder. You can
+* provide a list of locations for additional background images, cliparts, passepartouts (frames)
+* define how the additional fonts you have specified (see below) are organised into families so that bold and italic texts are shown correctly
+* define non-standard line spacing (linescale) for any fonts that need it
+* define output resolution for the pdf
+* and more
+  
 The contents can, for example, be of the form:
-
 ```
 [DEFAULT]
 cewe_folder = C:\Program Files\Elkjop fotoservice_6.3\elkjop fotoservice
@@ -93,20 +97,21 @@ fontLineScales =
 #expectedLoggingMessageCounts =
 #	cewe2pdf.config: WARNING[32], INFO[669]
 #	root:            ERROR[2], WARNING[4], INFO[38]
-
 ```
 
-The code knows where to find the fonts delivered with the Cewe software, but if you use non-Cewe fonts then you must specify the location of those fonts. For historical reasons configuration of fonts is done with a separate (optional) file, ``additional_fonts.txt``. The code searches the album directory, the current directory and the location of the program itself to find ``additional_fonts.txt``; it uses only the **first** such file found. For normal use, it makes sense to place an ``additional_fonts.txt`` file with the album file. The  file should contain one line per font or font directory to be added. Both `.ttf` or `.otf` files are read.
+### additional_fonts.txt
+The code knows where to find the fonts delivered with the Cewe software, but if you use non-Cewe fonts then you must specify the location of those fonts. For historical reasons configuration of fonts is done with a separate (optional) configuration file, ``additional_fonts.txt``. The file should contain one line per font file or font directory to be added. Both `.ttf` or `.otf` files are read.
+
+To find a potential ``additional_fonts.txt`` the code searches, in order, the album directory, the current directory and the location of the program itself; it uses only the **first** such file found.
+
+For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place an ``additional_fonts.txt`` file with the album file, out of the way of future updates to the program repository. You can prevent the program from using fonts defined in the code repository versions of the file by providing an empty ``additional_fonts.txt`` next to your album file.
 
 Example for Windows font file and directory paths:
-
 ```
 C:\Windows\Fonts\BOD_R.TTF
 C:\Windows\Fonts\
 ```
-
 Example for linux font file and directory paths:
-
 ```
 /usr/share/fonts/truetype/lato/Lato-Heavy.ttf
 /home/myusername/.local/share/fonts/
