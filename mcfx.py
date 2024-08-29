@@ -60,15 +60,16 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
                     sys.exit(1)
                 mcfname = Path(tempdirPath) / filename
 
-                # try turn the blob of bytes into a string, since an mcf is supposed to be xml
-                try:
-                    notused = str(filecontent, encoding='utf-8') # noqa
-                except UnicodeDecodeError as decodeEx:
-                    if decodeEx.reason == "invalid start byte" and decodeEx.object[decodeEx.start-1] == 0:
-                        # Then we've (probably, based on experimentation!) reached the end of the xml string
-                        # and there is junk in the buffer after that. Shorten the amount of data to be stored
-                        # in the actual xml file...
-                        filecontent = filecontent[:decodeEx.start-1]
+                # data.mcf from an mcfx file has been found to contain extra content of various
+                # kinds after b'<fotobook>...</fotobook>'. Make sure that we don't return any of that
+                # with the xml we give back to the main code by shortening the length of the file
+                # we write to contain only the data up to and and including the closing fotobook tag
+                endtag = b'</fotobook>'
+                fotobookend = filecontent.find(endtag)
+                if fotobookend == -1:
+                    logging.error(f'The mcf in the mcfx file does not contain the required end tag {endtag.decode("utf-8")}')
+                    sys.exit(1)
+                filecontent = filecontent[:fotobookend + len(endtag)]
 
             if os.path.exists(filename) and lastchange < os.path.getmtime(filename):
                 # not changed since last extraction
