@@ -75,6 +75,7 @@
     <Content Include="tests\testFontDoesNotExist\__pycache__\test_fontDoesNotExist.cpython-37-pytest-5.4.1.pyc" />
     <Content Include="tests\unittest_fotobook.mcf" />
     <Content Include="tests\unittest_fotobook.mcf.pdf" />
+    <Content Include="tests\unittest_fotobook.mcfx" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\20200306_111748.jpg" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\20200320_124632.jpg" />
     <Content Include="tests\unittest_fotobook_mcf-Dateien\GreySquareBlueBorder.jpg" />

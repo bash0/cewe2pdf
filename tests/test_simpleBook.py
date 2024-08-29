@@ -14,8 +14,7 @@ from pikepdf import Pdf
 
 from cewe2pdf import convertMcf
 
-def tryToBuildBook(keepDoublePages):
-    infilename = 'unittest_fotobook.mcf' # or 'unittest_fotobook.mcfx'
+def tryToBuildBook(infilename, keepDoublePages = False):
     inFile = str(Path(Path.cwd(), 'tests', infilename))
     outFile = str(Path(Path.cwd(), 'tests', infilename + '.pdf'))
     if os.path.exists(outFile) == True:
@@ -35,10 +34,13 @@ def tryToBuildBook(keepDoublePages):
     #os.remove(outFile)
 
 def test_simpleBookSinglePage():
-    tryToBuildBook(False)
+    tryToBuildBook('unittest_fotobook.mcf')
 
 def test_simpleBookDoublePage():
-    tryToBuildBook(True)
+    tryToBuildBook('unittest_fotobook.mcf', keepDoublePages = True)
+
+def test_simpleBookSinglePageMcfx():
+    tryToBuildBook('unittest_fotobook.mcfx')
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
