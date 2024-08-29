@@ -41,6 +41,11 @@ def test_mcfxExtraction():
     assert unpackedFolder is None # since we are providing an outdir
     assert str(mcfxmlname) == os.path.join(str(outdirPath), "data.mcf") # the mcf is always called data.mcf!
 
+    # At this point we could usefully compare data.mcf with McfOriginals/testMcfxExtraction.mcf but it's not
+    # easy because the XML contains some "session" data, like the lastTextFormat used tag, the folder id, some
+    # statistical stuff, and so on. And sometimes the Cewe editor just seems to be a bit random about the order
+    # in which it stores, e.g., alignment attributes. Something to add in the next round ...
+
     # check that all the (image) files from the checked-in mcf version are present in the newly unpacked mcfx folder
     mcfdateienPath = Path(Path.cwd(), 'tests', 'testMcfxExtraction', 'McfOriginals', 'testMcfxExtraction_mcf-Dateien')
 
