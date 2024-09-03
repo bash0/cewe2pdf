@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="1cf375dd-eecf-483c-b949-49187f8e1382" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
-    <project createdWithHPSVersion="7.0.1" createdWithHPSVersionBuild="20191025" multiPurposeText="" projectID="69675965-93ed-4a07-b25f-7dc31eedcc67" projectIDCreatedEpoch="1725295002"/>
-    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.4.3" programversionBuild="20240328" savetime="2024-09-02 22:38"/>
+<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="20e3cbed-069b-4f75-a6f8-5b46b216b564" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+    <project createdWithHPSVersion="7.0.1" createdWithHPSVersionBuild="20191025" multiPurposeText="" projectID="69675965-93ed-4a07-b25f-7dc31eedcc67" projectIDCreatedEpoch="1725309516"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.4.3" programversionBuild="20240328" savetime="2024-09-03 08:54"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
     <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
         <outline width="0"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNLEFT" IndentMargin="2" VerticalIndentMargin="2" backgroundColor="#00000000" font="Arial Narrow,11,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNHCENTER" IndentMargin="60" VerticalIndentMargin="60" backgroundColor="#00000000" font="Function,22,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.0.0"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
@@ -277,7 +277,7 @@
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:10pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">A gray image, itself with a blue border, then with added red border to the image in Cewe editor</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNABSOLUTE,ALIGNTRAILING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Calibri,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNABSOLUTE,ALIGNRIGHT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Calibri,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -286,7 +286,7 @@
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:10pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">A grey image, itself with a blue border, then with added red border to the image in Cewe editor</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNABSOLUTE,ALIGNTRAILING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNABSOLUTE,ALIGNRIGHT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -315,7 +315,7 @@
                 <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
             </decoration>
             <image filename="safecontainer:/20200306_111748.jpg" useABK="1">
-                <cutout left="-0.0177741" scale="0.324043" top="0"/>
+                <cutout left="-0.0185147" scale="0.324043" top="0"/>
                 <quality noise="100" sharpness="100" texture="100"/>
             </image>
         </area>
@@ -388,7 +388,7 @@
             <designElementIDs passepartout="125186"/>
             <decoration/>
             <image filename="safecontainer:/20200320_124632.jpg" passepartoutDesignElementId="125186" useABK="1">
-                <cutout left="-86.8395" scale="0.169986" top="0"/>
+                <cutout left="-86.8403" scale="0.169986" top="0"/>
                 <quality noise="100" sharpness="100" texture="100"/>
                 <ClipartConfiguration applySpotColor="0"/>
             </image>
@@ -450,11 +450,19 @@
             </clipart>
         </area>
         <area areatype="clipartarea">
-            <position height="66" left="2777.19" rotation="90" top="2181.91" width="620.883" zposition="115"/>
+            <position height="66" left="2797.97" rotation="90" top="2181.57" width="621.329" zposition="115"/>
             <designElementIDs clipart="63457"/>
             <decoration/>
             <clipart designElementId="63457">
                 <ClipartConfiguration applySpotColor="0"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="66" left="3528.01" rotation="90" top="2188.55" width="638.157" zposition="116"/>
+            <designElementIDs clipart="63457"/>
+            <decoration/>
+            <clipart designElementId="63457">
+                <ClipartConfiguration applySpotColor="1"/>
             </clipart>
         </area>
         <area areatype="textarea">
@@ -640,7 +648,7 @@
             </text>
         </area>
         <area areatype="textarea">
-            <position height="149.676" left="2167.27" rotation="0" top="1652.12" width="1767" zposition="7029"/>
+            <position height="149.676" left="2167.27" rotation="0" top="1651.12" width="1767" zposition="7029"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'FranklinGothic'; font-size:11pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-weight:600; color:#000000;">The OpenType font .otf file problem: </span><span style=" color:#000000;">CEWE provides some fonts in OpenType files that we cannot handle. We try to fix that with a one-time conversion to ttf files. Here are some tests </span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">https://github.com/bash0/cewe2pdf/issues/133</span></p></td></tr></table></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="FranklinGothic,11,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
@@ -695,15 +703,24 @@
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial'; font-size:10pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:120%;"><span style=" color:#000000;">Line spacing 1.2 is now honoured by our code.</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:130%;"><span style=" color:#000000;">Line spacing 1.3 is now honoured by our code.</span></p><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:140%;"><span style=" color:#000000;">Line spacing 1.4 is now honoured by our code</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Line spacing 1.0 is now honoured by our code.</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNTRAILING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial'; font-size:10pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:120%;"><span style=" color:#000000;">Line spacing 1.2 is now honoured by our code with Arial</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:130%;"><span style=" color:#000000;">Line spacing 1.3 is now honoured by our code.</span></p><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:140%;"><span style=" color:#000000;">Line spacing 1.4 is now honoured by our code</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Line spacing 1.0 is now honoured by our code.</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNRIGHT" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="58" left="3076.63" rotation="0" top="1843.7" width="809" zposition="7037"/>
+            <position height="58" left="3097.63" rotation="0" top="1843.7" width="809" zposition="7037"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:11pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">https://github.com/bash0/cewe2pdf/issues/182</p></td></tr></table></body></html>]]><outline width="0"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:11pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">https://github.com/bash0/cewe2pdf/issues/182</p></td></tr></table></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,11,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="627.344" left="3483.03" rotation="0" top="1908.47" width="353" zposition="7038"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial'; font-size:10pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bodoni'; color:#000000;">Line spacing 1.0 is now honoured by our code with Bodoni</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:120%;"><span style=" font-family:'Bodoni'; color:#000000;">Line spacing 1.2 is now honoured by our code.</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:130%;"><span style=" font-family:'Bodoni'; color:#000000;">Line spacing 1.3 is now honoured by our code.</span></p><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:140%;"><span style=" font-family:'Bodoni'; color:#000000;">Line spacing 1.4 is now honoured by our code</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,10,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="120"/>
             </text>
         </area>
     </page>
@@ -841,17 +858,17 @@
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships>
-        <foto id="safecontainer:/GreySquareBlueBorder.jpg"/>
-        <foto id="safecontainer:/img.png"/>
-        <foto id="safecontainer:/img4.png"/>
-        <foto id="safecontainer:/img5.png"/>
+        <foto id="safecontainer:/img2.png"/>
         <foto id="safecontainer:/20200320_124632.jpg"/>
         <foto id="safecontainer:/img3.png"/>
         <foto id="safecontainer:/img6.png"/>
+        <foto id="safecontainer:/img5.png"/>
+        <foto id="safecontainer:/img.png"/>
+        <foto id="safecontainer:/img4.png"/>
+        <foto id="safecontainer:/GreySquareBlueBorder.jpg"/>
         <foto id="file:///D:/Users/pete/Pictures/PhotoAlbumWork/PhotoAlbum2020/Album Candidates/20200306_111748.jpg">
             <foto id="safecontainer:/20200306_111748.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
         </foto>
-        <foto id="safecontainer:/img2.png"/>
     </fotoRelationships>
-    <statistics assistantUsed="0" countPauses="69" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="462681" fotosAdded="9" fotosRemoved="5" pauseTime="379256" sessionsUsed="49"/>
+    <statistics assistantUsed="0" countPauses="69" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="463854" fotosAdded="9" fotosRemoved="5" pauseTime="379256" sessionsUsed="50"/>
 </fotobook>
