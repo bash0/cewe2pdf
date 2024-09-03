@@ -99,6 +99,10 @@ fontFamilies =
 pdfImageResolution = 150
 pdfBackgroundResolution = 150
 
+# specify default leading (1.1 = 10% of the font size as leading is standard in the code, where we leave
+# it unaltered for backward compatibility, but 1.15 works best when line spacing is used, see issue 182)
+defaultLineScale = 1.15
+
 # Define line scale (line spacing, essentially) for fonts where the default 1.1 (110%) is not acceptable
 fontLineScales =
 	Crafty Girls: 1.43
