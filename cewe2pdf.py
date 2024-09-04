@@ -183,7 +183,8 @@ clipartPathList = tuple[str]()
 passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
 passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
 fontSubstitutions = list[str]() # used to avoid repeated messages
-fontLineScales = {} # mapping fontnames to linescale where the standard value is not ok
+fontLineScales = {} # mapping fontnames to linescale where the standard defaultLineScale is not ok
+defaultLineScale = 1.1 # line scale if not overridden. Best to configure to 1.15 - don't break old albums by changing here
 
 
 def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
@@ -499,7 +500,7 @@ def AppendBreak(paragraphText, parachild):
 def lineScaleForFont(font):
     if font in fontLineScales:
         return fontLineScales[font]
-    return 1.1
+    return defaultLineScale
 
 
 def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
@@ -756,6 +757,21 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
             pdf_styleN.alignment = reportlab.lib.enums.TA_JUSTIFY
         else:
             pdf_styleN.alignment = reportlab.lib.enums.TA_LEFT
+
+        # there will be a paragraph style with various attributes, most of which we do not handle.
+        # But this is where the line spacing is defined, with the line-height attribute
+        pLineHeight = 1.0 # normal line spacing by default
+        pStyleAttribute = p.get('style')
+        if pStyleAttribute is not None:
+            pStyle = dict([kv.split(':') for kv in
+                p.get('style').lstrip(' ').rstrip(';').split('; ')])
+            if 'line-height' in pStyle.keys():
+                try:
+                    pLineHeight = floor(float(pStyle['line-height'].strip("%")))/100.0
+                except: # noqa: E722
+                    logging.warning(f"Ignoring invalid paragraph line-height setting {pStyleAttribute}")
+        finalLeadingFactor = lineScaleForFont(bodyfont) * pLineHeight
+
         htmlspans = p.findall(".*")
         if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
@@ -763,7 +779,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 additional_fonts, bodyfont, bodyfs, bweight, bstyle)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
-            pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
+            pdf_styleN.leading = usefs * finalLeadingFactor # line spacing (text + leading)
             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
 
         else:
@@ -776,7 +792,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
                     additional_fonts, bodyfont, bodyfs, bweight, bstyle)
                 usefs = maxfs if maxfs > 0 else bodyfs
-                pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
+                pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
 
             # now run round the htmlspans
             for item in htmlspans:
@@ -786,7 +802,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                     # but if it is not there then an empty paragraph goes missing :-(
                     paragraphText += '&nbsp;</para>'
                     usefs = maxfs if maxfs > 0 else bodyfs
-                    pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
+                    pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
@@ -813,7 +829,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                             # terminate the current pdf para and add it to the flow
                             paragraphText += '</para>'
                             usefs = maxfs if maxfs > 0 else bodyfs
-                            pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
+                            pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
                             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
@@ -833,7 +849,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
             try:
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
-                pdf_styleN.leading = usefs * lineScaleForFont(bodyfont)  # line spacing (text + leading)
+                pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception:
                 logging.exception('Exception')
@@ -1226,6 +1242,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     global passepartoutDict  # pylint: disable=global-statement
     global passepartoutFolders  # pylint: disable=global-statement
     global fontLineScales  # pylint: disable=global-statement
+    global defaultLineScale  # pylint: disable=global-statement
     global image_res  # pylint: disable=global-statement
     global bg_res  # pylint: disable=global-statement
 
@@ -1358,6 +1375,15 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             bg_res = getConfigurationInt(defaultConfigSection, 'pdfBackgroundResolution', '150', 100)
 
     mustsee.info(f'Using image resolution {image_res}, background resolution {bg_res}')
+
+    # Read a default line scale (which is maybe overridden per font after font registration is complete)
+    if defaultConfigSection is not None:
+        try:
+            dls = defaultConfigSection.getfloat('defaultLineScale', 1.15)
+            defaultLineScale = dls
+        except:# noqa: E722
+            configlogger.error(f"Invalid defaultLineScale in .ini file")
+        mustsee.info(f"Default line scale = {defaultLineScale}")
 
     if keyaccountFolder is not None:
         passepartoutFolders = passepartoutFolders + \
@@ -1588,7 +1614,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             else:
                 configlogger.info(f"Font family '{familyName}' was already registered from configuration file")
 
-    # Read and record non-standard line scale values for specified fonts
+    # Read any non-standard line scales for specified fonts
     if defaultConfigSection is not None:
         ff = defaultConfigSection.get('fontLineScales', '').splitlines()  # newline separated list of fontname : line_scale
         specifiedLineScales = filter(lambda bg: (len(bg) != 0), ff)
