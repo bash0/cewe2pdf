@@ -6,8 +6,16 @@ Getting the program to work on Windows is one thing - but it would be nice to be
 Microsoft provides a way to execute Linux on a Windows machine, the [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install).
 Once WSL is installed we must create the Python environment (TBD, I forgot to make notes while I did this)
 - open a shell window
-- install Python
-- run pip install -r  requirements.txt
+- install Python (I used the steps from [here](https://gist.github.com/rutcreate/c0041e842f858ceb455b748809763ddb)), though when I checked the current version it was 3.10 rather than the 3.8 described in the document, so I just stopped there.
+  - sudo apt update
+  - sudo apt install software-properties-common -y
+  - sudo add-apt-repository ppa:deadsnakes/ppa
+  - sudo apt update
+  - sudo apt install python3.10 python3.10-venv python3.10-dev
+  - python3 --version
+- install our environment
+  - cd /mnt/d/whatever (wherever your cewe2pdf stuff is)
+  - pip install -r  requirements.txt
 
 When Python and our requirements are in place then we must change the cewe2pdf configuration to know where the (Windows) Cewe stuff is when it is accessed using the Linux file system. (I have not tried to install Cewe on the WSL Ubuntu subsystem. Since we don't need the executables, just the data for backgrounds, cliparts etc., it seems better to use exactly the same files as have been used in the Windows testing on the same machine)
 
