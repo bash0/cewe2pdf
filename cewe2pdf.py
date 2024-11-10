@@ -471,6 +471,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     if frameClipartFileName is not None:
         # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
         # already has these transformations applied. So don't do it twice.
+        # flipX and flipY are also set to false because it cause an exception in PIL
+        # therefore, even if the CEWE software offers the possibility to flip the clipart frame, cewe2pdf
+        # remains unable to render it
         colorreplacements, flipX, flipY = getClipConfig(imageTag)
         insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False)
 
