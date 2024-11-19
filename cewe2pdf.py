@@ -1283,12 +1283,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         sys.exit(1)
 
     fotobook = mcf.getroot()
-    if fotobook.tag != 'fotobook':
-        invalidmsg = f"Cannot process invalid mcf file (root tag is not 'fotobook'): {mcfxmlname}"
-        if mcfxFormat:
-            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
-        logging.error(invalidmsg)
-        sys.exit(1)
+    ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat)
 
     # check output file is acceptable before we do any processing
     outputFileName = getOutputFileName(albumname)
@@ -1655,15 +1650,19 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         try:
             if (n == 0) or (n == pageCount - 1): # numeric comparisons read best like this so pylint: disable=consider-using-in
                 pageNumber = 0
-                page = [i for i in
-                        fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']")
-                        + fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
-                        if (i.find("./area") is not None)
-                        ][0]
-                oddpage = (n == 0) # bool assign is clearer with parens so pylint: disable=superfluous-parens
-                pagetype = 'cover'
-                # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
-                if ((keepDoublePages is True) and (n == (pageCount - 1))):
+                fullcoverpages = [i for i in
+                    fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']")
+                    + fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
+                    if (i.find("./area") is not None)]
+                if len(fullcoverpages) == 1: # in a well-formed album there are two fullcover pages, but only one with an area
+                    page = fullcoverpages[0]
+                    oddpage = (n == 0) # bool assign is clearer with parens so pylint: disable=superfluous-parens
+                    pagetype = 'cover'
+                    # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
+                    if ((keepDoublePages is True) and (n == (pageCount - 1))):
+                        page = None
+                else:
+                    logging.warning(f"Cannot locate a cover page, is this really an album?")
                     page = None
             elif n == 1:
                 pageNumber = 1
@@ -1767,6 +1766,23 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         unpackedFolder.cleanup()
 
     return True
+
+
+def ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat):
+    if fotobook.tag != 'fotobook':
+        invalidmsg = f"Cannot process invalid mcf file (root tag is not 'fotobook'): {mcfxmlname}"
+        if mcfxFormat:
+            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
+        logging.error(invalidmsg)
+        sys.exit(1)
+
+    startdatecalendarium = fotobook.attrib['startdatecalendarium']
+    if startdatecalendarium is not None and len(startdatecalendarium) > 0:
+        invalidmsg = f"Cannot process calendar mcf files (yet!): {mcfxmlname}"
+        if mcfxFormat:
+            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
+        logging.error(invalidmsg)
+        sys.exit(1)
 
 
 def getHpsDataFolder():
