@@ -103,6 +103,22 @@ from messageCounterHandler import MsgCounterHandler
 from passepartout import Passepartout
 from pathutils import localfont_dir
 from otf import getTtfsFromOtfs
+from enum import Enum
+
+class ProductStyle(Enum):
+    AlbumSingleSide = 1  # normal for albums, we divide the cewe 2 page bundle to single pages
+    AlbumDoubleSide = 2  # any album when --keepdoublepages is set
+    MemoryCard = 3 # memory card game
+
+def isAlbumProduct(ps: ProductStyle):
+    return ps == ProductStyle.AlbumSingleSide or ps == ProductStyle.AlbumDoubleSide
+
+def isAlbumSingleSide(ps: ProductStyle):
+    return ps == ProductStyle.AlbumSingleSide
+
+def isAlbumDoubleSide(ps: ProductStyle):
+    return ps == ProductStyle.AlbumDoubleSide
+
 
 if parse_version(PIL.__version__) >= parse_version('9.1.0'):
     # PIL.Image.LANCZOS was claimed closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
@@ -166,10 +182,28 @@ image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # Tabs seem to be in 8mm pitch
 tab_pitch = 80
 
-# definitions
-formats = {"ALB82": reportlab.lib.pagesizes.A4,
-           "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm)}  # add other page sizes here
-f = 72. / 254.  # convert from mcf (unit=0.1mm) to reportlab (unit=inch/72)
+# page sizes for various products. Probably not important since the bundlesize element
+# is used to set the page sizes along the way
+formats = {
+    "ALB82": reportlab.lib.pagesizes.A4,
+    "ALB98": reportlab.lib.pagesizes.A4, # unittest, L 20.5cm x 27.0cm
+    "ALB32": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm), # album XL, 30 x 30 cm
+    "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm),
+    # add other page sizes here
+    "MEM3": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm) # memory game cards 6x6cm
+    }
+
+# product style. The CEWE album products (which is what we are normally expecting in this
+# code) are basically defined in two page bundles. We normally will want single side pdfs
+# so we let the style default to ProductStyle.AlbumSingleSide unless the product is found
+# in this table. If we want to keep the double side layout in the pdf, then the keepDoublePages
+# option will cause AlbumSingleSide to be changed to AlbumDoubleSide.
+# Other "non-album" styles which we handle appear in this table
+styles = {
+    "MEM3": ProductStyle.MemoryCard # memory game cards 6x6cm
+    }
+
+f = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
 tempFileList = []  # we need to remove all this temporary files at the end
 
@@ -266,10 +300,9 @@ def findFileInDirs(filenames, paths):
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find(f"./page[@pagenr='{floor(2 * (pageNumber / 2))}']")
 
-
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
-                      keepDoublePages, pagetype, pdf, ph, pw):
+                      productstyle, pagetype, pdf, ph, pw):
     if pagetype == "emptypage":  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
         return
     if backgroundTags is not None and len(backgroundTags) > 0:
@@ -304,11 +337,11 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 bgPath = ""
                 bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
                 areaWidth = pw
-                if keepDoublePages:
+                if isAlbumDoubleSide(productstyle):
                     areaWidth = pw/2.
                 areaHeight = ph
 
-                if keepDoublePages and backgroundTag.get('alignment') == "3":
+                if isAlbumDoubleSide(productstyle) and backgroundTag.get('alignment') == "3":
                     ax = areaWidth
                 else:
                     ax = 0
@@ -334,7 +367,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
 
 
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir,
-                        keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy):
+                        productstyle, mcfBaseFolder, pagetype, pdf, pw, transx, transy):
     # open raw image file
     if imageTag.get('filename') is None:
         return
@@ -346,7 +379,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     if imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
         # display on the right page
-        if keepDoublePages:
+        if isAlbumDoubleSide(productstyle):
             img_transx = transx + f * pw/2
         else:
             img_transx = transx + f * pw
@@ -1020,13 +1053,13 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
 
 
 def processElements(additional_fonts, fotobook, imagedir,
-                    keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage):
-    if keepDoublePages and oddpage == 0 and pagetype == 'normal' and not lastpage:
+                    productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage):
+    if isAlbumDoubleSide(productstyle) and oddpage == 0 and pagetype == 'normal' and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
 
     # switch pack to the page element for the even page to get the elements
-    if pagetype == 'normal' and oddpage == 1:
+    if isAlbumProduct(productstyle) and pagetype == 'normal' and oddpage == 1:
         page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
 
     for area in page.findall('area'):
@@ -1034,7 +1067,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         areaLeft = float(areaPos.get('left').replace(',', '.'))
         # old python 2 code: aleft = float(area.get('left').replace(',', '.'))
         if pagetype != 'singleside' or len(area.findall('imagebackground')) == 0:
-            if oddpage and not keepDoublePages:
+            if oddpage and isAlbumSingleSide(productstyle):
                 # shift double-page content from other page
                 areaLeft -= pw
         areaTop = float(areaPos.get('top').replace(',', '.'))
@@ -1043,7 +1076,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         areaRot = float(areaPos.get('rotation'))
 
         # check if the image is on current page at all
-        if pagetype == 'normal' and not keepDoublePages:
+        if pagetype == 'normal' and isAlbumSingleSide(productstyle):
             if oddpage:
                 # the right edge of image is beyond the left page border
                 if (areaLeft+areaWidth) < 0:
@@ -1061,7 +1094,7 @@ def processElements(additional_fonts, fotobook, imagedir,
 
         # process images
         for imageTag in area.findall('imagebackground') + area.findall('image'):
-            processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, keepDoublePages, mcfBaseFolder, pagetype, pdf, pw, transx, transy)
+            processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, productstyle, mcfBaseFolder, pagetype, pdf, pw, transx, transy)
 
         # process text
         for textTag in area.findall('text'):
@@ -1083,7 +1116,7 @@ def processElements(additional_fonts, fotobook, imagedir,
 
 
 def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
-        page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
+        page, pageNumber, pageCount, pagetype, productstyle, oddpage,
         bg_notFoundDirList, additional_fonts, lastpage):
     logging.info(f"parsing page {page.get('pagenr')}  of {pageCount}")
 
@@ -1094,7 +1127,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
 
         # reduce the page width to a single page width,
         # if we want to have single pages.
-        if not keepDoublePages:
+        if isAlbumSingleSide(productstyle):
             pw = pw / 2
     else:
         # Assume A4 page size
@@ -1108,10 +1141,10 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     #  number for the background attribute if it is a original
     #  stock image, without filters.
     backgroundTags = page.findall('background')
-    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, keepDoublePages, pagetype, pdf, ph, pw)
+    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, productstyle, pagetype, pdf, ph, pw)
 
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
-    processElements(additional_fonts, fotobook, imagedir, keepDoublePages, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
+    processElements(additional_fonts, fotobook, imagedir, productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
 
 def getBaseClipartLocations(baseFolder):
     # create a tuple of places (folders) where background resources would be found by default
@@ -1285,16 +1318,11 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     fotobook = mcf.getroot()
     ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat)
 
-    # check output file is acceptable before we do any processing
+    # check output file is acceptable before we do any processing, which is
+    # preferable to processing for a long time and *then* discovering that
+    # the file is not writable
     outputFileName = getOutputFileName(albumname)
-    if os.path.exists(outputFileName):
-        if os.path.isfile(outputFileName):
-            if not os.access(outputFileName, os.W_OK):
-                logging.error(f"Existing output file '{outputFileName}' is not writable")
-                sys.exit(1)
-        else:
-            logging.error(f"Existing output '{outputFileName}' is not a file")
-            sys.exit(1)
+    ensureAcceptableOutputFile(outputFileName)
 
     # a null default configuration section means that some capabilities will be missing!
     defaultConfigSection = None
@@ -1377,7 +1405,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             dls = defaultConfigSection.getfloat('defaultLineScale', 1.15)
             defaultLineScale = dls
         except:# noqa: E722
-            configlogger.error(f"Invalid defaultLineScale in .ini file")
+            configlogger.error("Invalid defaultLineScale in .ini file")
         mustsee.info(f"Default line scale = {defaultLineScale}")
 
     if keyaccountFolder is not None:
@@ -1641,30 +1669,41 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     # create pdf
     pagesize = reportlab.lib.pagesizes.A4
-    if fotobook.get('productname') in formats:
-        pagesize = formats[fotobook.get('productname')]
+    productstyle = ProductStyle.AlbumSingleSide
+    productname = fotobook.get('productname')
+    if productname in formats:
+        pagesize = formats[productname]
+    if productname in styles:
+        productstyle = styles[productname]
+    if keepDoublePages:
+        match productstyle:
+            case ProductStyle.AlbumSingleSide:
+                productstyle = ProductStyle.AlbumDoubleSide
+            case ProductStyle.MemoryCard:
+                logging.warning('keepdoublepages option is irrelevant and ignored for a memory card product')
+
     pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
     pdf.setTitle(albumTitle)
 
     for n in range(pageCount):
         try:
-            if (n == 0) or (n == pageCount - 1): # numeric comparisons read best like this so pylint: disable=consider-using-in
+            if isAlbumProduct(productstyle) and ((n == 0) or (n == pageCount - 1)): # clearest like this so pylint: disable=consider-using-in
                 pageNumber = 0
                 fullcoverpages = [i for i in
                     fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']")
                     + fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
-                    if (i.find("./area") is not None)]
+                    if i.find("./area") is not None]
                 if len(fullcoverpages) == 1: # in a well-formed album there are two fullcover pages, but only one with an area
                     page = fullcoverpages[0]
                     oddpage = (n == 0) # bool assign is clearer with parens so pylint: disable=superfluous-parens
                     pagetype = 'cover'
                     # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
-                    if ((keepDoublePages is True) and (n == (pageCount - 1))):
+                    if (isAlbumDoubleSide(productstyle) and (n == (pageCount - 1))):
                         page = None
                 else:
-                    logging.warning(f"Cannot locate a cover page, is this really an album?")
+                    logging.warning("Cannot locate a cover page, is this really an album?")
                     page = None
-            elif n == 1:
+            elif isAlbumProduct(productstyle) and n == 1: # album page 1 is handled specially
                 pageNumber = 1
                 oddpage = True
                 # Look for an empty page 0 that still contains an area element
@@ -1688,7 +1727,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     pagetype = 'singleside'
                     lastpage = False
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
-                        realFirstPageList[0], pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
+                        realFirstPageList[0], pageNumber, pageCount, pagetype, productstyle, oddpage,
                         bg_notFoundDirList, additional_fonts, lastpage)
                 pagetype = 'emptypage'
             else:
@@ -1703,17 +1742,20 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             if page is not None:
                 lastpage = (n == pageCount - 2) # bool assign is clearer with parens so pylint: disable=superfluous-parens
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
-                    page, pageNumber, pageCount, pagetype, keepDoublePages, oddpage,
+                    page, pageNumber, pageCount, pagetype, productstyle, oddpage,
                     bg_notFoundDirList, additional_fonts, lastpage)
 
-            # finish the page and start a new one.
-            # If "keepDoublePages" was active, we only start a new page, after the odd pages.
-            if ((keepDoublePages is False)
-                or ((not (oddpage is False and pagetype == 'normal'))
-                    and (not (n == (pageCount - 1) and pagetype == 'cover'))
-                   )
-               ):
-                pdf.showPage()
+                # finish the pdf page and start a new one.
+                if not isAlbumProduct(productstyle):
+                    # it would be neat to duplicate the page for MemoryCard products but showPage
+                    # empties the canvas so the user must just print the pdf file twice!
+                    pdf.showPage()
+                elif (isAlbumSingleSide(productstyle)
+                        or ((not (oddpage is False and pagetype == 'normal'))
+                        and (not (n == (pageCount - 1) and pagetype == 'cover'))
+                        )):
+                    # If we're creating a AlbumDoubleSide then we only output after the odd pages
+                    pdf.showPage()
 
         except Exception as pageex:
             # if one page fails: continue with next one
@@ -1721,7 +1763,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             logging.error(f'error on page {n}: {pageex.args[0]}')
 
     # save final output pdf
-    pdf.save()
+    try:
+        pdf.save()
+    except Exception as ex:
+        logging.error(f'Could not save the output file: {str(ex)}')
 
     pdf = []
 
@@ -1732,8 +1777,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     # print log count summaries
     print("Total message counts, including messages suppressed by logger configuration")
-    print(f"cewe2pdf.config: {configMessageCountHandler.messageCountText()}")
-    print(f"root:            {rootMessageCountHandler.messageCountText()}")
+    print(f" cewe2pdf.config: {configMessageCountHandler.messageCountText()}")
+    print(f" root:            {rootMessageCountHandler.messageCountText()}")
+
+    if productstyle == ProductStyle.MemoryCard:
+        print()
+        print("Use Adobe Acrobat to print the memory cards. Set custom pages per sheet, 4 wide x 6 down")
+        print(" and print two copies!")
 
     # if he has specified "normal" values for the number of messages of each kind, then warn if we do not see that number
     if defaultConfigSection is not None:
@@ -1766,6 +1816,27 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         unpackedFolder.cleanup()
 
     return True
+
+
+def ensureAcceptableOutputFile(outputFileName):
+    if os.path.exists(outputFileName):
+        if os.path.isfile(outputFileName):
+            if not os.access(outputFileName, os.W_OK):
+                logging.error(f"Existing output file '{outputFileName}' is not writable")
+                sys.exit(1)
+            # this still won't have caught the case where the output file is opened for
+            # exclusive access by another process (eg Acrobat does that). We plan to
+            # overwrite the file anyway so we just check by opening it for writing and
+            # then closing it again before we do our normal stuff
+            try:
+                with open(outputFileName, 'w'):
+                    logging.info(f"Existing output file '{outputFileName}' can be written")
+            except Exception as e:
+                logging.error(f"Existing output file '{outputFileName}' is writable, but not accessible {str(e)}")
+                sys.exit(1)
+        else:
+            logging.error(f"Existing output '{outputFileName}' is not a file")
+            sys.exit(1)
 
 
 def ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat):
