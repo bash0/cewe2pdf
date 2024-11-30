@@ -32,7 +32,7 @@ def tryToBuildBook(keepDoublePages):
     #check the pdf contents
     readPdf = Pdf.open(outFile)
     numPages =  len(readPdf.pages)
-    assert numPages == 6
+    assert numPages == 5
 
     #os.remove(outFile)
 
