@@ -1676,11 +1676,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     if productname in styles:
         productstyle = styles[productname]
     if keepDoublePages:
-        match productstyle:
-            case ProductStyle.AlbumSingleSide:
-                productstyle = ProductStyle.AlbumDoubleSide
-            case ProductStyle.MemoryCard:
-                logging.warning('keepdoublepages option is irrelevant and ignored for a memory card product')
+        if productstyle == ProductStyle.AlbumSingleSide:
+            productstyle = ProductStyle.AlbumDoubleSide
+        elif productstyle == ProductStyle.MemoryCard:
+            logging.warning('keepdoublepages option is irrelevant and ignored for a memory card product')
 
     pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
     pdf.setTitle(albumTitle)
