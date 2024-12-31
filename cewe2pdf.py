@@ -504,7 +504,11 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     if frameClipartFileName is not None:
         # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
         # already has these transformations applied. So don't do it twice.
-        insertClipartFile(frameClipartFileName, [], 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False)
+        # flipX and flipY are also set to false because it cause an exception in PIL
+        # therefore, even if the CEWE software offers the possibility to flip the clipart frame, cewe2pdf
+        # remains unable to render it
+        colorreplacements, flipX, flipY = getClipConfig(imageTag)
+        insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False)
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
@@ -983,6 +987,27 @@ def loadClipart(fileName) -> ClpFile:
     return newClpFile
 
 
+def getClipConfig(Element):
+    colorreplacements = []
+    flipX = False
+    flipY = False
+    for clipconfig in Element.findall('ClipartConfiguration'):
+        for clipcolors in clipconfig.findall('colors'):
+            for clipcolor in clipcolors.findall('color'):
+                source = '#'+clipcolor.get('source').upper()[1:7]
+                target = '#'+clipcolor.get('target').upper()[1:7]
+                replacement = (source, target)
+                colorreplacements.append(replacement)
+        mirror = clipconfig.get('mirror')
+        if mirror is not None:
+            # cewe developers have a different understanding of x and y :)
+            if mirror in ('y', 'both'):
+                flipX = True
+            if mirror in ('x', 'both'):
+                flipY = True
+    return colorreplacements, flipX, flipY
+
+
 def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha):
     clipartID = int(clipartElement.get('designElementId'))
     # print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
@@ -1000,23 +1025,7 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
         logging.error(f"Problem getting file name for clipart ID: {clipartID}")
         return
 
-    colorreplacements = []
-    flipX = False
-    flipY = False
-    for clipconfig in clipartElement.findall('ClipartConfiguration'):
-        for clipcolors in clipconfig.findall('colors'):
-            for clipcolor in clipcolors.findall('color'):
-                source = '#'+clipcolor.get('source').upper()[1:7]
-                target = '#'+clipcolor.get('target').upper()[1:7]
-                replacement = (source, target)
-                colorreplacements.append(replacement)
-        mirror = clipconfig.get('mirror')
-        if mirror is not None:
-            # cewe developers have a different understanding of x and y :)
-            if mirror in ('y', 'both'):
-                flipX = True
-            if mirror in ('x', 'both'):
-                flipY = True
+    colorreplacements, flipX, flipY = getClipConfig(clipartElement)
 
     insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY)
 
