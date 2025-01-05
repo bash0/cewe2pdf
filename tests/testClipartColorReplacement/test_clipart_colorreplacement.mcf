@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="0b797ffc-3099-4407-b08a-344e6130bb13" imagedir="test_clipart_colorreplacement_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
-    <project createdWithHPSVersion="7.4.3" createdWithHPSVersionBuild="20240328" multiPurposeText="" projectID="44455f16-6ca7-4a45-a3a9-3ed7e8f966eb" projectIDCreatedEpoch="1735640301"/>
-    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.4.4" programversionBuild="20240826" savetime="2025-01-05 08:23"/>
+<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="a2abdd24-8d35-4fab-9311-060b770db17e" imagedir="test_clipart_colorreplacement_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+    <project createdWithHPSVersion="7.4.3" createdWithHPSVersionBuild="20240328" multiPurposeText="" projectID="44455f16-6ca7-4a45-a3a9-3ed7e8f966eb" projectIDCreatedEpoch="1736102931"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.4.4" programversionBuild="20240826" savetime="2025-01-05 20:04"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
     <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="CEWE Head" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
         <outline width="0"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="20" VerticalIndentMargin="20" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.0.0"/>
     </extra>
     <page designStyleID="1158347" designStyleTemplateName="collage_cover_back" pagenr="0" rotation="0" type="fullcover">
@@ -24,7 +24,7 @@
 p, li { white-space: pre-wrap; }
 </style></head><body style=" font-family:'CEWE Head'; font-size:12pt; font-weight:400; font-style:normal;">
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -44,36 +44,104 @@ p, li { white-space: pre-wrap; }
         <designElementIDs background="201"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <area areatype="imagearea">
-            <position height="475.766" left="2395.15" rotation="0" top="549.675" width="457.467" zposition="104"/>
+            <position height="475" left="2416.79" rotation="0" top="691.627" width="458" zposition="100"/>
             <designElementIDs passepartout="127517"/>
-            <decoration>
-                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
-            </decoration>
-            <image filename="safecontainer:/abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg" passepartoutDesignElementId="127517" useABK="1">
-                <cutout left="-28.0745" scale="0.711055" top="-5.3184e-05"/>
+            <decoration/>
+            <image filename="safecontainer:/abx6bvk1_7_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="-28" scale="0.711055" top="0"/>
                 <quality noise="0" sharpness="0" texture="0"/>
-                <ClipartConfiguration applySpotColor="0"/>
-            </image>
-        </area>
-        <area areatype="clipartarea">
-            <position height="401" left="2394.63" rotation="0" top="1039.79" width="579" zposition="105"/>
-            <designElementIDs clipart="63544"/>
-            <decoration>
-                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
-            </decoration>
-            <clipart designElementId="63544">
                 <ClipartConfiguration applySpotColor="1"/>
-            </clipart>
+            </image>
         </area>
         <area areatype="imagearea">
-            <position height="383" left="2401.63" rotation="0" top="1048.79" width="564" zposition="106"/>
-            <designElementIDs passepartout="125186"/>
+            <position height="475" left="3279.79" rotation="0" top="691.627" width="457" zposition="101"/>
+            <designElementIDs passepartout="127517"/>
             <decoration/>
-            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="125186" useABK="1">
-                <cutout left="-87" scale="0.169986" top="0"/>
-                <quality noise="100" sharpness="100" texture="100"/>
-                <ClipartConfiguration applySpotColor="1"/>
+            <image filename="safecontainer:/abx6bvk1_7_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="-28" scale="0.710329" top="0"/>
+                <quality noise="0" sharpness="0" texture="0"/>
+                <ClipartConfiguration applySpotColor="0">
+                    <colors>
+                        <color source="#000000" target="#b51600"/>
+                        <color source="#757575" target="#f47723"/>
+                        <color source="#7f7f7f" target="#ff9000"/>
+                        <color source="#818181" target="#fca404"/>
+                        <color source="#b5b5b5" target="#fcbc7c"/>
+                        <color source="#c4c4c4" target="#fec400"/>
+                        <color source="#e3e3e3" target="#fbd75d"/>
+                        <color source="#ececec" target="#fff6b5"/>
+                        <color source="#f8f8f8" target="#f8f8f8"/>
+                        <color source="#ffffff" target="#ffffff"/>
+                    </colors>
+                </ClipartConfiguration>
             </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="475" left="2400.79" rotation="270" top="1856.63" width="457" zposition="102"/>
+            <designElementIDs passepartout="127517"/>
+            <decoration/>
+            <image filename="safecontainer:/abx6bvk1_6_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="0" scale="0.710329" top="0"/>
+                <quality noise="0" sharpness="0" texture="0"/>
+                <ClipartConfiguration applySpotColor="0" mirror="y">
+                    <colors>
+                        <color source="#000000" target="#000000"/>
+                        <color source="#757575" target="#757575"/>
+                        <color source="#7f7f7f" target="#7f7f7f"/>
+                        <color source="#818181" target="#818181"/>
+                        <color source="#b5b5b5" target="#b5b5b5"/>
+                        <color source="#c4c4c4" target="#c4c4c4"/>
+                        <color source="#e3e3e3" target="#e3e3e3"/>
+                        <color source="#ececec" target="#ececec"/>
+                        <color source="#f8f8f8" target="#f8f8f8"/>
+                        <color source="#ffffff" target="#ffffff"/>
+                    </colors>
+                </ClipartConfiguration>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="475" left="3274.79" rotation="270" top="1856.63" width="457" zposition="103"/>
+            <designElementIDs passepartout="127517"/>
+            <decoration/>
+            <image filename="safecontainer:/abx6bvk1_6_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="0" scale="0.710329" top="0"/>
+                <quality noise="0" sharpness="0" texture="0"/>
+                <ClipartConfiguration applySpotColor="0" mirror="y">
+                    <colors>
+                        <color source="#000000" target="#b51600"/>
+                        <color source="#757575" target="#f47723"/>
+                        <color source="#7f7f7f" target="#ff9000"/>
+                        <color source="#818181" target="#fca404"/>
+                        <color source="#b5b5b5" target="#fcbc7c"/>
+                        <color source="#c4c4c4" target="#fec400"/>
+                        <color source="#e3e3e3" target="#fbd75d"/>
+                        <color source="#ececec" target="#fff6b5"/>
+                        <color source="#f8f8f8" target="#f8f8f8"/>
+                        <color source="#ffffff" target="#ffffff"/>
+                    </colors>
+                </ClipartConfiguration>
+            </image>
+        </area>
+        <area areatype="textarea" backgroundcolor="2164260863">
+            <position height="158" left="2213.79" rotation="0" top="452.627" width="831" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'CEWE Head'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:39px; margin-bottom:20px; margin-left:20px; margin-right:20px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Image in a unmodified frame</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="20" VerticalIndentMargin="50" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea" backgroundcolor="2164260863">
+            <position height="158" left="3087.79" rotation="0" top="452.627" width="832" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'CEWE Head'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:39px; margin-bottom:20px; margin-left:20px; margin-right:20px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Frame with modified color</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="20" VerticalIndentMargin="50" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea" backgroundcolor="2164260863">
+            <position height="198" left="2681.79" rotation="0" top="1584.63" width="831" zposition="7002"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'CEWE Head'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:20px; margin-bottom:20px; margin-left:20px; margin-right:20px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Same with different rotations of image and frame (flipped)</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="20" VerticalIndentMargin="50" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
         </area>
     </page>
     <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="1" rotation="0" type="normalpage">
@@ -84,9 +152,111 @@ p, li { white-space: pre-wrap; }
     </page>
     <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="2" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
-        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
-        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <designElementIDs background="6044" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="6044" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_011"/>
+        <area areatype="clipartarea">
+            <position height="401" left="100.739" rotation="0" top="788.976" width="579" zposition="101"/>
+            <designElementIDs clipart="63544"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <clipart designElementId="63544">
+                <ClipartConfiguration applySpotColor="0"/>
+            </clipart>
+        </area>
+        <area areatype="imagearea">
+            <position height="383" left="107.739" rotation="0" top="797.976" width="564" zposition="102"/>
+            <designElementIDs passepartout="125186"/>
+            <decoration/>
+            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="125186" useABK="1">
+                <cutout left="-87" scale="0.169986" top="0"/>
+                <quality noise="100" sharpness="100" texture="100"/>
+                <ClipartConfiguration applySpotColor="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="625" left="875" rotation="0" top="778" width="625" zposition="103"/>
+            <designElementIDs passepartout="46537"/>
+            <decoration>
+                <border applySpotColor="0" color="#ffb51600" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="46537" useABK="1">
+                <cutout left="-0.968354" scale="0.318878" top="0"/>
+                <quality noise="100" sharpness="100" texture="100"/>
+                <ClipartConfiguration applySpotColor="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="602" left="750" rotation="0" top="1485" width="488" zposition="104"/>
+            <designElementIDs passepartout="46245"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="46245" useABK="1">
+                <cutout left="-1.33613" scale="0.307531" top="0"/>
+                <quality noise="100" sharpness="100" texture="100"/>
+                <ClipartConfiguration applySpotColor="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="625" left="875" rotation="0" top="103" width="625" zposition="105"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" useABK="1">
+                <cutout left="-0.968996" scale="0.318878" top="0"/>
+                <quality noise="100" sharpness="100" texture="100"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="475" left="104.371" rotation="0" top="108.437" width="458" zposition="106"/>
+            <designElementIDs passepartout="127517"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="-0.427424" scale="0.154659" top="0"/>
+                <quality noise="100" sharpness="100" texture="100"/>
+                <ClipartConfiguration applySpotColor="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="602" left="1345" rotation="90" top="1428" width="488" zposition="107"/>
+            <designElementIDs passepartout="46245"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="46245" useABK="1">
+                <cutout left="-1.33613" scale="0.307531" top="0"/>
+                <quality noise="100" sharpness="100" texture="100"/>
+                <ClipartConfiguration applySpotColor="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="602" left="807" rotation="270" top="2065" width="488" zposition="110"/>
+            <designElementIDs passepartout="46245"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="46245" useABK="1">
+                <cutout left="-1.33613" scale="0.307531" top="0"/>
+                <quality noise="100" sharpness="100" texture="100"/>
+                <ClipartConfiguration applySpotColor="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="602" left="1402" rotation="0" top="2008" width="488" zposition="111"/>
+            <designElementIDs passepartout="46245"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="46245" useABK="1">
+                <cutout left="-1.33613" scale="0.307531" top="0"/>
+                <quality noise="100" sharpness="100" texture="100"/>
+                <ClipartConfiguration applySpotColor="0"/>
+            </image>
+        </area>
     </page>
     <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="3" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
@@ -239,10 +409,15 @@ p, li { white-space: pre-wrap; }
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships>
-        <foto id="safecontainer:/abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg"/>
+        <foto id="file:///D:/Users/pete/Source/GitHub/cewe2pdf/tests/testClipartColorReplacement/test_clipart_colorreplacement.mcfx/Contents/abx6bvk1_5_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg">
+            <foto id="safecontainer:/abx6bvk1_6_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
+        <foto id="file:///D:/Users/pete/Source/GitHub/cewe2pdf/tests/testClipartColorReplacement/test_clipart_colorreplacement.mcfx/Contents/abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg">
+            <foto id="safecontainer:/abx6bvk1_7_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
         <foto id="file:///D:/Users/pete/Source/GitHub/cewe2pdf/tests/unittest_fotobook_mcf-Dateien/20200320_124632.jpg">
             <foto id="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
         </foto>
     </fotoRelationships>
-    <statistics assistantUsed="1" countPauses="72" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="473731" fotosAdded="29" fotosRemoved="23" pauseTime="383822" sessionsUsed="54"/>
+    <statistics assistantUsed="1" countPauses="84" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="507072" fotosAdded="91" fotosRemoved="38" pauseTime="410337" sessionsUsed="56"/>
 </fotobook>
