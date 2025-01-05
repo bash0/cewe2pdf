@@ -66,3 +66,4 @@ nosetests.xml
 /tests/unittest_fotobook_mcf-Dateien/identifier.xml
 /tests/testMcfxExtraction/tmp-dir
 /requirements-all.txt
+/tests/testClipartColorReplacement/test_clipart_colorreplacement.mcfx.pdf

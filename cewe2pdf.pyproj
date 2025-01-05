@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>runAllTests.py</StartupFile>
+    <StartupFile>tests\testClipartColorReplacement\test_clipartColorReplacement.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -65,6 +65,17 @@
     <Content Include="tests\Resources\photofun\decorations\rect_terracotta.clp" />
     <Content Include="tests\Resources\photofun\decorations\rect_white.clp" />
     <Content Include="tests\test.webp" />
+    <Content Include="tests\testClipartColorReplacement\additional_fonts.txt" />
+    <Content Include="tests\testClipartColorReplacement\cewe2pdf.ini" />
+    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcf" />
+    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcfx" />
+    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcfx.pdf" />
+    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
+    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_2_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
+    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_3_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
+    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_4_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
+    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_5_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
+    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testClipart\cewe2pdf.ini" />
     <Content Include="tests\testClipart\testClipart.mcf" />
     <Content Include="tests\testClipart\__pycache__\test_drawClipart.cpython-37-pytest-5.4.1.pyc" />
@@ -99,6 +110,7 @@
     <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
     <Compile Include="runAllTests.py" />
+    <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
     <Compile Include="tests\testClipart\test_drawClipart.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
@@ -129,6 +141,8 @@
     <Folder Include="tests\Resources\photofun\" />
     <Folder Include="tests\Resources\photofun\backgrounds\" />
     <Folder Include="tests\Resources\photofun\decorations\" />
+    <Folder Include="tests\testClipartColorReplacement\" />
+    <Folder Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\" />
     <Folder Include="tests\testClipart\" />
     <Folder Include="tests\testClipart\__pycache__\" />
     <Folder Include="tests\testFontDoesNotExist\" />
