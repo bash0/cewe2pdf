@@ -1010,7 +1010,6 @@ def getClipConfig(Element):
 
 def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, clipArtDecoration):
     clipartID = int(clipartElement.get('designElementId'))
-    # print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
 
     # designElementId 0 seems to be a special empty placeholder
     if clipartID == 0:
@@ -1119,8 +1118,9 @@ def processElements(additional_fonts, fotobook, imagedir,
         # Clip-Art
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
         # We are using the <clipart> element here
-        if area.get('areatype') == 'clipartarea': # only look for alpha and clipart within clipartarea tags
-            decoration = area.find('decoration') # decoration tag
+        if area.get('areatype') == 'clipartarea':
+            # within clipartarea tags we need the decoration for alpha and border information
+            decoration = area.find('decoration')
             for clipartElement in area.findall('clipart'):
                 processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, decoration)
     return
