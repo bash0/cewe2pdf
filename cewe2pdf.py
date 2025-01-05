@@ -508,7 +508,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         # therefore, even if the CEWE software offers the possibility to flip the clipart frame, cewe2pdf
         # remains unable to render it
         colorreplacements, flipX, flipY = getClipConfig(imageTag)
-        insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False)
+        insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False, None)
 
     for decorationTag in area.findall('decoration'):
         processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
@@ -1008,7 +1008,7 @@ def getClipConfig(Element):
     return colorreplacements, flipX, flipY
 
 
-def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha):
+def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, clipArtDecoration):
     clipartID = int(clipartElement.get('designElementId'))
     # print("Warning: clip-art elements are not supported. (designElementId = {})".format(clipartID))
 
@@ -1025,12 +1025,17 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
         logging.error(f"Problem getting file name for clipart ID: {clipartID}")
         return
 
+    alpha = 255
+    if clipArtDecoration is not None:
+        alphatext = clipArtDecoration.get('alpha') # alpha attribute
+        if alphatext is not None:
+            alpha = int((float(alphatext)) * 255)
+
     colorreplacements, flipX, flipY = getClipConfig(clipartElement)
+    insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY, clipArtDecoration)
 
-    insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY)
 
-
-def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY):
+def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY, decoration):
     img_transx = transx
 
     res = image_res # use the foreground resolution setting for clipart
@@ -1057,6 +1062,8 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     pdf.drawImage(ImageReader(clipart.pngMemFile),
         f * -0.5 * areaWidth, f * -0.5 * areaHeight,
         width=f * areaWidth, height=f * areaHeight, mask='auto')
+    if decoration is not None:
+        processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf)
     pdf.rotate(areaRot)
     pdf.translate(-img_transx, -transy)
 
@@ -1113,14 +1120,9 @@ def processElements(additional_fonts, fotobook, imagedir,
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
         # We are using the <clipart> element here
         if area.get('areatype') == 'clipartarea': # only look for alpha and clipart within clipartarea tags
-            alpha = 255
             decoration = area.find('decoration') # decoration tag
-            if decoration is not None:
-                alphatext = decoration.get('alpha') # alpha attribute
-                if alphatext is not None:
-                    alpha = int((float(alphatext)) * 255)
             for clipartElement in area.findall('clipart'):
-                processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, alpha)
+                processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, decoration)
     return
 
 
