@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="0b797ffc-3099-4407-b08a-344e6130bb13" imagedir="test_clipart_colorreplacement_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+    <project createdWithHPSVersion="7.4.3" createdWithHPSVersionBuild="20240328" multiPurposeText="" projectID="44455f16-6ca7-4a45-a3a9-3ed7e8f966eb" projectIDCreatedEpoch="1735640301"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.4.4" programversionBuild="20240826" savetime="2025-01-05 08:23"/>
+    <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
+    <addOns/>
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="CEWE Head" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
+        <outline width="0"/>
+    </pagenumbering>
+    <extra>
+        <lastTextFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <imageQuality version="1.0.0"/>
+    </extra>
+    <page designStyleID="1158347" designStyleTemplateName="collage_cover_back" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4290"/>
+        <designElementIDs background="201" layout="384109" styles_v2="1158347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
+        <area areatype="spinetextarea">
+            <position height="106" left="820" rotation="270" top="1322" width="2650" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body style=" font-family:'CEWE Head'; font-size:12pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="cover_spine" pagenr="0" rotation="0" type="spine">
+        <bundlesize height="2750" width="4290"/>
+        <designElementIDs background="201" styles_v2="1158347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="collage_1_cover_front" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4290"/>
+        <designElementIDs background="201" layout="1168346" styles_v2="1158347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="1168346" layout="1" templatename="collage_1_cover_front_portrait"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <area areatype="imagearea">
+            <position height="475.766" left="2395.15" rotation="0" top="549.675" width="457.467" zposition="104"/>
+            <designElementIDs passepartout="127517"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <image filename="safecontainer:/abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="-28.0745" scale="0.711055" top="-5.3184e-05"/>
+                <quality noise="0" sharpness="0" texture="0"/>
+                <ClipartConfiguration applySpotColor="0"/>
+            </image>
+        </area>
+        <area areatype="clipartarea">
+            <position height="401" left="2394.63" rotation="0" top="1039.79" width="579" zposition="105"/>
+            <designElementIDs clipart="63544"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <clipart designElementId="63544">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="imagearea">
+            <position height="383" left="2401.63" rotation="0" top="1048.79" width="564" zposition="106"/>
+            <designElementIDs passepartout="125186"/>
+            <decoration/>
+            <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="125186" useABK="1">
+                <cutout left="-87" scale="0.169986" top="0"/>
+                <quality noise="100" sharpness="100" texture="100"/>
+                <ClipartConfiguration applySpotColor="1"/>
+            </image>
+        </area>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="6044" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="6044" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_010"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_011"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="5.4. DIN A4"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_010"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="5" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_055"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="6" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_005"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="7" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_010"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="8" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="4.20 DIN A4"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="9" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_036"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="10" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_052"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="11" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_012"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="12" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="5.4. DIN A4_y"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="13" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_052_x, y"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="14" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_012_x"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="15" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="5.4. DIN A4"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="16" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_010"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="17" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_011"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="18" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="5.4. DIN A4_y"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="19" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_010"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="20" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_012"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="21" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="5.4. DIN A4"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="22" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_052_y"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="23" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_012_x"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="24" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="5.4. DIN A4_y"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="25" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_052_x"/>
+    </page>
+    <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="26" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="4.20 DIN A4_x, y"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships>
+        <foto id="safecontainer:/abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg"/>
+        <foto id="file:///D:/Users/pete/Source/GitHub/cewe2pdf/tests/unittest_fotobook_mcf-Dateien/20200320_124632.jpg">
+            <foto id="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
+    </fotoRelationships>
+    <statistics assistantUsed="1" countPauses="72" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="473731" fotosAdded="29" fotosRemoved="23" pauseTime="383822" sessionsUsed="54"/>
+</fotobook>
