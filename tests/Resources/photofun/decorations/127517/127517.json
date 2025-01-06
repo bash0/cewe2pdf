@@ -1,0 +1,34 @@
+{
+    "customScore": null,
+    "decoFrameMetadata": {
+        "aspectRatio": 1.0492289,
+        "fotoArea": {
+            "height": 0.638172,
+            "width": 0.9265171,
+            "x": 0.07229048,
+            "y": 0.014172803
+        },
+        "keepAspectRatio": true
+    },
+    "designElementId": 127517,
+    "elementType": "mask",
+    "expirationDate": null,
+    "lastChanged": 1616743621000,
+    "productionId": "12678-DECO-CC",
+    "publishedAt": 1616743621000,
+    "score": 384,
+    "tags": {
+        "CATEGORY": [
+            "category-travel",
+            "category-map-icons"
+        ],
+        "FEATURE": [
+            "feature-keep-aspect-ratio"
+        ],
+        "MASK_TYPE": [
+            "mask_type_decorated"
+        ]
+    },
+    "visible": true
+}
+

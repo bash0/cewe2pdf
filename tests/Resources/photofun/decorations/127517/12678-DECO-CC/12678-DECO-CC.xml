@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><decorations>
+  <decoration designElementId="127517" id="12678-DECO-CC" type="fading">
+    <categories>
+      
+    <category>Symbole fuer Landkarten</category></categories>
+    <fading designElementType="passepartout" file="12678-DECO-CC-mask.svg" keepAspectRatio="1" ratio="1.0492288705299">
+      <clipart designElementType="clipart" file="12678-DECO-CC-clip.svg" ratio="1.0492288705299"/>
+      <fotoarea height="0.63817195944227" width="0.92651710070234" x="0.072290477605768" y="0.014172802898737"/>
+    </fading>
+  </decoration>
+</decorations>
