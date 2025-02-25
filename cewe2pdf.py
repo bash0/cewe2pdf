@@ -198,6 +198,7 @@ formats = {
     "ALB82": reportlab.lib.pagesizes.A4,
     "ALB98": reportlab.lib.pagesizes.A4, # unittest, L 20.5cm x 27.0cm
     "ALB32": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm), # album XL, 30 x 30 cm
+    "ALB17": (205 * reportlab.lib.pagesizes.mm, 205 * reportlab.lib.pagesizes.mm), # album kvadratisk, 20.5 x 20.5 cm
     "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm),
     # add other page sizes here
     "MEM3": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm) # memory game cards 6x6cm
