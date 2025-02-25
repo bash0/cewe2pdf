@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>tests\testClipartColorReplacement\test_clipartColorReplacement.py</StartupFile>
+    <StartupFile>runAllTests.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -28,7 +28,7 @@
     <Content Include=".github\workflows\pythonapp.yml" />
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
-    <Content Include="additional_fonts.txt" />
+    <Content Include="tests\testbackgrounds\additional_fonts.txt" />
     <Content Include="build_a_compiled_version.md" />
     <Content Include="cewe2pdf.ini" />
     <Content Include="CLP file format.txt" />
@@ -111,7 +111,7 @@
     <Compile Include="processManyMcfs.py" />
     <Compile Include="runAllTests.py" />
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
-    <Compile Include="tests\testClipart\test_drawClipart.py" />
+    <Compile Include="tests\testbackgrounds\test_backgrounds.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\test_simpleBook.py" />
@@ -141,6 +141,7 @@
     <Folder Include="tests\Resources\photofun\" />
     <Folder Include="tests\Resources\photofun\backgrounds\" />
     <Folder Include="tests\Resources\photofun\decorations\" />
+    <Folder Include="tests\testbackgrounds\" />
     <Folder Include="tests\testClipartColorReplacement\" />
     <Folder Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\" />
     <Folder Include="tests\testClipart\" />
