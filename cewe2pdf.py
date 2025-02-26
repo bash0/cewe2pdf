@@ -235,15 +235,29 @@ defaultLineScale = 1.1 # line scale if not overridden. Best to configure to 1.15
 
 def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
     returnValue = minimumValue
-    try:
-        # eg getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
-        returnValue = int(configSection.get(itemName, defaultValue))
-    except ValueError:
-        logging.error(f'Invalid configuration value supplied for {itemName}')
-        returnValue = int(defaultValue)
-    if returnValue < minimumValue:
-        logging.error(f'Configuration value supplied for {itemName} is less than {minimumValue}, using {minimumValue}')
-        returnValue = minimumValue
+    if configSection is not None:
+        try:
+            # eg getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
+            returnValue = int(configSection.get(itemName, defaultValue))
+        except ValueError:
+            logging.error(f'Invalid configuration value supplied for {itemName}')
+            returnValue = int(defaultValue)
+        if returnValue < minimumValue:
+            logging.error(f'Configuration value supplied for {itemName} is less than {minimumValue}, using {minimumValue}')
+            returnValue = minimumValue
+    return returnValue
+
+
+def getConfigurationBool(configSection, itemName, defaultValue):
+    returnValue = defaultValue
+    if configSection is not None:
+        try:
+            # eg getConfigurationBool(defaultConfigSection, 'insideCoverWhite', False)
+            bv = configSection.get(itemName, defaultValue)
+            returnValue = bv.lower() == "true"
+        except ValueError:
+            logging.error(f'Invalid configuration value supplied for {itemName}')
+            returnValue = bool(defaultValue)
     return returnValue
 
 
@@ -316,6 +330,7 @@ def getPageElementForPageNumber(fotobook, pageNumber):
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
                       productstyle, pagetype, pdf, ph, pw):
+    global defaultConfigSection
     areaHeight = ph
     areaWidth = pw
     areaXOffset = 0
@@ -327,11 +342,12 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
             # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
             return
         if isAlbumDoubleSide(productstyle):
-            # if we also just return here, then everything looks "good" because this inside cover page comes
-            # out with the background of the first inner side. But it's not the same as the cewe album. Instead
-            # we put out the background that the empty page defines, on the left side only by halving the width
-            # This might be where we could add a configuration option to allow a choice for the inside cover page bg.
+            # if we just return here, then everything looks "nice" because this inside
+            # front cover page comes out with the background of the first inner side.
+            # But "nice" is not the same as the cewe album. If you want white inside cover pages, set the ini file
+            # option to True and continue to output the page with the background that the empty page defines
             areaWidth = areaWidth / 2
+
     if pagetype == PageType.BackInsideCover:
         if isAlbumSingleSide(productstyle):
             # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
@@ -339,6 +355,11 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
         if isAlbumDoubleSide(productstyle):
             areaWidth = areaWidth / 2
             areaXOffset = areaXOffset + areaWidth
+
+    if pagetype in [PageType.EmptyPage,PageType.BackInsideCover] and not getConfigurationBool(defaultConfigSection, "insideCoverWhite", "False"):
+        # return without drawing the background, thus accepting whatever was underneath. If the config option
+        # is set to true then the inside cover pages will be set to the cewe specified default, white
+        return
 
     if backgroundTags is not None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
@@ -1330,6 +1351,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     global defaultLineScale  # pylint: disable=global-statement
     global image_res  # pylint: disable=global-statement
     global bg_res  # pylint: disable=global-statement
+    global defaultConfigSection  # pylint: disable=global-statement
 
     clipartDict = {}    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
@@ -1816,9 +1838,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                         page, pageNumber, pageCount, PageType.Normal, productstyle, oddpage,
                         bg_notFoundDirList, additional_fonts, lastpage)
 
-                # Now look for an empty page 0 that does NOT contain an area element. That will
-                # put the background for the inside cover page on top of the right side of the page
-                # we have just processed
+                # Look for an empty page 0 that does NOT contain an area element. That will define
+                # the background for the inside cover page to be placed on top of the right side of
+                # the page we have just processed
                 page = [i for i in
                         fotobook.findall("./page[@pagenr='0'][@type='EMPTY']")
                         + fotobook.findall("./page[@pagenr='0'][@type='emptypage']")

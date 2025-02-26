@@ -109,6 +109,12 @@ defaultLineScale = 1.15
 fontLineScales =
 	Crafty Girls: 1.43
 
+# Define how the inside cover pages are processed in a keepDoublePages run
+#  Default False, if True then the inside cover pages on a keepDoublePages run will be white (as CEWE)
+#  rather than matching the background of the facing pages (i.e. the first and last usable pages)
+#  This has no effect on a single page width run, where the inside cover pages are simply omitted
+insideCoverWhite = False
+
 # These possibilities are seldom needed in the latest versions of the program
 #extraBackgroundFolders =
 #	${PROGRAMDATA}/hps/${KEYACCOUNT}/addons/447/backgrounds/v1/backgrounds
