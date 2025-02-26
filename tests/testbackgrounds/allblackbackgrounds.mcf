@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9221" article_name="CEWE%20FOTOBOK%20kvadratisk%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="72f76eb1-3091-4d7e-a326-71af807a6a8c" imagedir="allblackbackgrounds_mcf-Dateien" isDataMcf="0" productname="ALB17" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="9221" article_name="CEWE%20FOTOBOK%20kvadratisk%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="4053e36f-e02b-4479-961a-36b495adc361" imagedir="allblackbackgrounds_mcf-Dateien" isDataMcf="0" productname="ALB17" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="90ea972f-6f05-4b96-8bff-482c2af291eb" projectIDCreatedEpoch="1740219297"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-02-24 20:11"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-02-25 19:44"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-02-16 16:57"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -14,8 +14,8 @@
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
         <bundlesize height="2100" width="4275"/>
-        <designElementIDs background="212" layout="384109"/>
-        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <designElementIDs background="6001" layout="384109"/>
+        <background alignment="4" designElementId="6001" rotation="0" type="1"/>
         <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
         <area areatype="imagearea">
             <position height="731" left="2476.75" rotation="0" top="700.869" width="1503" zposition="100"/>
@@ -49,13 +49,13 @@
     </page>
     <page designStyleID="0" pagenr="0" rotation="0" type="spine">
         <bundlesize height="2100" width="4275"/>
-        <designElementIDs background="212"/>
-        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <designElementIDs background="6001"/>
+        <background alignment="4" designElementId="6001" rotation="0" type="1"/>
     </page>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
         <bundlesize height="2100" width="4275"/>
-        <designElementIDs background="212" layout="422099"/>
-        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <designElementIDs background="6001" layout="422099"/>
+        <background alignment="4" designElementId="6001" rotation="0" type="1"/>
         <background designElementId="422099" layout="1" templatename="fullcoverpage_with_title"/>
     </page>
     <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
@@ -244,5 +244,5 @@
             <foto id="safecontainer:/m00luf2a_1_20200306_111748.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
         </foto>
     </fotoRelationships>
-    <statistics assistantUsed="0" countPauses="20" elapsedTimeGross="2025-02-16T16:57:40" elapsedTimeNet="130395" fotosAdded="1" fotosRemoved="0" pauseTime="114726" sessionsUsed="3"/>
+    <statistics assistantUsed="0" countPauses="32" elapsedTimeGross="2025-02-16T16:57:40" elapsedTimeNet="215165" fotosAdded="1" fotosRemoved="0" pauseTime="197773" sessionsUsed="3"/>
 </fotobook>

@@ -1106,8 +1106,8 @@ def processElements(additional_fonts, fotobook, imagedir,
         areaHeight = float(areaPos.get('height').replace(',', '.'))
         areaRot = float(areaPos.get('rotation'))
 
-        # check if the image is on current page at all
-        if pagetype == PageType.Normal and isAlbumSingleSide(productstyle):
+        # check if the image is on current page at all, and if not then skip processing it
+        if isAlbumSingleSide(productstyle) and pagetype in [PageType.Normal, PageType.Cover]:
             if oddpage:
                 # the right edge of image is beyond the left page border
                 if (areaLeft+areaWidth) < 0:
