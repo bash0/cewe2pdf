@@ -33,13 +33,14 @@ def tryToBuildBook(keepDoublePages, expectedPages, expectedEqualBackgroundPageLi
         imagecount = len(imagekeys)
         if p == 0:
             # the test album has just one photo, on the front cover
-            assert imagecount == 2, f"Expected 2 images on front cover, found {imagecount}"
+            assert imagecount == 2, f"Expected 2 images on front cover (background + picture), found {imagecount}"
             coverBackgroundImageKey = imagekeys[1] # should be the same on both cover pages
+        elif p == 1 and keepDoublePages:
+            assert imagecount == 2, f"Expected 2 images on page 2 (two backgrounds), found {imagecount}"
         else:
             assert imagecount == 1, f"Expected 1 image (the background) on inner pages, found {imagecount} images on page {p}"
-            if p == 4: # a random innner page
+            if p == 4: # remember the key from a random inner page
                 innerBackgroundImageKey = imagekeys[0] # should be the same on all inside pages
-        #print(f"page {p} imagekeys: {imagekeys}")
 
     # check that the background image keys match for the covers and for all the inner pages
     assert coverBackgroundImageKey is not None, f"Could not locate cover background image"

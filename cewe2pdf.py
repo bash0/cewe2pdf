@@ -110,7 +110,7 @@ class PageType(Enum):
     Normal = 1
     SingleSide = 2 # don't quite know what this is yet
     Cover = 3 # front / back cover
-    EmptyPage = 4 # the intentional blanks inside the front and back covers
+    EmptyPage = 4 # the intentional blanks inside the front and back covers (both have pagenr 0)
 
     def __str__(self):
         return self.name # to print the enum name without the class
@@ -314,8 +314,17 @@ def getPageElementForPageNumber(fotobook, pageNumber):
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
                       productstyle, pagetype, pdf, ph, pw):
-    if pagetype == PageType.EmptyPage:  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
-        return
+    if pagetype == PageType.EmptyPage:
+        if isAlbumSingleSide(productstyle):
+            # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
+            return
+        if isAlbumDoubleSide(productstyle):
+            # if we also just return here, then everything looks "good" because this inside cover page comes
+            # out with the background of the right hand side. But it's not the same as the cewe album. Instead
+            # we put out the left side background that the page defines. This might be where we could add a
+            # configuration option to allow a choice for the inside cover page
+            pw = pw / 2
+
     if backgroundTags is not None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
         for curTag in backgroundTags:
@@ -1166,6 +1175,11 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     #  stock image, without filters.
     backgroundTags = page.findall('background')
     processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, productstyle, pagetype, pdf, ph, pw)
+
+    if isAlbumSingleSide(productstyle) and pagetype == PageType.SingleSide:
+        # This must be page 1, the inside front cover, so we only do the background. Page 1
+        # is processed again with PageType.EmptyPage, and the elements will be done then
+        return
 
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
     processElements(additional_fonts, fotobook, imagedir, productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
