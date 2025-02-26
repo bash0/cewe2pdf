@@ -111,6 +111,7 @@ class PageType(Enum):
     SingleSide = 2 # don't quite know what this is yet
     Cover = 3 # front / back cover
     EmptyPage = 4 # the intentional blanks inside the front and back covers (both have pagenr 0)
+    BackInsideCover = 5 # the obligatory empty page to the right of the last page in keep double pages
 
     def __str__(self):
         return self.name # to print the enum name without the class
@@ -311,19 +312,33 @@ def findFileInDirs(filenames, paths):
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find(f"./page[@pagenr='{floor(2 * (pageNumber / 2))}']")
 
+
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
                       productstyle, pagetype, pdf, ph, pw):
+    areaHeight = ph
+    areaWidth = pw
+    areaXOffset = 0
+
     if pagetype == PageType.EmptyPage:
+        # EmptyPage is used when we're processing the inside cover / first page pair
+        # for the second time after already processing it once as SingleSide
         if isAlbumSingleSide(productstyle):
             # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
             return
         if isAlbumDoubleSide(productstyle):
             # if we also just return here, then everything looks "good" because this inside cover page comes
-            # out with the background of the right hand side. But it's not the same as the cewe album. Instead
-            # we put out the left side background that the page defines. This might be where we could add a
-            # configuration option to allow a choice for the inside cover page
-            pw = pw / 2
+            # out with the background of the first inner side. But it's not the same as the cewe album. Instead
+            # we put out the background that the empty page defines, on the left side only by halving the width
+            # This might be where we could add a configuration option to allow a choice for the inside cover page bg.
+            areaWidth = areaWidth / 2
+    if pagetype == PageType.BackInsideCover:
+        if isAlbumSingleSide(productstyle):
+            # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
+            return
+        if isAlbumDoubleSide(productstyle):
+            areaWidth = areaWidth / 2
+            areaXOffset = areaXOffset + areaWidth
 
     if backgroundTags is not None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
@@ -365,9 +380,6 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 # but rather uses the background colour of the cover page. This whiteness is what
                 # issue 198 is really complaining about, and I agree with it. Cover page colour is
                 # a better choice when we are creating a pdf.
-                areaHeight = ph
-                areaWidth = pw
-                areaXOffset = 0
 
                 logging.debug(f"Reading background file: {bgPath}")
                 # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
@@ -1154,7 +1166,7 @@ def processElements(additional_fonts, fotobook, imagedir,
 def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
         page, pageNumber, pageCount, pagetype, productstyle, oddpage,
         bg_notFoundDirList, additional_fonts, lastpage):
-    logging.info(f"Pdf page {pageNumber} ({pagetype}): parsing pagenr {page.get('pagenr')} of {pageCount}")
+    logging.info(f"Side {pageNumber} ({pagetype}): parsing pagenr {page.get('pagenr')} of {pageCount}")
 
     bundlesize = page.find("./bundlesize")
     if bundlesize is not None:
@@ -1732,9 +1744,17 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     def IsBackCover(n):
         return n == (pageCount - 1)
 
+    def IsLastPage(n):
+        return n == (pageCount - 2)
+
+    def IsOddPage(n):
+        return (n % 2) == 1
+
     for n in range(pageCount): # starting at 0
         try:
             pagetype = PageType.Unknown
+            lastpage = IsLastPage(n) # bool assign is clearer with parens so pylint: disable=superfluous-parens
+
             # The <page> sections all have a pagenr attribute. The normal pages run from pagenr 1 to pagenr 26 while there are
             # actually FIVE page elements with pagenr 0 in an album file, 4 coming before pagenr 1 and 1 after pagenr 26
             if isAlbumProduct(productstyle) and ((n == 0) or IsBackCover(n)): # clearest like this so pylint: disable=consider-using-in
@@ -1751,11 +1771,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     pagetype = PageType.Cover
                     pageNumber = n
                     # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
-                    if (isAlbumDoubleSide(productstyle) and IsBackCover(n)):
+                    if (isAlbumDoubleSide(productstyle) and IsBackCover(pageNumber)):
                         page = None
                 else:
                     logging.warning("Cannot locate a cover page, is this really an album?")
                     page = None
+
             elif isAlbumProduct(productstyle) and n == 1: # album page 1 is handled specially
                 pageNumber = 1
                 oddpage = True
@@ -1783,9 +1804,37 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                         realFirstPageList[0], pageNumber, pageCount, pagetype, productstyle, oddpage,
                         bg_notFoundDirList, additional_fonts, lastpage)
                 pagetype = PageType.EmptyPage
+
+            elif isAlbumProduct(productstyle) and lastpage: # album last page is special because of inside cover
+                pageNumber = n
+                if pageNumbers is None or pageNumber in pageNumbers:
+                    # process the actual last page
+                    oddpage = IsOddPage(pageNumber)
+                    page = getPageElementForPageNumber(fotobook, n)
+                    pagetype = PageType.Normal
+                    parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
+                        page, pageNumber, pageCount, PageType.Normal, productstyle, oddpage,
+                        bg_notFoundDirList, additional_fonts, lastpage)
+
+                # Now look for an empty page 0 that does NOT contain an area element. That will
+                # put the background for the inside cover page on top of the right side of the page
+                # we have just processed
+                page = [i for i in
+                        fotobook.findall("./page[@pagenr='0'][@type='EMPTY']")
+                        + fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
+                        if i.find("./area") is None]
+                if len(page) >= 1:
+                    # set up to process the special section for the inside cover
+                    page = page[0]
+                    pageNumber = n + 1
+                    oddpage = IsOddPage(pageNumber)
+                    pagetype = PageType.BackInsideCover
+                else:
+                    page = None # catastrophe
+
             else:
                 pageNumber = n
-                oddpage = (pageNumber % 2) == 1
+                oddpage = IsOddPage(pageNumber)
                 page = getPageElementForPageNumber(fotobook, n)
                 pagetype = PageType.Normal
 
@@ -1796,7 +1845,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 if pagetype == PageType.Unknown:
                     logging.error(f'Unable to deduce page type for page {pageNumber}')
                     continue
-                lastpage = (n == pageCount - 2) # bool assign is clearer with parens so pylint: disable=superfluous-parens
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, productstyle, oddpage,
                     bg_notFoundDirList, additional_fonts, lastpage)
