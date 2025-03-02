@@ -73,6 +73,7 @@ import gc
 import argparse  # to parse arguments
 import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
 
+from enum import Enum
 from io import BytesIO
 from math import sqrt, floor
 
@@ -103,7 +104,6 @@ from messageCounterHandler import MsgCounterHandler
 from passepartout import Passepartout
 from pathutils import localfont_dir
 from otf import getTtfsFromOtfs
-from enum import Enum
 
 class PageType(Enum):
     Unknown = 0 # this must be an error
@@ -122,7 +122,7 @@ class ProductStyle(Enum):
     MemoryCard = 3 # memory card game
 
 def isAlbumProduct(ps: ProductStyle):
-    return ps == ProductStyle.AlbumSingleSide or ps == ProductStyle.AlbumDoubleSide
+    return ps in (ProductStyle.AlbumSingleSide, ProductStyle.AlbumDoubleSide)
 
 def isAlbumSingleSide(ps: ProductStyle):
     return ps == ProductStyle.AlbumSingleSide
@@ -231,6 +231,7 @@ passepartoutFolders = tuple[str]() # global variable with the folders for passep
 fontSubstitutions = list[str]() # used to avoid repeated messages
 fontLineScales = {} # mapping fontnames to linescale where the standard defaultLineScale is not ok
 defaultLineScale = 1.1 # line scale if not overridden. Best to configure to 1.15 - don't break old albums by changing here
+defaultConfigSection = None
 
 
 def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
@@ -330,7 +331,6 @@ def getPageElementForPageNumber(fotobook, pageNumber):
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
                       productstyle, pagetype, pdf, ph, pw):
-    global defaultConfigSection
     areaHeight = ph
     areaWidth = pw
     areaXOffset = 0
@@ -565,7 +565,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         # flipX and flipY are also set to false because it cause an exception in PIL
         # therefore, even if the CEWE software offers the possibility to flip the clipart frame, cewe2pdf
         # remains unable to render it
-        colorreplacements, flipX, flipY = getClipConfig(imageTag)
+        colorreplacements, flipX, flipY = getClipConfig(imageTag) # pylint: disable=unused-variable
         insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False, None)
 
     for decorationTag in area.findall('decoration'):
@@ -1386,7 +1386,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         invalidmsg = f"Cannot open mcf file {mcfxmlname}"
         if mcfxFormat:
             invalidmsg = invalidmsg + f" (unpacked from {albumname})"
-        logging.error(invalidmsg + f": {repr(e)}")
+        invalidmsg = invalidmsg + f": {repr(e)}"
+        logging.error(invalidmsg)
         sys.exit(1)
 
     fotobook = mcf.getroot()
@@ -1736,11 +1737,11 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
     pageCount = int(articleConfigElement.get('normalpages')) + 2
-        # The normalpages attribute in the mcf is the number of "usable" inside pages, excluding the front and back covers and the blank inside
-        #  cover pages. Add 2 so that pagecount represents the actual number of printed pdf pages we expect in the normal single sided
-        #  pdf print (a basic album is 26 inside pages, plus front and back cover, i.e. 28). If we use keepDoublePages, then we'll
-        #  actually be producing 2 more (the inside covers) but halving the number of final output pdf pages, making 15 double pages.
-        # There is also a totalpages attribute in the mcf, but oddly in my files it is 3 more than the normalpages value. Why not 4 more?
+    # The normalpages attribute in the mcf is the number of "usable" inside pages, excluding the front and back covers and the blank inside
+    #  cover pages. Add 2 so that pagecount represents the actual number of printed pdf pages we expect in the normal single sided
+    #  pdf print (a basic album is 26 inside pages, plus front and back cover, i.e. 28). If we use keepDoublePages, then we'll
+    #  actually be producing 2 more (the inside covers) but halving the number of final output pdf pages, making 15 double pages.
+    # There is also a totalpages attribute in the mcf, but oddly in my files it is 3 more than the normalpages value. Why not 4 more?
     imagedir = fotobook.get('imagedir')
 
     # generate a list of available clip-arts
@@ -1750,9 +1751,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     pagesize = reportlab.lib.pagesizes.A4
     productstyle = ProductStyle.AlbumSingleSide
     productname = fotobook.get('productname')
-    if productname in formats:
+    if productname in formats: # IMO this is clearest so pylint: disable=consider-using-get
         pagesize = formats[productname]
-    if productname in styles:
+    if productname in styles: # IMO this is clearest so pylint: disable=consider-using-get
         productstyle = styles[productname]
     if keepDoublePages:
         if productstyle == ProductStyle.AlbumSingleSide:
@@ -1954,7 +1955,7 @@ def ensureAcceptableOutputFile(outputFileName):
             # overwrite the file anyway so we just check by opening it for writing and
             # then closing it again before we do our normal stuff
             try:
-                with open(outputFileName, 'w'):
+                with open(outputFileName, 'w'): # encoding is irrelevant, so pylint: disable=unspecified-encoding
                     logging.info(f"Existing output file '{outputFileName}' can be written")
             except Exception as e:
                 logging.error(f"Existing output file '{outputFileName}' is writable, but not accessible {str(e)}")
@@ -2002,11 +2003,11 @@ def getHpsDataFolder():
     return None
 
 
-def getKeyaccountDataFolder(keyAccountNumber, defaultConfigSection=None):
+def getKeyaccountDataFolder(keyAccountNumber, configSection=None):
     # for testing (in particular on checkin on github where no cewe product is installed)
     # we may want to have a specially constructed local key account data folder
-    if defaultConfigSection is not None:
-        inihps = defaultConfigSection.get('hpsFolder')
+    if configSection is not None:
+        inihps = configSection.get('hpsFolder')
         if inihps is not None:
             inikadf = os.path.join(inihps, keyAccountNumber)
             if os.path.exists(inikadf):
@@ -2032,15 +2033,15 @@ def getKeyAccountFileName(cewe_folder):
     return keyAccountFileName
 
 
-def getKeyaccountNumber(cewe_folder, defaultConfigSection=None):
+def getKeyaccountNumber(cewe_folder, configSection=None):
     keyAccountFileName = getKeyAccountFileName(cewe_folder)
     try:
         katree = etree.parse(keyAccountFileName)
         karoot = katree.getroot()
         ka = karoot.find('keyAccount').text # that's the official installed value
         # see if he has a .ini file override for the keyaccount
-        if defaultConfigSection is not None:
-            inika = defaultConfigSection.get('keyaccount')
+        if configSection is not None:
+            inika = configSection.get('keyaccount')
             if inika is not None:
                 logging.info(f'ini file overrides keyaccount from {ka} to {inika}')
                 ka = inika
