@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>tests\testClipartColorReplacement\test_clipartColorReplacement.py</StartupFile>
+    <StartupFile>runAllTests.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -28,7 +28,21 @@
     <Content Include=".github\workflows\pythonapp.yml" />
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
-    <Content Include="additional_fonts.txt" />
+    <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
+    <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
+    <Content Include="tests\Resources\photofun\backgrounds\6044.jpg" />
+    <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC-clip.clp" />
+    <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC-mask.clp" />
+    <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC-preview.clp" />
+    <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC.xml" />
+    <Content Include="tests\Resources\photofun\decorations\127517\127517.json" />
+    <Content Include="tests\Resources\photofun\decorations\46245\46245.json" />
+    <Content Include="tests\Resources\photofun\decorations\46245\Blume_3\Blume_3.clp" />
+    <Content Include="tests\Resources\photofun\decorations\46245\Blume_3\Blume_3.xml" />
+    <Content Include="tests\Resources\photofun\decorations\46537\46537.json" />
+    <Content Include="tests\Resources\photofun\decorations\46537\Kreis\Kreis.clp" />
+    <Content Include="tests\Resources\photofun\decorations\46537\Kreis\Kreis.xml" />
+    <Content Include="tests\testbackgrounds\additional_fonts.txt" />
     <Content Include="build_a_compiled_version.md" />
     <Content Include="cewe2pdf.ini" />
     <Content Include="CLP file format.txt" />
@@ -65,6 +79,12 @@
     <Content Include="tests\Resources\photofun\decorations\rect_terracotta.clp" />
     <Content Include="tests\Resources\photofun\decorations\rect_white.clp" />
     <Content Include="tests\test.webp" />
+    <Content Include="tests\testbackgrounds\allblackbackgrounds.mcf" />
+    <Content Include="tests\testbackgrounds\allblackbackgrounds.mcf.pdf" />
+    <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\m00luf2a_1_20200306_111748.jpg" />
+    <Content Include="tests\testbackgrounds\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\additional_fonts.txt" />
     <Content Include="tests\testClipartColorReplacement\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcf" />
@@ -111,7 +131,7 @@
     <Compile Include="processManyMcfs.py" />
     <Compile Include="runAllTests.py" />
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
-    <Compile Include="tests\testClipart\test_drawClipart.py" />
+    <Compile Include="tests\testbackgrounds\test_backgrounds.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\test_simpleBook.py" />
@@ -141,6 +161,14 @@
     <Folder Include="tests\Resources\photofun\" />
     <Folder Include="tests\Resources\photofun\backgrounds\" />
     <Folder Include="tests\Resources\photofun\decorations\" />
+    <Folder Include="tests\Resources\photofun\decorations\127517\" />
+    <Folder Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\" />
+    <Folder Include="tests\Resources\photofun\decorations\46245\" />
+    <Folder Include="tests\Resources\photofun\decorations\46245\Blume_3\" />
+    <Folder Include="tests\Resources\photofun\decorations\46537\" />
+    <Folder Include="tests\Resources\photofun\decorations\46537\Kreis\" />
+    <Folder Include="tests\testbackgrounds\" />
+    <Folder Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\" />
     <Folder Include="tests\testClipartColorReplacement\" />
     <Folder Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\" />
     <Folder Include="tests\testClipart\" />
