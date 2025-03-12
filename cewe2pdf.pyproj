@@ -80,7 +80,6 @@
     <Content Include="tests\Resources\photofun\decorations\rect_white.clp" />
     <Content Include="tests\test.webp" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds.mcf" />
-    <Content Include="tests\testbackgrounds\allblackbackgrounds.mcf.pdf" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\m00luf2a_1_20200306_111748.jpg" />
