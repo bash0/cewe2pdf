@@ -1,0 +1,30 @@
+{
+    "customScore": null,
+    "decoFrameMetadata": {
+        "aspectRatio": 2.2483,
+        "fotoArea": {
+            "height": 0.4486,
+            "width": 0.6777,
+            "x": 0.1781,
+            "y": 0.4723
+        },
+        "keepAspectRatio": true
+    },
+    "designElementId": 106793,
+    "elementType": "mask",
+    "expirationDate": null,
+    "lastChanged": 1673621767000,
+    "productionId": "8394-DECO-SF",
+    "publishedAt": 1430130076000,
+    "score": 182,
+    "tags": {
+        "CATEGORY": [
+            "category-travel"
+        ],
+        "MASK_TYPE": [
+            "mask_type_decorated"
+        ]
+    },
+    "visible": true
+}
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><decorations>
+  <decoration designElementId="106796" id="8397-DECO-SF" type="fading">
+    <categories>
+      
+    <category>Reise</category></categories>
+    <fading designElementType="passepartout" file="8397-DECO-SF-mask.svg" keepAspectRatio="1" ratio="0.7997">
+      <clipart designElementType="clipart" file="8397-DECO-SF-clip.svg" ratio="0.7997"/>
+      <fotoarea height="0.7836" width="0.8969" x="0.0629" y="0.0344"/>
+    </fading>
+  </decoration>
+</decorations>
