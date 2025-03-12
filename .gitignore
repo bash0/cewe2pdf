@@ -67,3 +67,5 @@ nosetests.xml
 /tests/testMcfxExtraction/tmp-dir
 /requirements-all.txt
 /tests/testClipartColorReplacement/test_clipart_colorreplacement.mcfx.pdf
+/tests/testClipartColorReplacement/test_clipart_colorreplacement.mcf.pdf
+/tests/testbackgrounds/allblackbackgrounds.mcf.pdf

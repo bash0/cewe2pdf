@@ -80,7 +80,6 @@
     <Content Include="tests\Resources\photofun\decorations\rect_white.clp" />
     <Content Include="tests\test.webp" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds.mcf" />
-    <Content Include="tests\testbackgrounds\allblackbackgrounds.mcf.pdf" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\m00luf2a_1_20200306_111748.jpg" />
@@ -89,7 +88,6 @@
     <Content Include="tests\testClipartColorReplacement\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcf" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcfx" />
-    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcfx.pdf" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_2_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_3_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
