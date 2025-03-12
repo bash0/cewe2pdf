@@ -89,7 +89,6 @@
     <Content Include="tests\testClipartColorReplacement\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcf" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcfx" />
-    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcfx.pdf" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_2_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_3_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
