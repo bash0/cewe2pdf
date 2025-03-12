@@ -76,6 +76,7 @@ disable=bad-inline-option,
         missing-module-docstring,
         raw-checker-failed,
         suppressed-message,
+        too-many-positional-arguments,
         useless-suppression,
         use-symbolic-message-instead
 

@@ -73,6 +73,7 @@ import gc
 import argparse  # to parse arguments
 import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
 
+from enum import Enum
 from io import BytesIO
 from math import sqrt, floor
 
@@ -103,7 +104,17 @@ from messageCounterHandler import MsgCounterHandler
 from passepartout import Passepartout
 from pathutils import localfont_dir
 from otf import getTtfsFromOtfs
-from enum import Enum
+
+class PageType(Enum):
+    Unknown = 0 # this must be an error
+    Normal = 1
+    SingleSide = 2 # don't quite know what this is yet
+    Cover = 3 # front / back cover
+    EmptyPage = 4 # the intentional blanks inside the front and back covers (both have pagenr 0)
+    BackInsideCover = 5 # the obligatory empty page to the right of the last page in keep double pages
+
+    def __str__(self):
+        return self.name # to print the enum name without the class
 
 class ProductStyle(Enum):
     AlbumSingleSide = 1  # normal for albums, we divide the cewe 2 page bundle to single pages
@@ -111,7 +122,7 @@ class ProductStyle(Enum):
     MemoryCard = 3 # memory card game
 
 def isAlbumProduct(ps: ProductStyle):
-    return ps == ProductStyle.AlbumSingleSide or ps == ProductStyle.AlbumDoubleSide
+    return ps in (ProductStyle.AlbumSingleSide, ProductStyle.AlbumDoubleSide)
 
 def isAlbumSingleSide(ps: ProductStyle):
     return ps == ProductStyle.AlbumSingleSide
@@ -188,6 +199,7 @@ formats = {
     "ALB82": reportlab.lib.pagesizes.A4,
     "ALB98": reportlab.lib.pagesizes.A4, # unittest, L 20.5cm x 27.0cm
     "ALB32": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm), # album XL, 30 x 30 cm
+    "ALB17": (205 * reportlab.lib.pagesizes.mm, 205 * reportlab.lib.pagesizes.mm), # album kvadratisk, 20.5 x 20.5 cm
     "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm),
     # add other page sizes here
     "MEM3": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm) # memory game cards 6x6cm
@@ -219,19 +231,34 @@ passepartoutFolders = tuple[str]() # global variable with the folders for passep
 fontSubstitutions = list[str]() # used to avoid repeated messages
 fontLineScales = {} # mapping fontnames to linescale where the standard defaultLineScale is not ok
 defaultLineScale = 1.1 # line scale if not overridden. Best to configure to 1.15 - don't break old albums by changing here
+defaultConfigSection = None
 
 
 def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
     returnValue = minimumValue
-    try:
-        # eg getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
-        returnValue = int(configSection.get(itemName, defaultValue))
-    except ValueError:
-        logging.error(f'Invalid configuration value supplied for {itemName}')
-        returnValue = int(defaultValue)
-    if returnValue < minimumValue:
-        logging.error(f'Configuration value supplied for {itemName} is less than {minimumValue}, using {minimumValue}')
-        returnValue = minimumValue
+    if configSection is not None:
+        try:
+            # eg getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
+            returnValue = int(configSection.get(itemName, defaultValue))
+        except ValueError:
+            logging.error(f'Invalid configuration value supplied for {itemName}')
+            returnValue = int(defaultValue)
+        if returnValue < minimumValue:
+            logging.error(f'Configuration value supplied for {itemName} is less than {minimumValue}, using {minimumValue}')
+            returnValue = minimumValue
+    return returnValue
+
+
+def getConfigurationBool(configSection, itemName, defaultValue):
+    returnValue = defaultValue
+    if configSection is not None:
+        try:
+            # eg getConfigurationBool(defaultConfigSection, 'insideCoverWhite', False)
+            bv = configSection.get(itemName, defaultValue)
+            returnValue = bv.lower() == "true"
+        except ValueError:
+            logging.error(f'Invalid configuration value supplied for {itemName}')
+            returnValue = bool(defaultValue)
     return returnValue
 
 
@@ -300,11 +327,40 @@ def findFileInDirs(filenames, paths):
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find(f"./page[@pagenr='{floor(2 * (pageNumber / 2))}']")
 
+
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
                       productstyle, pagetype, pdf, ph, pw):
-    if pagetype == "emptypage":  # don't draw background for the empty pages. That is page nr. 1 and pageCount-1.
+    areaHeight = ph
+    areaWidth = pw
+    areaXOffset = 0
+
+    if pagetype == PageType.EmptyPage:
+        # EmptyPage is used when we're processing the inside cover / first page pair
+        # for the second time after already processing it once as SingleSide
+        if isAlbumSingleSide(productstyle):
+            # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
+            return
+        if isAlbumDoubleSide(productstyle):
+            # if we just return here, then everything looks "nice" because this inside
+            # front cover page comes out with the background of the first inner side.
+            # But "nice" is not the same as the cewe album. If you want white inside cover pages, set the ini file
+            # option to True and continue to output the page with the background that the empty page defines
+            areaWidth = areaWidth / 2
+
+    if pagetype == PageType.BackInsideCover:
+        if isAlbumSingleSide(productstyle):
+            # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
+            return
+        if isAlbumDoubleSide(productstyle):
+            areaWidth = areaWidth / 2
+            areaXOffset = areaXOffset + areaWidth
+
+    if pagetype in [PageType.EmptyPage,PageType.BackInsideCover] and not getConfigurationBool(defaultConfigSection, "insideCoverWhite", "False"):
+        # return without drawing the background, thus accepting whatever was underneath. If the config option
+        # is set to true then the inside cover pages will be set to the cewe specified default, white
         return
+
     if backgroundTags is not None and len(backgroundTags) > 0:
         # look for a tag that has an alignment attribute
         for curTag in backgroundTags:
@@ -336,15 +392,16 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
             try:
                 bgPath = ""
                 bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
-                areaWidth = pw
-                if isAlbumDoubleSide(productstyle):
-                    areaWidth = pw/2.
-                areaHeight = ph
 
-                if isAlbumDoubleSide(productstyle) and backgroundTag.get('alignment') == "3":
-                    ax = areaWidth
-                else:
-                    ax = 0
+                # Feb 2025, removed single/double side differentiation here, which basically cured
+                # issue https://github.com/bash0/cewe2pdf/issues/198. I can only imagine that we have
+                # tried to cure single/double page problems with "partial fixes" through the years
+                # without understanding or testing all the cases. It is true that this solution does
+                # not show the "forced empty pages" on the inside of the covers as white, a la CEWE,
+                # but rather uses the background colour of the cover page. This whiteness is what
+                # issue 198 is really complaining about, and I agree with it. Cover page colour is
+                # a better choice when we are creating a pdf.
+
                 logging.debug(f"Reading background file: {bgPath}")
                 # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
                 imObj = PIL.Image.open(bgPath)
@@ -356,7 +413,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 memFileHandle.seek(0)
                 # im = imread(bgpath) #does not work with 1-bit images
                 pdf.drawImage(ImageReader(
-                    memFileHandle), f * ax, 0, width=f * areaWidth, height=f * areaHeight)
+                    memFileHandle), f * areaXOffset, 0, width=f * areaWidth, height=f * areaHeight)
                 # pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
             except Exception:
                 if bgPath not in bg_notFoundDirList:
@@ -508,7 +565,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         # flipX and flipY are also set to false because it cause an exception in PIL
         # therefore, even if the CEWE software offers the possibility to flip the clipart frame, cewe2pdf
         # remains unable to render it
-        colorreplacements, flipX, flipY = getClipConfig(imageTag)
+        colorreplacements, flipX, flipY = getClipConfig(imageTag) # pylint: disable=unused-variable
         insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False, None)
 
     for decorationTag in area.findall('decoration'):
@@ -1070,19 +1127,19 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
 
 def processElements(additional_fonts, fotobook, imagedir,
                     productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage):
-    if isAlbumDoubleSide(productstyle) and oddpage == 0 and pagetype == 'normal' and not lastpage:
+    if isAlbumDoubleSide(productstyle) and pagetype == PageType.Normal and not oddpage and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
 
-    # switch pack to the page element for the even page to get the elements
-    if isAlbumProduct(productstyle) and pagetype == 'normal' and oddpage == 1:
+    # the mcf file really comes in "bundles" of two pages, so for odd pages we switch back to
+    # the page element for the preceding even page to get the elements
+    if isAlbumProduct(productstyle) and pagetype == PageType.Normal and oddpage:
         page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
 
     for area in page.findall('area'):
         areaPos = area.find('position')
         areaLeft = float(areaPos.get('left').replace(',', '.'))
-        # old python 2 code: aleft = float(area.get('left').replace(',', '.'))
-        if pagetype != 'singleside' or len(area.findall('imagebackground')) == 0:
+        if pagetype != PageType.SingleSide or len(area.findall('imagebackground')) == 0:
             if oddpage and isAlbumSingleSide(productstyle):
                 # shift double-page content from other page
                 areaLeft -= pw
@@ -1091,8 +1148,8 @@ def processElements(additional_fonts, fotobook, imagedir,
         areaHeight = float(areaPos.get('height').replace(',', '.'))
         areaRot = float(areaPos.get('rotation'))
 
-        # check if the image is on current page at all
-        if pagetype == 'normal' and isAlbumSingleSide(productstyle):
+        # check if the image is on current page at all, and if not then skip processing it
+        if isAlbumSingleSide(productstyle) and pagetype in [PageType.Normal, PageType.Cover]:
             if oddpage:
                 # the right edge of image is beyond the left page border
                 if (areaLeft+areaWidth) < 0:
@@ -1130,17 +1187,14 @@ def processElements(additional_fonts, fotobook, imagedir,
 def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
         page, pageNumber, pageCount, pagetype, productstyle, oddpage,
         bg_notFoundDirList, additional_fonts, lastpage):
-    logging.info(f"parsing page {page.get('pagenr')}  of {pageCount}")
+    logging.info(f"Side {pageNumber} ({pagetype}): parsing pagenr {page.get('pagenr')} of {pageCount}")
 
     bundlesize = page.find("./bundlesize")
     if bundlesize is not None:
         pw = float(bundlesize.get('width'))
         ph = float(bundlesize.get('height'))
-
-        # reduce the page width to a single page width,
-        # if we want to have single pages.
         if isAlbumSingleSide(productstyle):
-            pw = pw / 2
+            pw = pw / 2 # reduce the page width to a single page width for single sided
     else:
         # Assume A4 page size
         pw = 2100
@@ -1149,14 +1203,20 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
 
     # process background
     # look for all "<background...> tags.
-    # the preceeding designElementIDs tag only match the same
+    # the preceding designElementIDs tag only match the same
     #  number for the background attribute if it is a original
     #  stock image, without filters.
     backgroundTags = page.findall('background')
     processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, productstyle, pagetype, pdf, ph, pw)
 
+    if isAlbumSingleSide(productstyle) and pagetype == PageType.SingleSide:
+        # This must be page 1, the inside front cover, so we only do the background. Page 1
+        # is processed again with PageType.EmptyPage, and the elements will be done then
+        return
+
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
     processElements(additional_fonts, fotobook, imagedir, productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
+
 
 def getBaseClipartLocations(baseFolder):
     # create a tuple of places (folders) where background resources would be found by default
@@ -1166,6 +1226,7 @@ def getBaseClipartLocations(baseFolder):
         # os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'frame_frames')
     )
     return baseClipartLocations
+
 
 def readClipArtConfigXML(baseFolder, keyaccountFolder):
     """Parse the configuration XML file and generate a dictionary of designElementId to fileName
@@ -1290,6 +1351,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     global defaultLineScale  # pylint: disable=global-statement
     global image_res  # pylint: disable=global-statement
     global bg_res  # pylint: disable=global-statement
+    global defaultConfigSection  # pylint: disable=global-statement
 
     clipartDict = {}    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
@@ -1324,7 +1386,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         invalidmsg = f"Cannot open mcf file {mcfxmlname}"
         if mcfxFormat:
             invalidmsg = invalidmsg + f" (unpacked from {albumname})"
-        logging.error(invalidmsg + f": {repr(e)}")
+        invalidmsg = invalidmsg + f": {repr(e)}"
+        logging.error(invalidmsg)
         sys.exit(1)
 
     fotobook = mcf.getroot()
@@ -1673,7 +1736,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     if articleConfigElement is None:
         logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
-    pageCount = int(articleConfigElement.get('normalpages')) + 2    # maximum number of pages
+    pageCount = int(articleConfigElement.get('normalpages')) + 2
+    # The normalpages attribute in the mcf is the number of "usable" inside pages, excluding the front and back covers and the blank inside
+    #  cover pages. Add 2 so that pagecount represents the actual number of printed pdf pages we expect in the normal single sided
+    #  pdf print (a basic album is 26 inside pages, plus front and back cover, i.e. 28). If we use keepDoublePages, then we'll
+    #  actually be producing 2 more (the inside covers) but halving the number of final output pdf pages, making 15 double pages.
+    # There is also a totalpages attribute in the mcf, but oddly in my files it is 3 more than the normalpages value. Why not 4 more?
     imagedir = fotobook.get('imagedir')
 
     # generate a list of available clip-arts
@@ -1683,9 +1751,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     pagesize = reportlab.lib.pagesizes.A4
     productstyle = ProductStyle.AlbumSingleSide
     productname = fotobook.get('productname')
-    if productname in formats:
+    if productname in formats: # IMO this is clearest so pylint: disable=consider-using-get
         pagesize = formats[productname]
-    if productname in styles:
+    if productname in styles: # IMO this is clearest so pylint: disable=consider-using-get
         productstyle = styles[productname]
     if keepDoublePages:
         if productstyle == ProductStyle.AlbumSingleSide:
@@ -1696,24 +1764,42 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
     pdf.setTitle(albumTitle)
 
-    for n in range(pageCount):
+    def IsBackCover(n):
+        return n == (pageCount - 1)
+
+    def IsLastPage(n):
+        return n == (pageCount - 2)
+
+    def IsOddPage(n):
+        return (n % 2) == 1
+
+    for n in range(pageCount): # starting at 0
         try:
-            if isAlbumProduct(productstyle) and ((n == 0) or (n == pageCount - 1)): # clearest like this so pylint: disable=consider-using-in
-                pageNumber = 0
+            pagetype = PageType.Unknown
+            lastpage = IsLastPage(n) # bool assign is clearer with parens so pylint: disable=superfluous-parens
+
+            # The <page> sections all have a pagenr attribute. The normal pages run from pagenr 1 to pagenr 26 while there are
+            # actually FIVE page elements with pagenr 0 in an album file, 4 coming before pagenr 1 and 1 after pagenr 26
+            if isAlbumProduct(productstyle) and ((n == 0) or IsBackCover(n)): # clearest like this so pylint: disable=consider-using-in
                 fullcoverpages = [i for i in
                     fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']")
                     + fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
                     if i.find("./area") is not None]
-                if len(fullcoverpages) == 1: # in a well-formed album there are two fullcover pages, but only one with an area
+                if len(fullcoverpages) == 1:
+                    # in a well-formed album there are two fullcover pages, but only one with an area, which we
+                    # have just found. That fullcover "page 0" (bundle) contains all the stuff for the back cover
+                    # on the left side, and the front cover on the right sight (and the spine, as it happens)
                     page = fullcoverpages[0]
                     oddpage = (n == 0) # bool assign is clearer with parens so pylint: disable=superfluous-parens
-                    pagetype = 'cover'
+                    pagetype = PageType.Cover
+                    pageNumber = n
                     # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
-                    if (isAlbumDoubleSide(productstyle) and (n == (pageCount - 1))):
+                    if (isAlbumDoubleSide(productstyle) and IsBackCover(pageNumber)):
                         page = None
                 else:
                     logging.warning("Cannot locate a cover page, is this really an album?")
                     page = None
+
             elif isAlbumProduct(productstyle) and n == 1: # album page 1 is handled specially
                 pageNumber = 1
                 oddpage = True
@@ -1733,25 +1819,55 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 # Look for the the first page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
                 if len(realFirstPageList) > 0 and (pageNumbers is None or 0 in pageNumbers):
-                    # we need to do run parseInputPage twico for one output page in the PDF.
+                    # for this special page we need to do run parseInputPage twice for one output page in the PDF.
                     # The background needs to be drawn first, or it would obscure any other other elements.
-                    pagetype = 'singleside'
+                    pagetype = PageType.SingleSide
                     lastpage = False
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         realFirstPageList[0], pageNumber, pageCount, pagetype, productstyle, oddpage,
                         bg_notFoundDirList, additional_fonts, lastpage)
-                pagetype = 'emptypage'
+                pagetype = PageType.EmptyPage
+
+            elif isAlbumProduct(productstyle) and lastpage: # album last page is special because of inside cover
+                pageNumber = n
+                if pageNumbers is None or pageNumber in pageNumbers:
+                    # process the actual last page
+                    oddpage = IsOddPage(pageNumber)
+                    page = getPageElementForPageNumber(fotobook, n)
+                    pagetype = PageType.Normal
+                    parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
+                        page, pageNumber, pageCount, PageType.Normal, productstyle, oddpage,
+                        bg_notFoundDirList, additional_fonts, lastpage)
+
+                # Look for an empty page 0 that does NOT contain an area element. That will define
+                # the background for the inside cover page to be placed on top of the right side of
+                # the page we have just processed
+                page = [i for i in
+                        fotobook.findall("./page[@pagenr='0'][@type='EMPTY']")
+                        + fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
+                        if i.find("./area") is None]
+                if len(page) >= 1:
+                    # set up to process the special section for the inside cover
+                    page = page[0]
+                    pageNumber = n + 1
+                    oddpage = IsOddPage(pageNumber)
+                    pagetype = PageType.BackInsideCover
+                else:
+                    page = None # catastrophe
+
             else:
                 pageNumber = n
-                oddpage = (pageNumber % 2) == 1
+                oddpage = IsOddPage(pageNumber)
                 page = getPageElementForPageNumber(fotobook, n)
-                pagetype = 'normal'
+                pagetype = PageType.Normal
 
             if pageNumbers is not None and pageNumber not in pageNumbers:
                 continue
 
             if page is not None:
-                lastpage = (n == pageCount - 2) # bool assign is clearer with parens so pylint: disable=superfluous-parens
+                if pagetype == PageType.Unknown:
+                    logging.error(f'Unable to deduce page type for page {pageNumber}')
+                    continue
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, productstyle, oddpage,
                     bg_notFoundDirList, additional_fonts, lastpage)
@@ -1761,11 +1877,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     # it would be neat to duplicate the page for MemoryCard products but showPage
                     # empties the canvas so the user must just print the pdf file twice!
                     pdf.showPage()
-                elif (isAlbumSingleSide(productstyle)
-                        or ((not (oddpage is False and pagetype == 'normal'))
-                        and (not (n == (pageCount - 1) and pagetype == 'cover'))
-                        )):
-                    # If we're creating a AlbumDoubleSide then we only output after the odd pages
+                elif isAlbumSingleSide(productstyle):
+                    pdf.showPage()
+                elif oddpage or (pagetype == PageType.Cover and not IsBackCover(n)):
+                    # We're creating a AlbumDoubleSide so we only output after the odd pages
                     pdf.showPage()
 
         except Exception as pageex:
@@ -1840,7 +1955,7 @@ def ensureAcceptableOutputFile(outputFileName):
             # overwrite the file anyway so we just check by opening it for writing and
             # then closing it again before we do our normal stuff
             try:
-                with open(outputFileName, 'w'):
+                with open(outputFileName, 'w'): # encoding is irrelevant, so pylint: disable=unspecified-encoding
                     logging.info(f"Existing output file '{outputFileName}' can be written")
             except Exception as e:
                 logging.error(f"Existing output file '{outputFileName}' is writable, but not accessible {str(e)}")
@@ -1888,11 +2003,11 @@ def getHpsDataFolder():
     return None
 
 
-def getKeyaccountDataFolder(keyAccountNumber, defaultConfigSection=None):
+def getKeyaccountDataFolder(keyAccountNumber, configSection=None):
     # for testing (in particular on checkin on github where no cewe product is installed)
     # we may want to have a specially constructed local key account data folder
-    if defaultConfigSection is not None:
-        inihps = defaultConfigSection.get('hpsFolder')
+    if configSection is not None:
+        inihps = configSection.get('hpsFolder')
         if inihps is not None:
             inikadf = os.path.join(inihps, keyAccountNumber)
             if os.path.exists(inikadf):
@@ -1918,15 +2033,15 @@ def getKeyAccountFileName(cewe_folder):
     return keyAccountFileName
 
 
-def getKeyaccountNumber(cewe_folder, defaultConfigSection=None):
+def getKeyaccountNumber(cewe_folder, configSection=None):
     keyAccountFileName = getKeyAccountFileName(cewe_folder)
     try:
         katree = etree.parse(keyAccountFileName)
         karoot = katree.getroot()
         ka = karoot.find('keyAccount').text # that's the official installed value
         # see if he has a .ini file override for the keyaccount
-        if defaultConfigSection is not None:
-            inika = defaultConfigSection.get('keyaccount')
+        if configSection is not None:
+            inika = configSection.get('keyaccount')
             if inika is not None:
                 logging.info(f'ini file overrides keyaccount from {ka} to {inika}')
                 ka = inika
