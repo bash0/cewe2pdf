@@ -549,14 +549,14 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # calculate the non-symmetric shift of the center, given the left pos and the width.
     frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
     frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
-    pdf.translate(frameShiftX_mcf * f, -frameShiftY_mcf * f) # for adjustments from passepartout
+    pdf.translate(-frameShiftX_mcf * f, -frameShiftY_mcf * f) # for adjustments from passepartout
     pdf.drawImage(ImageReader(jpeg.name),
         f * -0.5 * imgCropWidth_mcfunit,
         f * -0.5 * imgCropHeight_mcfunit,
         width=f * imgCropWidth_mcfunit,
         height=f * imgCropHeight_mcfunit,
         mask='auto')
-    pdf.translate(-frameShiftX_mcf * f, frameShiftY_mcf * f) # for adjustments from passepartout
+    pdf.translate(frameShiftX_mcf * f, frameShiftY_mcf * f) # for adjustments from passepartout
 
     # we need to draw our passepartout after the real image, so it overlays it.
     if frameClipartFileName is not None:
