@@ -12,7 +12,7 @@ import os, os.path
 from pikepdf import Pdf
 from cewe2pdf import convertMcf
 
-def tryToBuildBook(keepDoublePages):
+def tryToBuildBook(keepDoublePages, expectedPages):
     inFile = str(Path(Path.cwd(), 'tests', 'testEmptyPageOne', 'test_emptyPageOne.mcf'))
     outFile = str(Path(Path.cwd(), 'tests', 'testEmptyPageOne', 'test_emptyPageOne.mcf.pdf'))
     if os.path.exists(outFile) == True:
@@ -25,15 +25,14 @@ def tryToBuildBook(keepDoublePages):
     # we could also test more sophisticated things, like colors or compare images.
     readPdf = Pdf.open(outFile)
     numPages =  len(readPdf.pages)
+    assert numPages == expectedPages, f"Expected {expectedPages} pages, found {numPages}"
 
     #os.remove(outFile)
     return numPages
 
 def test_testEmptyPageOne():
-    #pages = tryToBuildBook(False)
-    #assert pages == 28, f"Expected 28 pages, got {pages}"
-    pages = tryToBuildBook(True)
-    assert pages == 15, f"Expected 15 pages, got {pages}"
+    tryToBuildBook(False, 28)
+    tryToBuildBook(True, 15)
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
