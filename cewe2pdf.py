@@ -368,6 +368,10 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 backgroundTag = curTag
                 break
 
+        if pagetype == PageType.Normal and isAlbumDoubleSide(productstyle) and backgroundTag.get('alignment') == "3":
+            areaWidth = areaWidth / 2
+            areaXOffset = areaXOffset + areaWidth
+
         if (cewe_folder and backgroundTag is not None
                 and backgroundTag.get('designElementId') is not None):
             bg = backgroundTag.get('designElementId')
@@ -392,17 +396,8 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
             try:
                 bgPath = ""
                 bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
-
-                # Feb 2025, removed single/double side differentiation here, which basically cured
-                # issue https://github.com/bash0/cewe2pdf/issues/198. I can only imagine that we have
-                # tried to cure single/double page problems with "partial fixes" through the years
-                # without understanding or testing all the cases. It is true that this solution does
-                # not show the "forced empty pages" on the inside of the covers as white, a la CEWE,
-                # but rather uses the background colour of the cover page. This whiteness is what
-                # issue 198 is really complaining about, and I agree with it. Cover page colour is
-                # a better choice when we are creating a pdf.
-
                 logging.debug(f"Reading background file: {bgPath}")
+
                 # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
                 imObj = PIL.Image.open(bgPath)
                 # create a in-memory byte array of the image file
@@ -411,10 +406,11 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 imObj = imObj.convert("RGB")
                 imObj.save(memFileHandle, 'jpeg')
                 memFileHandle.seek(0)
-                # im = imread(bgpath) #does not work with 1-bit images
-                pdf.drawImage(ImageReader(
-                    memFileHandle), f * areaXOffset, 0, width=f * areaWidth, height=f * areaHeight)
+
                 # pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
+                #   but im = ImageReader(bgpath) does not work with 1-bit images,so ...
+                pdf.drawImage(ImageReader(memFileHandle), f * areaXOffset, 0, width=f * areaWidth, height=f * areaHeight)
+
             except Exception:
                 if bgPath not in bg_notFoundDirList:
                     logging.error("Could not find background or error when adding to pdf")
@@ -1741,7 +1737,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     #  cover pages. Add 2 so that pagecount represents the actual number of printed pdf pages we expect in the normal single sided
     #  pdf print (a basic album is 26 inside pages, plus front and back cover, i.e. 28). If we use keepDoublePages, then we'll
     #  actually be producing 2 more (the inside covers) but halving the number of final output pdf pages, making 15 double pages.
-    # There is also a totalpages attribute in the mcf, but oddly in my files it is 3 more than the normalpages value. Why not 4 more?
+    # There is also a totalpages attribute in the mcf, but in my files it is 5 more than the normalpages value. Why not 4 more? I
+    #  guess that may be because it is a count of the <page> elements and not actually related to the number of printed pages.
     imagedir = fotobook.get('imagedir')
 
     # generate a list of available clip-arts
@@ -1779,7 +1776,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             lastpage = IsLastPage(n) # bool assign is clearer with parens so pylint: disable=superfluous-parens
 
             # The <page> sections all have a pagenr attribute. The normal pages run from pagenr 1 to pagenr 26 while there are
-            # actually FIVE page elements with pagenr 0 in an album file, 4 coming before pagenr 1 and 1 after pagenr 26
+            # actually FIVE page elements with pagenr 0 in a default album file, 4 coming before pagenr 1 and 1 after pagenr 26
             if isAlbumProduct(productstyle) and ((n == 0) or IsBackCover(n)): # clearest like this so pylint: disable=consider-using-in
                 fullcoverpages = [i for i in
                     fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']")
@@ -1807,14 +1804,15 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 page = [i for i in
                         fotobook.findall("./page[@pagenr='0'][@type='EMPTY']")
                         + fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
-                        if i.find("./area") is not None]
+                        if i.find("./area") is not None or i.find("./background[@alignment='1']") is not None]
                 if len(page) >= 1:
                     page = page[0]
                     # If there is on page 1 only text, the area-tag is still on page 0.
                     #  So this will either include the text (which is put in page 0),
                     #  or the packground which is put in page 1.
                 else:
-                    page = None # if we find no empty page with an area tag, we need to set this to None to prevent an exception later.
+                    logging.error(f'Failed to locate initial emptypage when processing page {n}')
+                    page = None
 
                 # Look for the the first page and set it up for processing
                 realFirstPageList = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
@@ -1845,7 +1843,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 page = [i for i in
                         fotobook.findall("./page[@pagenr='0'][@type='EMPTY']")
                         + fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
-                        if i.find("./area") is None]
+                        if i.find("./area") is None or i.find("./background[@alignment='3']") is not None]
                 if len(page) >= 1:
                     # set up to process the special section for the inside cover
                     page = page[0]
@@ -1853,6 +1851,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     oddpage = IsOddPage(pageNumber)
                     pagetype = PageType.BackInsideCover
                 else:
+                    logging.error(f'Failed to locate final emptypage when processing last page {n}')
                     page = None # catastrophe
 
             else:

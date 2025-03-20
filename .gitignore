@@ -42,9 +42,9 @@ nosetests.xml
 
 *.mcf~
 *.xml~
+* - Copy.*
 
 /cewe_folder.txt
-/cewe2pdf - Copy.py
 /cewe2pdf.iss
 /cewe2pdf.pyproj.user
 /cewe2pdf.spec

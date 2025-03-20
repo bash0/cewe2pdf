@@ -96,11 +96,13 @@
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testClipart\cewe2pdf.ini" />
     <Content Include="tests\testClipart\testClipart.mcf" />
-    <Content Include="tests\testClipart\__pycache__\test_drawClipart.cpython-37-pytest-5.4.1.pyc" />
+    <Content Include="tests\testEmptyPageOne\additional_fonts.txt" />
+    <Content Include="tests\testEmptyPageOne\cewe2pdf.ini" />
+    <Content Include="tests\testEmptyPageOne\test_emptyPageOne.mcf" />
+    <Content Include="tests\testEmptyPageOne\test_emptyPageOne_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testFontDoesNotExist\additional_fonts.txt" />
     <Content Include="tests\testFontDoesNotExist\cewe2pdf.ini" />
     <Content Include="tests\testFontDoesNotExist\testFontDoesNotExist.mcf" />
-    <Content Include="tests\testFontDoesNotExist\__pycache__\test_fontDoesNotExist.cpython-37-pytest-5.4.1.pyc" />
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction.mcf" />
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\20200306_111748.jpg" />
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\folderid.xml" />
@@ -130,6 +132,8 @@
     <Compile Include="runAllTests.py" />
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
     <Compile Include="tests\testbackgrounds\test_backgrounds.py" />
+    <Compile Include="tests\testClipart\test_drawClipart.py" />
+    <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\test_simpleBook.py" />
@@ -170,9 +174,9 @@
     <Folder Include="tests\testClipartColorReplacement\" />
     <Folder Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\" />
     <Folder Include="tests\testClipart\" />
-    <Folder Include="tests\testClipart\__pycache__\" />
+    <Folder Include="tests\testEmptyPageOne\" />
+    <Folder Include="tests\testEmptyPageOne\test_emptyPageOne_mcf-Dateien\" />
     <Folder Include="tests\testFontDoesNotExist\" />
-    <Folder Include="tests\testFontDoesNotExist\__pycache__\" />
     <Folder Include="tests\testMcfxExtraction\" />
     <Folder Include="tests\testMcfxExtraction\McfOriginals\" />
     <Folder Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\" />
