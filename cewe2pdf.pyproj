@@ -123,6 +123,7 @@
   <ItemGroup>
     <Compile Include="cewe2pdf.py" />
     <Compile Include="clpFile.py" />
+    <Compile Include="colorFrame.py" />
     <Compile Include="mcfx.py" />
     <Compile Include="messageCounterHandler.py" />
     <Compile Include="otf.py" />

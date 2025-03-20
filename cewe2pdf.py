@@ -81,6 +81,7 @@ from pathlib import Path
 
 from fontTools import ttLib
 
+from reportlab.lib.colors import Color
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
@@ -98,6 +99,7 @@ from packaging.version import parse as parse_version
 from lxml import etree
 import yaml
 
+from colorFrame import ColorFrame
 from clpFile import ClpFile  # for clipart .CLP and .SVG files
 from mcfx import unpackMcfx
 from messageCounterHandler import MsgCounterHandler
@@ -605,8 +607,8 @@ def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
         leftIndent=0,
         rightIndent=0,
         embeddedHyphenation=1,  # allow line break on existing hyphens
-        textColor=textcolor,
-        backColor=backgroundColor)
+        # backColor=backgroundColor, # text bg not used since ColorFrame colours the whole bg
+        textColor=textcolor)
     return parastyle
 
 
@@ -984,13 +986,17 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
         logging.warning(' Try widening the text box just slightly to avoid an unexpected word wrap, or increasing the height yourself')
         logging.warning(f' Most recent paragraph text: {paragraphText}')
         frameHeight = finalTotalHeight
+    else:
+        frameHeight = max(frameHeight, finalTotalHeight)
+
     frameWidth = max(frameWidth, finalTotalWidth)
 
-    newFrame = Frame(frameBottomLeft_x, frameBottomLeft_y,
+    newFrame = ColorFrame(frameBottomLeft_x, frameBottomLeft_y,
         frameWidth, frameHeight,
         leftPadding=leftPad, bottomPadding=bottomPad,
         rightPadding=rightPad, topPadding=topPad,
-        showBoundary=0  # for debugging useful to set 1
+        showBoundary=0,  # for debugging useful to set 1
+        background=backgroundColor
         )
 
     # This call should produce an exception, if any of the flowables do not fit inside the frame.
