@@ -42,6 +42,17 @@
     <Content Include="tests\Resources\photofun\decorations\46537\46537.json" />
     <Content Include="tests\Resources\photofun\decorations\46537\Kreis\Kreis.clp" />
     <Content Include="tests\Resources\photofun\decorations\46537\Kreis\Kreis.xml" />
+    <Content Include="tests\Resources\photofun\fonts\info.txt" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSans-BaDn.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSansBold-1adM.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSansBoldItalic-ngV4.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSansItalic-RJre.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\misc\AUTHORS-e301" />
+    <Content Include="tests\Resources\photofun\fonts\misc\ChangeLog-0f6e" />
+    <Content Include="tests\Resources\photofun\fonts\misc\COPYING-94d5" />
+    <Content Include="tests\Resources\photofun\fonts\misc\License%282%29-f555.txt" />
+    <Content Include="tests\Resources\photofun\fonts\misc\License-8eb1.txt" />
+    <Content Include="tests\Resources\photofun\fonts\misc\README-75f0" />
     <Content Include="tests\testbackgrounds\additional_fonts.txt" />
     <Content Include="build_a_compiled_version.md" />
     <Content Include="cewe2pdf.ini" />
@@ -159,6 +170,8 @@
     <Folder Include="tests\hps\5026\addons\63488\cliparts\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\decorations\" />
+    <Folder Include="tests\Resources\photofun\fonts\" />
+    <Folder Include="tests\Resources\photofun\fonts\misc\" />
     <Folder Include="tests\test_webp_loading\" />
     <Folder Include="tests\unittest_fotobook\" />
     <Folder Include="tests\Resources\" />
