@@ -1,3 +1,0 @@
-# All fonts delivered by CEWE are added automatically, add the system fonts ...
-/mnt/c/windows/fonts/
-/mnt/c/Users/pete/AppData/Local/Microsoft/Windows/Fonts/

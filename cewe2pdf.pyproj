@@ -50,9 +50,9 @@
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="TestingOnWSL.md" />
-    <Content Include="tests\additional_fonts.txt" />
+    <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
     <Content Include="tests\cewe2pdf-local.ini" />
-    <Content Include="tests\cewe2pdf.ini" />
+    <Content Include="tests\unittest_fotobook\cewe2pdf.ini" />
     <Content Include="tests\hps\5026\.gitkeep" />
     <Content Include="tests\hps\5026\addons\121285\cliparts\v1\decorations\12089-CLIP-GOLD-GD.clp" />
     <Content Include="tests\hps\5026\addons\121285\cliparts\v1\decorations\12089-CLIP-GOLD-GD.xml" />
@@ -78,7 +78,7 @@
     <Content Include="tests\Resources\photofun\decorations\rect_lightyellow.clp" />
     <Content Include="tests\Resources\photofun\decorations\rect_terracotta.clp" />
     <Content Include="tests\Resources\photofun\decorations\rect_white.clp" />
-    <Content Include="tests\test.webp" />
+    <Content Include="tests\test_webp_loading\test.webp" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds.mcf" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testbackgrounds\allblackbackgrounds_mcf-Dateien\folderid.xml~" />
@@ -107,18 +107,18 @@
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\20200306_111748.jpg" />
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testMcfxExtraction\testMcfxExtraction.mcfx" />
-    <Content Include="tests\unittest_fotobook.mcf" />
-    <Content Include="tests\unittest_fotobook.mcf.pdf" />
-    <Content Include="tests\unittest_fotobook.mcfx" />
-    <Content Include="tests\unittest_fotobook_mcf-Dateien\20200306_111748.jpg" />
-    <Content Include="tests\unittest_fotobook_mcf-Dateien\20200320_124632.jpg" />
-    <Content Include="tests\unittest_fotobook_mcf-Dateien\GreySquareBlueBorder.jpg" />
-    <Content Include="tests\unittest_fotobook_mcf-Dateien\img.png" />
-    <Content Include="tests\unittest_fotobook_mcf-Dateien\img2.png" />
-    <Content Include="tests\unittest_fotobook_mcf-Dateien\img3.png" />
-    <Content Include="tests\unittest_fotobook_mcf-Dateien\img4.png" />
-    <Content Include="tests\unittest_fotobook_mcf-Dateien\img5.png" />
-    <Content Include="tests\unittest_fotobook_mcf-Dateien\img6.png" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook.mcf" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook.mcf.pdf" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook.mcfx" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\20200306_111748.jpg" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\20200320_124632.jpg" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\GreySquareBlueBorder.jpg" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img.png" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img2.png" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img3.png" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img4.png" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img5.png" />
+    <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img6.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="cewe2pdf.py" />
@@ -137,8 +137,8 @@
     <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
-    <Compile Include="tests\test_simpleBook.py" />
-    <Compile Include="tests\test_webp_loading.py" />
+    <Compile Include="tests\unittest_fotobook\test_simpleBook.py" />
+    <Compile Include="tests\test_webp_loading\test_webp_loading.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />
@@ -159,6 +159,8 @@
     <Folder Include="tests\hps\5026\addons\63488\cliparts\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\decorations\" />
+    <Folder Include="tests\test_webp_loading\" />
+    <Folder Include="tests\unittest_fotobook\" />
     <Folder Include="tests\Resources\" />
     <Folder Include="tests\Resources\config\" />
     <Folder Include="tests\Resources\photofun\" />
@@ -181,7 +183,7 @@
     <Folder Include="tests\testMcfxExtraction\" />
     <Folder Include="tests\testMcfxExtraction\McfOriginals\" />
     <Folder Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\" />
-    <Folder Include="tests\unittest_fotobook_mcf-Dateien" />
+    <Folder Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf" />
