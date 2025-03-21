@@ -70,3 +70,5 @@ nosetests.xml
 /tests/testClipartColorReplacement/test_clipart_colorreplacement.mcf.pdf
 /tests/testbackgrounds/allblackbackgrounds.mcf.pdf
 /tests/testEmptyPageOne/test_emptyPageOne.mcf.pdf
+/tests/unittest_fotobook/unittest_fotobook.mcf.pdf
+/tests/unittest_fotobook/unittest_fotobook.mcfx.pdf
