@@ -1,0 +1,2 @@
+﻿license: GPL
+link: https://www.fontspace.com/liberation-sans-font-f3435
