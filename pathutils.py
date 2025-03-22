@@ -1,6 +1,9 @@
 # The beginning of a collection of file system related utilities which do not really
 # belong in the main code file
 
+import fnmatch
+import os
+import re
 import sys
 from os import getenv
 from pathlib import Path
@@ -43,3 +46,28 @@ def localfont_dir():
     # join with cewe2pdf dir
     path = Path(os_path)
     return path.expanduser()
+
+
+# locate files in a directory with a pattern, with optional case sensitivity
+# eg: findFilesInDir(fontdir, '*.ttf')
+def findFilesInDir(dirpath: str, glob_pat: str, ignore_case: bool = True):
+    if not os.path.exists(dirpath):
+        return []
+    rule = re.compile(fnmatch.translate(glob_pat), re.IGNORECASE) if ignore_case \
+        else re.compile(fnmatch.translate(glob_pat))
+    return [os.path.join(dirpath, n) for n in os.listdir(dirpath) if rule.match(n)]
+
+
+def findFileInDirs(filenames, paths, logging=None):
+    if not isinstance(filenames, list):
+        filenames = [filenames]
+    for filename in filenames:
+        for p in paths:
+            testPath = os.path.join(p, filename)
+            if os.path.exists(testPath):
+                return testPath
+
+    complaint = f"Could not find {filenames} in {', '.join(paths)} paths"
+    if logging is not None:
+        logging.debug(complaint)
+    raise ValueError(complaint)

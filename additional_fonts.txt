@@ -1,3 +1,19 @@
+# In an additional_fonts.txt file you can list individual font files or directories containing
+# fonts over and above what the code loads as standard which is:
+# - all fonts from the directory where the operating system installs fonts for the user
+# - all fonts from the Resources/photofun/fonts directory beneath the cewe_folder
+
+# cewe2pdf searches for just one additional_fonts.txt file, the first it can find, starting
+#  with the album folder, then the current directory, then the program directory.
+#  This unlike the way that it reads and combines all the cewe2pdf.ini files that it finds.
+# If you want no non-standard fonts to be used, then simply place an empty additional_fonts.txt
+#  file in the album folder, thereby stopping the code from looking further.
+
+# Note that cewe2pdf does *not* load the operating system fonts (on the basis that
+# CEWE might not have them, though it certainly seems that they make the Windows fonts
+# available for albums), so you might want to add e.g. C:\Windows\Fonts\ to your
+# additional fonts file.
+
 C:\Windows\Fonts\BOD_R.TTF
 ${CEWE_FOLDER}\Resources\photofun\fonts\Function-Light.ttf
 /home/cweiske/.local/share/fonts/

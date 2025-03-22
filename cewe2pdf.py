@@ -57,14 +57,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # only needed when the program is frozen (i.e. compiled).
 import sys
 import glob
-import fnmatch
 
 import logging
 import logging.config
 
 import os.path
 import os
-import re
 import tempfile
 import html
 
@@ -79,15 +77,10 @@ from math import sqrt, floor
 
 from pathlib import Path
 
-from fontTools import ttLib
-
-from reportlab.lib.colors import Color
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import Paragraph, Frame, Table
+from reportlab.platypus import Paragraph, Table
 from reportlab.lib.styles import ParagraphStyle
 # from reportlab.lib.styles import getSampleStyleSheet
 
@@ -99,13 +92,13 @@ from packaging.version import parse as parse_version
 from lxml import etree
 import yaml
 
-from colorFrame import ColorFrame
 from clpFile import ClpFile  # for clipart .CLP and .SVG files
+from colorFrame import ColorFrame
+from fontHandling import findAndRegisterFonts, setupFontLineScales
 from mcfx import unpackMcfx
 from messageCounterHandler import MsgCounterHandler
 from passepartout import Passepartout
-from pathutils import localfont_dir
-from otf import getTtfsFromOtfs
+from pathutils import findFileInDirs
 
 class PageType(Enum):
     Unknown = 0 # this must be an error
@@ -303,29 +296,6 @@ def findFileByExtInDirs(filebase, extList, paths):
     raise ValueError(prtStr)
 
 
-# locate files in a directory with a pattern, with optional case sensitivity
-# eg: findFilesInDir(fontdir, '*.ttf')
-def findFilesInDir(dirpath: str, glob_pat: str, ignore_case: bool = True):
-    if not os.path.exists(dirpath):
-        return []
-    rule = re.compile(fnmatch.translate(glob_pat), re.IGNORECASE) if ignore_case \
-        else re.compile(fnmatch.translate(glob_pat))
-    return [os.path.join(dirpath, n) for n in os.listdir(dirpath) if rule.match(n)]
-
-
-def findFileInDirs(filenames, paths):
-    if not isinstance(filenames, list):
-        filenames = [filenames]
-    for filename in filenames:
-        for p in paths:
-            testPath = os.path.join(p, filename)
-            if os.path.exists(testPath):
-                return testPath
-
-    logging.debug(f"Could not find {filenames} in {', '.join(paths)} paths")
-    raise ValueError(f"Could not find {filenames} in {', '.join(paths)} paths")
-
-
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find(f"./page[@pagenr='{floor(2 * (pageNumber / 2))}']")
 
@@ -397,7 +367,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                         f"value of background attribute not supported: type =  {backgroundTag.get('type')}")
             try:
                 bgPath = ""
-                bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
+                bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations, logging=logging)
                 logging.debug(f"Reading background file: {bgPath}")
 
                 # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
@@ -1033,7 +1003,7 @@ def loadClipart(fileName) -> ClpFile:
         baseFileName = pathObj.stem
         fileFolder = pathObj.parent
         try:
-            filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], (fileFolder,) + clipartPathList)
+            filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], (fileFolder,) + clipartPathList, logging=logging)
             filePath = Path(filePath)
         except Exception as ex:
             logging.error(f" {baseFileName}, {ex}")
@@ -1237,7 +1207,7 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
     clipartPathList = getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
     xmlConfigFileName = 'cliparts_default.xml'
     try:
-        xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
+        xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList, logging=logging)
         loadClipartConfigXML(xmlFileName)
         configlogger.info(f'{xmlFileName} listed {len(clipartDict)} cliparts')
     except: # noqa: E722
@@ -1405,7 +1375,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
-        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
+        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))),
+            logging=logging)
         with open(configFolderFileName, 'r') as cewe_file:  # this works on all relevant platforms so pylint: disable=unspecified-encoding
             cewe_folder = cewe_file.read().strip()
             checkCeweFolder(cewe_folder)
@@ -1494,242 +1465,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
     # Load additional fonts
-    ttfFiles = []
-    fontDirs = []
-    fontLineScales = {}
-    additional_fonts = {}
-    additional_fontFamilies = {}
-
-    if cewe_folder:
-        fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
-
-    # if a user has installed fonts locally on his machine, then we need to look there as well
-    localFontFolder = localfont_dir()
-    if os.path.exists(localFontFolder):
-        fontDirs.append(str(localFontFolder))
-
-    try:
-        searchlocations = (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__)))
-        configFontFileName = findFileInDirs('additional_fonts.txt', searchlocations)
-        mustsee.info(f'Using additional font definitions from: {configFontFileName}')
-        with open(configFontFileName, 'r') as fp: # this works on all relevant platforms so pylint: disable=unspecified-encoding
-            for line in fp:
-                line = line.strip()
-                if not line:
-                    continue # ignore empty lines
-                if line.startswith("#"):
-                    continue # ignore comments
-                if line.find(" = ") != -1:
-                    # Old "font name = /path/to/file" format
-                    p = line.split(" = ", 1)
-                    path = os.path.expandvars(p[1])
-                else:
-                    path = os.path.expandvars(line)
-
-                if not os.path.exists(path):
-                    configlogger.error(f'Custom additional font file does not exist: {path}')
-                    continue
-                if os.path.isdir(path):
-                    fontDirs.append(path)
-                else:
-                    ttfFiles.append(path)
-            fp.close()
-    except ValueError: # noqa: E722. This is a locally thrown exception
-        mustsee.info(f'No additional_fonts.txt found in {searchlocations}')
-    except: # noqa: E722
-        configlogger.error('Cannot read additional fonts from {configFontFileName}')
-        configlogger.error('Content example:')
-        configlogger.error('/tmp/vera.ttf')
-
-    if len(fontDirs) > 0:
-        mustsee.info(f'Scanning for ttf/otf files in {str(fontDirs)}')
-        for fontDir in fontDirs:
-            # this is what we really want to do to find extra ttf files:
-            #   ttfextras = glob.glob(os.path.join(fontDir, '*.ttf'))
-            # but case sensitivity is a problem which will kick in - at least - when executing
-            # a Linux subsystem on a Windows machine and file system. So we use a case insensitive
-            # alternative [until Python 3.12 when glob itself offers case insensitivity] Ref the
-            # discussion at https://stackoverflow.com/questions/8151300/ignore-case-in-glob-on-linux
-            ttfextras = findFilesInDir(fontDir, '*.ttf')
-            ttfFiles.extend(sorted(ttfextras))
-
-            # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf
-            #   see https://github.com/bash0/cewe2pdf/issues/133
-            otfFiles = findFilesInDir(fontDir, '*.otf')
-            if len(otfFiles) > 0:
-                ttfsFromOtfs = getTtfsFromOtfs(otfFiles,appDataDir)
-                ttfFiles.extend(sorted(ttfsFromOtfs))
-
-    if len(ttfFiles) > 0:
-        ttfFiles = list(dict.fromkeys(ttfFiles))# remove duplicates
-        for ttfFile in ttfFiles:
-            font = ttLib.TTFont(ttfFile)
-
-            # See https://learn.microsoft.com/en-us/typography/opentype/spec/name#name-ids
-            # The dp4 fontviewer shows the contents of ttf files https://us.fontviewer.de/
-            fontFamily = font['name'].getDebugName(1) # eg Arial
-            fontSubFamily = font['name'].getDebugName(2) # eg Regular, Bold, Bold Italic
-            fontFullName = font['name'].getDebugName(4) # eg usually a combo of 1 and 2
-            if fontFamily is None:
-                configlogger.warning(f'Could not get family (name) of font: {ttfFile}')
-                continue
-            if fontSubFamily is None:
-                configlogger.warning(f'Could not get subfamily of font: {ttfFile}')
-                continue
-            if fontFullName is None:
-                configlogger.warning(f'Could not get full font name: {ttfFile}')
-                continue
-
-            # Cewe offers the users "fonts" which really name a "font family" (so that you can then use
-            # the B or I buttons to get bold or italic.)  The mcf file contains those (family) names.
-            # So we're going to register (with pdfmetrics):
-            #   (1) a lookup between the cewe font (family) name and up to four fontNames (for R,B,I,BI)
-            #   (2) a lookup between these four fontNames and the ttf file implementing the font
-            # Observe that these fontNames are used only internally in this code, to create the one-to-four
-            #  connection between the cewe font (family) name and the ttf files. The names used to be created
-            #  in code, but now we just use the official full font name
-            # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined
-            #  because the fontFullName is identical for all three of them, namely FranklinGothic, rather than
-            #  including the subfamily names which are Regular, Medium, Medium Italic
-            if (fontFullName == fontFamily) and fontSubFamily not in ('Regular', 'Light', 'Roman'):
-                # We have a non-"normal" subfamily where the full font name which is not different from the family name.
-                # That may be a slightly dubious font definition, and it seems to cause us trouble. First, warn about it,
-                # in case people have actually used these rather "special" fonts:
-                configlogger.warning(f"fontFullName == fontFamily '{fontFullName}' for a non-regular subfamily '{fontSubFamily}'. A bit strange!")
-                # Some of the special cases really are special and probably OK, but CEWE FranklinGothic
-                # is a case in point where I think the definition is just wrong, and we can successfully
-                # fix it, in combination with a manual FontFamilies defintion in the .ini file:
-                if fontFamily == "FranklinGothic":
-                    fontFullName = fontFamily + " " + fontSubFamily
-                    configlogger.warning(f"  constructed fontFullName '{fontFullName}' for '{fontFamily}' '{fontSubFamily}'")
-
-            if fontSubFamily == "Regular" and fontFullName == fontFamily + " Regular":
-                configlogger.warning(f"Revised regular fontFullName '{fontFullName}' to '{fontFamily}'")
-                fontFullName = fontFamily
-
-            additional_fonts[fontFullName] = ttfFile
-
-            # first time we see a family we create an empty entry from that family to the R,B,I,BI font names
-            if fontFamily not in additional_fontFamilies:
-                additional_fontFamilies[fontFamily] = {
-                    "normal": None,
-                    "bold": None,
-                    "italic": None,
-                    "boldItalic": None
-                }
-
-            # then try some heuristics to guess which fonts in a potentially large font family can be
-            # used to represent the more limited set of four fonts offered by cewe. We should perhaps
-            # prefer a particular name (eg in case both Light and Regular exist) but for now the last
-            # font in each weight wins
-            if fontSubFamily in {"Regular", "Light", "Roman"}:
-                additional_fontFamilies[fontFamily]["normal"] = fontFullName
-            elif fontSubFamily in {"Bold", "Medium", "Heavy", "Xbold", "Demibold", "Demibold Roman"}:
-                additional_fontFamilies[fontFamily]["bold"] = fontFullName
-            elif fontSubFamily in {"Italic", "Light Italic", "Oblique"}:
-                additional_fontFamilies[fontFamily]["italic"] = fontFullName
-            elif fontSubFamily in {"Bold Italic", "Medium Italic", "BoldItalic", "Heavy Italic", "Bold Oblique", "Demibold Italic"}:
-                additional_fontFamilies[fontFamily]["boldItalic"] = fontFullName
-            else:
-                configlogger.warning(f"Unhandled fontSubFamily '{fontSubFamily}', using fontFamily '{fontFamily}' as the regular font name")
-                additional_fontFamilies[fontFamily]["normal"] = fontFamily
-                additional_fonts[fontFamily] = ttfFile
-
-    logging.info(f"Registering {len(additional_fonts)} fonts")
-    # We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
-    for curFontName in list(additional_fonts):
-        try:
-            pdfmetrics.registerFont(TTFont(curFontName, additional_fonts[curFontName]))
-            configlogger.info(f"Registered '{curFontName}' from '{additional_fonts[curFontName]}'")
-        except:# noqa: E722
-            configlogger.error(f"Failed to register font '{curFontName}' (from {additional_fonts[curFontName]})")
-            del additional_fonts[curFontName]    # remove this item from the font list, so it won't be used later and cause problems.
-
-    # the reportlab manual says:
-    #  Before using the TT Fonts in Platypus we should add a mapping from the family name to the individual font
-    #  names that describe the behaviour under the <b> and <i> attributes.
-    #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
-    #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
-
-    # That's the fonts registered and known to the pdf system. Now for the font families...
-    # FIRST we register families explicitly defined in the .ini configuration, because they are
-    # potentially providing correct definitions for families which are not correctly identified by
-    # the normal heuristic family setup above  - the "fixed" FranklinGothic being a good example:
-    # fontFamilies =
-    #   FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
-    explicitlyRegisteredFamilyNames = []
-    if defaultConfigSection is not None:
-        ff = defaultConfigSection.get('FontFamilies', '').splitlines()  # newline separated list of folders
-        explicitFontFamilies = filter(lambda bg: (len(bg) != 0), ff)
-        for explicitFontFamily in explicitFontFamilies:
-            members = explicitFontFamily.split(",")
-            if len(members) == 5:
-                m_familyname = members[0].strip()
-                m_n = members[1].strip()
-                m_b = members[2].strip()
-                m_i = members[3].strip()
-                m_bi = members[4].strip()
-                # using font names here which are not already registered as fonts will cause crashes
-                # later, so check for that before registering the family
-                fontsOk = True
-                msg = ""
-                for fontToCheck in (m_n, m_b, m_i, m_bi):
-                    if fontToCheck not in additional_fonts:
-                        if fontsOk:
-                            msg = f"Configured font family {m_familyname} ignored because of unregistered fonts: "
-                        msg += f"{fontToCheck} "
-                        fontsOk = False
-                if not fontsOk:
-                    configlogger.error(msg)
-                else:
-                    pdfmetrics.registerFontFamily(m_familyname, normal=m_n, bold=m_b, italic=m_i, boldItalic=m_bi)
-                    explicitlyRegisteredFamilyNames.append(m_familyname)
-                    configlogger.warning(f"Using configured font family '{m_familyname}': '{m_n}','{m_b}','{m_i}','{m_bi}'")
-            else:
-                configlogger.error(f'Invalid FontFamilies line ignored (!= 5 comma-separated strings): {explicitFontFamily}')
-
-    # Now we can register the families we have "observed" and built up as we read the font files,
-    #  but ignoring any family name which was registered explicitly from configuration
-    if len(additional_fontFamilies) > 0:
-        for familyName, fontFamily in additional_fontFamilies.items():
-            if fontFamily['normal'] is None:
-                if fontFamily['italic'] is not None:
-                    alternateNormal = 'italic'
-                elif fontFamily['bold'] is not None:
-                    alternateNormal = 'bold'
-                elif fontFamily['boldItalic'] is not None:
-                    alternateNormal = 'boldItalic'
-                else:
-                    alternateNormal = ''
-                    configlogger.error(f"Font family '{familyName}' has no normal font and no alternate. The font will not be available")
-                if alternateNormal:
-                    fontFamily['normal'] = fontFamily[alternateNormal]
-                    configlogger.warning(f"Font family '{familyName}' has no normal font, chosen {fontFamily['normal']} from {alternateNormal}")
-            for key, value in dict(fontFamily).items(): # looping through normal, bold, italic, bold italic
-                if value is None:
-                    del fontFamily[key]
-            if familyName not in explicitlyRegisteredFamilyNames:
-                pdfmetrics.registerFontFamily(familyName, **fontFamily)
-                configlogger.info(f"Registered fontfamily '{familyName}': {fontFamily}")
-            else:
-                configlogger.info(f"Font family '{familyName}' was already registered from configuration file")
+    additional_fonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder)
 
     # Read any non-standard line scales for specified fonts
-    if defaultConfigSection is not None:
-        ff = defaultConfigSection.get('fontLineScales', '').splitlines()  # newline separated list of fontname : line_scale
-        specifiedLineScales = filter(lambda bg: (len(bg) != 0), ff)
-        for specifiedLineScale in specifiedLineScales:
-            scaleItems = specifiedLineScale.split(":")
-            if len(scaleItems) == 2:
-                fontName = scaleItems[0].strip()
-                try:
-                    scale = float(scaleItems[1].strip())
-                    fontLineScales[fontName] = scale
-                    configlogger.info(f"Font {fontName} uses non-standard line scale {fontLineScales[fontName]}")
-                except ValueError:
-                    configlogger.error(f"Invalid line scale value {scaleItems[1]} ignored for {fontName}")
-            else:
-                configlogger.error(f"Invalid lineScales entry ignored (should be 'FontName: Scale'): {specifiedLineScale}")
+    fontLineScales = setupFontLineScales(defaultConfigSection)
 
     logging.info("Ended font registration")
 
