@@ -2,6 +2,7 @@
 # belong in the main code file
 
 import fnmatch
+import logging
 import os
 import re
 import sys
@@ -58,7 +59,7 @@ def findFilesInDir(dirpath: str, glob_pat: str, ignore_case: bool = True):
     return [os.path.join(dirpath, n) for n in os.listdir(dirpath) if rule.match(n)]
 
 
-def findFileInDirs(filenames, paths, logging=None):
+def findFileInDirs(filenames, paths):
     if not isinstance(filenames, list):
         filenames = [filenames]
     for filename in filenames:
@@ -68,6 +69,5 @@ def findFileInDirs(filenames, paths, logging=None):
                 return testPath
 
     complaint = f"Could not find {filenames} in {', '.join(paths)} paths"
-    if logging is not None:
-        logging.debug(complaint)
+    logging.debug(complaint)
     raise ValueError(complaint)

@@ -345,7 +345,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                         f"value of background attribute not supported: type =  {backgroundTag.get('type')}")
             try:
                 bgPath = ""
-                bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations, logging=logging)
+                bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
                 logging.debug(f"Reading background file: {bgPath}")
 
                 # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
@@ -985,7 +985,7 @@ def loadClipart(fileName) -> ClpFile:
         baseFileName = pathObj.stem
         fileFolder = pathObj.parent
         try:
-            filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], (fileFolder,) + clipartPathList, logging=logging)
+            filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], (fileFolder,) + clipartPathList)
             filePath = Path(filePath)
         except Exception as ex:
             logging.error(f" {baseFileName}, {ex}")
@@ -1179,7 +1179,7 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
     clipartPathList = CeweInfo.getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
     xmlConfigFileName = 'cliparts_default.xml'
     try:
-        xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList, logging=logging)
+        xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
         loadClipartConfigXML(xmlFileName)
         configlogger.info(f'{xmlFileName} listed {len(clipartDict)} cliparts')
     except: # noqa: E722
@@ -1306,8 +1306,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
-        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))),
-            logging=logging)
+        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
         with open(configFolderFileName, 'r') as cewe_file:  # this works on all relevant platforms so pylint: disable=unspecified-encoding
             cewe_folder = cewe_file.read().strip()
             CeweInfo.checkCeweFolder(cewe_folder)
