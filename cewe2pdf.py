@@ -94,7 +94,7 @@ from lxml import etree
 from ceweInfo import CeweInfo
 from clpFile import ClpFile  # for clipart .CLP and .SVG files
 from colorFrame import ColorFrame
-from extraLoggers import mustsee, configlogger, configMessageCountHandler, rootMessageCountHandler
+from extraLoggers import mustsee, configlogger, configMessageCountHandler, rootMessageCountHandler, VerifyMessageCounts,        printMessageCountSummaries
 from fontHandling import findAndRegisterFonts, setupFontLineScales
 from mcfx import unpackMcfx
 from passepartout import Passepartout
@@ -1188,7 +1188,7 @@ def readClipArtConfigXML(baseFolder, keyaccountFolder):
         # cliparts_default.xml went missing in 7.3.4 so we have to go looking for all the individual xml
         # files, which still seem to be there and have the same format as cliparts_default.xml, and see
         # if we can build our internal dictionary from them.
-        decorations = os.path.join(baseFolder, 'Resources', 'photofun', 'decorations')
+        decorations = CeweInfo.getCeweDecorationsFolder(baseFolder)
         configlogger.info(f'clipart xml path: {decorations}')
         for (root, dirs, files) in os.walk(decorations): # walk returns a 3-tuple so pylint: disable=unused-variable
             for decorationfile in files:
@@ -1377,32 +1377,29 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     mustsee.info(f'Using image resolution {image_res}, background resolution {bg_res}')
 
-    # Read a default line scale (which is maybe overridden per font after font registration is complete)
+    # See if there is a configured default line scale overriding the coded default.
+    # This global default line scale may be reconfigured per font, after font registration
+    # is complete, into the fontLineScales mapping
     if defaultConfigSection is not None:
         try:
             dls = defaultConfigSection.getfloat('defaultLineScale', 1.15)
             defaultLineScale = dls
         except:# noqa: E722
             configlogger.error("Invalid defaultLineScale in .ini file")
-        mustsee.info(f"Default line scale = {defaultLineScale}")
+    mustsee.info(f"Default line scale = {defaultLineScale}")
 
     if keyAccountFolder is not None:
-        passepartoutFolders = passepartoutFolders + \
-            tuple([os.path.join(keyAccountFolder, "addons")]) + \
-            tuple([os.path.join(keyAccountFolder, "photofun", "decorations")]) + \
-            tuple([os.path.join(cewe_folder, "Resources", "photofun", "decorations")])
+        passepartoutFolders = passepartoutFolders + CeweInfo.getCewePassepartoutFolders(cewe_folder, keyAccountFolder)
 
-    bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
+    bg_notFoundDirList = set([]) # keep a list of background folders that are not found, to prevent multiple errors for the same cause.
 
-    # Load additional fonts
+    # Load fonts
     availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder)
 
-    # Read any non-standard line scales for specified fonts
+    # Read any configured non-standard line scales for specified fonts, creating a map of font name to line scale
     fontLineScales = setupFontLineScales(defaultConfigSection)
 
-    logging.info("Ended font registration")
-
-    # extract properties
+    # extract basic album properties
     articleConfigElement = fotobook.find('articleConfig')
     if articleConfigElement is None:
         logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
@@ -1414,12 +1411,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     #  actually be producing 2 more (the inside covers) but halving the number of final output pdf pages, making 15 double pages.
     # There is also a totalpages attribute in the mcf, but in my files it is 5 more than the normalpages value. Why not 4 more? I
     #  guess that may be because it is a count of the <page> elements and not actually related to the number of printed pages.
-    imagedir = fotobook.get('imagedir')
+    imageFolder = fotobook.get('imagedir')
 
     # generate a list of available clip-arts
     readClipArtConfigXML(cewe_folder, keyAccountFolder)
 
-    # create pdf
+    # find the correct size for the album format (if we know!) and set the product style
     pagesize = reportlab.lib.pagesizes.A4
     productstyle = ProductStyle.AlbumSingleSide
     productname = fotobook.get('productname')
@@ -1433,8 +1430,42 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         elif productstyle == ProductStyle.MemoryCard:
             logging.warning('keepdoublepages option is irrelevant and ignored for a memory card product')
 
+    # initialize a pdf canvas
     pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
     pdf.setTitle(albumTitle)
+
+    # generate all the requested pages
+    processPages(fotobook, mcfBaseFolder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
+        cewe_folder, availableFonts, backgroundLocations, bg_notFoundDirList)
+
+    # save final output pdf
+    try:
+        pdf.save()
+    except Exception as ex:
+        logging.error(f'Could not save the output file: {str(ex)}')
+
+    pdf = []
+
+    # force the release of objects which might be holding on to picture file references
+    # so that they will not prevent the removal of the files as we clean up and exit
+    objectscollected = gc.collect()
+    logging.info(f'GC collected objects : {objectscollected}')
+
+    printMessageCountSummaries()
+
+    if productstyle == ProductStyle.MemoryCard:
+        print()
+        print("Use Adobe Acrobat to print the memory cards. Set custom pages per sheet, 4 wide x 6 down")
+        print(" and print two copies!")
+
+    VerifyMessageCounts(defaultConfigSection)
+
+    cleanUpTempFiles(tempFileList, unpackedFolder)
+
+    return True
+
+
+def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount, pageNumbers, cewe_folder, availableFonts, backgroundLocations, bg_notFoundDirList):
 
     def IsBackCover(n):
         return n == (pageCount - 1)
@@ -1562,65 +1593,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             logging.exception("Exception")
             logging.error(f'error on page {n}: {pageex.args[0]}')
 
-    # save final output pdf
-    try:
-        pdf.save()
-    except Exception as ex:
-        logging.error(f'Could not save the output file: {str(ex)}')
 
-    pdf = []
-
-    # force the release of objects which might be holding on to picture file references
-    # so that they will not prevent the removal of the files as we clean up and exit
-    objectscollected = gc.collect()
-    logging.info(f'GC collected objects : {objectscollected}')
-
-    # print log count summaries
-    print("Total message counts, including messages suppressed by logger configuration")
-    print(f" cewe2pdf.config: {configMessageCountHandler.messageCountText()}")
-    print(f" root:            {rootMessageCountHandler.messageCountText()}")
-
-    if productstyle == ProductStyle.MemoryCard:
-        print()
-        print("Use Adobe Acrobat to print the memory cards. Set custom pages per sheet, 4 wide x 6 down")
-        print(" and print two copies!")
-
-    # if he has specified "normal" values for the number of messages of each kind, then warn if we do not see that number
-    if defaultConfigSection is not None:
-        # the expectedLoggingMessageCounts section is one or more newline separated list of
-        #   loggername: levelname[count], ...
-        # e.g.
-        #   root: WARNING[4], INFO[38]
-        # Any loggername that is missing is not checked, any logging level that is missing is expected to have 0 messages
-        ff = defaultConfigSection.get('expectedLoggingMessageCounts', '').splitlines()
-        loggerdefs = filter(lambda bg: (len(bg) != 0), ff)
-        for loggerdef in loggerdefs:
-            items = loggerdef.split(":")
-            if len(items) == 2:
-                loggerName = items[0].strip()
-                leveldefs = items[1].strip() # a comma separated list of levelname[count]
-                if loggerName == configlogger.name:
-                    configMessageCountHandler.checkCounts(loggerName,leveldefs)
-                elif loggerName == logging.getLogger().name:
-                    rootMessageCountHandler.checkCounts(loggerName,leveldefs)
-                else:
-                    print(f"Invalid expectedLoggingMessageCounts logger name, entry ignored: {loggerdef}")
-            else:
-                print(f"Invalid expectedLoggingMessageCounts entry ignored: {loggerdef}")
-
-    # clean up temp files
-    for tmpFileName in tempFileList:
-        if os.path.exists(tmpFileName):
-            os.remove(tmpFileName)
-    if unpackedFolder is not None:
-        unpackedFolder.cleanup()
-
-    return True
-
-
-if __name__ == '__main__':
-    # only executed when this file is run directly.
-    # we need trick to have both: default and fixed formats.
+def collectArgsAndConvert():
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
         pass
 
@@ -1692,3 +1666,17 @@ if __name__ == '__main__':
 
     # convert the file
     resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData)
+
+
+def cleanUpTempFiles(fileList, unpackedFolder):
+    for tmpFileName in tempFileList:
+        if os.path.exists(tmpFileName):
+            os.remove(tmpFileName)
+    if unpackedFolder is not None:
+        unpackedFolder.cleanup()
+
+
+if __name__ == '__main__':
+    # only executed when this file is run directly.
+    # we need trick to have both: default and fixed formats.
+    collectArgsAndConvert()

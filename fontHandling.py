@@ -5,6 +5,7 @@ from fontTools import ttLib
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+from ceweInfo import CeweInfo
 from extraLoggers import mustsee, configlogger
 from otf import getTtfsFromOtfs
 from pathutils import localfont_dir, findFileInDirs, findFilesInDir
@@ -37,7 +38,7 @@ def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe
     familiesToRegister = {}
 
     if cewe_folder:
-        fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
+        fontDirs.append(CeweInfo.getCeweFontsFolder(cewe_folder))
 
     # if a user has installed fonts locally on his machine, then we need to look there as well
     localFontFolder = localfont_dir()
@@ -108,7 +109,9 @@ def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe
     #  but ignoring any family name which was registered explicitly from configuration
     registerFontFamilies(familiesToRegister, explicitlyRegisteredFamilyNames)
 
-    return fontsToRegister
+    logging.info("Ended font registration")
+
+    return fontsToRegister # pass back a list of all the available fonts
 
 
 def buildFontsToRegisterFromTtfFiles(ttfFiles, fontList, fontFamilyList):
