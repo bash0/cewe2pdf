@@ -9,7 +9,7 @@ from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, newTable
-from fontTools.cu2qu import errors # errors not used here, but this ensures that pyinstaller gets it pylint: disable=unused-import
+from fontTools.cu2qu import errors # noqa: errors not used here, but this ensures that pyinstaller gets it pylint: disable=unused-import
 
 from extraLoggers import configlogger
 from pathutils import appdata_dir
