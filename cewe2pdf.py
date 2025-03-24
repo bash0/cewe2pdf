@@ -92,11 +92,12 @@ from packaging.version import parse as parse_version
 from lxml import etree
 import yaml
 
+from ceweInfo import CeweInfo
 from clpFile import ClpFile  # for clipart .CLP and .SVG files
 from colorFrame import ColorFrame
+from extraLoggers import mustsee, configlogger, configMessageCountHandler, rootMessageCountHandler
 from fontHandling import findAndRegisterFonts, setupFontLineScales
 from mcfx import unpackMcfx
-from messageCounterHandler import MsgCounterHandler
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 
@@ -147,28 +148,6 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         if not os.environ["PATH"].endswith(os.pathsep):
             os.environ["PATH"] += os.pathsep
         os.environ["PATH"] += dllpath
-
-if os.path.exists('loggerconfig.yaml'):
-    with open('loggerconfig.yaml', 'r') as loggeryaml: # this works on all relevant platforms so pylint: disable=unspecified-encoding
-        config = yaml.safe_load(loggeryaml.read())
-        logging.config.dictConfig(config)
-else:
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-
-# a logger for information we try to "insist" that the user sees
-mustsee = logging.getLogger("cewe2pdf.mustsee")
-
-# a logger for configuration, to distinguish that from logging in the album processing
-configlogger = logging.getLogger("cewe2pdf.config")
-
-# create log output handlers which count messages at each level
-rootMessageCountHandler = MsgCounterHandler()
-rootMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
-logging.getLogger().addHandler(rootMessageCountHandler)
-
-configMessageCountHandler = MsgCounterHandler()
-configMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
-configlogger.addHandler(configMessageCountHandler)
 
 # make it possible for PIL.Image to open .heic files if the album editor stores them directly
 # ref https://github.com/bash0/cewe2pdf/issues/130
@@ -1190,21 +1169,11 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     processElements(additional_fonts, fotobook, imagedir, productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
 
 
-def getBaseClipartLocations(baseFolder):
-    # create a tuple of places (folders) where background resources would be found by default
-    baseClipartLocations = (
-        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations'),   # trailing comma is important to make a 1-element tuple
-        # os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'form_frames'),
-        # os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'frame_frames')
-    )
-    return baseClipartLocations
-
-
 def readClipArtConfigXML(baseFolder, keyaccountFolder):
     """Parse the configuration XML file and generate a dictionary of designElementId to fileName
     currently only cliparts_default.xml is supported !"""
     global clipartPathList  # pylint: disable=global-statement
-    clipartPathList = getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
+    clipartPathList = CeweInfo.getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
     xmlConfigFileName = 'cliparts_default.xml'
     try:
         xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList, logging=logging)
@@ -1272,47 +1241,6 @@ def loadClipartConfigXML(xmlFileName):
         logging.error(f"Cannot open clipart file {xmlFileName}: {repr(clpOpenEx)}")
 
 
-def getBaseBackgroundLocations(basefolder, keyaccountFolder):
-    # create a tuple of places (folders) where background resources would be found by default
-    baseBackgroundLocations = (
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds'),
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
-    )
-
-    # at some point the base cewe organisation of the backgrounds has been changed
-    baseBackgroundLocations = baseBackgroundLocations + \
-        tuple(glob.glob(os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', "*", "*/")))
-
-    # and then the key account may have added some more backgrounds ...
-    if keyaccountFolder is not None:
-        baseBackgroundLocations = baseBackgroundLocations + \
-            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1", "backgrounds/"))) + \
-            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1/"))) + \
-            tuple(glob.glob(os.path.join(keyaccountFolder, "photofun", "backgrounds", "*", "*/"))) # from 7.3.4 onwards, I think
-
-    return baseBackgroundLocations
-
-
-def SetEnvironmentVariables(cewe_folder, keyAccountNumber):
-    # put values into the environment so that it can be substituted in later
-    # config elements in the ini file, eg as ${CEWE_FOLDER}
-    os.environ['CEWE_FOLDER'] = cewe_folder
-    os.environ['KEYACCOUNT'] = keyAccountNumber
-
-
-def getOutputFileName(mcfname):
-    return mcfname + '.pdf'
-
-
-def checkCeweFolder(cewe_folder):
-    if os.path.exists(cewe_folder):
-        mustsee.info(f"cewe_folder is {cewe_folder}")
-    else:
-        logging.error(f"cewe_folder {cewe_folder} not found. This must be a test run which doesn't need it!")
-
-
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None): # noqa: C901 (too complex)
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
@@ -1363,13 +1291,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         sys.exit(1)
 
     fotobook = mcf.getroot()
-    ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat)
+    CeweInfo.ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat)
 
     # check output file is acceptable before we do any processing, which is
     # preferable to processing for a long time and *then* discovering that
     # the file is not writable
-    outputFileName = getOutputFileName(albumname)
-    ensureAcceptableOutputFile(outputFileName)
+    outputFileName = CeweInfo.getOutputFileName(albumname)
+    CeweInfo.ensureAcceptableOutputFile(outputFileName)
 
     # a null default configuration section means that some capabilities will be missing!
     defaultConfigSection = None
@@ -1379,10 +1307,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             logging=logging)
         with open(configFolderFileName, 'r') as cewe_file:  # this works on all relevant platforms so pylint: disable=unspecified-encoding
             cewe_folder = cewe_file.read().strip()
-            checkCeweFolder(cewe_folder)
-            keyAccountNumber = getKeyaccountNumber(cewe_folder)
-            keyaccountFolder = getKeyaccountDataFolder(keyAccountNumber)
-            backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
+            CeweInfo.checkCeweFolder(cewe_folder)
+            keyAccountNumber = CeweInfo.getKeyAccountNumber(cewe_folder)
+            keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber)
+            backgroundLocations = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
 
     except: # noqa: E722
         # arrives here if the original cewe_folder.txt file is missing, which we really expect it to be these days.
@@ -1406,16 +1334,16 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 sys.exit(1)
 
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
-            checkCeweFolder(cewe_folder)
+            CeweInfo.checkCeweFolder(cewe_folder)
 
-            keyAccountNumber = getKeyaccountNumber(cewe_folder, defaultConfigSection)
+            keyAccountNumber = CeweInfo.getKeyAccountNumber(cewe_folder, defaultConfigSection)
 
             # set the cewe folder and key account number into the environment for later use in the config files
-            SetEnvironmentVariables(cewe_folder, keyAccountNumber)
+            CeweInfo.SetEnvironmentVariables(cewe_folder, keyAccountNumber)
 
-            keyaccountFolder = getKeyaccountDataFolder(keyAccountNumber, defaultConfigSection)
+            keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber, defaultConfigSection)
 
-            baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
+            baseBackgroundLocations = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
 
             # add any extra background folders, substituting environment variables
             xbg = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()  # newline separated list of folders
@@ -1456,10 +1384,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             configlogger.error("Invalid defaultLineScale in .ini file")
         mustsee.info(f"Default line scale = {defaultLineScale}")
 
-    if keyaccountFolder is not None:
+    if keyAccountFolder is not None:
         passepartoutFolders = passepartoutFolders + \
-            tuple([os.path.join(keyaccountFolder, "addons")]) + \
-            tuple([os.path.join(keyaccountFolder, "photofun", "decorations")]) + \
+            tuple([os.path.join(keyAccountFolder, "addons")]) + \
+            tuple([os.path.join(keyAccountFolder, "photofun", "decorations")]) + \
             tuple([os.path.join(cewe_folder, "Resources", "photofun", "decorations")])
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
@@ -1487,7 +1415,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     imagedir = fotobook.get('imagedir')
 
     # generate a list of available clip-arts
-    readClipArtConfigXML(cewe_folder, keyaccountFolder)
+    readClipArtConfigXML(cewe_folder, keyAccountFolder)
 
     # create pdf
     pagesize = reportlab.lib.pagesizes.A4
@@ -1687,112 +1615,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     return True
 
-
-def ensureAcceptableOutputFile(outputFileName):
-    if os.path.exists(outputFileName):
-        if os.path.isfile(outputFileName):
-            if not os.access(outputFileName, os.W_OK):
-                logging.error(f"Existing output file '{outputFileName}' is not writable")
-                sys.exit(1)
-            # this still won't have caught the case where the output file is opened for
-            # exclusive access by another process (eg Acrobat does that). We plan to
-            # overwrite the file anyway so we just check by opening it for writing and
-            # then closing it again before we do our normal stuff
-            try:
-                with open(outputFileName, 'w'): # encoding is irrelevant, so pylint: disable=unspecified-encoding
-                    logging.info(f"Existing output file '{outputFileName}' can be written")
-            except Exception as e:
-                logging.error(f"Existing output file '{outputFileName}' is writable, but not accessible {str(e)}")
-                sys.exit(1)
-        else:
-            logging.error(f"Existing output '{outputFileName}' is not a file")
-            sys.exit(1)
-
-
-def ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat):
-    if fotobook.tag != 'fotobook':
-        invalidmsg = f"Cannot process invalid mcf file (root tag is not 'fotobook'): {mcfxmlname}"
-        if mcfxFormat:
-            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
-        logging.error(invalidmsg)
-        sys.exit(1)
-
-    startdatecalendarium = fotobook.attrib['startdatecalendarium']
-    if startdatecalendarium is not None and len(startdatecalendarium) > 0:
-        invalidmsg = f"Cannot process calendar mcf files (yet!): {mcfxmlname}"
-        if mcfxFormat:
-            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
-        logging.error(invalidmsg)
-        sys.exit(1)
-
-
-def getHpsDataFolder():
-    # linux + macosx
-    dotMcfFolder = os.path.expanduser("~/.mcf/hps/")
-    if os.path.exists(dotMcfFolder):
-        return dotMcfFolder
-
-    # windows
-    # from some time around september 2022 (07.02.05) the key account folder seems to have been moved
-    # (or perhaps added to on a per user basis?) from ${PROGRAMDATA}/hps/ to ${LOCALAPPDATA}/CEWE/hps/
-    winHpsFolder = os.path.expandvars("${LOCALAPPDATA}/CEWE/hps/")
-    if os.path.exists(winHpsFolder):
-        return winHpsFolder
-    # check for the older location
-    winHpsFolder = os.path.expandvars("${PROGRAMDATA}/hps/")
-    if os.path.exists(winHpsFolder):
-        logging.info(f'hps data folder found at old location {winHpsFolder}')
-        return winHpsFolder
-
-    return None
-
-
-def getKeyaccountDataFolder(keyAccountNumber, configSection=None):
-    # for testing (in particular on checkin on github where no cewe product is installed)
-    # we may want to have a specially constructed local key account data folder
-    if configSection is not None:
-        inihps = configSection.get('hpsFolder')
-        if inihps is not None:
-            inikadf = os.path.join(inihps, keyAccountNumber)
-            if os.path.exists(inikadf):
-                logging.info(f'ini file overrides hps folder, key account folder set to {inikadf}')
-                return inikadf.strip()
-            logging.error(f'ini file overrides hps folder, but key account folder {inikadf} does not exist. Using defaults')
-
-    hpsFolder = getHpsDataFolder()
-    if hpsFolder is None:
-        logging.warning('No installed hps data folder found')
-        return None
-
-    kadf = os.path.join(hpsFolder, keyAccountNumber)
-    if os.path.exists(kadf):
-        mustsee.info(f'Installed key account data folder at {kadf}')
-        return kadf
-    logging.error(f'Installed key account data folder {kadf} not found')
-    return None
-
-
-def getKeyAccountFileName(cewe_folder):
-    keyAccountFileName = os.path.join(cewe_folder, "Resources", "config", "keyaccount.xml")
-    return keyAccountFileName
-
-
-def getKeyaccountNumber(cewe_folder, configSection=None):
-    keyAccountFileName = getKeyAccountFileName(cewe_folder)
-    try:
-        katree = etree.parse(keyAccountFileName)
-        karoot = katree.getroot()
-        ka = karoot.find('keyAccount').text # that's the official installed value
-        # see if he has a .ini file override for the keyaccount
-        if configSection is not None:
-            inika = configSection.get('keyaccount')
-            if inika is not None:
-                logging.info(f'ini file overrides keyaccount from {ka} to {inika}')
-                ka = inika
-    except Exception:
-        ka = "0"
-        logging.error(f'Could not extract keyAccount tag in file: {keyAccountFileName}, using {ka}')
-    return ka.strip()
 
 
 if __name__ == '__main__':

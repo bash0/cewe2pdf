@@ -134,12 +134,18 @@
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img6.png" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ceweInfo.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="fontHandling.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="cewe2pdf.py" />
     <Compile Include="clpFile.py" />
     <Compile Include="colorFrame.py" />
+    <Compile Include="extraLoggers.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="mcfx.py" />
     <Compile Include="messageCounterHandler.py" />
     <Compile Include="otf.py" />
