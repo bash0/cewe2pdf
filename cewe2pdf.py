@@ -57,14 +57,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # only needed when the program is frozen (i.e. compiled).
 import sys
 import glob
-import fnmatch
 
 import logging
 import logging.config
 
 import os.path
 import os
-import re
 import tempfile
 import html
 
@@ -79,15 +77,10 @@ from math import sqrt, floor
 
 from pathlib import Path
 
-from fontTools import ttLib
-
-from reportlab.lib.colors import Color
 from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import Paragraph, Frame, Table
+from reportlab.platypus import Paragraph, Table
 from reportlab.lib.styles import ParagraphStyle
 # from reportlab.lib.styles import getSampleStyleSheet
 
@@ -97,15 +90,15 @@ import PIL
 
 from packaging.version import parse as parse_version
 from lxml import etree
-import yaml
 
-from colorFrame import ColorFrame
+from ceweInfo import CeweInfo
 from clpFile import ClpFile  # for clipart .CLP and .SVG files
+from colorFrame import ColorFrame
+from extraLoggers import mustsee, configlogger, configMessageCountHandler, rootMessageCountHandler
+from fontHandling import findAndRegisterFonts, setupFontLineScales
 from mcfx import unpackMcfx
-from messageCounterHandler import MsgCounterHandler
 from passepartout import Passepartout
-from pathutils import localfont_dir
-from otf import getTtfsFromOtfs
+from pathutils import findFileInDirs
 
 class PageType(Enum):
     Unknown = 0 # this must be an error
@@ -154,28 +147,6 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         if not os.environ["PATH"].endswith(os.pathsep):
             os.environ["PATH"] += os.pathsep
         os.environ["PATH"] += dllpath
-
-if os.path.exists('loggerconfig.yaml'):
-    with open('loggerconfig.yaml', 'r') as loggeryaml: # this works on all relevant platforms so pylint: disable=unspecified-encoding
-        config = yaml.safe_load(loggeryaml.read())
-        logging.config.dictConfig(config)
-else:
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-
-# a logger for information we try to "insist" that the user sees
-mustsee = logging.getLogger("cewe2pdf.mustsee")
-
-# a logger for configuration, to distinguish that from logging in the album processing
-configlogger = logging.getLogger("cewe2pdf.config")
-
-# create log output handlers which count messages at each level
-rootMessageCountHandler = MsgCounterHandler()
-rootMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
-logging.getLogger().addHandler(rootMessageCountHandler)
-
-configMessageCountHandler = MsgCounterHandler()
-configMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
-configlogger.addHandler(configMessageCountHandler)
 
 # make it possible for PIL.Image to open .heic files if the album editor stores them directly
 # ref https://github.com/bash0/cewe2pdf/issues/130
@@ -301,29 +272,6 @@ def findFileByExtInDirs(filebase, extList, paths):
     prtStr = f"Could not find {filebase} [{' '.join(extList)}] in paths {', '.join(paths)}"
     logging.info(prtStr)
     raise ValueError(prtStr)
-
-
-# locate files in a directory with a pattern, with optional case sensitivity
-# eg: findFilesInDir(fontdir, '*.ttf')
-def findFilesInDir(dirpath: str, glob_pat: str, ignore_case: bool = True):
-    if not os.path.exists(dirpath):
-        return []
-    rule = re.compile(fnmatch.translate(glob_pat), re.IGNORECASE) if ignore_case \
-        else re.compile(fnmatch.translate(glob_pat))
-    return [os.path.join(dirpath, n) for n in os.listdir(dirpath) if rule.match(n)]
-
-
-def findFileInDirs(filenames, paths):
-    if not isinstance(filenames, list):
-        filenames = [filenames]
-    for filename in filenames:
-        for p in paths:
-            testPath = os.path.join(p, filename)
-            if os.path.exists(testPath):
-                return testPath
-
-    logging.debug(f"Could not find {filenames} in {', '.join(paths)} paths")
-    raise ValueError(f"Could not find {filenames} in {', '.join(paths)} paths")
 
 
 def getPageElementForPageNumber(fotobook, pageNumber):
@@ -596,7 +544,7 @@ def lineScaleForFont(font):
     return defaultLineScale
 
 
-def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
+def CreateParagraphStyle(textcolor, font, fontsize):
     parastyle = ParagraphStyle(None, None,
         alignment=reportlab.lib.enums.TA_LEFT,  # will often be overridden
         fontSize=fontsize,
@@ -835,9 +783,13 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
         backgroundColorRGBA = (backgroundColorRGB << 8) + backgroundColorA
         backgroundColor = reportlab.lib.colors.HexColor(backgroundColorRGBA, False, True)
 
-    # set default para style in case there are no spans to set it
-    pdf_styleN = CreateParagraphStyle(backgroundColor, reportlab.lib.colors.black, bodyfont, bodyfs)
-    # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
+    # set default para style in case there are no spans to set it.
+    pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs)
+
+    # for debugging the background colour may be useful, but it is not used in production
+    # since we started to use ColorFrame to colour the background, and it is thus left
+    # unset by CreateParagraphStyle
+    # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00")
 
     htmlparas = body.findall(".//p")
     for p in htmlparas:
@@ -1220,21 +1172,11 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     processElements(additional_fonts, fotobook, imagedir, productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
 
 
-def getBaseClipartLocations(baseFolder):
-    # create a tuple of places (folders) where background resources would be found by default
-    baseClipartLocations = (
-        os.path.join(baseFolder, 'Resources', 'photofun', 'decorations'),   # trailing comma is important to make a 1-element tuple
-        # os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'form_frames'),
-        # os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'frame_frames')
-    )
-    return baseClipartLocations
-
-
 def readClipArtConfigXML(baseFolder, keyaccountFolder):
     """Parse the configuration XML file and generate a dictionary of designElementId to fileName
     currently only cliparts_default.xml is supported !"""
     global clipartPathList  # pylint: disable=global-statement
-    clipartPathList = getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
+    clipartPathList = CeweInfo.getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
     xmlConfigFileName = 'cliparts_default.xml'
     try:
         xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
@@ -1302,47 +1244,6 @@ def loadClipartConfigXML(xmlFileName):
         logging.error(f"Cannot open clipart file {xmlFileName}: {repr(clpOpenEx)}")
 
 
-def getBaseBackgroundLocations(basefolder, keyaccountFolder):
-    # create a tuple of places (folders) where background resources would be found by default
-    baseBackgroundLocations = (
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds'),
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'einfarbige'),
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'multicolor'),
-        os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', 'spotcolor'),
-    )
-
-    # at some point the base cewe organisation of the backgrounds has been changed
-    baseBackgroundLocations = baseBackgroundLocations + \
-        tuple(glob.glob(os.path.join(basefolder, 'Resources', 'photofun', 'backgrounds', "*", "*/")))
-
-    # and then the key account may have added some more backgrounds ...
-    if keyaccountFolder is not None:
-        baseBackgroundLocations = baseBackgroundLocations + \
-            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1", "backgrounds/"))) + \
-            tuple(glob.glob(os.path.join(keyaccountFolder, "addons", "*", "backgrounds", "v1/"))) + \
-            tuple(glob.glob(os.path.join(keyaccountFolder, "photofun", "backgrounds", "*", "*/"))) # from 7.3.4 onwards, I think
-
-    return baseBackgroundLocations
-
-
-def SetEnvironmentVariables(cewe_folder, keyAccountNumber):
-    # put values into the environment so that it can be substituted in later
-    # config elements in the ini file, eg as ${CEWE_FOLDER}
-    os.environ['CEWE_FOLDER'] = cewe_folder
-    os.environ['KEYACCOUNT'] = keyAccountNumber
-
-
-def getOutputFileName(mcfname):
-    return mcfname + '.pdf'
-
-
-def checkCeweFolder(cewe_folder):
-    if os.path.exists(cewe_folder):
-        mustsee.info(f"cewe_folder is {cewe_folder}")
-    else:
-        logging.error(f"cewe_folder {cewe_folder} not found. This must be a test run which doesn't need it!")
-
-
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None): # noqa: C901 (too complex)
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
@@ -1393,13 +1294,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         sys.exit(1)
 
     fotobook = mcf.getroot()
-    ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat)
+    CeweInfo.ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat)
 
     # check output file is acceptable before we do any processing, which is
     # preferable to processing for a long time and *then* discovering that
     # the file is not writable
-    outputFileName = getOutputFileName(albumname)
-    ensureAcceptableOutputFile(outputFileName)
+    outputFileName = CeweInfo.getOutputFileName(albumname)
+    CeweInfo.ensureAcceptableOutputFile(outputFileName)
 
     # a null default configuration section means that some capabilities will be missing!
     defaultConfigSection = None
@@ -1408,10 +1309,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
         with open(configFolderFileName, 'r') as cewe_file:  # this works on all relevant platforms so pylint: disable=unspecified-encoding
             cewe_folder = cewe_file.read().strip()
-            checkCeweFolder(cewe_folder)
-            keyAccountNumber = getKeyaccountNumber(cewe_folder)
-            keyaccountFolder = getKeyaccountDataFolder(keyAccountNumber)
-            backgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
+            CeweInfo.checkCeweFolder(cewe_folder)
+            keyAccountNumber = CeweInfo.getKeyAccountNumber(cewe_folder)
+            keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber)
+            backgroundLocations = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
 
     except: # noqa: E722
         # arrives here if the original cewe_folder.txt file is missing, which we really expect it to be these days.
@@ -1435,16 +1336,16 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 sys.exit(1)
 
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
-            checkCeweFolder(cewe_folder)
+            CeweInfo.checkCeweFolder(cewe_folder)
 
-            keyAccountNumber = getKeyaccountNumber(cewe_folder, defaultConfigSection)
+            keyAccountNumber = CeweInfo.getKeyAccountNumber(cewe_folder, defaultConfigSection)
 
             # set the cewe folder and key account number into the environment for later use in the config files
-            SetEnvironmentVariables(cewe_folder, keyAccountNumber)
+            CeweInfo.SetEnvironmentVariables(cewe_folder, keyAccountNumber)
 
-            keyaccountFolder = getKeyaccountDataFolder(keyAccountNumber, defaultConfigSection)
+            keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber, defaultConfigSection)
 
-            baseBackgroundLocations = getBaseBackgroundLocations(cewe_folder, keyaccountFolder)
+            baseBackgroundLocations = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
 
             # add any extra background folders, substituting environment variables
             xbg = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()  # newline separated list of folders
@@ -1485,251 +1386,19 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             configlogger.error("Invalid defaultLineScale in .ini file")
         mustsee.info(f"Default line scale = {defaultLineScale}")
 
-    if keyaccountFolder is not None:
+    if keyAccountFolder is not None:
         passepartoutFolders = passepartoutFolders + \
-            tuple([os.path.join(keyaccountFolder, "addons")]) + \
-            tuple([os.path.join(keyaccountFolder, "photofun", "decorations")]) + \
+            tuple([os.path.join(keyAccountFolder, "addons")]) + \
+            tuple([os.path.join(keyAccountFolder, "photofun", "decorations")]) + \
             tuple([os.path.join(cewe_folder, "Resources", "photofun", "decorations")])
 
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
     # Load additional fonts
-    ttfFiles = []
-    fontDirs = []
-    fontLineScales = {}
-    additional_fonts = {}
-    additional_fontFamilies = {}
-
-    if cewe_folder:
-        fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
-
-    # if a user has installed fonts locally on his machine, then we need to look there as well
-    localFontFolder = localfont_dir()
-    if os.path.exists(localFontFolder):
-        fontDirs.append(str(localFontFolder))
-
-    try:
-        searchlocations = (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__)))
-        configFontFileName = findFileInDirs('additional_fonts.txt', searchlocations)
-        mustsee.info(f'Using additional font definitions from: {configFontFileName}')
-        with open(configFontFileName, 'r') as fp: # this works on all relevant platforms so pylint: disable=unspecified-encoding
-            for line in fp:
-                line = line.strip()
-                if not line:
-                    continue # ignore empty lines
-                if line.startswith("#"):
-                    continue # ignore comments
-                if line.find(" = ") != -1:
-                    # Old "font name = /path/to/file" format
-                    p = line.split(" = ", 1)
-                    path = os.path.expandvars(p[1])
-                else:
-                    path = os.path.expandvars(line)
-
-                if not os.path.exists(path):
-                    configlogger.error(f'Custom additional font file does not exist: {path}')
-                    continue
-                if os.path.isdir(path):
-                    fontDirs.append(path)
-                else:
-                    ttfFiles.append(path)
-            fp.close()
-    except ValueError: # noqa: E722. This is a locally thrown exception
-        mustsee.info(f'No additional_fonts.txt found in {searchlocations}')
-    except: # noqa: E722
-        configlogger.error('Cannot read additional fonts from {configFontFileName}')
-        configlogger.error('Content example:')
-        configlogger.error('/tmp/vera.ttf')
-
-    if len(fontDirs) > 0:
-        mustsee.info(f'Scanning for ttf/otf files in {str(fontDirs)}')
-        for fontDir in fontDirs:
-            # this is what we really want to do to find extra ttf files:
-            #   ttfextras = glob.glob(os.path.join(fontDir, '*.ttf'))
-            # but case sensitivity is a problem which will kick in - at least - when executing
-            # a Linux subsystem on a Windows machine and file system. So we use a case insensitive
-            # alternative [until Python 3.12 when glob itself offers case insensitivity] Ref the
-            # discussion at https://stackoverflow.com/questions/8151300/ignore-case-in-glob-on-linux
-            ttfextras = findFilesInDir(fontDir, '*.ttf')
-            ttfFiles.extend(sorted(ttfextras))
-
-            # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf
-            #   see https://github.com/bash0/cewe2pdf/issues/133
-            otfFiles = findFilesInDir(fontDir, '*.otf')
-            if len(otfFiles) > 0:
-                ttfsFromOtfs = getTtfsFromOtfs(otfFiles,appDataDir)
-                ttfFiles.extend(sorted(ttfsFromOtfs))
-
-    if len(ttfFiles) > 0:
-        ttfFiles = list(dict.fromkeys(ttfFiles))# remove duplicates
-        for ttfFile in ttfFiles:
-            font = ttLib.TTFont(ttfFile)
-
-            # See https://learn.microsoft.com/en-us/typography/opentype/spec/name#name-ids
-            # The dp4 fontviewer shows the contents of ttf files https://us.fontviewer.de/
-            fontFamily = font['name'].getDebugName(1) # eg Arial
-            fontSubFamily = font['name'].getDebugName(2) # eg Regular, Bold, Bold Italic
-            fontFullName = font['name'].getDebugName(4) # eg usually a combo of 1 and 2
-            if fontFamily is None:
-                configlogger.warning(f'Could not get family (name) of font: {ttfFile}')
-                continue
-            if fontSubFamily is None:
-                configlogger.warning(f'Could not get subfamily of font: {ttfFile}')
-                continue
-            if fontFullName is None:
-                configlogger.warning(f'Could not get full font name: {ttfFile}')
-                continue
-
-            # Cewe offers the users "fonts" which really name a "font family" (so that you can then use
-            # the B or I buttons to get bold or italic.)  The mcf file contains those (family) names.
-            # So we're going to register (with pdfmetrics):
-            #   (1) a lookup between the cewe font (family) name and up to four fontNames (for R,B,I,BI)
-            #   (2) a lookup between these four fontNames and the ttf file implementing the font
-            # Observe that these fontNames are used only internally in this code, to create the one-to-four
-            #  connection between the cewe font (family) name and the ttf files. The names used to be created
-            #  in code, but now we just use the official full font name
-            # EXCEPT that there's a special case ... the three FranklinGothic ttf files from CEWE are badly defined
-            #  because the fontFullName is identical for all three of them, namely FranklinGothic, rather than
-            #  including the subfamily names which are Regular, Medium, Medium Italic
-            if (fontFullName == fontFamily) and fontSubFamily not in ('Regular', 'Light', 'Roman'):
-                # We have a non-"normal" subfamily where the full font name which is not different from the family name.
-                # That may be a slightly dubious font definition, and it seems to cause us trouble. First, warn about it,
-                # in case people have actually used these rather "special" fonts:
-                configlogger.warning(f"fontFullName == fontFamily '{fontFullName}' for a non-regular subfamily '{fontSubFamily}'. A bit strange!")
-                # Some of the special cases really are special and probably OK, but CEWE FranklinGothic
-                # is a case in point where I think the definition is just wrong, and we can successfully
-                # fix it, in combination with a manual FontFamilies defintion in the .ini file:
-                if fontFamily == "FranklinGothic":
-                    fontFullName = fontFamily + " " + fontSubFamily
-                    configlogger.warning(f"  constructed fontFullName '{fontFullName}' for '{fontFamily}' '{fontSubFamily}'")
-
-            if fontSubFamily == "Regular" and fontFullName == fontFamily + " Regular":
-                configlogger.warning(f"Revised regular fontFullName '{fontFullName}' to '{fontFamily}'")
-                fontFullName = fontFamily
-
-            additional_fonts[fontFullName] = ttfFile
-
-            # first time we see a family we create an empty entry from that family to the R,B,I,BI font names
-            if fontFamily not in additional_fontFamilies:
-                additional_fontFamilies[fontFamily] = {
-                    "normal": None,
-                    "bold": None,
-                    "italic": None,
-                    "boldItalic": None
-                }
-
-            # then try some heuristics to guess which fonts in a potentially large font family can be
-            # used to represent the more limited set of four fonts offered by cewe. We should perhaps
-            # prefer a particular name (eg in case both Light and Regular exist) but for now the last
-            # font in each weight wins
-            if fontSubFamily in {"Regular", "Light", "Roman"}:
-                additional_fontFamilies[fontFamily]["normal"] = fontFullName
-            elif fontSubFamily in {"Bold", "Medium", "Heavy", "Xbold", "Demibold", "Demibold Roman"}:
-                additional_fontFamilies[fontFamily]["bold"] = fontFullName
-            elif fontSubFamily in {"Italic", "Light Italic", "Oblique"}:
-                additional_fontFamilies[fontFamily]["italic"] = fontFullName
-            elif fontSubFamily in {"Bold Italic", "Medium Italic", "BoldItalic", "Heavy Italic", "Bold Oblique", "Demibold Italic"}:
-                additional_fontFamilies[fontFamily]["boldItalic"] = fontFullName
-            else:
-                configlogger.warning(f"Unhandled fontSubFamily '{fontSubFamily}', using fontFamily '{fontFamily}' as the regular font name")
-                additional_fontFamilies[fontFamily]["normal"] = fontFamily
-                additional_fonts[fontFamily] = ttfFile
-
-    logging.info(f"Registering {len(additional_fonts)} fonts")
-    # We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
-    for curFontName in list(additional_fonts):
-        try:
-            pdfmetrics.registerFont(TTFont(curFontName, additional_fonts[curFontName]))
-            configlogger.info(f"Registered '{curFontName}' from '{additional_fonts[curFontName]}'")
-        except:# noqa: E722
-            configlogger.error(f"Failed to register font '{curFontName}' (from {additional_fonts[curFontName]})")
-            del additional_fonts[curFontName]    # remove this item from the font list, so it won't be used later and cause problems.
-
-    # the reportlab manual says:
-    #  Before using the TT Fonts in Platypus we should add a mapping from the family name to the individual font
-    #  names that describe the behaviour under the <b> and <i> attributes.
-    #  from reportlab.pdfbase.pdfmetrics import registerFontFamily
-    #  registerFontFamily('Vera',normal='Vera',bold='VeraBd',italic='VeraIt',boldItalic='VeraBI')
-
-    # That's the fonts registered and known to the pdf system. Now for the font families...
-    # FIRST we register families explicitly defined in the .ini configuration, because they are
-    # potentially providing correct definitions for families which are not correctly identified by
-    # the normal heuristic family setup above  - the "fixed" FranklinGothic being a good example:
-    # fontFamilies =
-    #   FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
-    explicitlyRegisteredFamilyNames = []
-    if defaultConfigSection is not None:
-        ff = defaultConfigSection.get('FontFamilies', '').splitlines()  # newline separated list of folders
-        explicitFontFamilies = filter(lambda bg: (len(bg) != 0), ff)
-        for explicitFontFamily in explicitFontFamilies:
-            members = explicitFontFamily.split(",")
-            if len(members) == 5:
-                m_familyname = members[0].strip()
-                m_n = members[1].strip()
-                m_b = members[2].strip()
-                m_i = members[3].strip()
-                m_bi = members[4].strip()
-                # using font names here which are not already registered as fonts will cause crashes
-                # later, so check for that before registering the family
-                fontsOk = True
-                msg = ""
-                for fontToCheck in (m_n, m_b, m_i, m_bi):
-                    if fontToCheck not in additional_fonts:
-                        if fontsOk:
-                            msg = f"Configured font family {m_familyname} ignored because of unregistered fonts: "
-                        msg += f"{fontToCheck} "
-                        fontsOk = False
-                if not fontsOk:
-                    configlogger.error(msg)
-                else:
-                    pdfmetrics.registerFontFamily(m_familyname, normal=m_n, bold=m_b, italic=m_i, boldItalic=m_bi)
-                    explicitlyRegisteredFamilyNames.append(m_familyname)
-                    configlogger.warning(f"Using configured font family '{m_familyname}': '{m_n}','{m_b}','{m_i}','{m_bi}'")
-            else:
-                configlogger.error(f'Invalid FontFamilies line ignored (!= 5 comma-separated strings): {explicitFontFamily}')
-
-    # Now we can register the families we have "observed" and built up as we read the font files,
-    #  but ignoring any family name which was registered explicitly from configuration
-    if len(additional_fontFamilies) > 0:
-        for familyName, fontFamily in additional_fontFamilies.items():
-            if fontFamily['normal'] is None:
-                if fontFamily['italic'] is not None:
-                    alternateNormal = 'italic'
-                elif fontFamily['bold'] is not None:
-                    alternateNormal = 'bold'
-                elif fontFamily['boldItalic'] is not None:
-                    alternateNormal = 'boldItalic'
-                else:
-                    alternateNormal = ''
-                    configlogger.error(f"Font family '{familyName}' has no normal font and no alternate. The font will not be available")
-                if alternateNormal:
-                    fontFamily['normal'] = fontFamily[alternateNormal]
-                    configlogger.warning(f"Font family '{familyName}' has no normal font, chosen {fontFamily['normal']} from {alternateNormal}")
-            for key, value in dict(fontFamily).items(): # looping through normal, bold, italic, bold italic
-                if value is None:
-                    del fontFamily[key]
-            if familyName not in explicitlyRegisteredFamilyNames:
-                pdfmetrics.registerFontFamily(familyName, **fontFamily)
-                configlogger.info(f"Registered fontfamily '{familyName}': {fontFamily}")
-            else:
-                configlogger.info(f"Font family '{familyName}' was already registered from configuration file")
+    availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder)
 
     # Read any non-standard line scales for specified fonts
-    if defaultConfigSection is not None:
-        ff = defaultConfigSection.get('fontLineScales', '').splitlines()  # newline separated list of fontname : line_scale
-        specifiedLineScales = filter(lambda bg: (len(bg) != 0), ff)
-        for specifiedLineScale in specifiedLineScales:
-            scaleItems = specifiedLineScale.split(":")
-            if len(scaleItems) == 2:
-                fontName = scaleItems[0].strip()
-                try:
-                    scale = float(scaleItems[1].strip())
-                    fontLineScales[fontName] = scale
-                    configlogger.info(f"Font {fontName} uses non-standard line scale {fontLineScales[fontName]}")
-                except ValueError:
-                    configlogger.error(f"Invalid line scale value {scaleItems[1]} ignored for {fontName}")
-            else:
-                configlogger.error(f"Invalid lineScales entry ignored (should be 'FontName: Scale'): {specifiedLineScale}")
+    fontLineScales = setupFontLineScales(defaultConfigSection)
 
     logging.info("Ended font registration")
 
@@ -1748,7 +1417,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     imagedir = fotobook.get('imagedir')
 
     # generate a list of available clip-arts
-    readClipArtConfigXML(cewe_folder, keyaccountFolder)
+    readClipArtConfigXML(cewe_folder, keyAccountFolder)
 
     # create pdf
     pagesize = reportlab.lib.pagesizes.A4
@@ -1829,7 +1498,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     lastpage = False
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         realFirstPageList[0], pageNumber, pageCount, pagetype, productstyle, oddpage,
-                        bg_notFoundDirList, additional_fonts, lastpage)
+                        bg_notFoundDirList, availableFonts, lastpage)
                 pagetype = PageType.EmptyPage
 
             elif isAlbumProduct(productstyle) and lastpage: # album last page is special because of inside cover
@@ -1841,7 +1510,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     pagetype = PageType.Normal
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         page, pageNumber, pageCount, PageType.Normal, productstyle, oddpage,
-                        bg_notFoundDirList, additional_fonts, lastpage)
+                        bg_notFoundDirList, availableFonts, lastpage)
 
                 # Look for an empty page 0 that does NOT contain an area element. That will define
                 # the background for the inside cover page to be placed on top of the right side of
@@ -1875,7 +1544,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     continue
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, productstyle, oddpage,
-                    bg_notFoundDirList, additional_fonts, lastpage)
+                    bg_notFoundDirList, availableFonts, lastpage)
 
                 # finish the pdf page and start a new one.
                 if not isAlbumProduct(productstyle):
@@ -1947,113 +1616,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         unpackedFolder.cleanup()
 
     return True
-
-
-def ensureAcceptableOutputFile(outputFileName):
-    if os.path.exists(outputFileName):
-        if os.path.isfile(outputFileName):
-            if not os.access(outputFileName, os.W_OK):
-                logging.error(f"Existing output file '{outputFileName}' is not writable")
-                sys.exit(1)
-            # this still won't have caught the case where the output file is opened for
-            # exclusive access by another process (eg Acrobat does that). We plan to
-            # overwrite the file anyway so we just check by opening it for writing and
-            # then closing it again before we do our normal stuff
-            try:
-                with open(outputFileName, 'w'): # encoding is irrelevant, so pylint: disable=unspecified-encoding
-                    logging.info(f"Existing output file '{outputFileName}' can be written")
-            except Exception as e:
-                logging.error(f"Existing output file '{outputFileName}' is writable, but not accessible {str(e)}")
-                sys.exit(1)
-        else:
-            logging.error(f"Existing output '{outputFileName}' is not a file")
-            sys.exit(1)
-
-
-def ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat):
-    if fotobook.tag != 'fotobook':
-        invalidmsg = f"Cannot process invalid mcf file (root tag is not 'fotobook'): {mcfxmlname}"
-        if mcfxFormat:
-            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
-        logging.error(invalidmsg)
-        sys.exit(1)
-
-    startdatecalendarium = fotobook.attrib['startdatecalendarium']
-    if startdatecalendarium is not None and len(startdatecalendarium) > 0:
-        invalidmsg = f"Cannot process calendar mcf files (yet!): {mcfxmlname}"
-        if mcfxFormat:
-            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
-        logging.error(invalidmsg)
-        sys.exit(1)
-
-
-def getHpsDataFolder():
-    # linux + macosx
-    dotMcfFolder = os.path.expanduser("~/.mcf/hps/")
-    if os.path.exists(dotMcfFolder):
-        return dotMcfFolder
-
-    # windows
-    # from some time around september 2022 (07.02.05) the key account folder seems to have been moved
-    # (or perhaps added to on a per user basis?) from ${PROGRAMDATA}/hps/ to ${LOCALAPPDATA}/CEWE/hps/
-    winHpsFolder = os.path.expandvars("${LOCALAPPDATA}/CEWE/hps/")
-    if os.path.exists(winHpsFolder):
-        return winHpsFolder
-    # check for the older location
-    winHpsFolder = os.path.expandvars("${PROGRAMDATA}/hps/")
-    if os.path.exists(winHpsFolder):
-        logging.info(f'hps data folder found at old location {winHpsFolder}')
-        return winHpsFolder
-
-    return None
-
-
-def getKeyaccountDataFolder(keyAccountNumber, configSection=None):
-    # for testing (in particular on checkin on github where no cewe product is installed)
-    # we may want to have a specially constructed local key account data folder
-    if configSection is not None:
-        inihps = configSection.get('hpsFolder')
-        if inihps is not None:
-            inikadf = os.path.join(inihps, keyAccountNumber)
-            if os.path.exists(inikadf):
-                logging.info(f'ini file overrides hps folder, key account folder set to {inikadf}')
-                return inikadf.strip()
-            logging.error(f'ini file overrides hps folder, but key account folder {inikadf} does not exist. Using defaults')
-
-    hpsFolder = getHpsDataFolder()
-    if hpsFolder is None:
-        logging.warning('No installed hps data folder found')
-        return None
-
-    kadf = os.path.join(hpsFolder, keyAccountNumber)
-    if os.path.exists(kadf):
-        mustsee.info(f'Installed key account data folder at {kadf}')
-        return kadf
-    logging.error(f'Installed key account data folder {kadf} not found')
-    return None
-
-
-def getKeyAccountFileName(cewe_folder):
-    keyAccountFileName = os.path.join(cewe_folder, "Resources", "config", "keyaccount.xml")
-    return keyAccountFileName
-
-
-def getKeyaccountNumber(cewe_folder, configSection=None):
-    keyAccountFileName = getKeyAccountFileName(cewe_folder)
-    try:
-        katree = etree.parse(keyAccountFileName)
-        karoot = katree.getroot()
-        ka = karoot.find('keyAccount').text # that's the official installed value
-        # see if he has a .ini file override for the keyaccount
-        if configSection is not None:
-            inika = configSection.get('keyaccount')
-            if inika is not None:
-                logging.info(f'ini file overrides keyaccount from {ka} to {inika}')
-                ka = inika
-    except Exception:
-        ka = "0"
-        logging.error(f'Could not extract keyAccount tag in file: {keyAccountFileName}, using {ka}')
-    return ka.strip()
 
 
 if __name__ == '__main__':

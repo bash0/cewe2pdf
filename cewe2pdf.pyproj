@@ -28,6 +28,7 @@
     <Content Include=".github\workflows\pythonapp.yml" />
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
+    <Content Include="additional_fonts.txt" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6044.jpg" />
@@ -61,6 +62,8 @@
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="TestingOnWSL.md" />
+    <Content Include="tests\testClipart\additional_fonts.txt" />
+    <Content Include="tests\testEmptyPageOne\additional_fonts.txt" />
     <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
     <Content Include="tests\cewe2pdf-local.ini" />
     <Content Include="tests\unittest_fotobook\cewe2pdf.ini" />
@@ -107,7 +110,6 @@
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testClipart\cewe2pdf.ini" />
     <Content Include="tests\testClipart\testClipart.mcf" />
-    <Content Include="tests\testEmptyPageOne\additional_fonts.txt" />
     <Content Include="tests\testEmptyPageOne\cewe2pdf.ini" />
     <Content Include="tests\testEmptyPageOne\test_emptyPageOne.mcf" />
     <Content Include="tests\testEmptyPageOne\test_emptyPageOne_mcf-Dateien\folderid.xml" />
@@ -132,9 +134,18 @@
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img6.png" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ceweInfo.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="fontHandling.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="cewe2pdf.py" />
     <Compile Include="clpFile.py" />
     <Compile Include="colorFrame.py" />
+    <Compile Include="extraLoggers.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="mcfx.py" />
     <Compile Include="messageCounterHandler.py" />
     <Compile Include="otf.py" />

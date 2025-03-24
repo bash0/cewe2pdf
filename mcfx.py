@@ -22,7 +22,7 @@ def writeTofile(data, filename):
         file.write(data)
 
 
-def unpackMcfx(mcfxPath: Path, tempdirPath):
+def unpackMcfx(mcfxPath: Path, tempdirPath): # pylint: disable=too-many-statements
     mcfname = ""
     curdir = os.getcwd()
 
@@ -82,7 +82,7 @@ def unpackMcfx(mcfxPath: Path, tempdirPath):
     except sqlite3.Error as error:
         logging.error(f"Exiting: sqllite3 failed to read image or mcf data: {error}")
         sys.exit(1)
-    except Exception as ex:
+    except Exception as ex: # pylint: disable=broad-exception-caught
         logging.error(f"Exiting: failure handling image or mcf data: {ex}")
         sys.exit(1)
 
