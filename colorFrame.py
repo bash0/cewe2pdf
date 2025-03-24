@@ -3,6 +3,9 @@ from reportlab.platypus import Frame
 
 # ref https://gist.github.com/styrmis/5317292
 
+# pylint complains about things which are decided by the base Frame class, so...
+# pylint: disable=too-many-arguments,redefined-builtin,too-many-function-args
+
 class ColorFrame(Frame):
     """ Extends the reportlab Frame with the ability to draw a background color. """
 

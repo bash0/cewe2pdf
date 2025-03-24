@@ -15,7 +15,7 @@ import logging
 from dataclasses import dataclass
 from lxml import etree
 
-configlogger = logging.getLogger("cewe2pdf.config")
+from extraLoggers import configlogger
 
 class Passepartout():
     def __init__(self):

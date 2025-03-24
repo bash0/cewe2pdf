@@ -1,11 +1,12 @@
+import glob
 import logging
 import os.path
 import os
 import sys
 
-import glob
-from extraLoggers import mustsee, configlogger
 from lxml import etree
+
+from extraLoggers import mustsee
 
 class CeweInfo():
     def __init__(self):
@@ -20,7 +21,6 @@ class CeweInfo():
             # os.path.join(baseFolder, 'Resources', 'photofun', 'decorations', 'frame_frames')
         )
         return baseClipartLocations
-
 
     @staticmethod
     def getBaseBackgroundLocations(basefolder, keyaccountFolder):
@@ -45,7 +45,6 @@ class CeweInfo():
 
         return baseBackgroundLocations
 
-
     @staticmethod
     def SetEnvironmentVariables(cewe_folder, keyAccountNumber):
         # put values into the environment so that it can be substituted in later
@@ -53,11 +52,9 @@ class CeweInfo():
         os.environ['CEWE_FOLDER'] = cewe_folder
         os.environ['KEYACCOUNT'] = keyAccountNumber
 
-
     @staticmethod
     def getOutputFileName(mcfname):
         return mcfname + '.pdf'
-
 
     @staticmethod
     def checkCeweFolder(cewe_folder):
@@ -65,7 +62,6 @@ class CeweInfo():
             mustsee.info(f"cewe_folder is {cewe_folder}")
         else:
             logging.error(f"cewe_folder {cewe_folder} not found. This must be a test run which doesn't need it!")
-
 
     @staticmethod
     def ensureAcceptableOutputFile(outputFileName):
@@ -81,13 +77,12 @@ class CeweInfo():
                 try:
                     with open(outputFileName, 'w'): # encoding is irrelevant, so pylint: disable=unspecified-encoding
                         logging.info(f"Existing output file '{outputFileName}' can be written")
-                except Exception as e:
+                except Exception as e: # pylint: disable=broad-exception-caught
                     logging.error(f"Existing output file '{outputFileName}' is writable, but not accessible {str(e)}")
                     sys.exit(1)
             else:
                 logging.error(f"Existing output '{outputFileName}' is not a file")
                 sys.exit(1)
-
 
     @staticmethod
     def ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat):
@@ -105,7 +100,6 @@ class CeweInfo():
                 invalidmsg = invalidmsg + f" (unpacked from {albumname})"
             logging.error(invalidmsg)
             sys.exit(1)
-
 
     @staticmethod
     def getHpsDataFolder():
@@ -127,7 +121,6 @@ class CeweInfo():
             return winHpsFolder
 
         return None
-
 
     @staticmethod
     def getKeyAccountDataFolder(keyAccountNumber, configSection=None):
@@ -154,12 +147,10 @@ class CeweInfo():
         logging.error(f'Installed key account data folder {kadf} not found')
         return None
 
-
     @staticmethod
     def getKeyAccountFileName(cewe_folder):
         keyAccountFileName = os.path.join(cewe_folder, "Resources", "config", "keyaccount.xml")
         return keyAccountFileName
-
 
     @staticmethod
     def getKeyAccountNumber(cewe_folder, configSection=None):
@@ -174,7 +165,7 @@ class CeweInfo():
                 if inika is not None:
                     logging.info(f'ini file overrides keyaccount from {ka} to {inika}')
                     ka = inika
-        except Exception:
+        except Exception: # pylint: disable=broad-exception-caught
             ka = "0"
             logging.error(f'Could not extract keyAccount tag in file: {keyAccountFileName}, using {ka}')
         return ka.strip()

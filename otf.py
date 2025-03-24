@@ -3,17 +3,16 @@
 # This code is heavily based on https://github.com/awesometoolbox/otf2ttf/blob/master/src/otf2ttf/cli.py
 # and https://github.com/SwagLyrics/SwagLyrics-For-Spotify/blob/master/swaglyrics/__init__.py#L8-L32
 
-import logging
 import os
 
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, newTable
-from fontTools.cu2qu import errors # noqa - not used here, but this makes sure that pyinstaller gets it
-from pathutils import appdata_dir
+from fontTools.cu2qu import errors # errors not used here, but this ensures that pyinstaller gets it pylint: disable=unused-import
 
-log = logging.getLogger("cewe2pdf.config")
+from extraLoggers import configlogger
+from pathutils import appdata_dir
 
 # default approximation error, measured in UPEM
 MAX_ERR = 1.0
@@ -76,7 +75,7 @@ def otf_to_ttf(ttFont, post_format=POST_FORMAT, **kwargs):
         post.compile(ttFont)
     except OverflowError:
         post.formatType = 3
-        log.warning("Dropping glyph names, they do not fit in 'post' table.")
+        configlogger.warning("Dropping glyph names, they do not fit in 'post' table.")
 
     ttFont.sfntVersion = "\000\001\000\000"
 
@@ -92,7 +91,7 @@ def getTtfsFromOtfs(otfFiles, ttfdirPath=None):
 
     for otfFile in otfFiles:
         if "LiebeGerda-BoldItalic" in otfFile:
-            log.info("LiebeGerda-BoldItalic not available: the otf->ttf conversion hangs!")
+            configlogger.info("LiebeGerda-BoldItalic not available: the otf->ttf conversion hangs!")
             continue # the conversion code hangs on this font!
         ttfFile = makeOutputFileName(
             otfFile,
@@ -101,9 +100,9 @@ def getTtfsFromOtfs(otfFiles, ttfdirPath=None):
             overWrite=True, # options.overwrite
         )
         if os.path.exists(ttfFile):
-            log.info(f"Accepting otf->ttf font conversion: {ttfFile}")
+            configlogger.info(f"Accepting otf->ttf font conversion: {ttfFile}")
         else:
-            log.warning(f"One-time font conversion otf->ttf: {ttfFile}")
+            configlogger.warning(f"One-time font conversion otf->ttf: {ttfFile}")
             font = TTFont(otfFile, fontNumber=0) # options.face_index
             otf_to_ttf(
                 font,

@@ -90,7 +90,6 @@ import PIL
 
 from packaging.version import parse as parse_version
 from lxml import etree
-import yaml
 
 from ceweInfo import CeweInfo
 from clpFile import ClpFile  # for clipart .CLP and .SVG files
@@ -545,7 +544,7 @@ def lineScaleForFont(font):
     return defaultLineScale
 
 
-def CreateParagraphStyle(backgroundColor, textcolor, font, fontsize):
+def CreateParagraphStyle(textcolor, font, fontsize):
     parastyle = ParagraphStyle(None, None,
         alignment=reportlab.lib.enums.TA_LEFT,  # will often be overridden
         fontSize=fontsize,
@@ -784,9 +783,13 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
         backgroundColorRGBA = (backgroundColorRGB << 8) + backgroundColorA
         backgroundColor = reportlab.lib.colors.HexColor(backgroundColorRGBA, False, True)
 
-    # set default para style in case there are no spans to set it
-    pdf_styleN = CreateParagraphStyle(backgroundColor, reportlab.lib.colors.black, bodyfont, bodyfs)
-    # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00") # for debuging useful
+    # set default para style in case there are no spans to set it.
+    pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs)
+
+    # for debugging the background colour may be useful, but it is not used in production
+    # since we started to use ColorFrame to colour the background, and it is thus left
+    # unset by CreateParagraphStyle
+    # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00")
 
     htmlparas = body.findall(".//p")
     for p in htmlparas:
@@ -1393,7 +1396,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     bg_notFoundDirList = set([])   # keep a list with background folders that not found, to prevent multiple errors for the same cause.
 
     # Load additional fonts
-    additional_fonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder)
+    availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder)
 
     # Read any non-standard line scales for specified fonts
     fontLineScales = setupFontLineScales(defaultConfigSection)
@@ -1496,7 +1499,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     lastpage = False
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         realFirstPageList[0], pageNumber, pageCount, pagetype, productstyle, oddpage,
-                        bg_notFoundDirList, additional_fonts, lastpage)
+                        bg_notFoundDirList, availableFonts, lastpage)
                 pagetype = PageType.EmptyPage
 
             elif isAlbumProduct(productstyle) and lastpage: # album last page is special because of inside cover
@@ -1508,7 +1511,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     pagetype = PageType.Normal
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         page, pageNumber, pageCount, PageType.Normal, productstyle, oddpage,
-                        bg_notFoundDirList, additional_fonts, lastpage)
+                        bg_notFoundDirList, availableFonts, lastpage)
 
                 # Look for an empty page 0 that does NOT contain an area element. That will define
                 # the background for the inside cover page to be placed on top of the right side of
@@ -1542,7 +1545,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                     continue
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, productstyle, oddpage,
-                    bg_notFoundDirList, additional_fonts, lastpage)
+                    bg_notFoundDirList, availableFonts, lastpage)
 
                 # finish the pdf page and start a new one.
                 if not isAlbumProduct(productstyle):
@@ -1614,7 +1617,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         unpackedFolder.cleanup()
 
     return True
-
 
 
 if __name__ == '__main__':

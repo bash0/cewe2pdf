@@ -27,4 +27,3 @@ logging.getLogger().addHandler(rootMessageCountHandler)
 configMessageCountHandler = MsgCounterHandler()
 configMessageCountHandler.setLevel(logging.DEBUG) # ensuring that it counts everything
 configlogger.addHandler(configMessageCountHandler)
-
