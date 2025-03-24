@@ -20,7 +20,7 @@ def tryToBuildBook(infilename, keepDoublePages = False):
     if os.path.exists(outFile) == True:
         os.remove(outFile)
     assert os.path.exists(outFile) == False
-    convertMcf(inFile, keepDoublePages)
+    convertMcf(inFile, keepDoublePages) # you might try pageNumbers=[0,2,5,6,7,26]
     assert Path(outFile).exists() == True
 
     #check the pdf contents
