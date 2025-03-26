@@ -5,29 +5,10 @@ from fontTools import ttLib
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+from ceweInfo import CeweInfo
 from extraLoggers import mustsee, configlogger
 from otf import getTtfsFromOtfs
 from pathutils import localfont_dir, findFileInDirs, findFilesInDir
-
-
-def setupFontLineScales(defaultConfigSection):
-    fontLineScales = {}
-    if defaultConfigSection is not None:
-        ff = defaultConfigSection.get('fontLineScales', '').splitlines()  # newline separated list of fontname : line_scale
-        specifiedLineScales = filter(lambda bg: (len(bg) != 0), ff)
-        for specifiedLineScale in specifiedLineScales:
-            scaleItems = specifiedLineScale.split(":")
-            if len(scaleItems) == 2:
-                fontName = scaleItems[0].strip()
-                try:
-                    scale = float(scaleItems[1].strip())
-                    fontLineScales[fontName] = scale
-                    configlogger.info(f"Font {fontName} uses non-standard line scale {fontLineScales[fontName]}")
-                except ValueError:
-                    configlogger.error(f"Invalid line scale value {scaleItems[1]} ignored for {fontName}")
-            else:
-                configlogger.error(f"Invalid lineScales entry ignored (should be 'FontName: Scale'): {specifiedLineScale}")
-    return fontLineScales
 
 
 def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder): # pylint: disable=too-many-statements
@@ -37,7 +18,7 @@ def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe
     familiesToRegister = {}
 
     if cewe_folder:
-        fontDirs.append(os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts'))
+        fontDirs.append(CeweInfo.getCeweFontsFolder(cewe_folder))
 
     # if a user has installed fonts locally on his machine, then we need to look there as well
     localFontFolder = localfont_dir()
@@ -108,7 +89,9 @@ def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe
     #  but ignoring any family name which was registered explicitly from configuration
     registerFontFamilies(familiesToRegister, explicitlyRegisteredFamilyNames)
 
-    return fontsToRegister
+    logging.info("Ended font registration")
+
+    return fontsToRegister # pass back a list of all the available fonts
 
 
 def buildFontsToRegisterFromTtfFiles(ttfFiles, fontList, fontFamilyList):

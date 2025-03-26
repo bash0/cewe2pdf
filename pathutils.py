@@ -71,3 +71,14 @@ def findFileInDirs(filenames, paths):
     complaint = f"Could not find {filenames} in {', '.join(paths)} paths"
     logging.debug(complaint)
     raise ValueError(complaint)
+
+
+def findFileByExtInDirs(filebase, extList, paths):
+    for p in paths:
+        for ext in extList:
+            testPath = os.path.join(p, filebase + ext)
+            if os.path.exists(testPath):
+                return testPath
+    prtStr = f"Could not find {filebase} [{' '.join(extList)}] in paths {', '.join(paths)}"
+    logging.info(prtStr)
+    raise ValueError(prtStr)

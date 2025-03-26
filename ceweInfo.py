@@ -46,6 +46,13 @@ class CeweInfo():
         return baseBackgroundLocations
 
     @staticmethod
+    def getCewePassepartoutFolders(cewe_folder, keyAccountFolder):
+        return \
+            tuple([os.path.join(keyAccountFolder, "addons")]) + \
+            tuple([os.path.join(keyAccountFolder, "photofun", "decorations")]) + \
+            tuple([os.path.join(cewe_folder, "Resources", "photofun", "decorations")])
+
+    @staticmethod
     def SetEnvironmentVariables(cewe_folder, keyAccountNumber):
         # put values into the environment so that it can be substituted in later
         # config elements in the ini file, eg as ${CEWE_FOLDER}
@@ -100,6 +107,14 @@ class CeweInfo():
                 invalidmsg = invalidmsg + f" (unpacked from {albumname})"
             logging.error(invalidmsg)
             sys.exit(1)
+
+    @staticmethod
+    def getCeweFontsFolder(cewe_folder):
+        return os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts')
+
+    @staticmethod
+    def getCeweDecorationsFolder(cewe_folder):
+        return os.path.join(cewe_folder, 'Resources', 'photofun', 'decorations')
 
     @staticmethod
     def getHpsDataFolder():

@@ -13,7 +13,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId>CondaEnv|CondaEnv|cewe2pdf</InterpreterId>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
-    <CommandLineArguments>D:\Users\pete\Source\GitHub\cewe2pdf\tests\unittest_fotobook.mcf</CommandLineArguments>
+    <CommandLineArguments>D:\Users\pete\Source\GitHub\cewe2pdf\tests\unittest_fotobook\unittest_fotobook.mcf</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
@@ -137,6 +137,12 @@
     <Compile Include="ceweInfo.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clipArt.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="configUtils.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="fontHandling.py">
       <SubType>Code</SubType>
     </Compile>
@@ -144,6 +150,9 @@
     <Compile Include="clpFile.py" />
     <Compile Include="colorFrame.py" />
     <Compile Include="extraLoggers.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="lineScales.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="mcfx.py" />
@@ -161,6 +170,9 @@
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\unittest_fotobook\test_simpleBook.py" />
     <Compile Include="tests\test_webp_loading\test_webp_loading.py" />
+    <Compile Include="text.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />
