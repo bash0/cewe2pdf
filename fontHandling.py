@@ -11,26 +11,6 @@ from otf import getTtfsFromOtfs
 from pathutils import localfont_dir, findFileInDirs, findFilesInDir
 
 
-def setupFontLineScales(defaultConfigSection):
-    fontLineScales = {}
-    if defaultConfigSection is not None:
-        ff = defaultConfigSection.get('fontLineScales', '').splitlines()  # newline separated list of fontname : line_scale
-        specifiedLineScales = filter(lambda bg: (len(bg) != 0), ff)
-        for specifiedLineScale in specifiedLineScales:
-            scaleItems = specifiedLineScale.split(":")
-            if len(scaleItems) == 2:
-                fontName = scaleItems[0].strip()
-                try:
-                    scale = float(scaleItems[1].strip())
-                    fontLineScales[fontName] = scale
-                    configlogger.info(f"Font {fontName} uses non-standard line scale {fontLineScales[fontName]}")
-                except ValueError:
-                    configlogger.error(f"Invalid line scale value {scaleItems[1]} ignored for {fontName}")
-            else:
-                configlogger.error(f"Invalid lineScales entry ignored (should be 'FontName: Scale'): {specifiedLineScale}")
-    return fontLineScales
-
-
 def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder): # pylint: disable=too-many-statements
     ttfFiles = []
     fontDirs = []

@@ -77,11 +77,10 @@ from math import sqrt, floor
 
 from pathlib import Path
 
-from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph, Table
-from reportlab.lib.styles import ParagraphStyle
 # from reportlab.lib.styles import getSampleStyleSheet
 
 # import pil and work around a breaking change in pil 10.0.0, see
@@ -92,13 +91,16 @@ from packaging.version import parse as parse_version
 from lxml import etree
 
 from ceweInfo import CeweInfo
-from clpFile import ClpFile  # for clipart .CLP and .SVG files
+from clipArt import getClipConfig, loadClipart
 from colorFrame import ColorFrame
-from extraLoggers import mustsee, configlogger, configMessageCountHandler, rootMessageCountHandler, VerifyMessageCounts,        printMessageCountSummaries
-from fontHandling import findAndRegisterFonts, setupFontLineScales
+from configUtils import getConfigurationBool, getConfigurationInt
+from extraLoggers import mustsee, configlogger, VerifyMessageCounts, printMessageCountSummaries
+from fontHandling import findAndRegisterFonts
+from lineScales import LineScales
 from mcfx import unpackMcfx
 from passepartout import Passepartout
 from pathutils import findFileInDirs
+from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CreateParagraphStyle, Dequote, noteFontSubstitution
 
 class PageType(Enum):
     Unknown = 0 # this must be an error
@@ -201,38 +203,7 @@ clipartDict = dict[int, str]()    # a dictionary for clipart element IDs to file
 clipartPathList = tuple[str]()
 passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
 passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
-fontSubstitutions = list[str]() # used to avoid repeated messages
-fontLineScales = {} # mapping fontnames to linescale where the standard defaultLineScale is not ok
-defaultLineScale = 1.1 # line scale if not overridden. Best to configure to 1.15 - don't break old albums by changing here
 defaultConfigSection = None
-
-
-def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
-    returnValue = minimumValue
-    if configSection is not None:
-        try:
-            # eg getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
-            returnValue = int(configSection.get(itemName, defaultValue))
-        except ValueError:
-            logging.error(f'Invalid configuration value supplied for {itemName}')
-            returnValue = int(defaultValue)
-        if returnValue < minimumValue:
-            logging.error(f'Configuration value supplied for {itemName} is less than {minimumValue}, using {minimumValue}')
-            returnValue = minimumValue
-    return returnValue
-
-
-def getConfigurationBool(configSection, itemName, defaultValue):
-    returnValue = defaultValue
-    if configSection is not None:
-        try:
-            # eg getConfigurationBool(defaultConfigSection, 'insideCoverWhite', False)
-            bv = configSection.get(itemName, defaultValue)
-            returnValue = bv.lower() == "true"
-        except ValueError:
-            logging.error(f'Invalid configuration value supplied for {itemName}')
-            returnValue = bool(defaultValue)
-    return returnValue
 
 
 def autorot(im):
@@ -263,23 +234,12 @@ def autorot(im):
     return im
 
 
-def findFileByExtInDirs(filebase, extList, paths):
-    for p in paths:
-        for ext in extList:
-            testPath = os.path.join(p, filebase + ext)
-            if os.path.exists(testPath):
-                return testPath
-    prtStr = f"Could not find {filebase} [{' '.join(extList)}] in paths {', '.join(paths)}"
-    logging.info(prtStr)
-    raise ValueError(prtStr)
-
-
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find(f"./page[@pagenr='{floor(2 * (pageNumber / 2))}']")
 
 
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
-def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
+def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,  # noqa: C901
                       productstyle, pagetype, pdf, ph, pw):
     areaHeight = ph
     areaWidth = pw
@@ -474,7 +434,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     # apply the frame mask from the passepartout to the image
     if maskClipartFileName is not None:
-        maskClp = loadClipart(maskClipartFileName)
+        maskClp = loadClipart(maskClipartFileName, clipartPathList)
         im = maskClp.applyAsAlphaMaskToFoto(im)
 
     # re-compress image
@@ -522,160 +482,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     # we now have temporary file, that we need to delete after pdf creation
     tempFileList.append(jpeg.name)
-    # we can not delete now, because file is opened by pdf library
 
-
-def AppendText(paratext, newtext):
-    if newtext is None:
-        return paratext
-    return paratext + newtext.replace('\t', '&nbsp;&nbsp;&nbsp;')
-
-
-def AppendBreak(paragraphText, parachild):
-    br = parachild
-    paragraphText = AppendText(paragraphText, "<br></br>&nbsp;")
-    paragraphText = AppendText(paragraphText, br.tail)
-    return paragraphText
-
-
-def lineScaleForFont(font):
-    if font in fontLineScales:
-        return fontLineScales[font]
-    return defaultLineScale
-
-
-def CreateParagraphStyle(textcolor, font, fontsize):
-    parastyle = ParagraphStyle(None, None,
-        alignment=reportlab.lib.enums.TA_LEFT,  # will often be overridden
-        fontSize=fontsize,
-        fontName=font,
-        leading=fontsize*lineScaleForFont(font),  # line spacing (text + leading)
-        borderPadding=0,
-        borderWidth=0,
-        leftIndent=0,
-        rightIndent=0,
-        embeddedHyphenation=1,  # allow line break on existing hyphens
-        # backColor=backgroundColor, # text bg not used since ColorFrame colours the whole bg
-        textColor=textcolor)
-    return parastyle
-
-
-def IsBold(weight):
-    return weight > 400
-
-
-def IsItalic(itemstyle, outerstyle):
-    if 'font-style' in itemstyle:
-        return itemstyle['font-style'].strip(" ") == "italic"
-    if 'font-style' in outerstyle:
-        return outerstyle['font-style'].strip(" ") == "italic"
-    return False
-
-
-def IsUnderline(itemstyle, outerstyle):
-    if 'text-decoration' in itemstyle:
-        return itemstyle['text-decoration'].strip(" ") == "underline"
-    if 'text-decoration' in outerstyle:
-        return outerstyle['text-decoration'].strip(" ") == "underline"
-    return False
-
-
-def Dequote(s):
-    """
-    If a string has single or double quotes around it, remove them.
-    Make sure the pair of quotes match.
-    If a matching pair of quotes is not found, return the string unchanged.
-    """
-    if (s[0] == s[-1]) and s.startswith(("'", '"')):
-        return s[1:-1]
-    return s
-
-def noteFontSubstitution(family, replacement):
-    fontSubstitutionPair = family + "/" + replacement
-    fontSubsNotedAlready = fontSubstitutionPair in fontSubstitutions
-    if not fontSubsNotedAlready:
-        fontSubstitutions.append(fontSubstitutionPair)
-    if logging.root.isEnabledFor(logging.DEBUG):
-        # At DEBUG level we log all font substitutions, making it easier to find them in the mcf
-        logging.debug(f"Using font family = '{replacement}' (wanted {family})")
-        return
-    # At other logging levels we simply log the first font substitution
-    if not fontSubsNotedAlready:
-        logging.warning(f"Using font family = '{replacement}' (wanted {family})")
-
-def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
-    spanfont = dfltfont
-    spanfs = dfltfs
-    spanweight = bweight
-    spanstyle = dict([kv.split(':') for kv in
-                    item.get('style').lstrip(' ').rstrip(';').split('; ')])
-    if 'font-family' in spanstyle:
-        spanfamily = spanstyle['font-family'].strip("'")
-        availableFonts = pdf.getAvailableFonts()
-        if spanfamily in availableFonts:
-            spanfont = spanfamily
-        elif spanfamily in additional_fonts:
-            spanfont = spanfamily
-        if spanfamily != spanfont:
-            noteFontSubstitution(spanfamily, spanfont)
-
-    if 'font-weight' in spanstyle:
-        try:
-            spanweight = int(Dequote(spanstyle['font-weight']))
-        except: # noqa: E722
-            spanweight = 400
-
-    if 'font-size' in spanstyle:
-        spanfs = floor(float(spanstyle['font-size'].strip("pt")))
-    return spanfont, spanfs, spanweight, spanstyle
-
-
-def AppendSpanStart(paragraphText, font, fsize, fweight, fstyle, outerstyle):
-    """
-    Remember this is not really HTML, though it looks that way.
-    See 6.2 Paragraph XML Markup Tags in the reportlabs user guide.
-    """
-    paragraphText = AppendText(paragraphText, '<font name="' + font + '"' + ' size=' + str(fsize))
-
-    if 'color' in fstyle:
-        paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])
-
-    # This old strategy doesn't interpret background alpha values correctly, background is
-    # now done in processAreaTextTag (credit seaeagle1, changeset 687fe50)
-    #    if bgColorAttrib is not None:
-    #        paragraphText = AppendText(paragraphText, ' backcolor=' + bgColorAttrib)
-
-    paragraphText = AppendText(paragraphText, '>')
-
-    if IsBold(fweight):  # ref https://www.w3schools.com/csSref/pr_font_weight.asp
-        paragraphText = AppendText(paragraphText, "<b>")
-    if IsItalic(fstyle, outerstyle):
-        paragraphText = AppendText(paragraphText, '<i>')
-    if IsUnderline(fstyle, outerstyle):
-        paragraphText = AppendText(paragraphText, '<u>')
-    return paragraphText
-
-
-def AppendSpanEnd(paragraphText, weight, style, outerstyle):
-    if IsUnderline(style, outerstyle):
-        paragraphText = AppendText(paragraphText, '</u>')
-    if IsItalic(style, outerstyle):
-        paragraphText = AppendText(paragraphText, '</i>')
-    if IsBold(weight):
-        paragraphText = AppendText(paragraphText, "</b>")
-    paragraphText = AppendText(paragraphText, '</font>')
-    return paragraphText
-
-
-def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle):
-    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additional_fonts, bodyfont, bodyfs, bweight)
-    paragraphText = AppendSpanStart(paragraphText, pfont, pfs, pweight, pstyle, bstyle)
-    if text is None:
-        paragraphText = AppendText(paragraphText, "")
-    else:
-        paragraphText = AppendText(paragraphText, html.escape(text))
-    paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle, bstyle)
-    return paragraphText, pfs
 
 def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
     # Draw a single cell table to represent border decoration (a box around the object)
@@ -815,7 +622,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                     pLineHeight = floor(float(pStyle['line-height'].strip("%")))/100.0
                 except: # noqa: E722
                     logging.warning(f"Ignoring invalid paragraph line-height setting {pStyleAttribute}")
-        finalLeadingFactor = lineScaleForFont(bodyfont) * pLineHeight
+        finalLeadingFactor = LineScales.lineScaleForFont(bodyfont) * pLineHeight
 
         htmlspans = p.findall(".*")
         if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
@@ -964,62 +771,6 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     pdf.translate(-transx, -transy)
 
 
-def loadClipart(fileName) -> ClpFile:
-    """Tries to load a clipart file. Either from .CLP or .SVG file
-    returns a clpFile object"""
-    newClpFile = ClpFile("")
-
-    if os.path.isabs(fileName):
-        filePath = Path(fileName)
-        if not filePath.exists():
-            filePath = filePath.parent.joinpath(filePath.stem+".clp")
-            if not filePath.exists():
-                logging.error(f"Missing .clp: {fileName}")
-                return ClpFile("")   # return an empty ClpFile
-    else:
-        pathObj = Path(fileName)
-        # the name can actually be "correct", but its stem may not be in the clipartPathList. This will
-        # happen at least for passepartout clip masks when we're using a local test hps structure rather
-        # than an installed cewe_folder. For that reason we add the file's own folder to the clipartPathList
-        # before searching for a clp or svg file matching the stem
-        baseFileName = pathObj.stem
-        fileFolder = pathObj.parent
-        try:
-            filePath = findFileInDirs([baseFileName+'.clp', baseFileName+'.svg'], (fileFolder,) + clipartPathList)
-            filePath = Path(filePath)
-        except Exception as ex:
-            logging.error(f" {baseFileName}, {ex}")
-            return ClpFile("")   # return an empty ClpFile
-
-    if filePath.suffix == '.clp':
-        newClpFile.readClp(filePath)
-    else:
-        newClpFile.loadFromSVG(filePath)
-
-    return newClpFile
-
-
-def getClipConfig(Element):
-    colorreplacements = []
-    flipX = False
-    flipY = False
-    for clipconfig in Element.findall('ClipartConfiguration'):
-        for clipcolors in clipconfig.findall('colors'):
-            for clipcolor in clipcolors.findall('color'):
-                source = '#'+clipcolor.get('source').upper()[1:7]
-                target = '#'+clipcolor.get('target').upper()[1:7]
-                replacement = (source, target)
-                colorreplacements.append(replacement)
-        mirror = clipconfig.get('mirror')
-        if mirror is not None:
-            # cewe developers have a different understanding of x and y :)
-            if mirror in ('y', 'both'):
-                flipX = True
-            if mirror in ('x', 'both'):
-                flipY = True
-    return colorreplacements, flipX, flipY
-
-
 def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, clipArtDecoration):
     clipartID = int(clipartElement.get('designElementId'))
 
@@ -1055,7 +806,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     new_w = int(0.5 + areaWidth * res / 254.)
     new_h = int(0.5 + areaHeight * res / 254.)
 
-    clipart = loadClipart(fileName)
+    clipart = loadClipart(fileName, clipartPathList)
     if len(clipart.svgData) <= 0:
         logging.error(f"Clipart file could not be loaded: {fileName}")
         # avoiding exception in the processing below here
@@ -1247,18 +998,14 @@ def loadClipartConfigXML(xmlFileName):
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None): # noqa: C901 (too complex)
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
-    global fontSubstitutions  # pylint: disable=global-statement
     global passepartoutDict  # pylint: disable=global-statement
     global passepartoutFolders  # pylint: disable=global-statement
-    global fontLineScales  # pylint: disable=global-statement
-    global defaultLineScale  # pylint: disable=global-statement
     global image_res  # pylint: disable=global-statement
     global bg_res  # pylint: disable=global-statement
     global defaultConfigSection  # pylint: disable=global-statement
 
     clipartDict = {}    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
-    fontSubstitutions = [] # used to avoid repeated messages
     passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
     passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
 
@@ -1380,13 +1127,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # See if there is a configured default line scale overriding the coded default.
     # This global default line scale may be reconfigured per font, after font registration
     # is complete, into the fontLineScales mapping
-    if defaultConfigSection is not None:
-        try:
-            dls = defaultConfigSection.getfloat('defaultLineScale', 1.15)
-            defaultLineScale = dls
-        except:# noqa: E722
-            configlogger.error("Invalid defaultLineScale in .ini file")
-    mustsee.info(f"Default line scale = {defaultLineScale}")
+    LineScales.setupDefaultLineScale(defaultConfigSection)
 
     if keyAccountFolder is not None:
         passepartoutFolders = passepartoutFolders + CeweInfo.getCewePassepartoutFolders(cewe_folder, keyAccountFolder)
@@ -1397,7 +1138,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder)
 
     # Read any configured non-standard line scales for specified fonts, creating a map of font name to line scale
-    fontLineScales = setupFontLineScales(defaultConfigSection)
+    LineScales.setupFontLineScales(defaultConfigSection)
 
     # extract basic album properties
     articleConfigElement = fotobook.find('articleConfig')
@@ -1465,7 +1206,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     return True
 
 
-def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount, pageNumbers, cewe_folder, availableFonts, backgroundLocations, bg_notFoundDirList):
+def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount, pageNumbers, # noqa: C901
+        cewe_folder, availableFonts, backgroundLocations, bg_notFoundDirList):
 
     def IsBackCover(n):
         return n == (pageCount - 1)
@@ -1607,8 +1349,10 @@ def collectArgsAndConvert():
                         const=True, default=False,
                         help='Each page in the .pdf will be a double-sided page, instead of a normal single page.')
     parser.add_argument('--pages', dest='pages', action='store',
-                        default=None,
-                        help='Page numbers to render, e.g. 1,2,4-9 (default: None, which of course processes all the pages). These refer to the inside page numbers as you see them in the album editor - the first user editable inside page is number 1. If you want the front cover, then ask for page 0. Asking for the back cover explicitly will not work!')
+        default=None,
+        help='Page numbers to render, e.g. 1,2,4-9 (default: None, which of course processes all the pages). '
+            'These refer to the inside page numbers as you see them in the album editor - the first user editable inside page is number 1. '
+            'If you want the front cover, then ask for page 0. Asking for the back cover explicitly will not work!')
     parser.add_argument('--tmp-dir', dest='mcfxTmp', action='store',
                         default=None,
                         help='Directory for .mcfx file extraction')
@@ -1665,11 +1409,11 @@ def collectArgsAndConvert():
         appData = os.path.abspath(args.appData)
 
     # convert the file
-    resultFlag = convertMcf(args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData)
+    return convertMcf(args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData)
 
 
 def cleanUpTempFiles(fileList, unpackedFolder):
-    for tmpFileName in tempFileList:
+    for tmpFileName in fileList:
         if os.path.exists(tmpFileName):
             os.remove(tmpFileName)
     if unpackedFolder is not None:
@@ -1679,4 +1423,4 @@ def cleanUpTempFiles(fileList, unpackedFolder):
 if __name__ == '__main__':
     # only executed when this file is run directly.
     # we need trick to have both: default and fixed formats.
-    collectArgsAndConvert()
+    resultFlag = collectArgsAndConvert()
