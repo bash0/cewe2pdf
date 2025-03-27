@@ -56,7 +56,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # extend the search path so Cairo will find its dlls.
 # only needed when the program is frozen (i.e. compiled).
 import sys
-import glob
 
 import logging
 import logging.config
@@ -83,25 +82,26 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph, Table
 # from reportlab.lib.styles import getSampleStyleSheet
 
-# import pil and work around a breaking change in pil 10.0.0, see
-#   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
 import PIL
 
 from packaging.version import parse as parse_version
 from lxml import etree
 
-from ceweInfo import CeweInfo
-from clipArt import getClipConfig, loadClipart
+from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
+from clipArt import getClipConfig, loadClipart, readClipArtConfigXML
 from colorFrame import ColorFrame
 from configUtils import getConfigurationBool, getConfigurationInt
 from extraLoggers import mustsee, configlogger, VerifyMessageCounts, printMessageCountSummaries
 from fontHandling import findAndRegisterFonts
+from imageUtils import autorot
 from lineScales import LineScales
 from mcfx import unpackMcfx
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CreateParagraphStyle, Dequote, noteFontSubstitution
 
+
+# PageType is a concept for processing in this code, not something used by CEWE
 class PageType(Enum):
     Unknown = 0 # this must be an error
     Normal = 1
@@ -113,21 +113,9 @@ class PageType(Enum):
     def __str__(self):
         return self.name # to print the enum name without the class
 
-class ProductStyle(Enum):
-    AlbumSingleSide = 1  # normal for albums, we divide the cewe 2 page bundle to single pages
-    AlbumDoubleSide = 2  # any album when --keepdoublepages is set
-    MemoryCard = 3 # memory card game
 
-def isAlbumProduct(ps: ProductStyle):
-    return ps in (ProductStyle.AlbumSingleSide, ProductStyle.AlbumDoubleSide)
-
-def isAlbumSingleSide(ps: ProductStyle):
-    return ps == ProductStyle.AlbumSingleSide
-
-def isAlbumDoubleSide(ps: ProductStyle):
-    return ps == ProductStyle.AlbumDoubleSide
-
-
+# work around a breaking change in pil 10.0.0, see
+#   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
 if parse_version(PIL.__version__) >= parse_version('9.1.0'):
     # PIL.Image.LANCZOS was claimed closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
     # although you can find text which claims the latter is best (and also that the two LANCZOS
@@ -156,7 +144,7 @@ try:
     from pillow_heif import register_heif_opener # the absence of heif handling is handled so pylint: disable=import-error
     register_heif_opener()
 except ModuleNotFoundError as heifex:
-    logging.warning(f"{heifex.msg}: direct use of .heic images is not available")
+    logging.warning(f"{heifex.msg}: direct use of .heic images is not available without pillow_heif available")
 
 # ### settings ####
 image_res = 150  # dpi  The resolution of normal images will be reduced to this value, if it is higher.
@@ -168,31 +156,9 @@ image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # Tabs seem to be in 8mm pitch
 tab_pitch = 80
 
-# page sizes for various products. Probably not important since the bundlesize element
-# is used to set the page sizes along the way
-formats = {
-    "ALB82": reportlab.lib.pagesizes.A4,
-    "ALB98": reportlab.lib.pagesizes.A4, # unittest, L 20.5cm x 27.0cm
-    "ALB32": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm), # album XL, 30 x 30 cm
-    "ALB17": (205 * reportlab.lib.pagesizes.mm, 205 * reportlab.lib.pagesizes.mm), # album kvadratisk, 20.5 x 20.5 cm
-    "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm),
-    # add other page sizes here
-    "MEM3": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm) # memory game cards 6x6cm
-    }
-
-# product style. The CEWE album products (which is what we are normally expecting in this
-# code) are basically defined in two page bundles. We normally will want single side pdfs
-# so we let the style default to ProductStyle.AlbumSingleSide unless the product is found
-# in this table. If we want to keep the double side layout in the pdf, then the keepDoublePages
-# option will cause AlbumSingleSide to be changed to AlbumDoubleSide.
-# Other "non-album" styles which we handle appear in this table
-styles = {
-    "MEM3": ProductStyle.MemoryCard # memory game cards 6x6cm
-    }
-
 f = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
-tempFileList = []  # we need to remove all this temporary files at the end
+tempFileList = []  # we need to remove all the temporary files at the end
 
 # reportlab defaults
 # pdf_styles = getSampleStyleSheet()
@@ -204,34 +170,6 @@ clipartPathList = tuple[str]()
 passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
 passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
 defaultConfigSection = None
-
-
-def autorot(im):
-    # some cameras return JPEG in MPO container format. Just use the first image.
-    if im.format not in ('JPEG', 'MPO'):
-        return im
-    ExifRotationTag = 274
-    exifdict = im.getexif()
-    if exifdict is not None and ExifRotationTag in list(exifdict.keys()):
-        orientation = exifdict[ExifRotationTag]
-        # The PIL.Image values must be dynamic in some way so disable pylint no-member
-        if orientation == 2:
-            im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT) # pylint: disable=no-member
-        elif orientation == 3:
-            im = im.transpose(PIL.Image.ROTATE_180) # pylint: disable=no-member
-        elif orientation == 4:
-            im = im.transpose(PIL.Image.FLIP_TOP_BOTTOM) # pylint: disable=no-member
-        elif orientation == 5:
-            im = im.transpose(PIL.Image.FLIP_TOP_BOTTOM) # pylint: disable=no-member
-            im = im.transpose(PIL.Image.ROTATE_90) # pylint: disable=no-member
-        elif orientation == 6:
-            im = im.transpose(PIL.Image.ROTATE_270) # pylint: disable=no-member
-        elif orientation == 7:
-            im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT) # pylint: disable=no-member
-            im = im.transpose(PIL.Image.ROTATE_90) # pylint: disable=no-member
-        elif orientation == 8:
-            im = im.transpose(PIL.Image.ROTATE_90) # pylint: disable=no-member
-    return im
 
 
 def getPageElementForPageNumber(fotobook, pageNumber):
@@ -248,10 +186,10 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
     if pagetype == PageType.EmptyPage:
         # EmptyPage is used when we're processing the inside cover / first page pair
         # for the second time after already processing it once as SingleSide
-        if isAlbumSingleSide(productstyle):
+        if AlbumInfo.isAlbumSingleSide(productstyle):
             # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
             return
-        if isAlbumDoubleSide(productstyle):
+        if AlbumInfo.isAlbumDoubleSide(productstyle):
             # if we just return here, then everything looks "nice" because this inside
             # front cover page comes out with the background of the first inner side.
             # But "nice" is not the same as the cewe album. If you want white inside cover pages, set the ini file
@@ -259,10 +197,10 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
             areaWidth = areaWidth / 2
 
     if pagetype == PageType.BackInsideCover:
-        if isAlbumSingleSide(productstyle):
+        if AlbumInfo.isAlbumSingleSide(productstyle):
             # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
             return
-        if isAlbumDoubleSide(productstyle):
+        if AlbumInfo.isAlbumDoubleSide(productstyle):
             areaWidth = areaWidth / 2
             areaXOffset = areaXOffset + areaWidth
 
@@ -278,7 +216,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 backgroundTag = curTag
                 break
 
-        if pagetype == PageType.Normal and isAlbumDoubleSide(productstyle) and backgroundTag.get('alignment') == "3":
+        if pagetype == PageType.Normal and AlbumInfo.isAlbumDoubleSide(productstyle) and backgroundTag.get('alignment') == "3":
             areaWidth = areaWidth / 2
             areaXOffset = areaXOffset + areaWidth
 
@@ -342,7 +280,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     if imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
         # display on the right page
-        if isAlbumDoubleSide(productstyle):
+        if AlbumInfo.isAlbumDoubleSide(productstyle):
             img_transx = transx + f * pw/2
         else:
             img_transx = transx + f * pw
@@ -352,10 +290,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # correct for exif rotation
     im = autorot(im)
     # get the cutout position and scale
-    imleft = float(imageTag.find('cutout').get(
-        'left').replace(',', '.'))
-    imtop = float(imageTag.find('cutout').get(
-        'top').replace(',', '.'))
+    imleft = float(imageTag.find('cutout').get('left').replace(',', '.'))
+    imtop = float(imageTag.find('cutout').get('top').replace(',', '.'))
     # imageWidth_px, imageHeight_px = im.size
     imScale = float(imageTag.find('cutout').get('scale'))
 
@@ -832,20 +768,20 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
 
 def processElements(additional_fonts, fotobook, imagedir,
                     productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage):
-    if isAlbumDoubleSide(productstyle) and pagetype == PageType.Normal and not oddpage and not lastpage:
+    if AlbumInfo.isAlbumDoubleSide(productstyle) and pagetype == PageType.Normal and not oddpage and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
 
     # the mcf file really comes in "bundles" of two pages, so for odd pages we switch back to
     # the page element for the preceding even page to get the elements
-    if isAlbumProduct(productstyle) and pagetype == PageType.Normal and oddpage:
+    if AlbumInfo.isAlbumProduct(productstyle) and pagetype == PageType.Normal and oddpage:
         page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
 
     for area in page.findall('area'):
         areaPos = area.find('position')
         areaLeft = float(areaPos.get('left').replace(',', '.'))
         if pagetype != PageType.SingleSide or len(area.findall('imagebackground')) == 0:
-            if oddpage and isAlbumSingleSide(productstyle):
+            if oddpage and AlbumInfo.isAlbumSingleSide(productstyle):
                 # shift double-page content from other page
                 areaLeft -= pw
         areaTop = float(areaPos.get('top').replace(',', '.'))
@@ -854,7 +790,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         areaRot = float(areaPos.get('rotation'))
 
         # check if the image is on current page at all, and if not then skip processing it
-        if isAlbumSingleSide(productstyle) and pagetype in [PageType.Normal, PageType.Cover]:
+        if AlbumInfo.isAlbumSingleSide(productstyle) and pagetype in [PageType.Normal, PageType.Cover]:
             if oddpage:
                 # the right edge of image is beyond the left page border
                 if (areaLeft+areaWidth) < 0:
@@ -898,7 +834,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     if bundlesize is not None:
         pw = float(bundlesize.get('width'))
         ph = float(bundlesize.get('height'))
-        if isAlbumSingleSide(productstyle):
+        if AlbumInfo.isAlbumSingleSide(productstyle):
             pw = pw / 2 # reduce the page width to a single page width for single sided
     else:
         # Assume A4 page size
@@ -914,85 +850,13 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     backgroundTags = page.findall('background')
     processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, productstyle, pagetype, pdf, ph, pw)
 
-    if isAlbumSingleSide(productstyle) and pagetype == PageType.SingleSide:
+    if AlbumInfo.isAlbumSingleSide(productstyle) and pagetype == PageType.SingleSide:
         # This must be page 1, the inside front cover, so we only do the background. Page 1
         # is processed again with PageType.EmptyPage, and the elements will be done then
         return
 
     # all elements (images, text,..) for even and odd pages are defined on the even page element!
     processElements(additional_fonts, fotobook, imagedir, productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
-
-
-def readClipArtConfigXML(baseFolder, keyaccountFolder):
-    """Parse the configuration XML file and generate a dictionary of designElementId to fileName
-    currently only cliparts_default.xml is supported !"""
-    global clipartPathList  # pylint: disable=global-statement
-    clipartPathList = CeweInfo.getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
-    xmlConfigFileName = 'cliparts_default.xml'
-    try:
-        xmlFileName = findFileInDirs(xmlConfigFileName, clipartPathList)
-        loadClipartConfigXML(xmlFileName)
-        configlogger.info(f'{xmlFileName} listed {len(clipartDict)} cliparts')
-    except: # noqa: E722
-        configlogger.info(f'Could not locate and load the clipart definition file: {xmlConfigFileName}')
-        configlogger.info('Trying a search for cliparts instead')
-        # cliparts_default.xml went missing in 7.3.4 so we have to go looking for all the individual xml
-        # files, which still seem to be there and have the same format as cliparts_default.xml, and see
-        # if we can build our internal dictionary from them.
-        decorations = CeweInfo.getCeweDecorationsFolder(baseFolder)
-        configlogger.info(f'clipart xml path: {decorations}')
-        for (root, dirs, files) in os.walk(decorations): # walk returns a 3-tuple so pylint: disable=unused-variable
-            for decorationfile in files:
-                if decorationfile.endswith(".xml"):
-                    loadClipartConfigXML(os.path.join(root, decorationfile))
-        numberClipartsLocated = len(clipartDict)
-        if numberClipartsLocated > 0:
-            configlogger.info(f'{numberClipartsLocated} clipart xmls found')
-        else:
-            configlogger.error('No clipart xmls found, no delivered cliparts will be available.')
-
-    if keyaccountFolder is None:
-        # In "production" this is definitely an error, although for unit tests (in particular when
-        # run on the checkin build where CEWE is not installed and there is definitely no downloaded
-        # stuff from the installation) it isn't really an error because there is a local folder
-        # tests/Resources/photofun/decorations with the clipart files needed for the tests.
-        configlogger.error("No downloaded clipart folder found")
-        return
-
-    # from (at least) 7.3.4 the addon cliparts might be in more than one structure, so ... first the older layout
-    addonclipartxmls = os.path.join(keyaccountFolder, "addons", "*", "cliparts", "v1", "decorations", "*.xml")
-    for file in glob.glob(addonclipartxmls):
-        loadClipartConfigXML(file)
-
-    # then the newer layout
-    currentClipartCount = len(clipartDict)
-    localDecorations = os.path.join(keyaccountFolder, 'photofun', 'decorations')
-    xmlfiles = glob.glob(os.path.join(localDecorations, "*", "*", "*.xml"))
-    configlogger.info(f'local clipart xml path: {localDecorations}')
-    for xmlfile in xmlfiles:
-        loadClipartConfigXML(xmlfile)
-    numberClipartsLocated = len(clipartDict) - currentClipartCount
-    if numberClipartsLocated > 0:
-        configlogger.info(f'{numberClipartsLocated} local clipart xmls found')
-
-    if len(clipartDict) == 0:
-        configlogger.error('No cliparts found')
-
-
-def loadClipartConfigXML(xmlFileName):
-    try:
-        with open(xmlFileName, 'rb') as clipArtXml:
-            xmlInfo = etree.parse(clipArtXml)
-        for decoration in xmlInfo.findall('decoration'):
-            clipartElement = decoration.find('clipart')
-            # we might be reading a decoration definition that is not clipart, just ignore those
-            if clipartElement is None:
-                continue
-            fileName = os.path.join(os.path.dirname(xmlFileName), clipartElement.get('file'))
-            designElementId = int(clipartElement.get('designElementId'))    # assume these IDs are always integers.
-            clipartDict[designElementId] = fileName
-    except Exception as clpOpenEx:
-        logging.error(f"Cannot open clipart file {xmlFileName}: {repr(clpOpenEx)}")
 
 
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None): # noqa: C901 (too complex)
@@ -1155,16 +1019,16 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     imageFolder = fotobook.get('imagedir')
 
     # generate a list of available clip-arts
-    readClipArtConfigXML(cewe_folder, keyAccountFolder)
+    clipartPathList = readClipArtConfigXML(cewe_folder, keyAccountFolder, clipartDict)
 
     # find the correct size for the album format (if we know!) and set the product style
     pagesize = reportlab.lib.pagesizes.A4
     productstyle = ProductStyle.AlbumSingleSide
     productname = fotobook.get('productname')
-    if productname in formats: # IMO this is clearest so pylint: disable=consider-using-get
-        pagesize = formats[productname]
-    if productname in styles: # IMO this is clearest so pylint: disable=consider-using-get
-        productstyle = styles[productname]
+    if productname in AlbumInfo.formats: # IMO this is clearest so pylint: disable=consider-using-get
+        pagesize = AlbumInfo.formats[productname]
+    if productname in AlbumInfo.styles: # IMO this is clearest so pylint: disable=consider-using-get
+        productstyle = AlbumInfo.styles[productname]
     if keepDoublePages:
         if productstyle == ProductStyle.AlbumSingleSide:
             productstyle = ProductStyle.AlbumDoubleSide
@@ -1225,7 +1089,7 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
 
             # The <page> sections all have a pagenr attribute. The normal pages run from pagenr 1 to pagenr 26 while there are
             # actually FIVE page elements with pagenr 0 in a default album file, 4 coming before pagenr 1 and 1 after pagenr 26
-            if isAlbumProduct(productstyle) and ((n == 0) or IsBackCover(n)): # clearest like this so pylint: disable=consider-using-in
+            if AlbumInfo.isAlbumProduct(productstyle) and ((n == 0) or IsBackCover(n)): # clearest like this so pylint: disable=consider-using-in
                 fullcoverpages = [i for i in
                     fotobook.findall("./page[@pagenr='0'][@type='FULLCOVER']")
                     + fotobook.findall("./page[@pagenr='0'][@type='fullcover']")
@@ -1239,13 +1103,13 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                     pagetype = PageType.Cover
                     pageNumber = n
                     # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
-                    if (isAlbumDoubleSide(productstyle) and IsBackCover(pageNumber)):
+                    if (AlbumInfo.isAlbumDoubleSide(productstyle) and IsBackCover(pageNumber)):
                         page = None
                 else:
                     logging.warning("Cannot locate a cover page, is this really an album?")
                     page = None
 
-            elif isAlbumProduct(productstyle) and n == 1: # album page 1 is handled specially
+            elif AlbumInfo.isAlbumProduct(productstyle) and n == 1: # album page 1 is handled specially
                 pageNumber = 1
                 oddpage = True
                 # Look for an empty page 0 that still contains an area element
@@ -1274,7 +1138,7 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                         bg_notFoundDirList, availableFonts, lastpage)
                 pagetype = PageType.EmptyPage
 
-            elif isAlbumProduct(productstyle) and lastpage: # album last page is special because of inside cover
+            elif AlbumInfo.isAlbumProduct(productstyle) and lastpage: # album last page is special because of inside cover
                 pageNumber = n
                 if pageNumbers is None or pageNumber in pageNumbers:
                     # process the actual last page
@@ -1320,11 +1184,11 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                     bg_notFoundDirList, availableFonts, lastpage)
 
                 # finish the pdf page and start a new one.
-                if not isAlbumProduct(productstyle):
+                if not AlbumInfo.isAlbumProduct(productstyle):
                     # it would be neat to duplicate the page for MemoryCard products but showPage
                     # empties the canvas so the user must just print the pdf file twice!
                     pdf.showPage()
-                elif isAlbumSingleSide(productstyle):
+                elif AlbumInfo.isAlbumSingleSide(productstyle):
                     pdf.showPage()
                 elif oddpage or (pagetype == PageType.Cover and not IsBackCover(n)):
                     # We're creating a AlbumDoubleSide so we only output after the odd pages
