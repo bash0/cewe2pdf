@@ -3,10 +3,58 @@ import logging
 import os.path
 import os
 import sys
+from enum import Enum
+
+import reportlab.lib
 
 from lxml import etree
-
 from extraLoggers import mustsee
+
+
+class ProductStyle(Enum):
+    AlbumSingleSide = 1  # normal for albums, we divide the cewe 2 page bundle to single pages
+    AlbumDoubleSide = 2  # any album when --keepdoublepages is set
+    MemoryCard = 3 # memory card game
+
+
+class AlbumInfo():
+    def __init__(self):
+        return
+
+    # page sizes for various products. Probably not important since the bundlesize element
+    # is used to set the page sizes along the way
+    formats = {
+        "ALB82": reportlab.lib.pagesizes.A4,
+        "ALB98": reportlab.lib.pagesizes.A4, # unittest, L 20.5cm x 27.0cm
+        "ALB32": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm), # album XL, 30 x 30 cm
+        "ALB17": (205 * reportlab.lib.pagesizes.mm, 205 * reportlab.lib.pagesizes.mm), # album kvadratisk, 20.5 x 20.5 cm
+        "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm),
+        # add other page sizes here
+        "MEM3": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm) # memory game cards 6x6cm
+        }
+
+    # product style. The CEWE album products (which is what we are normally expecting in this
+    # code) are basically defined in two page bundles. We normally will want single side pdfs
+    # so we let the style default to ProductStyle.AlbumSingleSide unless the product is found
+    # in this table. If we want to keep the double side layout in the pdf, then the keepDoublePages
+    # option will cause AlbumSingleSide to be changed to AlbumDoubleSide.
+    # Other "non-album" styles which we handle appear in this table
+    styles = {
+        "MEM3": ProductStyle.MemoryCard # memory game cards 6x6cm
+        }
+
+    @staticmethod
+    def isAlbumProduct(ps: ProductStyle):
+        return ps in (ProductStyle.AlbumSingleSide, ProductStyle.AlbumDoubleSide)
+
+    @staticmethod
+    def isAlbumSingleSide(ps: ProductStyle):
+        return ps == ProductStyle.AlbumSingleSide
+
+    @staticmethod
+    def isAlbumDoubleSide(ps: ProductStyle):
+        return ps == ProductStyle.AlbumDoubleSide
+
 
 class CeweInfo():
     def __init__(self):

@@ -152,6 +152,9 @@
     <Compile Include="extraLoggers.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="imageUtils.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="lineScales.py">
       <SubType>Code</SubType>
     </Compile>
