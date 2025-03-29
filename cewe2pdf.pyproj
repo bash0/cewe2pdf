@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>runAllTests.py</StartupFile>
+    <StartupFile>tests\testFontSubstitution\test_fontSubstitution.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -43,7 +43,6 @@
     <Content Include="tests\Resources\photofun\decorations\46537\46537.json" />
     <Content Include="tests\Resources\photofun\decorations\46537\Kreis\Kreis.clp" />
     <Content Include="tests\Resources\photofun\decorations\46537\Kreis\Kreis.xml" />
-    <Content Include="tests\Resources\photofun\fonts\info.txt" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSans-BaDn.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansBold-1adM.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansBoldItalic-ngV4.ttf" />
@@ -64,6 +63,10 @@
     <Content Include="TestingOnWSL.md" />
     <Content Include="tests\testClipart\additional_fonts.txt" />
     <Content Include="tests\testEmptyPageOne\additional_fonts.txt" />
+    <Content Include="tests\testfontsubstitution\additional_fonts.txt" />
+    <Content Include="tests\testfontsubstitution\cewe2pdf.ini" />
+    <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
+    <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
     <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
     <Content Include="tests\cewe2pdf-local.ini" />
     <Content Include="tests\unittest_fotobook\cewe2pdf.ini" />
@@ -170,6 +173,7 @@
     <Compile Include="tests\testClipart\test_drawClipart.py" />
     <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
+    <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\unittest_fotobook\test_simpleBook.py" />
     <Compile Include="tests\test_webp_loading\test_webp_loading.py" />
@@ -198,6 +202,8 @@
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\decorations\" />
     <Folder Include="tests\Resources\photofun\fonts\" />
     <Folder Include="tests\Resources\photofun\fonts\misc\" />
+    <Folder Include="tests\testfontsubstitution\" />
+    <Folder Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\" />
     <Folder Include="tests\test_webp_loading\" />
     <Folder Include="tests\unittest_fotobook\" />
     <Folder Include="tests\Resources\" />

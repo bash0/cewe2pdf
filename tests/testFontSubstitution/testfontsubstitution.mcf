@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="9171" article_name="CEWE%20FOTOBOK%20stor%20Softcover%20standard%20digitaltrykk" externalProjectId="" folderID="1e309ef6-93ca-461f-84ff-9d3ffc01f662" imagedir="testfontsubstitution_mcf-Dateien" isDataMcf="0" productname="ALB14" startdatecalendarium="" useSpineLogo="1" version="4.0">
+    <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="9c7098ea-9e57-4db7-a83c-6e4ed777877a" projectIDCreatedEpoch="1743274466"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-03-29 20:03"/>
+    <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-03-29 07:01"/>
+    <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
+    <addOns/>
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="CEWE Head" fontitalics="0" fontsize="12" format="0" margin="110" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
+        <outline width="0"/>
+    </pagenumbering>
+    <extra>
+        <lastTextFormat Alignment="ALIGNLEFT" IndentMargin="2" VerticalIndentMargin="2" backgroundColor="#00000000" font="Arial Narrow,11,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <imageQuality version="1.0.0"/>
+    </extra>
+    <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2700" width="4128"/>
+        <designElementIDs background="201" layout="384109"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
+        <area areatype="spinetextarea">
+            <position height="38" left="764" rotation="270" top="1331" width="2600" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body style=" font-family:'CEWE Head'; font-size:6pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,6,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="spine">
+        <bundlesize height="2700" width="4128"/>
+        <designElementIDs background="201"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2700" width="4128"/>
+        <designElementIDs background="201" layout="422099"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="422099" layout="1" templatename="fullcoverpage_with_title"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <area areatype="imagearea">
+            <position height="1200" left="2160" rotation="0" top="110" width="1830" zposition="100"/>
+            <decoration/>
+            <image/>
+        </area>
+        <area areatype="imagearea">
+            <position height="1200" left="2160" rotation="0" top="1390" width="1830" zposition="101"/>
+            <decoration/>
+            <image/>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="clipartarea">
+            <position height="66" left="218.257" rotation="90" top="375.897" width="405.691" zposition="103"/>
+            <designElementIDs clipart="63457"/>
+            <decoration/>
+            <clipart designElementId="63457">
+                <ClipartConfiguration applySpotColor="0">
+                    <colors>
+                        <color source="#000000" target="#df1900"/>
+                    </colors>
+                </ClipartConfiguration>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="66" left="464.259" rotation="90" top="375.897" width="406" zposition="104"/>
+            <designElementIDs clipart="63457"/>
+            <decoration/>
+            <clipart designElementId="63457">
+                <ClipartConfiguration applySpotColor="0">
+                    <colors>
+                        <color source="#000000" target="#df1900"/>
+                    </colors>
+                </ClipartConfiguration>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="66" left="515.895" rotation="90" top="375.897" width="406" zposition="105"/>
+            <designElementIDs clipart="63457"/>
+            <decoration/>
+            <clipart designElementId="63457">
+                <ClipartConfiguration applySpotColor="0">
+                    <colors>
+                        <color source="#000000" target="#df1900"/>
+                    </colors>
+                </ClipartConfiguration>
+            </clipart>
+        </area>
+        <area areatype="textarea">
+            <position height="69.5291" left="167.047" rotation="0" top="263.65" width="260.956" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:6px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="69.5291" left="167.047" rotation="0" top="368.693" width="539.116" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:6px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Liberation Sans</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="69.5291" left="167.047" rotation="0" top="479" width="606.223" zposition="7002"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:8px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Liberation Sans Narrow</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="5" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="6" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="7" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="8" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="9" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="10" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="11" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="12" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="13" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="14" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="15" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="16" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="17" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="18" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="19" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="20" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="21" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="22" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="23" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="24" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="25" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="26" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships/>
+    <statistics assistantUsed="0" countPauses="4" elapsedTimeGross="2025-03-29T07:01:21" elapsedTimeNet="19738" fotosAdded="0" fotosRemoved="0" pauseTime="16447" sessionsUsed="4"/>
+</fotobook>

@@ -96,6 +96,7 @@ def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe
 
 def buildFontsToRegisterFromTtfFiles(ttfFiles, fontList, fontFamilyList):
     if len(ttfFiles) > 0:
+        redefinedCount = 0
         ttfFiles = list(dict.fromkeys(ttfFiles)) # remove duplicates
         for ttfFile in ttfFiles:
             font = ttLib.TTFont(ttfFile)
@@ -142,7 +143,11 @@ def buildFontsToRegisterFromTtfFiles(ttfFiles, fontList, fontFamilyList):
                 configlogger.warning(f"Revised regular fontFullName '{fontFullName}' to '{fontFamily}'")
                 fontFullName = fontFamily
 
-            fontList[fontFullName] = ttfFile
+            if fontFullName in fontList:
+                configlogger.info(f"'{fontFullName}' redefined: the first definition '{fontList[fontFullName]}' is preferred over '{ttfFile}'")
+                redefinedCount = redefinedCount + 1
+            else:
+                fontList[fontFullName] = ttfFile
 
             # first time we see a family we create an empty entry from that family to the R,B,I,BI font names
             if fontFamily not in fontFamilyList:
@@ -170,6 +175,8 @@ def buildFontsToRegisterFromTtfFiles(ttfFiles, fontList, fontFamilyList):
                 fontFamilyList[fontFamily]["normal"] = fontFamily
                 fontList[fontFamily] = ttfFile
 
+        if redefinedCount > 0:
+            configlogger.warning(f"Multiple ttf files found for {redefinedCount} fonts, increase the cewe2pdf.config log level to see redefinitions")
 
 def getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontList):
     if defaultConfigSection is None:
@@ -216,7 +223,11 @@ def addTtfFilesFromFontdirs(ttfFiles, fontDirs, appDataDir):
             # a Linux subsystem on a Windows machine and file system. So we use a case insensitive
             # alternative [until Python 3.12 when glob itself offers case insensitivity] Ref the
             # discussion at https://stackoverflow.com/questions/8151300/ignore-case-in-glob-on-linux
-            ttfextras = findFilesInDir(fontDir, '*.ttf')
+            ttfextras = findFilesInDir(fontDir, '*.ttf', walk_structure = False)
+                # walk_structure set to True looks like a good idea, so we could keep our own
+                # downloaded fonts, eg from Google Fonts, in separate folders. But it turns out
+                # that Windows really assumes that searches are restricted to a single folder,
+                # so that deleted fonts may be moved to a "Deleted" sub folder.
             ttfFiles.extend(sorted(ttfextras))
 
             # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf
@@ -251,3 +262,23 @@ def registerFontFamilies(fontFamilies, explicitlyRegisteredFamilyNames):
                 configlogger.info(f"Registered fontfamily '{familyName}': {fontFamily}")
             else:
                 configlogger.info(f"Font family '{familyName}' was already registered from configuration file")
+
+
+def determineFontSubstitution(family):
+    knownSubstitutions = {
+            "Arial": "Liberation Sans Narrow",
+            "Arial Narrow": "Liberation Sans Narrow",
+            "Arial Rounded MT Bold": "Liberation Sans Bold",
+            "Bodoni": "Libre Bodoni",
+            "Calibri": "Liberation Sans Narrow",
+            "CalligraphScript": "Liberation Sans Narrow",
+            "CEWE Head": "Poppins Black",
+            "Stafford": "Liberation Sans Narrow",
+            "FranklinGothic": "Libre Bodoni",
+            }
+    if family in knownSubstitutions:
+        bodyfont = knownSubstitutions[family]
+    else:
+        bodyfont = 'Helvetica'
+        # reportlabs actually offers Helvetica, which is a bit strange since it is a proprietary font.
+    return bodyfont
