@@ -72,3 +72,4 @@ nosetests.xml
 /tests/testEmptyPageOne/test_emptyPageOne.mcf.pdf
 /tests/unittest_fotobook/unittest_fotobook.mcf.pdf
 /tests/unittest_fotobook/unittest_fotobook.mcfx.pdf
+/tests/testFontSubstitution/testfontsubstitution.mcf.pdf
