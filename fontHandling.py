@@ -266,15 +266,21 @@ def registerFontFamilies(fontFamilies, explicitlyRegisteredFamilyNames):
 
 def determineFontSubstitution(family):
     knownSubstitutions = {
-            "Arial": "Liberation Sans Narrow",
-            "Arial Narrow": "Liberation Sans Narrow",
-            "Arial Rounded MT Bold": "Liberation Sans Bold",
-            "Bodoni": "Libre Bodoni",
-            "Calibri": "Liberation Sans Narrow",
-            "CalligraphScript": "Liberation Sans Narrow",
-            "CEWE Head": "Poppins Black",
-            "Stafford": "Liberation Sans Narrow",
-            "FranklinGothic": "Libre Bodoni",
+            "Arial":                    "Liberation Sans Narrow",
+            "Arial Narrow":             "Liberation Sans Narrow",
+            "Arial Rounded MT Bold":    "Poppins",
+            "Bodoni":                   "EB Garamond",
+            "Calibri":                  "Liberation Sans Narrow",
+            "CalligraphScript":         "Edwardian Script ITC",
+            "CEWE Head":                "EB Garamond",
+            "FranklinGothic":           "Liberation Sans Narrow",
+            "Stafford":                 "Liberation Sans Narrow",
+            "Balloon Caps":             "Liberation Sans Narrow",
+            # Crafty Girls
+            # Function
+            # Harlow Solid Italic
+            # Pecita
+            # Segoe UI Symbol
             }
     if family in knownSubstitutions:
         bodyfont = knownSubstitutions[family]
@@ -282,3 +288,4 @@ def determineFontSubstitution(family):
         bodyfont = 'Helvetica'
         # reportlabs actually offers Helvetica, which is a bit strange since it is a proprietary font.
     return bodyfont
+
