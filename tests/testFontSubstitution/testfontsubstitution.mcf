@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9171" article_name="CEWE%20FOTOBOK%20stor%20Softcover%20standard%20digitaltrykk" externalProjectId="" folderID="bd35a3fb-5300-46ac-8c2f-2fa7d17f66f6" imagedir="testfontsubstitution_mcf-Dateien" isDataMcf="0" productname="ALB14" startdatecalendarium="" useSpineLogo="1" version="4.0">
-    <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="9c7098ea-9e57-4db7-a83c-6e4ed777877a" projectIDCreatedEpoch="1743316353"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-03-30 09:28"/>
+<fotobook art_id="9171" article_name="CEWE%20FOTOBOK%20stor%20Softcover%20standard%20digitaltrykk" externalProjectId="" folderID="0c6d1dc9-407e-4155-84b5-505788c3926b" imagedir="testfontsubstitution_mcf-Dateien" isDataMcf="0" productname="ALB14" startdatecalendarium="" useSpineLogo="1" version="4.0">
+    <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="9c7098ea-9e57-4db7-a83c-6e4ed777877a" projectIDCreatedEpoch="1743324555"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-03-30 17:27"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-03-29 07:01"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -9,7 +9,7 @@
         <outline width="0"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Poppins,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.0.0"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
@@ -25,7 +25,7 @@
 p, li { white-space: pre-wrap; }
 </style></head><body style=" font-family:'CEWE Head'; font-size:6pt; font-weight:400; font-style:normal;">
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,6,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,6,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -67,7 +67,7 @@ p, li { white-space: pre-wrap; }
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
         <area areatype="clipartarea">
-            <position height="66" left="748.348" rotation="90" top="1476.42" width="2020.76" zposition="103"/>
+            <position height="66" left="748.728" rotation="90" top="1476.42" width="2020" zposition="103"/>
             <designElementIDs clipart="63457"/>
             <decoration/>
             <clipart designElementId="63457">
@@ -84,61 +84,61 @@ p, li { white-space: pre-wrap; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:6px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="75" left="120.147" rotation="0" top="663.739" width="359.526" zposition="7003"/>
+            <position height="69" left="120.147" rotation="0" top="656.739" width="359.526" zposition="7003"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:9px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Narrow</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:6px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Narrow</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="69" left="120.147" rotation="0" top="847.985" width="722.671" zposition="7004"/>
+            <position height="82.4202" left="116.516" rotation="0" top="831.854" width="739.25" zposition="7004"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial Rounded MT Bold'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:6px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Rounded MT Bold</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial Rounded MT Bold,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial Rounded MT Bold'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Rounded MT Bold.</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial Rounded MT Bold,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="69" left="120.147" rotation="0" top="1026.23" width="329.464" zposition="7005"/>
+            <position height="76.2629" left="120.147" rotation="0" top="1026.23" width="354.884" zposition="7005"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Bodoni'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Bodoni</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Bodoni,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Bodoni'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:9px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Bodoni</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Bodoni,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="69" left="120.147" rotation="0" top="1204.48" width="277.213" zposition="7006"/>
+            <position height="69" left="120.147" rotation="0" top="1213.48" width="277.213" zposition="7006"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:4px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Calibri</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="75" left="120.147" rotation="0" top="1382.73" width="445" zposition="7007"/>
+            <position height="69" left="120.147" rotation="0" top="1385.73" width="445" zposition="7007"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'CalligraphScript'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:6px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in CalligraphScript</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="CalligraphScript,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'CalligraphScript'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:3px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in CalligraphScript</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="CalligraphScript,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="69" left="120.147" rotation="0" top="1573.65" width="429" zposition="7008"/>
+            <position height="69" left="120.147" rotation="0" top="1573.65" width="447.157" zposition="7008"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'CEWE Head'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in CEWE Head</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="CEWE Head,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="CEWE Head,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -147,79 +147,79 @@ p, li { white-space: pre-wrap; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:7px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Stafford</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Stafford,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Stafford,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="54" left="120.201" rotation="0" top="1923.68" width="466.391" zposition="7010"/>
+            <position height="69" left="120.147" rotation="0" top="1916.18" width="466.391" zposition="7010"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'FranklinGothic'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in FranklinGothic</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="FranklinGothic,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'FranklinGothic'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:7px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in FranklinGothic</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="FranklinGothic,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="69" left="120.514" rotation="0" top="565.446" width="260.266" zposition="7011"/>
+            <position height="69" left="120.147" rotation="0" top="565.446" width="260.266" zposition="7011"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:8px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="75" left="120.384" rotation="0" top="746.698" width="359.526" zposition="7014"/>
+            <position height="69" left="120.147" rotation="0" top="739.698" width="359.526" zposition="7014"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:11px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Narrow</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:8px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Narrow</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="74" left="120.312" rotation="0" top="927.951" width="722.671" zposition="7015"/>
+            <position height="82.4202" left="116.516" rotation="0" top="923.741" width="739.25" zposition="7015"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Poppins'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Rounded MT Bold</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Poppins'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:4px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Rounded MT Bold</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="69" left="120.147" rotation="0" top="1106.2" width="329.464" zposition="7016"/>
+            <position height="76.2629" left="116.516" rotation="0" top="1113.2" width="358.516" zposition="7016"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'EB Garamond'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:2px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Bodoni</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'EB Garamond'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:6px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Bodoni</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="69" left="120.147" rotation="0" top="1284.46" width="277.213" zposition="7017"/>
+            <position height="69" left="120.147" rotation="0" top="1293.46" width="277.213" zposition="7017"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:8px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Calibri</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="58" left="120.147" rotation="0" top="1466.71" width="445" zposition="7018"/>
+            <position height="69" left="120.147" rotation="0" top="1463.21" width="445" zposition="7018"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Edwardian Script ITC'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in CalligraphScript</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Edwardian Script ITC,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Edwardian Script ITC'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-family:'Dancing Script'; color:#000000;">Text in CalligraphScript</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Edwardian Script ITC,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="53" left="120.147" rotation="0" top="1661.55" width="429" zposition="7019"/>
+            <position height="74" left="120.147" rotation="0" top="1654.05" width="447.157" zposition="7019"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in CEWE Head</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:8px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-family:'Liberation Sans'; color:#000000;">Text in CEWE Head</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -228,41 +228,77 @@ p, li { white-space: pre-wrap; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:8px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Stafford</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="53" left="120.201" rotation="0" top="1987.51" width="452" zposition="7021"/>
+            <position height="69" left="120.147" rotation="0" top="1999.51" width="466.391" zposition="7021"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in FranklinGothic</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:8px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in FranklinGothic</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
             <position height="294" left="120.147" rotation="0" top="114.706" width="1672.85" zposition="7022"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Arial'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-size:12pt; color:#000000;">This shows how text in various fonts appears when that font is not available and a substitution is made. The top text of a pair is in the named font. The lower text, which says the same, is in the font which will be used as a substitution. The idea is that we can see what the text looks like in the substitution font - we want the substituions to be roughly the same weight, and perhaps most importantly, no wider. The text boxes are adjusted to the width of the text in the original font. The substitution is supposed to fit inside as well.</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNTOP,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNTOP" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="54" left="120.201" rotation="0" top="2082.89" width="449" zposition="7023"/>
+            <position height="69" left="120.147" rotation="0" top="2091.39" width="449" zposition="7023"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Balloon Caps'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Balloon Caps</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Balloon Caps,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Balloon Caps'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:7px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Balloon Caps</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Balloon Caps,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="64" left="120.201" rotation="0" top="2145.89" width="452" zposition="7024"/>
+            <position height="69" left="120.147" rotation="0" top="2171.39" width="449" zposition="7024"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:5px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Text in Balloon Caps</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:8px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Text in Balloon Caps</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="61" left="120.147" rotation="0" top="2270.68" width="449" zposition="7025"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Balloon Caps'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-family:'Pecita'; color:#000000;">Text in Pecita</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Balloon Caps,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="61" left="120.147" rotation="0" top="2342.68" width="449" zposition="7026"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:1px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Dancing Script'; color:#000000;">Text in Pecita</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="67" left="121.477" rotation="0" top="2453.54" width="336.425" zposition="7027"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Pecita'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Segoe UI Symbol'; color:#000000; background-color:#ffffff;">©☹♡</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Pecita,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="66" left="121.477" rotation="0" top="2538.65" width="336" zposition="7029"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Segoe UI Symbol'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000; background-color:#ffffff;">©☹♡</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Segoe UI Symbol,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -417,5 +453,5 @@ p, li { white-space: pre-wrap; }
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships/>
-    <statistics assistantUsed="0" countPauses="10" elapsedTimeGross="2025-03-29T07:01:21" elapsedTimeNet="63853" fotosAdded="0" fotosRemoved="0" pauseTime="50941" sessionsUsed="5"/>
+    <statistics assistantUsed="0" countPauses="15" elapsedTimeGross="2025-03-29T07:01:21" elapsedTimeNet="92075" fotosAdded="0" fotosRemoved="0" pauseTime="71455" sessionsUsed="7"/>
 </fotobook>

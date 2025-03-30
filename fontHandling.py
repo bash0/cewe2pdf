@@ -271,15 +271,15 @@ def determineFontSubstitution(family):
             "Arial Rounded MT Bold":    "Poppins",
             "Bodoni":                   "EB Garamond",
             "Calibri":                  "Liberation Sans Narrow",
-            "CalligraphScript":         "Edwardian Script ITC",
-            "CEWE Head":                "EB Garamond",
+            "CalligraphScript":         "Dancing Script",
+            "CEWE Head":                "Liberation Sans",
             "FranklinGothic":           "Liberation Sans Narrow",
+            "Pecita":                   "Dancing Script",
             "Stafford":                 "Liberation Sans Narrow",
             "Balloon Caps":             "Liberation Sans Narrow",
             # Crafty Girls
             # Function
             # Harlow Solid Italic
-            # Pecita
             # Segoe UI Symbol
             }
     if family in knownSubstitutions:
