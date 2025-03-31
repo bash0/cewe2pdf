@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<decorations>
+	<decoration type="clipart">
+		<categories>
+			<category>category-test3</category>
+		</categories>
+		<clipart file="customClipart1.svg" designElementId="12345" designElementType="clipart"/>
+	</decoration>
+</decorations>

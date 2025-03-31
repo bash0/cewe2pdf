@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{261b8fb1-634c-480e-b162-8b5b56d18330}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>tests\unittest_fotobook\test_simpleBook.py</StartupFile>
+    <StartupFile>runAllTests.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -32,6 +32,17 @@
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6044.jpg" />
+    <Content Include="tests\Resources\photofun\decorations\106793\106793.json" />
+    <Content Include="tests\Resources\photofun\decorations\106793\8394-DECO-SF\8394-DECO-SF-clip.clp" />
+    <Content Include="tests\Resources\photofun\decorations\106793\8394-DECO-SF\8394-DECO-SF-mask.clp" />
+    <Content Include="tests\Resources\photofun\decorations\106793\8394-DECO-SF\8394-DECO-SF-preview.clp" />
+    <Content Include="tests\Resources\photofun\decorations\106793\8394-DECO-SF\8394-DECO-SF.xml" />
+    <Content Include="tests\Resources\photofun\decorations\106796\106796.json" />
+    <Content Include="tests\Resources\photofun\decorations\106796\8397-DECO-SF\8397-DECO-SF-clip.clp" />
+    <Content Include="tests\Resources\photofun\decorations\106796\8397-DECO-SF\8397-DECO-SF-mask.clp" />
+    <Content Include="tests\Resources\photofun\decorations\106796\8397-DECO-SF\8397-DECO-SF-preview.clp" />
+    <Content Include="tests\Resources\photofun\decorations\106796\8397-DECO-SF\8397-DECO-SF.xml" />
+    <Content Include="tests\Resources\photofun\decorations\11744-CLIP-CC.xml" />
     <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC-clip.clp" />
     <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC-mask.clp" />
     <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC-preview.clp" />
@@ -43,6 +54,17 @@
     <Content Include="tests\Resources\photofun\decorations\46537\46537.json" />
     <Content Include="tests\Resources\photofun\decorations\46537\Kreis\Kreis.clp" />
     <Content Include="tests\Resources\photofun\decorations\46537\Kreis\Kreis.xml" />
+    <Content Include="tests\Resources\photofun\decorations\5351-Clip-GD.xml" />
+    <Content Include="tests\Resources\photofun\decorations\63457\63457.json" />
+    <Content Include="tests\Resources\photofun\decorations\63457\line_single_black\line_single_black.clp" />
+    <Content Include="tests\Resources\photofun\decorations\63457\line_single_black\line_single_black.xml" />
+    <Content Include="tests\Resources\photofun\decorations\7065-CLIP-SF.xml" />
+    <Content Include="tests\Resources\photofun\decorations\circle.xml" />
+    <Content Include="tests\Resources\photofun\decorations\customClipart1.xml" />
+    <Content Include="tests\Resources\photofun\decorations\customClipart2.xml" />
+    <Content Include="tests\Resources\photofun\decorations\rect_lightyellow.xml" />
+    <Content Include="tests\Resources\photofun\decorations\rect_terracotta.xml" />
+    <Content Include="tests\Resources\photofun\decorations\rect_white.xml" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSans-BaDn.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansBold-1adM.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansBoldItalic-ngV4.ttf" />
@@ -200,6 +222,12 @@
     <Folder Include="tests\hps\5026\addons\63488\cliparts\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\decorations\" />
+    <Folder Include="tests\Resources\photofun\decorations\106793\" />
+    <Folder Include="tests\Resources\photofun\decorations\106793\8394-DECO-SF\" />
+    <Folder Include="tests\Resources\photofun\decorations\106796\" />
+    <Folder Include="tests\Resources\photofun\decorations\106796\8397-DECO-SF\" />
+    <Folder Include="tests\Resources\photofun\decorations\63457\" />
+    <Folder Include="tests\Resources\photofun\decorations\63457\line_single_black\" />
     <Folder Include="tests\Resources\photofun\fonts\" />
     <Folder Include="tests\Resources\photofun\fonts\misc\" />
     <Folder Include="tests\testfontsubstitution\" />

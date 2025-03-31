@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<decorations>
+	<decoration type="clipart">
+		<categories>
+			<category>category-colours</category>
+		</categories>
+		<clipart file="rect_terracotta.svg" designElementId="63539" designElementType="clipart"/>
+	</decoration>
+</decorations>
