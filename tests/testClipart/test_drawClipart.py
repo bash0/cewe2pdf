@@ -14,8 +14,7 @@ sys.path.append('..')
 sys.path.append('.')
 from pathlib import Path
 import os, os.path
-from pikepdf import Pdf
-
+from pikepdf import Pdf, PdfImage
 
 from cewe2pdf import convertMcf
 
@@ -33,6 +32,22 @@ def tryToBuildBook(keepDoublePages):
     readPdf = Pdf.open(outFile)
     numPages =  len(readPdf.pages)
     assert numPages == 6, f"Expected 6 pages (4 normal plus 2 covers), found {numPages}"
+
+    page = readPdf.pages[0]
+    imagesizes = [(412,385),(412,288),(412,423),(219,225),(10,10)]
+    imagekeys = list(page.images.keys())
+    imagecount = len(imagekeys)
+    # the test album front cover has 5 images. My interpretation (aided by pdfexplorer) is
+    # 1 clipart for the background, a 10x10 image
+    # 2 cliparts each used twice (same size, different rotation) so they count just 2
+    # 1 clipart used once (the blue square with the white circle centre, large)
+    # 1 clipart used three times (the same blue square as above, but smaller and used in 3 different rotations)
+    assert imagecount == 5, f"Expected 5 images on front cover, found {imagecount}"
+    for imk in imagekeys:
+        coverimage = page.images[imk]
+        coverpdfimage = PdfImage(coverimage)
+        size = (coverpdfimage.width,coverpdfimage.height)
+        assert size in imagesizes, f"Image sized {size} not expected"
 
     #os.remove(outFile)
 
