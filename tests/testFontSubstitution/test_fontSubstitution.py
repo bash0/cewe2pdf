@@ -13,8 +13,8 @@ from pikepdf import Pdf
 from cewe2pdf import convertMcf
 
 def tryToBuildBook(keepDoublePages, expectedPages):
-    inFile = str(Path(Path.cwd(), 'tests', 'testfontsubstitution', 'testfontsubstitution.mcf'))
-    outFile = str(Path(Path.cwd(), 'tests', 'testfontsubstitution', 'testfontsubstitution.mcf.pdf'))
+    inFile = str(Path(Path.cwd(), 'tests', 'testFontSubstitution', 'testfontsubstitution.mcf'))
+    outFile = str(Path(Path.cwd(), 'tests', 'testFontSubstitution', 'testfontsubstitution.mcf.pdf'))
     if os.path.exists(outFile) == True:
         os.remove(outFile)
     assert os.path.exists(outFile) == False
