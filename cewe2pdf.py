@@ -92,7 +92,7 @@ from clipArt import getClipConfig, loadClipart, readClipArtConfigXML
 from colorFrame import ColorFrame
 from configUtils import getConfigurationBool, getConfigurationInt
 from extraLoggers import mustsee, configlogger, VerifyMessageCounts, printMessageCountSummaries
-from fontHandling import determineFontSubstitution, findAndRegisterFonts
+from fontHandling import getMissingFontSubstitute, findAndRegisterFonts
 from imageUtils import autorot
 from lineScales import LineScales
 from mcfx import unpackMcfx
@@ -487,7 +487,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     elif family in additional_fonts:
         bodyfont = family
     else:
-        bodyfont = determineFontSubstitution(family)
+        bodyfont = getMissingFontSubstitute(family)
         noteFontSubstitution(family, bodyfont)
 
     try:

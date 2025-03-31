@@ -11,7 +11,7 @@ from otf import getTtfsFromOtfs
 from pathutils import localfont_dir, findFileInDirs, findFilesInDir
 
 
-def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder): # pylint: disable=too-many-statements
+def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder): # pylint: disable=too-many-statements
     ttfFiles = []
     fontDirs = []
     fontsToRegister = {}
@@ -83,11 +83,13 @@ def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe
     #  the normal heuristic family setup above  - the "fixed" FranklinGothic being a good example:
     #   fontFamilies =
     #      FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
-    explicitlyRegisteredFamilyNames = getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontsToRegister)
+    explicitlyRegisteredFamilyNames = getExplicitlyRegisteredFamilyNames(configSection, fontsToRegister)
 
     # Now we can register the families we have "observed" and built up as we read the font files,
     #  but ignoring any family name which was registered explicitly from configuration
     registerFontFamilies(familiesToRegister, explicitlyRegisteredFamilyNames)
+
+    loadMissingFontSubstitutions(configSection, fontsToRegister)
 
     logging.info("Ended font registration")
 
@@ -264,8 +266,9 @@ def registerFontFamilies(fontFamilies, explicitlyRegisteredFamilyNames):
                 configlogger.info(f"Font family '{familyName}' was already registered from configuration file")
 
 
-def determineFontSubstitution(family):
-    knownSubstitutions = {
+# if a font is missing when we need it then we'll try to find an
+# alternative from this table
+missingFontSubstitutions = {
             "Arial":                    "Liberation Sans Narrow",
             "Arial Narrow":             "Liberation Sans Narrow",
             "Arial Rounded MT Bold":    "Poppins",
@@ -281,9 +284,37 @@ def determineFontSubstitution(family):
             # Function
             # Harlow Solid Italic
             # Segoe UI Symbol
-            }
-    if family in knownSubstitutions:
-        bodyfont = knownSubstitutions[family]
+    }
+
+def loadMissingFontSubstitutions(configSection, availableFonts):
+    global missingFontSubstitutions
+    if configSection is None:
+        return
+    # build the known missing font substitutions table
+    fs = configSection.get('missingFontSubstitutions', '').splitlines()  # newline separated list of fontname: fontname pairs
+    ffs = list(filter(lambda fnp: (len(fnp) != 0), fs)) # filter out empty entries
+    f2fs = tuple(map(lambda fnp: os.path.expandvars(fnp), ffs)) # expand environment vars pylint: disable=unnecessary-lambda
+    for fnp in f2fs:
+        definition = fnp.split(':')
+        if len(definition) == 2:
+            originalfont = definition[0].strip()
+            newfont = definition[1].strip()
+            if originalfont == '' and newfont == '':
+                missingFontSubstitutions = {}
+            else:
+                if originalfont != '' and newfont != '':
+                    if newfont not in availableFonts:
+                        configlogger.error(f"Font substitution with '{newfont}' ignored, that font has not been found")
+                        continue
+                    missingFontSubstitutions[originalfont] = newfont
+                else:
+                    configlogger.error(f"Invalid font substitution '{originalfont}' : '{newfont}' ignored")
+                    continue
+
+
+def getMissingFontSubstitute(family):
+    if family in missingFontSubstitutions:
+        bodyfont = missingFontSubstitutions[family]
     else:
         bodyfont = 'Helvetica'
         # reportlabs actually offers Helvetica, which is a bit strange since it is a proprietary font.
