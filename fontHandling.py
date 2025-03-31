@@ -11,7 +11,7 @@ from otf import getTtfsFromOtfs
 from pathutils import localfont_dir, findFileInDirs, findFilesInDir
 
 
-def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder): # pylint: disable=too-many-statements
+def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder): # pylint: disable=too-many-statements
     ttfFiles = []
     fontDirs = []
     fontsToRegister = {}
@@ -83,11 +83,13 @@ def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe
     #  the normal heuristic family setup above  - the "fixed" FranklinGothic being a good example:
     #   fontFamilies =
     #      FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
-    explicitlyRegisteredFamilyNames = getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontsToRegister)
+    explicitlyRegisteredFamilyNames = getExplicitlyRegisteredFamilyNames(configSection, fontsToRegister)
 
     # Now we can register the families we have "observed" and built up as we read the font files,
     #  but ignoring any family name which was registered explicitly from configuration
     registerFontFamilies(familiesToRegister, explicitlyRegisteredFamilyNames)
+
+    loadMissingFontSubstitutions(configSection, fontsToRegister)
 
     logging.info("Ended font registration")
 
@@ -96,6 +98,7 @@ def findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe
 
 def buildFontsToRegisterFromTtfFiles(ttfFiles, fontList, fontFamilyList):
     if len(ttfFiles) > 0:
+        redefinedCount = 0
         ttfFiles = list(dict.fromkeys(ttfFiles)) # remove duplicates
         for ttfFile in ttfFiles:
             font = ttLib.TTFont(ttfFile)
@@ -142,7 +145,11 @@ def buildFontsToRegisterFromTtfFiles(ttfFiles, fontList, fontFamilyList):
                 configlogger.warning(f"Revised regular fontFullName '{fontFullName}' to '{fontFamily}'")
                 fontFullName = fontFamily
 
-            fontList[fontFullName] = ttfFile
+            if fontFullName in fontList:
+                configlogger.info(f"'{fontFullName}' redefined: the first definition '{fontList[fontFullName]}' is preferred over '{ttfFile}'")
+                redefinedCount = redefinedCount + 1
+            else:
+                fontList[fontFullName] = ttfFile
 
             # first time we see a family we create an empty entry from that family to the R,B,I,BI font names
             if fontFamily not in fontFamilyList:
@@ -170,6 +177,8 @@ def buildFontsToRegisterFromTtfFiles(ttfFiles, fontList, fontFamilyList):
                 fontFamilyList[fontFamily]["normal"] = fontFamily
                 fontList[fontFamily] = ttfFile
 
+        if redefinedCount > 0:
+            configlogger.warning(f"Multiple ttf files found for {redefinedCount} fonts, increase the cewe2pdf.config log level to see redefinitions")
 
 def getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontList):
     if defaultConfigSection is None:
@@ -216,7 +225,11 @@ def addTtfFilesFromFontdirs(ttfFiles, fontDirs, appDataDir):
             # a Linux subsystem on a Windows machine and file system. So we use a case insensitive
             # alternative [until Python 3.12 when glob itself offers case insensitivity] Ref the
             # discussion at https://stackoverflow.com/questions/8151300/ignore-case-in-glob-on-linux
-            ttfextras = findFilesInDir(fontDir, '*.ttf')
+            ttfextras = findFilesInDir(fontDir, '*.ttf', walk_structure = False)
+                # walk_structure set to True looks like a good idea, so we could keep our own
+                # downloaded fonts, eg from Google Fonts, in separate folders. But it turns out
+                # that Windows really assumes that searches are restricted to a single folder,
+                # so that deleted fonts may be moved to a "Deleted" sub folder.
             ttfFiles.extend(sorted(ttfextras))
 
             # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf
@@ -251,3 +264,59 @@ def registerFontFamilies(fontFamilies, explicitlyRegisteredFamilyNames):
                 configlogger.info(f"Registered fontfamily '{familyName}': {fontFamily}")
             else:
                 configlogger.info(f"Font family '{familyName}' was already registered from configuration file")
+
+
+# if a font is missing when we need it then we'll try to find an
+# alternative from this table
+missingFontSubstitutions = {
+            "Arial":                    "Liberation Sans Narrow",
+            "Arial Narrow":             "Liberation Sans Narrow",
+            "Arial Rounded MT Bold":    "Poppins",
+            "Bodoni":                   "EB Garamond",
+            "Calibri":                  "Liberation Sans Narrow",
+            "CalligraphScript":         "Dancing Script",
+            "CEWE Head":                "Liberation Sans",
+            "FranklinGothic":           "Liberation Sans Narrow",
+            "Pecita":                   "Dancing Script",
+            "Stafford":                 "Liberation Sans Narrow",
+            "Balloon Caps":             "Liberation Sans Narrow",
+            # Crafty Girls
+            # Function
+            # Harlow Solid Italic
+            # Segoe UI Symbol
+    }
+
+def loadMissingFontSubstitutions(configSection, availableFonts):
+    global missingFontSubstitutions
+    if configSection is None:
+        return
+    # build the known missing font substitutions table
+    fs = configSection.get('missingFontSubstitutions', '').splitlines()  # newline separated list of fontname: fontname pairs
+    ffs = list(filter(lambda fnp: (len(fnp) != 0), fs)) # filter out empty entries
+    f2fs = tuple(map(lambda fnp: os.path.expandvars(fnp), ffs)) # expand environment vars pylint: disable=unnecessary-lambda
+    for fnp in f2fs:
+        definition = fnp.split(':')
+        if len(definition) == 2:
+            originalfont = definition[0].strip()
+            newfont = definition[1].strip()
+            if originalfont == '' and newfont == '':
+                missingFontSubstitutions = {}
+            else:
+                if originalfont != '' and newfont != '':
+                    if newfont not in availableFonts:
+                        configlogger.error(f"Font substitution with '{newfont}' ignored, that font has not been found")
+                        continue
+                    missingFontSubstitutions[originalfont] = newfont
+                else:
+                    configlogger.error(f"Invalid font substitution '{originalfont}' : '{newfont}' ignored")
+                    continue
+
+
+def getMissingFontSubstitute(family):
+    if family in missingFontSubstitutions:
+        bodyfont = missingFontSubstitutions[family]
+    else:
+        bodyfont = 'Helvetica'
+        # reportlabs actually offers Helvetica, which is a bit strange since it is a proprietary font.
+    return bodyfont
+

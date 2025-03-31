@@ -92,7 +92,7 @@ from clipArt import getClipConfig, loadClipart, readClipArtConfigXML
 from colorFrame import ColorFrame
 from configUtils import getConfigurationBool, getConfigurationInt
 from extraLoggers import mustsee, configlogger, VerifyMessageCounts, printMessageCountSummaries
-from fontHandling import findAndRegisterFonts
+from fontHandling import getMissingFontSubstitute, findAndRegisterFonts
 from imageUtils import autorot
 from lineScales import LineScales
 from mcfx import unpackMcfx
@@ -481,12 +481,13 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     except: # noqa: E722
         bodyfs = 12
     family = bstyle['font-family'].strip("'")
-    if family in pdf.getAvailableFonts():
+    reportlabFonts = pdf.getAvailableFonts()
+    if family in reportlabFonts:
         bodyfont = family
     elif family in additional_fonts:
         bodyfont = family
     else:
-        bodyfont = 'Helvetica'
+        bodyfont = getMissingFontSubstitute(family)
         noteFontSubstitution(family, bodyfont)
 
     try:
@@ -705,6 +706,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
 
     pdf.rotate(areaRot)
     pdf.translate(-transx, -transy)
+
 
 
 def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, clipArtDecoration):

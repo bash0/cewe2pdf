@@ -6,6 +6,7 @@ import reportlab.lib.enums
 
 from reportlab.lib.styles import ParagraphStyle
 
+from fontHandling import getMissingFontSubstitute
 from lineScales import LineScales
 
 fontSubstitutions = list[str]() # used to avoid repeated messages
@@ -82,12 +83,13 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
                     item.get('style').lstrip(' ').rstrip(';').split('; ')])
     if 'font-family' in spanstyle:
         spanfamily = spanstyle['font-family'].strip("'")
-        availableFonts = pdf.getAvailableFonts()
-        if spanfamily in availableFonts:
+        reportlabFonts = pdf.getAvailableFonts()
+        if spanfamily in reportlabFonts:
             spanfont = spanfamily
         elif spanfamily in additional_fonts:
             spanfont = spanfamily
         if spanfamily != spanfont:
+            spanfont = getMissingFontSubstitute(spanfamily)
             noteFontSubstitution(spanfamily, spanfont)
 
     if 'font-weight' in spanstyle:
