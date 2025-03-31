@@ -225,11 +225,11 @@ def addTtfFilesFromFontdirs(ttfFiles, fontDirs, appDataDir):
             # a Linux subsystem on a Windows machine and file system. So we use a case insensitive
             # alternative [until Python 3.12 when glob itself offers case insensitivity] Ref the
             # discussion at https://stackoverflow.com/questions/8151300/ignore-case-in-glob-on-linux
-            ttfextras = findFilesInDir(fontDir, '*.ttf', walk_structure = False)
-                # walk_structure set to True looks like a good idea, so we could keep our own
-                # downloaded fonts, eg from Google Fonts, in separate folders. But it turns out
-                # that Windows really assumes that searches are restricted to a single folder,
-                # so that deleted fonts may be moved to a "Deleted" sub folder.
+            ttfextras = findFilesInDir(fontDir, '*.ttf', walk_structure=False)
+            # walk_structure set to True looks like a good idea, so we could keep our own
+            # downloaded fonts, eg from Google Fonts, in separate folders. But it turns out
+            # that Windows really assumes that searches are restricted to a single folder,
+            # so that deleted fonts may be moved to a "Deleted" sub folder.
             ttfFiles.extend(sorted(ttfextras))
 
             # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf
@@ -269,25 +269,25 @@ def registerFontFamilies(fontFamilies, explicitlyRegisteredFamilyNames):
 # if a font is missing when we need it then we'll try to find an
 # alternative from this table
 missingFontSubstitutions = {
-            "Arial":                    "Liberation Sans Narrow",
-            "Arial Narrow":             "Liberation Sans Narrow",
-            "Arial Rounded MT Bold":    "Poppins",
-            "Bodoni":                   "EB Garamond",
-            "Calibri":                  "Liberation Sans Narrow",
-            "CalligraphScript":         "Dancing Script",
-            "CEWE Head":                "Liberation Sans",
-            "FranklinGothic":           "Liberation Sans Narrow",
-            "Pecita":                   "Dancing Script",
-            "Stafford":                 "Liberation Sans Narrow",
-            "Balloon Caps":             "Liberation Sans Narrow",
-            # Crafty Girls
-            # Function
-            # Harlow Solid Italic
-            # Segoe UI Symbol
+    "Arial": "Liberation Sans Narrow",
+    "Arial Narrow": "Liberation Sans Narrow",
+    "Arial Rounded MT Bold": "Poppins",
+    "Bodoni": "EB Garamond",
+    "Calibri": "Liberation Sans Narrow",
+    "CalligraphScript": "Dancing Script",
+    "CEWE Head": "Liberation Sans",
+    "FranklinGothic": "Liberation Sans Narrow",
+    "Pecita": "Dancing Script",
+    "Stafford": "Liberation Sans Narrow",
+    "Balloon Caps": "Liberation Sans Narrow",
+    # Crafty Girls
+    # Function
+    # Harlow Solid Italic
+    # Segoe UI Symbol
     }
 
 def loadMissingFontSubstitutions(configSection, availableFonts):
-    global missingFontSubstitutions
+    global missingFontSubstitutions  # pylint: disable=global-statement
     if configSection is None:
         return
     # build the known missing font substitutions table
@@ -313,10 +313,9 @@ def loadMissingFontSubstitutions(configSection, availableFonts):
 
 
 def getMissingFontSubstitute(family):
-    if family in missingFontSubstitutions:
+    if family in missingFontSubstitutions: # IMO this is clearest so pylint: disable=consider-using-get
         bodyfont = missingFontSubstitutions[family]
     else:
         bodyfont = 'Helvetica'
         # reportlabs actually offers Helvetica, which is a bit strange since it is a proprietary font.
     return bodyfont
-

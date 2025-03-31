@@ -311,7 +311,6 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         if passepartoutDict is None:
             configlogger.info("Regenerating passepartout index from .XML files.")
             # the folder list may in fact be modified by buildElementIdIndex so disable pylint complaints
-            global passepartoutFolders # pylint: disable=global-statement,global-variable-not-assigned
             passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
         # read information from .xml file
         try:
@@ -706,7 +705,6 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
 
     pdf.rotate(areaRot)
     pdf.translate(-transx, -transy)
-
 
 
 def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, clipArtDecoration):
