@@ -5,6 +5,9 @@ formatters:
   simple:
     format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     datefmt: '%H:%M:%S'
+  test:
+    format: '%(asctime)s - %(levelname)s - %(message)s'
+    datefmt: '%H:%M:%S'
 handlers:
   consoleEverything:
     class: logging.StreamHandler
@@ -29,6 +32,10 @@ loggers:
   cewe2pdf.mustsee:
     level: INFO
     handlers: [consoleMustSee]
+    propagate: no
+  cewe2pdf.test:
+    level: INFO
+    handlers: [consoleWarningOrWorse]
     propagate: no
   PIL.PngImagePlugin:
     level: WARNING

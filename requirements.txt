@@ -9,3 +9,5 @@ reportlab>=3.5.23
 pylint>=3.2.2
 pytest>=7.4.4
 flake8>=7.0.0
+pymupdf>=1.25.5
+opencv-python>=4.11.0

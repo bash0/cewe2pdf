@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import os
 
 def test_webp_loading():

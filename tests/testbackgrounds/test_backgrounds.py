@@ -5,15 +5,25 @@
 import sys
 sys.path.append('..')
 sys.path.append('.')
-from pathlib import Path
+sys.path.append('tests')
+
 import os, os.path
+import glob
+
+from pathlib import Path
 from pikepdf import Pdf, PdfImage
-import PIL
 
-from cewe2pdf import convertMcf
+from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
+from cewe2pdf import convertMcf # type: ignore
 
-def tryToBuildBook(keepDoublePages, expectedPages, expectedEqualBackgroundPageLists):
+def tryToBuildBook(latestResultFile, keepDoublePages, expectedPages, expectedEqualBackgroundPageLists):
     inFile = str(Path(Path.cwd(), 'tests', 'testbackgrounds', 'allblackbackgrounds.mcf'))
+    # TODO, allow convertMcf to accept an output file name
+    # from datetime import datetime
+    # styleid = "d" if keepDoublePages else "s"
+    # today = datetime.today()
+    # yyyymmdd = today.strftime("%Y%m%d")
+    # outfilebasename = f'allblackbackgrounds{styleid}{yyyymmdd}.mcf.pdf'
     outFile = str(Path(Path.cwd(), 'tests', 'testbackgrounds', 'allblackbackgrounds.mcf.pdf'))
     if os.path.exists(outFile) == True:
         os.remove(outFile)
@@ -73,11 +83,37 @@ def tryToBuildBook(keepDoublePages, expectedPages, expectedEqualBackgroundPageLi
     innertestpixel = innerpilimage.getpixel((1,1))
     assert innertestpixel == (0,0,0), f"Expected inner colour (0, 0, 0), got {innertestpixel}"
 
+    if latestResultFile is not None:
+        # compare our result with the latest one
+        print(f"Compare {outFile} with {latestResultFile}")
+        files = [outFile, latestResultFile]
+        compare = ComparePDF(files, ShowDiffsStyle.Nothing)
+        result = compare.compare()
+        assert result, "Pixel comparison failed"
+    else:
+        print(f"No result file to compare with")
+
     #os.remove(outFile)
 
+
+def getLatestResultFile(pattern : str)-> str:
+    resultpdfpattern = str(Path(Path.cwd(), 'tests', 'testbackgrounds', 'previous_result_pdfs', pattern))
+    resultpdffiles = glob.glob(resultpdfpattern)
+    resultpdffiles.sort(key=os.path.getmtime, reverse=True)
+    return resultpdffiles[0] if len(resultpdffiles) > 0 else None
+
+
 def test_testBackgrounds():
-    tryToBuildBook(False, 28, [[0,27],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]])
-    tryToBuildBook(True, 15, [[0],[1,2,3,4,5,6,7,8,9,10,11,12,13,14]])
+    # allow us to see that we have the expected environment
+    python_executable_path = sys.executable
+    virtual_env_name = os.path.basename(os.path.dirname(python_executable_path))
+    print(f"Virtual Environment: {virtual_env_name}")
+
+    latestResultFile = getLatestResultFile("*S.pdf")
+    tryToBuildBook(latestResultFile, False, 28, [[0,27],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]])
+
+    latestResultFile = getLatestResultFile("*D.pdf")
+    tryToBuildBook(latestResultFile, True, 15, [[0],[1,2,3,4,5,6,7,8,9,10,11,12,13,14]])
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
