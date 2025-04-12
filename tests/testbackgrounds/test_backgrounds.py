@@ -1,28 +1,30 @@
 # This test needs to be in its own directory, so it can have it's own cwew2pdf.ini.
 # Also we can store the asset files here.
 
+# Test backgrounds
+
 #if you run this file directly, it won't have access to parent folder, so add it to python path
-import sys
-sys.path.append('..')
-sys.path.append('.')
-sys.path.append('tests')
-
 import os, os.path
-import glob
+import sys
 
+from datetime import datetime
 from pathlib import Path
 from pikepdf import Pdf, PdfImage
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 
-def tryToBuildBook(latestResultFile, keepDoublePages, expectedPages, expectedEqualBackgroundPageLists):
-    inFile = str(Path(Path.cwd(), 'tests', 'testbackgrounds', 'allblackbackgrounds.mcf'))
-    outFile = str(Path(Path.cwd(), 'tests', 'testbackgrounds', 'allblackbackgrounds.mcf.pdf'))
+from testutils import getLatestResultFile
+
+sys.path.append('..')
+sys.path.append('.')
+sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
+
+def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages, expectedEqualBackgroundPageLists):
     if os.path.exists(outFile) == True:
         os.remove(outFile)
     assert os.path.exists(outFile) == False
-    convertMcf(inFile, keepDoublePages)
+    convertMcf(inFile, keepDoublePages, outputFileName=outFile)
     assert Path(outFile).exists() == True
 
     # check the pdf contents
@@ -90,11 +92,6 @@ def tryToBuildBook(latestResultFile, keepDoublePages, expectedPages, expectedEqu
     #os.remove(outFile)
 
 
-def getLatestResultFile(pattern : str)-> str:
-    resultpdfpattern = str(Path(Path.cwd(), 'tests', 'testbackgrounds', 'previous_result_pdfs', pattern))
-    resultpdffiles = glob.glob(resultpdfpattern)
-    resultpdffiles.sort(key=os.path.getmtime, reverse=True)
-    return resultpdffiles[0] if len(resultpdffiles) > 0 else None
 
 
 def test_testBackgrounds():
@@ -103,11 +100,22 @@ def test_testBackgrounds():
     virtual_env_name = os.path.basename(os.path.dirname(python_executable_path))
     print(f"Virtual Environment: {virtual_env_name}")
 
-    latestResultFile = getLatestResultFile("*S.pdf")
-    tryToBuildBook(latestResultFile, False, 28, [[0,27],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]])
+    albumFolderBasename = 'testbackgrounds'
+    albumBasename = "allblackbackgrounds"
+    inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
+    yyyymmdd = datetime.today().strftime("%Y%m%d")
 
-    latestResultFile = getLatestResultFile("*D.pdf")
-    tryToBuildBook(latestResultFile, True, 15, [[0],[1,2,3,4,5,6,7,8,9,10,11,12,13,14]])
+    styleid = "S"
+    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
+    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
+    tryToBuildBook(inFile, outFile, latestResultFile, False, 28, [[0,27],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]])
+
+    styleid = "D"
+    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
+    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
+    tryToBuildBook(inFile, outFile, latestResultFile, True, 15, [[0],[1,2,3,4,5,6,7,8,9,10,11,12,13,14]])
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
