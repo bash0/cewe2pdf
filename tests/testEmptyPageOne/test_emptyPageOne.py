@@ -4,19 +4,21 @@
 # Test rendering when page one is empty
 
 #if you run this file directly, it won't have access to parent folder, so add it to python path
-import sys
-sys.path.append('..')
-sys.path.append('.')
-sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
-
 import os, os.path
-import glob
+import sys
 
+from datetime import datetime
 from pathlib import Path
 from pikepdf import Pdf
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
+
+from testutils import getLatestResultFile
+
+sys.path.append('..')
+sys.path.append('.')
+sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
     if os.path.exists(outFile) == True:
@@ -44,14 +46,6 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     #os.remove(outFile)
     return numPages
 
-
-def getLatestResultFile(albumFolderBasename, pattern : str)-> str:
-    resultpdfpattern = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", 'previous_result_pdfs', pattern))
-    resultpdffiles = glob.glob(resultpdfpattern)
-    resultpdffiles.sort(key=os.path.getmtime, reverse=True)
-    return resultpdffiles[0] if len(resultpdffiles) > 0 else None
-
-from datetime import datetime
 
 def test_testEmptyPageOne():
     albumFolderBasename = 'testEmptyPageOne'

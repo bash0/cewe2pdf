@@ -96,7 +96,7 @@
     <Content Include="tests\testEmptyPageOne\previous_result_pdfs\test_emptyPageOne.mcf.20250321D.pdf" />
     <Content Include="tests\testfontsubstitution\additional_fonts.txt" />
     <Content Include="tests\testfontsubstitution\cewe2pdf.ini" />
-    <Content Include="tests\testFontSubstitution\previous_result_pdfs\testfontsubstitution.20250411.mcf.pdf" />
+    <Content Include="tests\testFontSubstitution\previous_result_pdfs\testfontsubstitution.mcf.20250411S.pdf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
     <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
@@ -232,6 +232,9 @@
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\unittest_fotobook\test_simpleBook.py" />
     <Compile Include="tests\test_webp_loading\test_webp_loading.py" />
+    <Compile Include="testutils.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="text.py">
       <SubType>Code</SubType>
     </Compile>
