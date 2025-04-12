@@ -91,7 +91,8 @@
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250319.pdf" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250326.pdf" />
     <Content Include="tests\testClipart\additional_fonts.txt" />
-    <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250326.pdf" />
+    <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250326S.pdf" />
+    <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250412S.pdf" />
     <Content Include="tests\testEmptyPageOne\additional_fonts.txt" />
     <Content Include="tests\testEmptyPageOne\previous_result_pdfs\test_emptyPageOne.mcf.20250321D.pdf" />
     <Content Include="tests\testfontsubstitution\additional_fonts.txt" />
