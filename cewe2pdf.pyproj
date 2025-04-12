@@ -29,6 +29,8 @@
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
+    <Content Include="tests\compare-pdf\LICENSE" />
+    <Content Include="tests\compare-pdf\README.md" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6044.jpg" />
@@ -218,7 +220,9 @@
     <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
     <Compile Include="runAllTests.py" />
-    <Compile Include="tests\compare_pdf.py" />
+    <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
+    <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
+    <Compile Include="tests\compare-pdf\setup.py" />
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
     <Compile Include="tests\testbackgrounds\test_backgrounds.py" />
     <Compile Include="tests\testClipart\test_drawClipart.py" />
@@ -236,6 +240,8 @@
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
     <Folder Include="tests" />
+    <Folder Include="tests\compare-pdf\" />
+    <Folder Include="tests\compare-pdf\compare_pdf\" />
     <Folder Include="tests\hps\" />
     <Folder Include="tests\hps\5026\" />
     <Folder Include="tests\hps\5026\addons\" />

@@ -68,9 +68,6 @@ class ComparePDF:
         windowName = f'Page {page_num}'
         cv2.namedWindow(windowName,cv2.WINDOW_NORMAL)
         sizeFactor = 0.4 # width and height adjustment to sensible window size for shown image
-        widthFactor = 1 # will need to double the width for two pages side by side
-        if self.showdiffs == ShowDiffsStyle.SideBySide:
-            widthFactor = 2 # double the width for two pages
         windowWidth = int(image.shape[1]*sizeFactor)
         windowHeight = int(image.shape[0]*sizeFactor)
         cv2.resizeWindow(windowName, windowWidth, windowHeight)
