@@ -859,7 +859,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     processElements(additional_fonts, fotobook, imagedir, productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
 
 
-def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None): # noqa: C901 (too complex)
+def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, outputFileName=None, mcfxTmpDir=None, appDataDir=None): # noqa: C901 (too complex)
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
     global passepartoutDict  # pylint: disable=global-statement
@@ -910,7 +910,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # check output file is acceptable before we do any processing, which is
     # preferable to processing for a long time and *then* discovering that
     # the file is not writable
-    outputFileName = CeweInfo.getOutputFileName(albumname)
+    if outputFileName is None:
+        outputFileName = CeweInfo.getOutputFileName(albumname)
     CeweInfo.ensureAcceptableOutputFile(outputFileName)
 
     # a null default configuration section means that some capabilities will be missing!

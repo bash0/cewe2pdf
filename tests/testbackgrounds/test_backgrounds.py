@@ -18,12 +18,6 @@ from cewe2pdf import convertMcf # type: ignore
 
 def tryToBuildBook(latestResultFile, keepDoublePages, expectedPages, expectedEqualBackgroundPageLists):
     inFile = str(Path(Path.cwd(), 'tests', 'testbackgrounds', 'allblackbackgrounds.mcf'))
-    # TODO, allow convertMcf to accept an output file name
-    # from datetime import datetime
-    # styleid = "d" if keepDoublePages else "s"
-    # today = datetime.today()
-    # yyyymmdd = today.strftime("%Y%m%d")
-    # outfilebasename = f'allblackbackgrounds{styleid}{yyyymmdd}.mcf.pdf'
     outFile = str(Path(Path.cwd(), 'tests', 'testbackgrounds', 'allblackbackgrounds.mcf.pdf'))
     if os.path.exists(outFile) == True:
         os.remove(outFile)
