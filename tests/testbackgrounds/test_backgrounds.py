@@ -6,6 +6,9 @@
 #if you run this file directly, it won't have access to parent folder, so add it to python path
 import os, os.path
 import sys
+sys.path.append('..')
+sys.path.append('.')
+sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
 
 from datetime import datetime
 from pathlib import Path
@@ -16,9 +19,6 @@ from cewe2pdf import convertMcf # type: ignore
 
 from testutils import getLatestResultFile
 
-sys.path.append('..')
-sys.path.append('.')
-sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages, expectedEqualBackgroundPageLists):
     if os.path.exists(outFile) == True:
