@@ -88,8 +88,9 @@
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250326D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411S.pdf" />
-    <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250319.pdf" />
-    <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250326.pdf" />
+    <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250319S.pdf" />
+    <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250326S.pdf" />
+    <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250412S.pdf" />
     <Content Include="tests\testClipart\additional_fonts.txt" />
     <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250326S.pdf" />
     <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250412S.pdf" />

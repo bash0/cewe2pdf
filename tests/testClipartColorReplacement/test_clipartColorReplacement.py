@@ -4,27 +4,27 @@
 # Test the clipart rendering with passepartout frame recoloring
 
 #if you run this file directly, it won't have access to parent folder, so add it to python path
-import sys
-sys.path.append('..')
-sys.path.append('.')
-sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
-
 import os, os.path
-import glob
+import sys
 
+from datetime import datetime
 from pathlib import Path
 from pikepdf import Pdf
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 
-def tryToBuildBook(latestResultFile, keepDoublePages, expectedPages):
-    inFile = str(Path(Path.cwd(), 'tests', 'testClipartColorReplacement', 'test_clipart_colorreplacement.mcf'))
-    outFile = str(Path(Path.cwd(), 'tests', 'testClipartColorReplacement', 'test_clipart_colorreplacement.mcf.pdf'))
+from testutils import getLatestResultFile
+
+sys.path.append('..')
+sys.path.append('.')
+sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
+
+def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
     if os.path.exists(outFile) == True:
         os.remove(outFile)
     assert os.path.exists(outFile) == False
-    convertMcf(inFile, keepDoublePages)
+    convertMcf(inFile, keepDoublePages, outputFileName=outFile)
     assert Path(outFile).exists() == True
 
     #check the pdf contents
@@ -46,16 +46,17 @@ def tryToBuildBook(latestResultFile, keepDoublePages, expectedPages):
     #os.remove(outFile)
 
 
-def getLatestResultFile(pattern : str)-> str:
-    resultpdfpattern = str(Path(Path.cwd(), 'tests', 'testClipartColorReplacement', 'previous_result_pdfs', pattern))
-    resultpdffiles = glob.glob(resultpdfpattern)
-    resultpdffiles.sort(key=os.path.getmtime, reverse=True)
-    return resultpdffiles[0] if len(resultpdffiles) > 0 else None
-
-
 def test_testClipartColorReplacement():
-    latestResultFile = getLatestResultFile("*.pdf")
-    tryToBuildBook(latestResultFile, False, 28)
+    albumFolderBasename = 'testClipartColorReplacement'
+    albumBasename = "test_clipart_colorreplacement"
+    inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
+    yyyymmdd = datetime.today().strftime("%Y%m%d")
+
+    styleid = "S"
+    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
+    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
+    tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
 
 
 if __name__ == '__main__':
