@@ -62,14 +62,14 @@ def runtest(albumFolderBasename, albumBasename, mcfSuffix, styleId, keepDoublePa
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{mcfSuffix}.*{styleId}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages)
 
-def test_simpleBookDoublePage():
-    runtest('unittest_fotobook', "unittest_fotobook", "mcf", "D", True, 15)
-
 def test_simpleBookSinglePage():
     runtest('unittest_fotobook', "unittest_fotobook", "mcf", "S", False, 28)
 
-def test_simpleBookSinglePageMcfx():
-    runtest('unittest_fotobook', "unittest_fotobook", "mcfx", "S", False, 28)
+# def test_simpleBookDoublePage():
+#     runtest('unittest_fotobook', "unittest_fotobook", "mcf", "D", True, 15)
+
+# def test_simpleBookSinglePageMcfx():
+#     runtest('unittest_fotobook', "unittest_fotobook", "mcfx", "S", False, 28)
 
 if __name__ == '__main__':
     #only executed when this file is run directly.

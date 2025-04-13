@@ -64,3 +64,4 @@ nosetests.xml
 /tests/*/*.mcfx.pdf
 /tests/*/*.mcf.*.pdf
 /tests/*/*.mcfx.*.pdf
+/tests/temp
