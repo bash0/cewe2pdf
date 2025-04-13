@@ -1,5 +1,5 @@
 # All fonts delivered by CEWE are added automatically, add the system fonts ...
-C:\WINDOWS\FONTS\
+# C:\WINDOWS\FONTS\
 
 # Adding the entire windows fonts directory may be overkill, so you could just pick the ones
 #  you want, though at the fairly high risk of forgetting some special case you had thought

@@ -216,17 +216,31 @@ Example:
 ```
 
 ## Development
-
 To create a stand-alone compiled package, you can use
 ```
 pip install pyinstaller
 pyinstaller cewe2pdf.py --onefile
 ```
-
 To run the unit-test you also need to install
-
 ```
 pip install pytest pikepdf
 ```
-
 You can then call pytest from the working directory or use the runAllTests.py file.
+
+### Using compare-pdf
+We have a local copy of the compare-pdf code from https://github.com/Formartha/compare-pdf
+
+The neat thing with this is that it can be used from the automated unit test code to do pixel-by-pixel comparison of the pdf pages that have been generated with a previous (approved) version. In addition compare_pdf can be used from the command line to see details of the differences. Just move to the compare-pdf directory and run the command
+```
+pip install .
+```
+Then you can call compare_pdf from the command line to show the two pdfs side by side, or as a diff image.
+```
+compare_pdf --pdf <path_to_pdf1> --pdf <path_to_pdf2> ... [--showdiffs={sidebyside|diffimage}]
+```
+_--showdiffs=sidebyside_ lets you do a visual comparison, but often the differences are subtle and difficult to see (a different font for text is a typical subtle difference!). In that case _diffimage_ will show you where the pixels differ and often give you a good enough hint to understand what has changed. 
+### Hints
+In connection with unit tests using compare-pdf you might want to set the date of an approved result pdf file. On Windows there is no touch(1) command, but powershell can be used, like this:
+```
+(Get-ChildItem .\testalbum.mcf.20250326.pdf).LastWriteTime = New-object DateTime 2025,03,26,19,00,00
+```

@@ -9,22 +9,27 @@
 # Test the clipart rendering
 
 #if you run this file directly, it won't have access to parent folder, so add it to python path
+import os, os.path
 import sys
 sys.path.append('..')
 sys.path.append('.')
+sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
+
+from datetime import datetime
 from pathlib import Path
-import os, os.path
 from pikepdf import Pdf, PdfImage
 
-from cewe2pdf import convertMcf
+from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
+from cewe2pdf import convertMcf # type: ignore
 
-def tryToBuildBook(keepDoublePages):
-    inFile = str(Path(Path.cwd(), 'tests', 'testClipart', 'testClipart.mcf'))
-    outFile = str(Path(Path.cwd(), 'tests', 'testClipart', 'testClipart.mcf.pdf'))
+from testutils import getLatestResultFile
+
+
+def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages):
     if os.path.exists(outFile) == True:
         os.remove(outFile)
     assert os.path.exists(outFile) == False
-    convertMcf(inFile, keepDoublePages)
+    convertMcf(inFile, keepDoublePages, outputFileName=outFile)
     assert Path(outFile).exists() == True
 
     #check the pdf contents
@@ -49,10 +54,29 @@ def tryToBuildBook(keepDoublePages):
         size = (coverpdfimage.width,coverpdfimage.height)
         assert size in imagesizes, f"Image sized {size} not expected"
 
+    if latestResultFile is not None:
+        # compare our result with the latest one
+        print(f"Compare {outFile} with {latestResultFile}")
+        files = [outFile, latestResultFile]
+        compare = ComparePDF(files, ShowDiffsStyle.Nothing)
+        result = compare.compare()
+        assert result, "Pixel comparison failed"
+    else:
+        print(f"No result file to compare with")
+
     #os.remove(outFile)
 
 def test_testDrawClipart():
-    tryToBuildBook(False)
+    albumFolderBasename = 'testClipart'
+    albumBasename = "testClipart"
+    inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
+    yyyymmdd = datetime.today().strftime("%Y%m%d")
+
+    styleid = "S"
+    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
+    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
+    tryToBuildBook(inFile, outFile, latestResultFile, False)
 
 if __name__ == '__main__':
     #only executed when this file is run directly.

@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>CondaEnv|CondaEnv|cewe2pdf</InterpreterId>
+    <InterpreterId>CondaEnv|CondaEnv|cewe2pdfenv</InterpreterId>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
     <CommandLineArguments>D:\Users\pete\Source\GitHub\cewe2pdf\tests\unittest_fotobook\unittest_fotobook.mcf</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
@@ -29,6 +29,8 @@
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
+    <Content Include="tests\compare-pdf\LICENSE" />
+    <Content Include="tests\compare-pdf\README.md" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6044.jpg" />
@@ -42,12 +44,16 @@
     <Content Include="tests\Resources\photofun\decorations\106796\8397-DECO-SF\8397-DECO-SF-mask.clp" />
     <Content Include="tests\Resources\photofun\decorations\106796\8397-DECO-SF\8397-DECO-SF-preview.clp" />
     <Content Include="tests\Resources\photofun\decorations\106796\8397-DECO-SF\8397-DECO-SF.xml" />
+    <Content Include="tests\Resources\photofun\decorations\1134365\19675-CLIP-AS\19675-CLIP-AS.clp" />
+    <Content Include="tests\Resources\photofun\decorations\1134365\19675-CLIP-AS\19675-CLIP-AS.xml" />
     <Content Include="tests\Resources\photofun\decorations\11744-CLIP-CC.xml" />
     <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC-clip.clp" />
     <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC-mask.clp" />
     <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC-preview.clp" />
     <Content Include="tests\Resources\photofun\decorations\127517\12678-DECO-CC\12678-DECO-CC.xml" />
     <Content Include="tests\Resources\photofun\decorations\127517\127517.json" />
+    <Content Include="tests\Resources\photofun\decorations\129188\14466-CLIP-EMBOSS-GD\14466-CLIP-EMBOSS-GD.clp" />
+    <Content Include="tests\Resources\photofun\decorations\129188\14466-CLIP-EMBOSS-GD\14466-CLIP-EMBOSS-GD.xml" />
     <Content Include="tests\Resources\photofun\decorations\46245\46245.json" />
     <Content Include="tests\Resources\photofun\decorations\46245\Blume_3\Blume_3.clp" />
     <Content Include="tests\Resources\photofun\decorations\46245\Blume_3\Blume_3.xml" />
@@ -65,16 +71,47 @@
     <Content Include="tests\Resources\photofun\decorations\rect_lightyellow.xml" />
     <Content Include="tests\Resources\photofun\decorations\rect_terracotta.xml" />
     <Content Include="tests\Resources\photofun\decorations\rect_white.xml" />
+    <Content Include="tests\Resources\photofun\fonts\CraftyGirls-Regular.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\DancingScript-Bold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\DancingScript-Medium.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\DancingScript-Regular.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\DancingScript-SemiBold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-Bold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-BoldItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-ExtraBold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-ExtraBoldItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-Italic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-Medium.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-MediumItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-Regular.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-SemiBold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EBGaramond-SemiBoldItalic.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSans-BaDn.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansBold-1adM.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansBoldItalic-ngV4.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansItalic-RJre.ttf" />
-    <Content Include="tests\Resources\photofun\fonts\misc\AUTHORS-e301" />
-    <Content Include="tests\Resources\photofun\fonts\misc\ChangeLog-0f6e" />
-    <Content Include="tests\Resources\photofun\fonts\misc\COPYING-94d5" />
-    <Content Include="tests\Resources\photofun\fonts\misc\License%282%29-f555.txt" />
-    <Content Include="tests\Resources\photofun\fonts\misc\License-8eb1.txt" />
-    <Content Include="tests\Resources\photofun\fonts\misc\README-75f0" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSansNarrow-Bold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSansNarrow-BoldItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSansNarrow-Italic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSansNarrow-Regular.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-Black.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-BlackItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-Bold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-BoldItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-ExtraBold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-ExtraBoldItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-ExtraLight.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-ExtraLightItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-Italic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-Light.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-LightItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-Medium.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-MediumItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-Regular.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-SemiBold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-SemiBoldItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-Thin.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins-ThinItalic.ttf" />
     <Content Include="tests\testbackgrounds\additional_fonts.txt" />
     <Content Include="build_a_compiled_version.md" />
     <Content Include="cewe2pdf.ini" />
@@ -83,10 +120,20 @@
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="TestingOnWSL.md" />
+    <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250326D.pdf" />
+    <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411D.pdf" />
+    <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411S.pdf" />
+    <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250319S.pdf" />
+    <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250326S.pdf" />
+    <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250412S.pdf" />
     <Content Include="tests\testClipart\additional_fonts.txt" />
+    <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250326S.pdf" />
+    <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250412S.pdf" />
     <Content Include="tests\testEmptyPageOne\additional_fonts.txt" />
+    <Content Include="tests\testEmptyPageOne\previous_result_pdfs\test_emptyPageOne.mcf.20250321D.pdf" />
     <Content Include="tests\testfontsubstitution\additional_fonts.txt" />
     <Content Include="tests\testfontsubstitution\cewe2pdf.ini" />
+    <Content Include="tests\testFontSubstitution\previous_result_pdfs\testfontsubstitution.mcf.20250411S.pdf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
     <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
@@ -145,6 +192,29 @@
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\20200306_111748.jpg" />
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testMcfxExtraction\testMcfxExtraction.mcfx" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20200516.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20210202.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20210715.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20210725.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20210805.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20211218.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20221219.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20230716.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20230717.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20231221.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20240410.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20240505.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20240607.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20240608.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20240706.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20240721.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20240903.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250321.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250326.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250327.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250413D.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250413S.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcfx.20250413S.pdf" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook.mcf" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook.mcf.pdf" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook.mcfx" />
@@ -190,6 +260,9 @@
     <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
     <Compile Include="runAllTests.py" />
+    <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
+    <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
+    <Compile Include="tests\compare-pdf\setup.py" />
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
     <Compile Include="tests\testbackgrounds\test_backgrounds.py" />
     <Compile Include="tests\testClipart\test_drawClipart.py" />
@@ -199,6 +272,9 @@
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\unittest_fotobook\test_simpleBook.py" />
     <Compile Include="tests\test_webp_loading\test_webp_loading.py" />
+    <Compile Include="testutils.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="text.py">
       <SubType>Code</SubType>
     </Compile>
@@ -207,6 +283,8 @@
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
     <Folder Include="tests" />
+    <Folder Include="tests\compare-pdf\" />
+    <Folder Include="tests\compare-pdf\compare_pdf\" />
     <Folder Include="tests\hps\" />
     <Folder Include="tests\hps\5026\" />
     <Folder Include="tests\hps\5026\addons\" />
@@ -226,11 +304,19 @@
     <Folder Include="tests\Resources\photofun\decorations\106793\8394-DECO-SF\" />
     <Folder Include="tests\Resources\photofun\decorations\106796\" />
     <Folder Include="tests\Resources\photofun\decorations\106796\8397-DECO-SF\" />
+    <Folder Include="tests\Resources\photofun\decorations\1134365\" />
+    <Folder Include="tests\Resources\photofun\decorations\1134365\19675-CLIP-AS\" />
+    <Folder Include="tests\Resources\photofun\decorations\129188\" />
+    <Folder Include="tests\Resources\photofun\decorations\129188\14466-CLIP-EMBOSS-GD\" />
     <Folder Include="tests\Resources\photofun\decorations\63457\" />
     <Folder Include="tests\Resources\photofun\decorations\63457\line_single_black\" />
     <Folder Include="tests\Resources\photofun\fonts\" />
-    <Folder Include="tests\Resources\photofun\fonts\misc\" />
+    <Folder Include="tests\testbackgrounds\previous_result_pdfs\" />
+    <Folder Include="tests\testClipartColorReplacement\previous_result_pdfs\" />
+    <Folder Include="tests\testClipart\previous_result_pdfs\" />
+    <Folder Include="tests\testEmptyPageOne\previous_result_pdfs\" />
     <Folder Include="tests\testfontsubstitution\" />
+    <Folder Include="tests\testFontSubstitution\previous_result_pdfs\" />
     <Folder Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\" />
     <Folder Include="tests\test_webp_loading\" />
     <Folder Include="tests\unittest_fotobook\" />
@@ -256,10 +342,11 @@
     <Folder Include="tests\testMcfxExtraction\" />
     <Folder Include="tests\testMcfxExtraction\McfOriginals\" />
     <Folder Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\" />
+    <Folder Include="tests\unittest_fotobook\previous_result_pdfs\" />
     <Folder Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf" />
+    <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdfenv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <PropertyGroup>

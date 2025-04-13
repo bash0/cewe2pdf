@@ -4,33 +4,60 @@
 # Test the clipart rendering with passepartout frame recoloring
 
 #if you run this file directly, it won't have access to parent folder, so add it to python path
+import os, os.path
 import sys
 sys.path.append('..')
 sys.path.append('.')
-from pathlib import Path
-import os, os.path
-from pikepdf import Pdf
-from cewe2pdf import convertMcf
+sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
 
-def tryToBuildBook(keepDoublePages):
-    inFile = str(Path(Path.cwd(), 'tests', 'testClipartColorReplacement', 'test_clipart_colorreplacement.mcf'))
-    outFile = str(Path(Path.cwd(), 'tests', 'testClipartColorReplacement', 'test_clipart_colorreplacement.mcf.pdf'))
+from datetime import datetime
+from pathlib import Path
+from pikepdf import Pdf
+
+from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
+from cewe2pdf import convertMcf # type: ignore
+
+from testutils import getLatestResultFile
+
+
+def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
     if os.path.exists(outFile) == True:
         os.remove(outFile)
     assert os.path.exists(outFile) == False
-    convertMcf(inFile, keepDoublePages)
+    convertMcf(inFile, keepDoublePages, outputFileName=outFile)
     assert Path(outFile).exists() == True
 
     #check the pdf contents
     # we could also test more sophisticated things, like colors or compare images.
     readPdf = Pdf.open(outFile)
     numPages =  len(readPdf.pages)
-    assert numPages == 28
+    assert numPages == expectedPages, f"Expected {expectedPages} pages, found {numPages}"
+
+    if latestResultFile is not None:
+        # compare our result with the latest one
+        print(f"Compare {outFile} with {latestResultFile}")
+        files = [outFile, latestResultFile]
+        compare = ComparePDF(files, ShowDiffsStyle.Nothing)
+        result = compare.compare()
+        assert result, "Pixel comparison failed"
+    else:
+        print(f"No result file to compare with")
 
     #os.remove(outFile)
 
+
 def test_testClipartColorReplacement():
-    tryToBuildBook(False)
+    albumFolderBasename = 'testClipartColorReplacement'
+    albumBasename = "test_clipart_colorreplacement"
+    inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
+    yyyymmdd = datetime.today().strftime("%Y%m%d")
+
+    styleid = "S"
+    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
+    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
+    tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
+
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
