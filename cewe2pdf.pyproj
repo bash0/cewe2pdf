@@ -177,6 +177,9 @@
     <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250321.pdf" />
     <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250326.pdf" />
     <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250327.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250413D.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250413S.pdf" />
+    <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcfx.20250413S.pdf" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook.mcf" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook.mcf.pdf" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook.mcfx" />
