@@ -20,6 +20,7 @@ from cewe2pdf import convertMcf # type: ignore
 
 from testutils import getLatestResultFile
 
+assertOnPixelComparisonFailure = True # set false to avoid the assertion on pixel-by-pixel comparison failure
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
     if os.path.exists(outFile) == True:
@@ -48,11 +49,13 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
         files = [outFile, latestResultFile]
         compare = ComparePDF(files, ShowDiffsStyle.Nothing)
         result = compare.compare()
-        assert result, "Pixel comparison failed"
+        if assertOnPixelComparisonFailure:
+            assert result, "Pixel comparison failed"
     else:
         print(f"No result file to compare with")
 
     #os.remove(outFile)
+
 
 def runtest(albumFolderBasename, albumBasename, mcfSuffix, styleId, keepDoublePages, expectedPages):
     inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.{mcfSuffix}'))
@@ -62,17 +65,32 @@ def runtest(albumFolderBasename, albumBasename, mcfSuffix, styleId, keepDoublePa
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{mcfSuffix}.*{styleId}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages)
 
+
 def test_simpleBookSinglePage():
     runtest('unittest_fotobook', "unittest_fotobook", "mcf", "S", False, 28)
 
+# You can uncomment these tests to also run different output variants, but basically
+#   this test is used to test the content of the pages and not the layout.
+#
 # def test_simpleBookDoublePage():
 #     runtest('unittest_fotobook', "unittest_fotobook", "mcf", "D", True, 15)
-
+#
 # def test_simpleBookSinglePageMcfx():
 #     runtest('unittest_fotobook', "unittest_fotobook", "mcfx", "S", False, 28)
 
+
 if __name__ == '__main__':
-    #only executed when this file is run directly.
+    # only executed when this file is run directly rather than by
+    # pytest finding the test_ methods
+
+    # Avoid the assertion on pixel failure for non pytest execution because
+    # normally this entrypoint will be used when doing manual testing in a local
+    # environment with correct local fonts, etc. The assert is basically only
+    # interesting when pytest is running the full set of automated tests in
+    # the github environment (or here, prior to commit, with runAllTests.py)
+    assertOnPixelComparisonFailure = False
+
     test_simpleBookSinglePage()
+
     #test_simpleBookDoublePage()
     #test_simpleBookSinglePageMcfx()
