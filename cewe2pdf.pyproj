@@ -16,6 +16,7 @@
     <CommandLineArguments>D:\Users\pete\Source\GitHub\cewe2pdf\tests\unittest_fotobook\unittest_fotobook.mcf</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
+    <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -137,7 +138,6 @@
     <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
     <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
-    <Content Include="tests\cewe2pdf-local.ini" />
     <Content Include="tests\unittest_fotobook\cewe2pdf.ini" />
     <Content Include="tests\hps\5026\.gitkeep" />
     <Content Include="tests\hps\5026\addons\121285\cliparts\v1\decorations\12089-CLIP-GOLD-GD.clp" />
