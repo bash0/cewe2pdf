@@ -859,7 +859,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     processElements(additional_fonts, fotobook, imagedir, productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
 
 
-def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, outputFileName=None, mcfxTmpDir=None, appDataDir=None): # noqa: C901 (too complex)
+def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None, outputFileName=None): # noqa: C901 (too complex)
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
     global passepartoutDict  # pylint: disable=global-statement
@@ -1224,6 +1224,9 @@ def collectArgsAndConvert():
     parser.add_argument('--appdata-dir', dest='appData',
                         default=None,
                         help='Directory for persistent app data, eg ttf fonts converted from otf fonts')
+    parser.add_argument('--outFile', dest='outFile',
+                        default=None,
+                        help="The name of the output file, rather than the default <inputFile>.pdf")
     parser.add_argument('inputFile', type=str, nargs='?',
                         help='Just one mcf(x) input file must be specified')
 
@@ -1273,8 +1276,12 @@ def collectArgsAndConvert():
     if args.appData is not None:
         appData = os.path.abspath(args.appData)
 
+    outFile = None
+    if args.outFile is not None:
+        outFile = os.path.abspath(args.outFile)
+
     # convert the file
-    return convertMcf(args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData)
+    return convertMcf(args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData, outputFileName=outFile)
 
 
 def cleanUpTempFiles(fileList, unpackedFolder):

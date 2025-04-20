@@ -30,6 +30,7 @@
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
+    <Content Include="cewe2pdf.spec" />
     <Content Include="tests\compare-pdf\LICENSE" />
     <Content Include="tests\compare-pdf\README.md" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
