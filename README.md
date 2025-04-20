@@ -226,12 +226,11 @@ To run the unit-test you also need to install
 ```
 pip install pytest pikepdf
 ```
-You can then call pytest from the working directory or use the runAllTests.py file.
+You can then call pytest from the working directory or use the runAllTests.py file, or you can run the individual test files.
+### Test verification using pixel level result comparison with compare-pdf
+We have a local copy of the compare-pdf code from https://github.com/Formartha/compare-pdf. This code can be used from our automated unit test code to do pixel-by-pixel comparison of the pdf pages that have been generated with a previous (approved) version. This strategy has been implemented for several of the tests, and it is therefore important that each test has an "approved" result pdf with which any new version is compared (see below)
 
-### Using compare-pdf
-We have a local copy of the compare-pdf code from https://github.com/Formartha/compare-pdf
-
-The neat thing with this is that it can be used from the automated unit test code to do pixel-by-pixel comparison of the pdf pages that have been generated with a previous (approved) version. In addition compare_pdf can be used from the command line to see details of the differences. Just move to the compare-pdf directory and run the command
+In addition compare_pdf can be used from the command line to see details of the differences. Just change to our tests/compare-pdf directory and run the command
 ```
 pip install .
 ```
@@ -240,8 +239,10 @@ Then you can call compare_pdf from the command line to show the two pdfs side by
 compare_pdf --pdf <path_to_pdf1> --pdf <path_to_pdf2> ... [--showdiffs={sidebyside|diffimage}]
 ```
 _--showdiffs=sidebyside_ lets you do a visual comparison, but often the differences are subtle and difficult to see (a different font for text is a typical subtle difference!). In that case _diffimage_ will show you where the pixels differ and often give you a good enough hint to understand what has changed. 
+### Conventions for naming and retaining approved result pdfs
+In each test directory where pixel comparison forms part of the test, it is necessary to keep an approved version (maybe several) to compare against. These are kept in a folder conventionally named _previous_result_pdfs_, and are conventionally named as the original mcf name with a suffix containing the date (yyyymmdd) and a style letter ("S" for single side pdfs, "D" for double side pdfs). The test programs create output files using this naming convention in their own directory. If a new version is different from the latest version in _previous_result_pdfs_ __AND__ is deemed to be correct by the developer, then the new test output(s) can be moved to _previous_result_pdfs_ and checked in there, thus becoming the basis against which future test results will be compared.
 ### Hints
-In connection with unit tests using compare-pdf you might want to set the date of an approved result pdf file. On Windows there is no touch(1) command, but powershell can be used, like this:
+Tests using compare-pdf originally used the modification time to sort result pdfs and choose the latest approved version. This doesn't work on github, and we now use the file naming convention to sort the files. For interest, however, there is no touch(1) command on Windows, and powershell must be used to change the timestamp for a file, like this:
 ```
 (Get-ChildItem .\testalbum.mcf.20250326.pdf).LastWriteTime = New-object DateTime 2025,03,26,19,00,00
 ```
