@@ -944,7 +944,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             if 'cewe_folder' not in defaultConfigSection:
-                logging.error('You must create cewe_folder.txt or modify cewe2pdf.ini')
+                logging.error('You must create cewe_folder.txt or modify cewe2pdf.ini to define cewe_folder')
                 sys.exit(1)
 
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
@@ -1010,6 +1010,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     if articleConfigElement is None:
         logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
+
+    pageNumberElement = fotobook.find('pagenumbering')
+    if pageNumberElement is not None:
+        pnpos = int(pageNumberElement.get('position'))
+        if pnpos != 0:
+            logging.warning(f'Page numbering is not yet implemented')
+
     pageCount = int(articleConfigElement.get('normalpages')) + 2
     # The normalpages attribute in the mcf is the number of "usable" inside pages, excluding the front and back covers and the blank inside
     #  cover pages. Add 2 so that pagecount represents the actual number of printed pdf pages we expect in the normal single sided

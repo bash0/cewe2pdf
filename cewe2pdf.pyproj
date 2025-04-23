@@ -138,6 +138,12 @@
     <Content Include="tests\testFontSubstitution\previous_result_pdfs\testfontsubstitution.mcf.20250411S.pdf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testPageNumbers\additional_fonts.txt" />
+    <Content Include="tests\testPageNumbers\cewe2pdf.ini" />
+    <Content Include="tests\testPageNumbers\test_pagenumbers.mcf" />
+    <Content Include="tests\testPageNumbers\test_pagenumbers.mcf~" />
+    <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
     <Content Include="tests\unittest_fotobook\cewe2pdf.ini" />
     <Content Include="tests\hps\5026\.gitkeep" />
@@ -271,6 +277,7 @@
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
+    <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
     <Compile Include="tests\unittest_fotobook\test_simpleBook.py" />
     <Compile Include="tests\test_webp_loading\test_webp_loading.py" />
     <Compile Include="testutils.py">
@@ -319,6 +326,8 @@
     <Folder Include="tests\testfontsubstitution\" />
     <Folder Include="tests\testFontSubstitution\previous_result_pdfs\" />
     <Folder Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\" />
+    <Folder Include="tests\testPageNumbers\" />
+    <Folder Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\" />
     <Folder Include="tests\test_webp_loading\" />
     <Folder Include="tests\unittest_fotobook\" />
     <Folder Include="tests\Resources\" />
