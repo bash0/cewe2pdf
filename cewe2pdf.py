@@ -156,7 +156,7 @@ image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # Tabs seem to be in 8mm pitch
 tab_pitch = 80
 
-f = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
+mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
 tempFileList = []  # we need to remove all the temporary files at the end
 
@@ -257,7 +257,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
 
                 # pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
                 #   but im = ImageReader(bgpath) does not work with 1-bit images,so ...
-                pdf.drawImage(ImageReader(memFileHandle), f * areaXOffset, 0, width=f * areaWidth, height=f * areaHeight)
+                pdf.drawImage(ImageReader(memFileHandle), mcf2rl * areaXOffset, 0, width=mcf2rl * areaWidth, height=mcf2rl * areaHeight)
 
             except Exception:
                 if bgPath not in bg_notFoundDirList:
@@ -281,9 +281,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     if imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
         # display on the right page
         if AlbumInfo.isAlbumDoubleSide(productstyle):
-            img_transx = transx + f * pw/2
+            img_transx = transx + mcf2rl * pw/2
         else:
-            img_transx = transx + f * pw
+            img_transx = transx + mcf2rl * pw
     else:
         img_transx = transx
 
@@ -390,14 +390,14 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # calculate the non-symmetric shift of the center, given the left pos and the width.
     frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
     frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
-    pdf.translate(-frameShiftX_mcf * f, -frameShiftY_mcf * f) # for adjustments from passepartout
+    pdf.translate(-frameShiftX_mcf * mcf2rl, -frameShiftY_mcf * mcf2rl) # for adjustments from passepartout
     pdf.drawImage(ImageReader(jpeg.name),
-        f * -0.5 * imgCropWidth_mcfunit,
-        f * -0.5 * imgCropHeight_mcfunit,
-        width=f * imgCropWidth_mcfunit,
-        height=f * imgCropHeight_mcfunit,
+        mcf2rl * -0.5 * imgCropWidth_mcfunit,
+        mcf2rl * -0.5 * imgCropHeight_mcfunit,
+        width=mcf2rl * imgCropWidth_mcfunit,
+        height=mcf2rl * imgCropHeight_mcfunit,
         mask='auto')
-    pdf.translate(frameShiftX_mcf * f, frameShiftY_mcf * f) # for adjustments from passepartout
+    pdf.translate(frameShiftX_mcf * mcf2rl, frameShiftY_mcf * mcf2rl) # for adjustments from passepartout
 
     # we need to draw our passepartout after the real image, so it overlays it.
     if frameClipartFileName is not None:
@@ -433,7 +433,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         if "width" in border.attrib:
             widthAttrib = border.get('width')
             if widthAttrib is not None:
-                bwidth = f * floor(float(widthAttrib)) # units are 1/10 mm
+                bwidth = mcf2rl * floor(float(widthAttrib)) # units are 1/10 mm
 
         bcolor = reportlab.lib.colors.blue
         if "color" in border.attrib:
@@ -450,10 +450,10 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
             if positionAttrib == "outside":
                 adjustment = bwidth * 0.5
 
-        frameBottomLeft_x = -0.5 * (f * areaWidth) - adjustment
-        frameBottomLeft_y = -0.5 * (f * areaHeight) - adjustment
-        frameWidth = f * areaWidth + 2 * adjustment
-        frameHeight = f * areaHeight + 2 * adjustment
+        frameBottomLeft_x = -0.5 * (mcf2rl * areaWidth) - adjustment
+        frameBottomLeft_y = -0.5 * (mcf2rl * areaHeight) - adjustment
+        frameWidth = mcf2rl * areaWidth + 2 * adjustment
+        frameHeight = mcf2rl * areaHeight + 2 * adjustment
         frm_table = Table(
             data=[[None]],
             colWidths=frameWidth,
@@ -643,12 +643,12 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 logging.exception('Exception')
 
     # Add a frame object that can contain multiple paragraphs
-    leftPad = f * tablelmarg
-    rightPad = f * tablermarg
-    bottomPad = f * tablebmarg
-    topPad = f * tabletmarg
-    frameWidth = f * areaWidth
-    frameHeight = f * areaHeight
+    leftPad = mcf2rl * tablelmarg
+    rightPad = mcf2rl * tablermarg
+    bottomPad = mcf2rl * tablebmarg
+    topPad = mcf2rl * tabletmarg
+    frameWidth = mcf2rl * areaWidth
+    frameHeight = mcf2rl * areaHeight
     frameBottomLeft_x = -0.5 * frameWidth
     frameBottomLeft_y = -0.5 * frameHeight
 
@@ -758,8 +758,8 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     pdf.translate(img_transx, transy)
     pdf.rotate(-areaRot)
     pdf.drawImage(ImageReader(clipart.pngMemFile),
-        f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-        width=f * areaWidth, height=f * areaHeight, mask='auto')
+        mcf2rl * -0.5 * areaWidth, mcf2rl * -0.5 * areaHeight,
+        width=mcf2rl * areaWidth, height=mcf2rl * areaHeight, mask='auto')
     if decoration is not None:
         processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf)
     pdf.rotate(areaRot)
@@ -803,8 +803,8 @@ def processElements(additional_fonts, fotobook, imagedir,
         cx = areaLeft + 0.5 * areaWidth
         cy = ph - (areaTop + 0.5 * areaHeight)
 
-        transx = f * cx
-        transy = f * cy
+        transx = mcf2rl * cx
+        transy = mcf2rl * cy
 
         # process images
         for imageTag in area.findall('imagebackground') + area.findall('image'):
@@ -840,7 +840,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
         # Assume A4 page size
         pw = 2100
         ph = 2970
-    pdf.setPageSize((f * pw, f * ph))
+    pdf.setPageSize((mcf2rl * pw, mcf2rl * ph))
 
     # process background
     # look for all "<background...> tags.
