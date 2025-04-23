@@ -96,6 +96,7 @@ from fontHandling import getMissingFontSubstitute, findAndRegisterFonts
 from imageUtils import autorot
 from lineScales import LineScales
 from mcfx import unpackMcfx
+from pageNumberingInfo import PageNumberingInfo
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CreateParagraphStyle, Dequote, noteFontSubstitution
@@ -170,6 +171,7 @@ clipartPathList = tuple[str]()
 passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
 passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
 defaultConfigSection = None
+pageNumberingInfo = None # if the album requests page numbering then we keep the details here
 
 
 def getPageElementForPageNumber(fotobook, pageNumber):
@@ -867,11 +869,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     global image_res  # pylint: disable=global-statement
     global bg_res  # pylint: disable=global-statement
     global defaultConfigSection  # pylint: disable=global-statement
+    global pageNumberingInfo  # pylint: disable=global-statement
 
     clipartDict = {}    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
     passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
     passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
+    pageNumberingInfo = None
 
     albumTitle, dummy = os.path.splitext(os.path.basename(albumname))
 
@@ -1014,8 +1018,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     pageNumberElement = fotobook.find('pagenumbering')
     if pageNumberElement is not None:
         pnpos = int(pageNumberElement.get('position'))
-        if pnpos != 0:
-            logging.warning(f'Page numbering is not yet implemented')
+        if pnpos != 0: # 0 implies no numbering
+            logging.warning(f'Page numbering is not yet fully implemented')
+            # make a page number description object to use later
+            pageNumberingInfo = PageNumberingInfo(pageNumberElement)
 
     pageCount = int(articleConfigElement.get('normalpages')) + 2
     # The normalpages attribute in the mcf is the number of "usable" inside pages, excluding the front and back covers and the blank inside
@@ -1076,6 +1082,63 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     cleanUpTempFiles(tempFileList, unpackedFolder)
 
     return True
+
+
+def addPageNumber(pdf, pageNumber, productStyle, oddpage):
+    global pageNumberingInfo
+    if pageNumberingInfo is None:
+        return
+    if pageNumberingInfo.position == 0:
+        return
+    pagesize = (pdf._pagesize[0],pdf._pagesize[1]) # pagesize in rl units
+    numberText = pageNumberingInfo.textstring # where a % indicates where the number has to go
+    # ignoring the requested format for now, just use decimal numbering ...
+    numberText = numberText.replace("%",str(pageNumber))
+    paragraphText = f'<para autoLeading="max">{numberText}</para>'
+    paragraph = Paragraph(paragraphText, pageNumberingInfo.paragraphStyle)
+    paraWidth = paragraph.minWidth()
+    _, paraHeight = paragraph.wrap(1000, 1000)
+    frameWidth = paraWidth + 20
+        # adding 20 is just what makes it work by trial and error. Copilot thinks this
+        # is necessary due to imprecisions in the reportlab suite!
+    frameHeight = paraHeight + 1
+
+    # now I can calculate the actual position
+    if productStyle == ProductStyle.AlbumDoubleSide and oddpage:
+        cx = pagesize[0] # moving across to the right hand page of the pair
+    else:
+        cx = 0
+
+    if pageNumberingInfo.position == 1: # outer top
+        cy = pagesize[1] - pageNumberingInfo.verticalMargin - frameHeight
+        if oddpage:
+            cx = cx + pagesize[0] - pageNumberingInfo.horizontalMargin - frameWidth
+        else:
+            cx = cx + pageNumberingInfo.horizontalMargin
+    elif pageNumberingInfo.position == 2: # centre top
+        cy = pagesize[1] - pageNumberingInfo.verticalMargin - frameHeight
+        cx = cx + 0.5 * (pagesize[0] - frameWidth)
+    elif pageNumberingInfo.position == 4: # outer bottom
+        cy = pageNumberingInfo.verticalMargin
+        if oddpage:
+            cx = cx + pagesize[0] - pageNumberingInfo.horizontalMargin - frameWidth
+        else:
+            cx = cx + pageNumberingInfo.horizontalMargin
+    elif pageNumberingInfo.position == 5: # centre bottom
+        cy = pageNumberingInfo.verticalMargin
+        cx = cx + 0.5 * (pagesize[0] - frameWidth)
+    else:
+        logging.error(f"Unrecognised pagenumbering position value {pageNumberingInfo.position}")
+        return
+
+    transx = cx
+    transy = cy
+    pdf.translate(transx, transy)
+    pdf_flowList = [paragraph]
+    # for debugging it may be useful to set the frame background=reportlab.lib.colors.aliceblue or showBoundary=1
+    newFrame = ColorFrame(0, 0, frameWidth, frameHeight, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
+    newFrame.addFromList(pdf_flowList, pdf)
+    pdf.translate(-transx, -transy)
 
 
 def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount, pageNumbers, # noqa: C901
@@ -1156,6 +1219,7 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         page, pageNumber, pageCount, PageType.Normal, productstyle, oddpage,
                         bg_notFoundDirList, availableFonts, lastpage)
+                    addPageNumber(pdf, pageNumber, productstyle, oddpage)
 
                 # Look for an empty page 0 that does NOT contain an area element. That will define
                 # the background for the inside cover page to be placed on top of the right side of
@@ -1190,6 +1254,9 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, productstyle, oddpage,
                     bg_notFoundDirList, availableFonts, lastpage)
+
+                if AlbumInfo.isAlbumProduct(productstyle) and pagetype in [PageType.EmptyPage, PageType.Normal]:
+                    addPageNumber(pdf, pageNumber, productstyle, oddpage)
 
                 # finish the pdf page and start a new one.
                 if not AlbumInfo.isAlbumProduct(productstyle):

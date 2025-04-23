@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="93aa07f8-20db-423e-85bd-cee812a1a9d5" imagedir="test_pagenumbers_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
-    <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="9c86007f-97d8-4384-a60d-148ff3168182" projectIDCreatedEpoch="1745387671"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-04-23 08:10"/>
+<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="13d07e11-3bde-43dc-891e-79ea9459b177" imagedir="test_pagenumbers_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
+    <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="9c86007f-97d8-4384-a60d-148ff3168182" projectIDCreatedEpoch="1745402571"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-04-23 22:25"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-04-23 07:21"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
-    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Crafty Girls" fontitalics="0" fontsize="12" format="0" margin="52" position="4" textcolor="#ff000000" textstring="Page %" verticalMargin="53">
+    <pagenumbering bgcolor="#00000000" fontbold="1" fontfamily="Crafty Girls" fontitalics="0" fontsize="16" format="0" margin="52" position="4" textcolor="#ff000000" textstring="Side %" verticalMargin="60">
         <outline width="1"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNLEFT" IndentMargin="2" VerticalIndentMargin="2" backgroundColor="#00000000" font="Arial Narrow,11,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="2" VerticalIndentMargin="2" backgroundColor="#00000000" font="Poppins,18,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.0.0"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
@@ -17,6 +17,16 @@
         <designElementIDs background="201" layout="384109"/>
         <background alignment="4" designElementId="201" rotation="0" type="1"/>
         <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
+        <area areatype="textarea">
+            <position height="275" left="2892.38" rotation="0" top="542.5" width="671.73" zposition="7000"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Poppins'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:89px; margin-bottom:2px; margin-left:2px; margin-right:2px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Front cover</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="2" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,18,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
         <area areatype="spinetextarea">
             <position height="91" left="812.5" rotation="270" top="1329.5" width="2650" zposition="7000"/>
             <decoration/>
@@ -26,6 +36,16 @@ p, li { white-space: pre-wrap; }
 </style></head><body style=" font-family:'CEWE Head'; font-size:12pt; font-weight:400; font-style:normal;">
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="275" left="711.25" rotation="0" top="542.5" width="671" zposition="7001"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Poppins'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:89px; margin-bottom:2px; margin-left:2px; margin-right:2px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Back cover</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="2" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,18,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -44,6 +64,16 @@ p, li { white-space: pre-wrap; }
         <bundlesize height="2700" width="4100"/>
         <designElementIDs background="201"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <area areatype="textarea">
+            <position height="66.0857" left="2863.28" rotation="322" top="972.261" width="390.474" zposition="7000"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:4px; margin-bottom:2px; margin-left:2px; margin-right:2px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Actual first page</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="2" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
     </page>
     <page designStyleID="0" pagenr="1" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
@@ -56,6 +86,30 @@ p, li { white-space: pre-wrap; }
         <designElementIDs background="201" layout="125061"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="clipartarea">
+            <position height="50" left="-190" rotation="90" top="1339.13" width="2430" zposition="100"/>
+            <designElementIDs clipart="63457"/>
+            <decoration/>
+            <clipart designElementId="63457">
+                <ClipartConfiguration applySpotColor="0">
+                    <colors>
+                        <color source="#000000" target="#df1900"/>
+                    </colors>
+                </ClipartConfiguration>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="50" left="1860" rotation="90" top="1339.13" width="2430" zposition="101"/>
+            <designElementIDs clipart="63457"/>
+            <decoration/>
+            <clipart designElementId="63457">
+                <ClipartConfiguration applySpotColor="0">
+                    <colors>
+                        <color source="#000000" target="#df1900"/>
+                    </colors>
+                </ClipartConfiguration>
+            </clipart>
+        </area>
     </page>
     <page designStyleID="0" pagenr="3" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
@@ -200,6 +254,16 @@ p, li { white-space: pre-wrap; }
         <designElementIDs background="201" layout="125061"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="textarea">
+            <position height="118" left="810.099" rotation="43" top="948.262" width="390" zposition="7000"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:30px; margin-bottom:2px; margin-left:2px; margin-right:2px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Actual last page</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="2" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
     </page>
     <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
         <bundlesize height="2700" width="4100"/>
@@ -208,5 +272,5 @@ p, li { white-space: pre-wrap; }
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships/>
-    <statistics assistantUsed="0" countPauses="0" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="1983" fotosAdded="2" fotosRemoved="2" pauseTime="0" sessionsUsed="3"/>
+    <statistics assistantUsed="0" countPauses="9" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="29389" fotosAdded="2" fotosRemoved="2" pauseTime="23713" sessionsUsed="4"/>
 </fotobook>
