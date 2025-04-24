@@ -1095,8 +1095,8 @@ def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
     paraWidth = paragraph.minWidth()
     _, paraHeight = paragraph.wrap(1000, 1000)
 
-    frameWidthFiddleFactor = 4 + pageNumberingInfo.fontsize * 1.5
-        # Copilot thinks the fiddle factor is necessary due to imprecisions in the reportlab suite!
+    frameWidthFiddleFactor = 3 + pageNumberingInfo.fontsize * 1.5
+        # Copilot thinks a fiddle factor is necessary due to imprecisions in the reportlab suite!
         # The fiddle factor calculation comes from trial and error! Surely there's a better solution?
     frameWidth = paraWidth + frameWidthFiddleFactor
     frameHeight = paraHeight + 1
@@ -1138,7 +1138,7 @@ def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
     pdf.translate(transx, transy)
     pdf_flowList = [paragraph]
     newFrame = ColorFrame(0, 0, frameWidth, frameHeight, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
-    newFrame.background = reportlab.lib.colors.aliceblue # for debugging it may be useful to set the frame background
+    # newFrame.background = reportlab.lib.colors.aliceblue # uncomment for debugging
     newFrame.addFromList(pdf_flowList, pdf)
     pdf.translate(-transx, -transy)
 

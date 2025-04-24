@@ -29,7 +29,7 @@ class PageNumberingInfo:
         self.textcolor = pageNumberElement.get('textcolor','#ff000000')
         self.bgcolor = pageNumberElement.get('bgcolor','#00000000')
         self.paragraphStyle = ParagraphStyle(None, None,
-            alignment=reportlab.lib.enums.TA_LEFT,  # will often be overridden
+            alignment=reportlab.lib.enums.TA_CENTER,
             fontSize=self.fontsize,
             fontName=self.fontfamily,
             leading=self.fontsize,
