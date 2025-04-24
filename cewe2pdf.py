@@ -1090,7 +1090,11 @@ def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
     numberText = pageNumberingInfo.textstring # where a % indicates where the number has to go
     # ignoring the requested format for now, just use decimal numbering ...
     numberText = numberText.replace("%",str(pageNumber))
-    paragraphText = f'<para autoLeading="max">{numberText}</para>'
+    boldstart = '<b>' if pageNumberingInfo.fontbold != 0 else ''
+    boldend = '</b>' if pageNumberingInfo.fontbold != 0 else ''
+    italicstart = '<i>' if pageNumberingInfo.fontitalics != 0 else ''
+    italicend = '</i>' if pageNumberingInfo.fontitalics != 0 else ''
+    paragraphText = f'<para>{boldstart}{italicstart}{numberText}{italicend}{boldend}</para>'
     paragraph = Paragraph(paragraphText, pageNumberingInfo.paragraphStyle)
     paraWidth = paragraph.minWidth()
     _, paraHeight = paragraph.wrap(1000, 1000)
