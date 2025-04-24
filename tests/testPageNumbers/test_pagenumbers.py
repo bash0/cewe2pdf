@@ -59,11 +59,11 @@ def test_testEmptyPageOne():
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
 
-    # styleid = "D"
-    # outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
-    # outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
-    # latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
-    # tryToBuildBook(inFile, outFile, latestResultFile, True, 15)
+    styleid = "D"
+    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
+    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
+    tryToBuildBook(inFile, outFile, latestResultFile, True, 15)
 
 
 if __name__ == '__main__':

@@ -1084,13 +1084,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     return True
 
 
-def addPageNumber(pdf, pageNumber, productStyle, oddpage):
-    global pageNumberingInfo
-    if pageNumberingInfo is None:
+def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
+    if pageNumberingInfo is None or pageNumberingInfo.position == 0:
         return
-    if pageNumberingInfo.position == 0:
-        return
-    pagesize = (pdf._pagesize[0],pdf._pagesize[1]) # pagesize in rl units
     numberText = pageNumberingInfo.textstring # where a % indicates where the number has to go
     # ignoring the requested format for now, just use decimal numbering ...
     numberText = numberText.replace("%",str(pageNumber))
@@ -1098,35 +1094,41 @@ def addPageNumber(pdf, pageNumber, productStyle, oddpage):
     paragraph = Paragraph(paragraphText, pageNumberingInfo.paragraphStyle)
     paraWidth = paragraph.minWidth()
     _, paraHeight = paragraph.wrap(1000, 1000)
-    frameWidth = paraWidth + 20
-        # adding 20 is just what makes it work by trial and error. Copilot thinks this
-        # is necessary due to imprecisions in the reportlab suite!
+
+    frameWidthFiddleFactor = 4 + pageNumberingInfo.fontsize * 1.5
+        # Copilot thinks the fiddle factor is necessary due to imprecisions in the reportlab suite!
+        # The fiddle factor calculation comes from trial and error! Surely there's a better solution?
+    frameWidth = paraWidth + frameWidthFiddleFactor
     frameHeight = paraHeight + 1
 
-    # now I can calculate the actual position
-    if productStyle == ProductStyle.AlbumDoubleSide and oddpage:
-        cx = pagesize[0] # moving across to the right hand page of the pair
+    pagesize = (pdf._pagesize[0],pdf._pagesize[1]) # pagesize in rl units
+    if productStyle == ProductStyle.AlbumDoubleSide:
+        sideWidth = pagesize[0] / 2
+        cx = sideWidth if oddpage else 0 # moving to the right hand side for odd pages
     else:
+        sideWidth = pagesize[0]
         cx = 0
+    sideHeight = pagesize[1]
 
+    # finally can calculate the actual position
     if pageNumberingInfo.position == 1: # outer top
-        cy = pagesize[1] - pageNumberingInfo.verticalMargin - frameHeight
+        cy = sideHeight - pageNumberingInfo.verticalMargin - frameHeight
         if oddpage:
-            cx = cx + pagesize[0] - pageNumberingInfo.horizontalMargin - frameWidth
+            cx = cx + sideWidth - pageNumberingInfo.horizontalMargin - frameWidth
         else:
             cx = cx + pageNumberingInfo.horizontalMargin
     elif pageNumberingInfo.position == 2: # centre top
-        cy = pagesize[1] - pageNumberingInfo.verticalMargin - frameHeight
-        cx = cx + 0.5 * (pagesize[0] - frameWidth)
+        cy = sideHeight - pageNumberingInfo.verticalMargin - frameHeight
+        cx = cx + 0.5 * (sideWidth - frameWidth)
     elif pageNumberingInfo.position == 4: # outer bottom
         cy = pageNumberingInfo.verticalMargin
         if oddpage:
-            cx = cx + pagesize[0] - pageNumberingInfo.horizontalMargin - frameWidth
+            cx = cx + sideWidth - pageNumberingInfo.horizontalMargin - frameWidth
         else:
             cx = cx + pageNumberingInfo.horizontalMargin
     elif pageNumberingInfo.position == 5: # centre bottom
         cy = pageNumberingInfo.verticalMargin
-        cx = cx + 0.5 * (pagesize[0] - frameWidth)
+        cx = cx + 0.5 * (sideWidth - frameWidth)
     else:
         logging.error(f"Unrecognised pagenumbering position value {pageNumberingInfo.position}")
         return
@@ -1135,8 +1137,8 @@ def addPageNumber(pdf, pageNumber, productStyle, oddpage):
     transy = cy
     pdf.translate(transx, transy)
     pdf_flowList = [paragraph]
-    # for debugging it may be useful to set the frame background=reportlab.lib.colors.aliceblue or showBoundary=1
     newFrame = ColorFrame(0, 0, frameWidth, frameHeight, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
+    newFrame.background = reportlab.lib.colors.aliceblue # for debugging it may be useful to set the frame background
     newFrame.addFromList(pdf_flowList, pdf)
     pdf.translate(-transx, -transy)
 
@@ -1219,7 +1221,7 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         page, pageNumber, pageCount, PageType.Normal, productstyle, oddpage,
                         bg_notFoundDirList, availableFonts, lastpage)
-                    addPageNumber(pdf, pageNumber, productstyle, oddpage)
+                    addPageNumber(pageNumberingInfo, pdf, pageNumber, productstyle, oddpage)
 
                 # Look for an empty page 0 that does NOT contain an area element. That will define
                 # the background for the inside cover page to be placed on top of the right side of
@@ -1256,7 +1258,7 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                     bg_notFoundDirList, availableFonts, lastpage)
 
                 if AlbumInfo.isAlbumProduct(productstyle) and pagetype in [PageType.EmptyPage, PageType.Normal]:
-                    addPageNumber(pdf, pageNumber, productstyle, oddpage)
+                    addPageNumber(pageNumberingInfo, pdf, pageNumber, productstyle, oddpage)
 
                 # finish the pdf page and start a new one.
                 if not AlbumInfo.isAlbumProduct(productstyle):
