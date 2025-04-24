@@ -174,6 +174,19 @@ defaultConfigSection = None
 pageNumberingInfo = None # if the album requests page numbering then we keep the details here
 
 
+def ReorderColorBytesMcf2Rl(backgroundColorAttrib):
+    # Reorder for alpha value - CEWE uses #AARRGGBB, expected #RRGGBBAA
+    if backgroundColorAttrib.startswith('#'):
+        backgroundColorInt = int(backgroundColorAttrib.lstrip('#'), 16)
+    else:
+        backgroundColorInt = int(backgroundColorAttrib)
+    backgroundColorRGB = backgroundColorInt & 0x00FFFFFF
+    backgroundColorA = (backgroundColorInt & 0xFF000000) >> 24
+    backgroundColorRGBA = (backgroundColorRGB << 8) + backgroundColorA
+    backgroundColor = reportlab.lib.colors.HexColor(backgroundColorRGBA, False, True)
+    return backgroundColor
+
+
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find(f"./page[@pagenr='{floor(2 * (pageNumber / 2))}']")
 
@@ -521,12 +534,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     backgroundColor = None
     backgroundColorAttrib = area.get('backgroundcolor')
     if backgroundColorAttrib is not None:
-        # Reorder for alpha value - CEWE uses #AARRGGBB, expected #RRGGBBAA
-        backgroundColorInt = int(backgroundColorAttrib)
-        backgroundColorRGB = backgroundColorInt & 0x00FFFFFF
-        backgroundColorA = (backgroundColorInt & 0xFF000000) >> 24
-        backgroundColorRGBA = (backgroundColorRGB << 8) + backgroundColorA
-        backgroundColor = reportlab.lib.colors.HexColor(backgroundColorRGBA, False, True)
+        backgroundColor = ReorderColorBytesMcf2Rl(backgroundColorAttrib)
 
     # set default para style in case there are no spans to set it.
     pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs)
@@ -1159,7 +1167,7 @@ def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
     pdf_flowList = [paragraph]
     newFrame = ColorFrame(0, 0, frameWidth, frameHeight, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
     # newFrame.background = reportlab.lib.colors.aliceblue # uncomment for debugging
-    newFrame.background = pageNumberingInfo.bgcolor
+    newFrame.background = ReorderColorBytesMcf2Rl(pageNumberingInfo.bgcolor)
     newFrame.addFromList(pdf_flowList, pdf)
     pdf.translate(-transx, -transy)
 
