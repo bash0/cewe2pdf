@@ -96,6 +96,7 @@ from fontHandling import getMissingFontSubstitute, findAndRegisterFonts
 from imageUtils import autorot
 from lineScales import LineScales
 from mcfx import unpackMcfx
+from pageNumberingInfo import PageNumberingInfo
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CreateParagraphStyle, Dequote, noteFontSubstitution
@@ -156,7 +157,7 @@ image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # Tabs seem to be in 8mm pitch
 tab_pitch = 80
 
-f = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
+mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
 tempFileList = []  # we need to remove all the temporary files at the end
 
@@ -170,6 +171,7 @@ clipartPathList = tuple[str]()
 passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
 passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
 defaultConfigSection = None
+pageNumberingInfo = None # if the album requests page numbering then we keep the details here
 
 
 def getPageElementForPageNumber(fotobook, pageNumber):
@@ -257,7 +259,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
 
                 # pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
                 #   but im = ImageReader(bgpath) does not work with 1-bit images,so ...
-                pdf.drawImage(ImageReader(memFileHandle), f * areaXOffset, 0, width=f * areaWidth, height=f * areaHeight)
+                pdf.drawImage(ImageReader(memFileHandle), mcf2rl * areaXOffset, 0, width=mcf2rl * areaWidth, height=mcf2rl * areaHeight)
 
             except Exception:
                 if bgPath not in bg_notFoundDirList:
@@ -281,9 +283,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     if imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
         # display on the right page
         if AlbumInfo.isAlbumDoubleSide(productstyle):
-            img_transx = transx + f * pw/2
+            img_transx = transx + mcf2rl * pw/2
         else:
-            img_transx = transx + f * pw
+            img_transx = transx + mcf2rl * pw
     else:
         img_transx = transx
 
@@ -390,14 +392,14 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # calculate the non-symmetric shift of the center, given the left pos and the width.
     frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
     frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
-    pdf.translate(-frameShiftX_mcf * f, -frameShiftY_mcf * f) # for adjustments from passepartout
+    pdf.translate(-frameShiftX_mcf * mcf2rl, -frameShiftY_mcf * mcf2rl) # for adjustments from passepartout
     pdf.drawImage(ImageReader(jpeg.name),
-        f * -0.5 * imgCropWidth_mcfunit,
-        f * -0.5 * imgCropHeight_mcfunit,
-        width=f * imgCropWidth_mcfunit,
-        height=f * imgCropHeight_mcfunit,
+        mcf2rl * -0.5 * imgCropWidth_mcfunit,
+        mcf2rl * -0.5 * imgCropHeight_mcfunit,
+        width=mcf2rl * imgCropWidth_mcfunit,
+        height=mcf2rl * imgCropHeight_mcfunit,
         mask='auto')
-    pdf.translate(frameShiftX_mcf * f, frameShiftY_mcf * f) # for adjustments from passepartout
+    pdf.translate(frameShiftX_mcf * mcf2rl, frameShiftY_mcf * mcf2rl) # for adjustments from passepartout
 
     # we need to draw our passepartout after the real image, so it overlays it.
     if frameClipartFileName is not None:
@@ -433,7 +435,7 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         if "width" in border.attrib:
             widthAttrib = border.get('width')
             if widthAttrib is not None:
-                bwidth = f * floor(float(widthAttrib)) # units are 1/10 mm
+                bwidth = mcf2rl * floor(float(widthAttrib)) # units are 1/10 mm
 
         bcolor = reportlab.lib.colors.blue
         if "color" in border.attrib:
@@ -450,10 +452,10 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
             if positionAttrib == "outside":
                 adjustment = bwidth * 0.5
 
-        frameBottomLeft_x = -0.5 * (f * areaWidth) - adjustment
-        frameBottomLeft_y = -0.5 * (f * areaHeight) - adjustment
-        frameWidth = f * areaWidth + 2 * adjustment
-        frameHeight = f * areaHeight + 2 * adjustment
+        frameBottomLeft_x = -0.5 * (mcf2rl * areaWidth) - adjustment
+        frameBottomLeft_y = -0.5 * (mcf2rl * areaHeight) - adjustment
+        frameWidth = mcf2rl * areaWidth + 2 * adjustment
+        frameHeight = mcf2rl * areaHeight + 2 * adjustment
         frm_table = Table(
             data=[[None]],
             colWidths=frameWidth,
@@ -643,12 +645,12 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 logging.exception('Exception')
 
     # Add a frame object that can contain multiple paragraphs
-    leftPad = f * tablelmarg
-    rightPad = f * tablermarg
-    bottomPad = f * tablebmarg
-    topPad = f * tabletmarg
-    frameWidth = f * areaWidth
-    frameHeight = f * areaHeight
+    leftPad = mcf2rl * tablelmarg
+    rightPad = mcf2rl * tablermarg
+    bottomPad = mcf2rl * tablebmarg
+    topPad = mcf2rl * tabletmarg
+    frameWidth = mcf2rl * areaWidth
+    frameHeight = mcf2rl * areaHeight
     frameBottomLeft_x = -0.5 * frameWidth
     frameBottomLeft_y = -0.5 * frameHeight
 
@@ -758,8 +760,8 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
     pdf.translate(img_transx, transy)
     pdf.rotate(-areaRot)
     pdf.drawImage(ImageReader(clipart.pngMemFile),
-        f * -0.5 * areaWidth, f * -0.5 * areaHeight,
-        width=f * areaWidth, height=f * areaHeight, mask='auto')
+        mcf2rl * -0.5 * areaWidth, mcf2rl * -0.5 * areaHeight,
+        width=mcf2rl * areaWidth, height=mcf2rl * areaHeight, mask='auto')
     if decoration is not None:
         processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf)
     pdf.rotate(areaRot)
@@ -803,8 +805,8 @@ def processElements(additional_fonts, fotobook, imagedir,
         cx = areaLeft + 0.5 * areaWidth
         cy = ph - (areaTop + 0.5 * areaHeight)
 
-        transx = f * cx
-        transy = f * cy
+        transx = mcf2rl * cx
+        transy = mcf2rl * cy
 
         # process images
         for imageTag in area.findall('imagebackground') + area.findall('image'):
@@ -840,7 +842,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
         # Assume A4 page size
         pw = 2100
         ph = 2970
-    pdf.setPageSize((f * pw, f * ph))
+    pdf.setPageSize((mcf2rl * pw, mcf2rl * ph))
 
     # process background
     # look for all "<background...> tags.
@@ -867,11 +869,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     global image_res  # pylint: disable=global-statement
     global bg_res  # pylint: disable=global-statement
     global defaultConfigSection  # pylint: disable=global-statement
+    global pageNumberingInfo  # pylint: disable=global-statement
 
     clipartDict = {}    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
     passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
     passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
+    pageNumberingInfo = None
 
     albumTitle, dummy = os.path.splitext(os.path.basename(albumname))
 
@@ -944,7 +948,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             defaultConfigSection = configuration['DEFAULT']
             # find cewe folder from ini file
             if 'cewe_folder' not in defaultConfigSection:
-                logging.error('You must create cewe_folder.txt or modify cewe2pdf.ini')
+                logging.error('You must create cewe_folder.txt or modify cewe2pdf.ini to define cewe_folder')
                 sys.exit(1)
 
             cewe_folder = defaultConfigSection['cewe_folder'].strip()
@@ -1010,6 +1014,15 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     if articleConfigElement is None:
         logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
+
+    pageNumberElement = fotobook.find('pagenumbering')
+    if pageNumberElement is not None:
+        pnpos = int(pageNumberElement.get('position'))
+        if pnpos != 0: # 0 implies no numbering
+            logging.warning(f'Page numbering is not yet fully implemented')
+            # make a page number description object to use later
+            pageNumberingInfo = PageNumberingInfo(pageNumberElement)
+
     pageCount = int(articleConfigElement.get('normalpages')) + 2
     # The normalpages attribute in the mcf is the number of "usable" inside pages, excluding the front and back covers and the blank inside
     #  cover pages. Add 2 so that pagecount represents the actual number of printed pdf pages we expect in the normal single sided
@@ -1069,6 +1082,86 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     cleanUpTempFiles(tempFileList, unpackedFolder)
 
     return True
+
+
+def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
+    if pageNumberingInfo is None or pageNumberingInfo.position == 0:
+        return
+
+    numberText = pageNumberingInfo.textstring # where a % indicates where the number has to go
+    if pageNumberingInfo.format == 1:
+        numberText = pageNumberingInfo.toRoman(pageNumber, lowerCase= True)
+    elif pageNumberingInfo.format == 2:
+        numberText = pageNumberingInfo.toRoman(pageNumber)
+    elif pageNumberingInfo.format == 3:
+        numberText = pageNumberingInfo.toAlphabetic(pageNumber, lowerCase=True)
+    elif pageNumberingInfo.format == 4:
+        numberText = pageNumberingInfo.toAlphabetic(pageNumber)
+    elif pageNumberingInfo.format == 5:
+        numberText = pageNumberingInfo.toBinary(pageNumber)
+    elif pageNumberingInfo.format == 6:
+        numberText = pageNumberingInfo.toHexadecimal(pageNumber)
+    else:
+        numberText = str(pageNumber)
+    numberText = numberText.replace("%",numberText)
+
+    boldstart = '<b>' if pageNumberingInfo.fontbold != 0 else ''
+    boldend = '</b>' if pageNumberingInfo.fontbold != 0 else ''
+    italicstart = '<i>' if pageNumberingInfo.fontitalics != 0 else ''
+    italicend = '</i>' if pageNumberingInfo.fontitalics != 0 else ''
+
+    paragraphText = f'<para>{boldstart}{italicstart}{numberText}{italicend}{boldend}</para>'
+    paragraph = Paragraph(paragraphText, pageNumberingInfo.paragraphStyle)
+    paraWidth = paragraph.minWidth()
+    _, paraHeight = paragraph.wrap(1000, 1000)
+
+    frameWidthFiddleFactor = 3 + pageNumberingInfo.fontsize * 1.5
+        # Copilot thinks a fiddle factor is necessary due to imprecisions in the reportlab suite!
+        # The fiddle factor calculation comes from trial and error! Surely there's a better solution?
+    frameWidth = paraWidth + frameWidthFiddleFactor
+    frameHeight = paraHeight + 1
+
+    pagesize = (pdf._pagesize[0],pdf._pagesize[1]) # pagesize in rl units
+    if productStyle == ProductStyle.AlbumDoubleSide:
+        sideWidth = pagesize[0] / 2
+        cx = sideWidth if oddpage else 0 # moving to the right hand side for odd pages
+    else:
+        sideWidth = pagesize[0]
+        cx = 0
+    sideHeight = pagesize[1]
+
+    # finally can calculate the actual position
+    if pageNumberingInfo.position == 1: # outer top
+        cy = sideHeight - pageNumberingInfo.verticalMargin - frameHeight
+        if oddpage:
+            cx = cx + sideWidth - pageNumberingInfo.horizontalMargin - frameWidth
+        else:
+            cx = cx + pageNumberingInfo.horizontalMargin
+    elif pageNumberingInfo.position == 2: # centre top
+        cy = sideHeight - pageNumberingInfo.verticalMargin - frameHeight
+        cx = cx + 0.5 * (sideWidth - frameWidth)
+    elif pageNumberingInfo.position == 4: # outer bottom
+        cy = pageNumberingInfo.verticalMargin
+        if oddpage:
+            cx = cx + sideWidth - pageNumberingInfo.horizontalMargin - frameWidth
+        else:
+            cx = cx + pageNumberingInfo.horizontalMargin
+    elif pageNumberingInfo.position == 5: # centre bottom
+        cy = pageNumberingInfo.verticalMargin
+        cx = cx + 0.5 * (sideWidth - frameWidth)
+    else:
+        # can't actually happen because pageNumberingInfo checks it
+        return
+
+    transx = cx
+    transy = cy
+    pdf.translate(transx, transy)
+    pdf_flowList = [paragraph]
+    newFrame = ColorFrame(0, 0, frameWidth, frameHeight, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
+    # newFrame.background = reportlab.lib.colors.aliceblue # uncomment for debugging
+    newFrame.background = pageNumberingInfo.bgcolor
+    newFrame.addFromList(pdf_flowList, pdf)
+    pdf.translate(-transx, -transy)
 
 
 def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount, pageNumbers, # noqa: C901
@@ -1149,6 +1242,7 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         page, pageNumber, pageCount, PageType.Normal, productstyle, oddpage,
                         bg_notFoundDirList, availableFonts, lastpage)
+                    addPageNumber(pageNumberingInfo, pdf, pageNumber, productstyle, oddpage)
 
                 # Look for an empty page 0 that does NOT contain an area element. That will define
                 # the background for the inside cover page to be placed on top of the right side of
@@ -1183,6 +1277,9 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                 parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                     page, pageNumber, pageCount, pagetype, productstyle, oddpage,
                     bg_notFoundDirList, availableFonts, lastpage)
+
+                if AlbumInfo.isAlbumProduct(productstyle) and pagetype in [PageType.EmptyPage, PageType.Normal]:
+                    addPageNumber(pageNumberingInfo, pdf, pageNumber, productstyle, oddpage)
 
                 # finish the pdf page and start a new one.
                 if not AlbumInfo.isAlbumProduct(productstyle):

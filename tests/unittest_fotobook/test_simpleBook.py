@@ -62,7 +62,7 @@ def runtest(albumFolderBasename, albumBasename, mcfSuffix, styleId, keepDoublePa
     yyyymmdd = datetime.today().strftime("%Y%m%d")
     outFileBasename = f'{albumBasename}.{mcfSuffix}.{yyyymmdd}{styleId}.pdf'
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
-    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{mcfSuffix}.*{styleId}.pdf")
+    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{mcfSuffix}.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]{styleId}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages)
 
 

@@ -76,6 +76,8 @@ def noteFontSubstitution(family, replacement):
 
 
 def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
+    if item is None:
+        return dfltfont, dfltfs, bweight, {}
     spanfont = dfltfont
     spanfs = dfltfs
     spanweight = bweight
