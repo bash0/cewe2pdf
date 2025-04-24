@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="1b5821ed-65d9-445f-8cef-4275ae147f94" imagedir="test_pagenumbers_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="18ccc01c-8823-4cad-831b-f7ec210df86b" imagedir="test_pagenumbers_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="9c86007f-97d8-4384-a60d-148ff3168182" projectIDCreatedEpoch="1745477965"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-04-24 15:10"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-04-24 16:46"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-04-23 07:21"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -296,5 +296,5 @@ p, li { white-space: pre-wrap; }
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships/>
-    <statistics assistantUsed="0" countPauses="12" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="54453" fotosAdded="2" fotosRemoved="2" pauseTime="46865" sessionsUsed="6"/>
+    <statistics assistantUsed="0" countPauses="15" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="60231" fotosAdded="2" fotosRemoved="2" pauseTime="51204" sessionsUsed="6"/>
 </fotobook>

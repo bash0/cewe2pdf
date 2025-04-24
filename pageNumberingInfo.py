@@ -1,3 +1,4 @@
+import logging
 from lxml import etree
 import reportlab.lib.colors
 import reportlab.lib.enums
@@ -18,6 +19,9 @@ class PageNumberingInfo:
         """
         # Extract relevant attributes or sub-elements from lxml_element
         self.position = int(pageNumberElement.get('position','1'))
+        if self.position not in [1,2,4,5]:
+            logging.error(f"Unrecognised pagenumbering position value {self.position}, reset to 1")
+            self.position = 1
         self.format = int(pageNumberElement.get('format','0'))
         self.horizontalMargin = int(pageNumberElement.get('margin','50')) * mcf2rl # * 0.1 mm
         self.verticalMargin = int(pageNumberElement.get('verticalMargin','50')) * mcf2rl # * 0.1 mm
@@ -41,45 +45,57 @@ class PageNumberingInfo:
             textColor=self.textcolor)
 
 
-
-
-
-    def display_page_number(self, current_page):
-        """
-        Generate the formatted page number for the given page.
-        :param current_page: Current page number.
-        :return: Formatted page number as a string.
-        """
-        if self.format == "roman":
-            return self.prefix + self.to_roman(current_page)
-        elif self.format == "arabic":
-            return self.prefix + str(current_page)
-        else:
-            return self.prefix + str(current_page)
-
     @staticmethod
-    def to_roman(num):
+    def toRoman(num, lowerCase=False)->str:
         """
         Convert an integer to a Roman numeral.
-        :param num: Integer to convert.
-        :return: Roman numeral as a string.
         """
         roman_numerals = {
             1: "I", 4: "IV", 5: "V", 9: "IX",
             10: "X", 40: "XL", 50: "L", 90: "XC",
             100: "C", 400: "CD", 500: "D", 900: "CM", 1000: "M"
         }
+        if num <= 0:
+            raise ValueError("Number must be greater than zero")
         result = ""
         for value, numeral in sorted(roman_numerals.items(), reverse=True):
             while num >= value:
                 result += numeral
                 num -= value
+        if lowerCase:
+            result = result.lower()
         return result
 
-# Example usage:
-# xml_data = '<PageNumbering startingNumber="1" format="roman" prefix="Page "/>'
-# lxml_element = etree.fromstring(xml_data)
+    @staticmethod
+    def toAlphabetic(num, lowerCase=False)->str:
+        """
+        Convert a number to an alphabetic sequence (A-Z, AA-ZZ, etc.).
+        """
+        if num <= 0:
+            raise ValueError("Number must be greater than zero")
+        result = ""
+        while num > 0:
+            num -= 1  # Adjust for 1-based indexing
+            result = chr(num % 26 + ord('A')) + result
+            num //= 26
+        if lowerCase:
+            result = result.lower()
+        return result
 
-# page_numbering = PageNumberingInfo(lxml_element)
-# print(page_numbering.display_page_number(5))  # Output: "Page V"
+    @staticmethod
+    def toBinary(num):
+        """
+        Convert a number to its binary representation.
+        """
+        if num < 0:
+            raise ValueError("Number must be non-negative")
+        return bin(num)[2:]  # Removes the '0b' prefix
 
+    @staticmethod
+    def toHexadecimal(num, width=2):
+        """
+        Convert a number to its hexadecimal representation.
+        """
+        if num < 0:
+            raise ValueError("Number must be non-negative")
+        return hex(num)[2:].upper().zfill(width)  # Removes the '0x' prefix, converts to uppercase and pads

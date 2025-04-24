@@ -1087,13 +1087,29 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
     if pageNumberingInfo is None or pageNumberingInfo.position == 0:
         return
+
     numberText = pageNumberingInfo.textstring # where a % indicates where the number has to go
-    # ignoring the requested format for now, just use decimal numbering ...
-    numberText = numberText.replace("%",str(pageNumber))
+    if pageNumberingInfo.format == 1:
+        numberText = pageNumberingInfo.toRoman(pageNumber, lowerCase= True)
+    elif pageNumberingInfo.format == 2:
+        numberText = pageNumberingInfo.toRoman(pageNumber)
+    elif pageNumberingInfo.format == 3:
+        numberText = pageNumberingInfo.toAlphabetic(pageNumber, lowerCase=True)
+    elif pageNumberingInfo.format == 4:
+        numberText = pageNumberingInfo.toAlphabetic(pageNumber)
+    elif pageNumberingInfo.format == 5:
+        numberText = pageNumberingInfo.toBinary(pageNumber)
+    elif pageNumberingInfo.format == 6:
+        numberText = pageNumberingInfo.toHexadecimal(pageNumber)
+    else:
+        numberText = str(pageNumber)
+    numberText = numberText.replace("%",numberText)
+
     boldstart = '<b>' if pageNumberingInfo.fontbold != 0 else ''
     boldend = '</b>' if pageNumberingInfo.fontbold != 0 else ''
     italicstart = '<i>' if pageNumberingInfo.fontitalics != 0 else ''
     italicend = '</i>' if pageNumberingInfo.fontitalics != 0 else ''
+
     paragraphText = f'<para>{boldstart}{italicstart}{numberText}{italicend}{boldend}</para>'
     paragraph = Paragraph(paragraphText, pageNumberingInfo.paragraphStyle)
     paraWidth = paragraph.minWidth()
@@ -1134,7 +1150,7 @@ def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
         cy = pageNumberingInfo.verticalMargin
         cx = cx + 0.5 * (sideWidth - frameWidth)
     else:
-        logging.error(f"Unrecognised pagenumbering position value {pageNumberingInfo.position}")
+        # can't actually happen because pageNumberingInfo checks it
         return
 
     transx = cx
@@ -1143,6 +1159,7 @@ def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
     pdf_flowList = [paragraph]
     newFrame = ColorFrame(0, 0, frameWidth, frameHeight, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
     # newFrame.background = reportlab.lib.colors.aliceblue # uncomment for debugging
+    newFrame.background = pageNumberingInfo.bgcolor
     newFrame.addFromList(pdf_flowList, pdf)
     pdf.translate(-transx, -transy)
 
