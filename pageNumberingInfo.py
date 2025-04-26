@@ -4,6 +4,7 @@ import reportlab.lib.colors
 import reportlab.lib.enums
 import reportlab.lib.styles
 from reportlab.lib.styles import ParagraphStyle
+from colorUtils import ReorderColorBytesMcf2Rl
 
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
@@ -30,8 +31,8 @@ class PageNumberingInfo:
         self.fontbold = int(pageNumberElement.get('fontbold','0'))
         self.fontitalics = int(pageNumberElement.get('fontitalics','0'))
         self.textstring = pageNumberElement.get('textstring','%')
-        self.textcolor = pageNumberElement.get('textcolor','#ff000000')
-        self.bgcolor = pageNumberElement.get('bgcolor','#00000000')
+        self.textcolor = ReorderColorBytesMcf2Rl(pageNumberElement.get('textcolor','#ff000000'))
+        self.bgcolor = ReorderColorBytesMcf2Rl(pageNumberElement.get('bgcolor','#00000000'))
         self.paragraphStyle = ParagraphStyle(None, None,
             alignment=reportlab.lib.enums.TA_CENTER,
             fontSize=self.fontsize,
@@ -41,9 +42,8 @@ class PageNumberingInfo:
             borderWidth=0,
             leftIndent=0,
             rightIndent=0,
-            # backColor=backgroundColor, # text bg not used since ColorFrame colours the whole bg
+            # backColor=self.bgcolor, # text bg not used since ColorFrame colours the whole bg
             textColor=self.textcolor)
-
 
     @staticmethod
     def toRoman(num, lowerCase=False)->str:

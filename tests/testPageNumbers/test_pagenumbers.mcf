@@ -5,7 +5,7 @@
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-04-23 07:21"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
-    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Liberation Sans" fontitalics="1" fontsize="12" format="0" margin="52" position="4" textcolor="#ff000000" textstring="%" verticalMargin="60">
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Liberation Sans" fontitalics="1" fontsize="12" format="0" margin="52" position="4" textcolor="#ffd41e51" textstring="%" verticalMargin="60">
         <outline width="1"/>
     </pagenumbering>
     <extra>
