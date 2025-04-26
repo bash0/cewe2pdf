@@ -242,6 +242,7 @@
     <Compile Include="clipArt.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="colorFrame.py" />
     <Compile Include="configUtils.py">
       <SubType>Code</SubType>
     </Compile>
@@ -250,7 +251,7 @@
     </Compile>
     <Compile Include="cewe2pdf.py" />
     <Compile Include="clpFile.py" />
-    <Compile Include="colorFrame.py" />
+    <Compile Include="colorUtils.py" />
     <Compile Include="extraLoggers.py">
       <SubType>Code</SubType>
     </Compile>

@@ -90,6 +90,7 @@ from lxml import etree
 from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
 from clipArt import getClipConfig, loadClipart, readClipArtConfigXML
 from colorFrame import ColorFrame
+from colorUtils import ReorderColorBytesMcf2Rl
 from configUtils import getConfigurationBool, getConfigurationInt
 from extraLoggers import mustsee, configlogger, VerifyMessageCounts, printMessageCountSummaries
 from fontHandling import getMissingFontSubstitute, findAndRegisterFonts
@@ -521,12 +522,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     backgroundColor = None
     backgroundColorAttrib = area.get('backgroundcolor')
     if backgroundColorAttrib is not None:
-        # Reorder for alpha value - CEWE uses #AARRGGBB, expected #RRGGBBAA
-        backgroundColorInt = int(backgroundColorAttrib)
-        backgroundColorRGB = backgroundColorInt & 0x00FFFFFF
-        backgroundColorA = (backgroundColorInt & 0xFF000000) >> 24
-        backgroundColorRGBA = (backgroundColorRGB << 8) + backgroundColorA
-        backgroundColor = reportlab.lib.colors.HexColor(backgroundColorRGBA, False, True)
+        backgroundColor = ReorderColorBytesMcf2Rl(backgroundColorAttrib)
 
     # set default para style in case there are no spans to set it.
     pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs)
@@ -1088,22 +1084,21 @@ def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
     if pageNumberingInfo is None or pageNumberingInfo.position == 0:
         return
 
-    numberText = pageNumberingInfo.textstring # where a % indicates where the number has to go
     if pageNumberingInfo.format == 1:
-        numberText = pageNumberingInfo.toRoman(pageNumber, lowerCase= True)
+        numberString = pageNumberingInfo.toRoman(pageNumber, lowerCase= True)
     elif pageNumberingInfo.format == 2:
-        numberText = pageNumberingInfo.toRoman(pageNumber)
+        numberString = pageNumberingInfo.toRoman(pageNumber)
     elif pageNumberingInfo.format == 3:
-        numberText = pageNumberingInfo.toAlphabetic(pageNumber, lowerCase=True)
+        numberString = pageNumberingInfo.toAlphabetic(pageNumber, lowerCase=True)
     elif pageNumberingInfo.format == 4:
-        numberText = pageNumberingInfo.toAlphabetic(pageNumber)
+        numberString = pageNumberingInfo.toAlphabetic(pageNumber)
     elif pageNumberingInfo.format == 5:
-        numberText = pageNumberingInfo.toBinary(pageNumber)
+        numberString = pageNumberingInfo.toBinary(pageNumber)
     elif pageNumberingInfo.format == 6:
-        numberText = pageNumberingInfo.toHexadecimal(pageNumber)
+        numberString = pageNumberingInfo.toHexadecimal(pageNumber)
     else:
-        numberText = str(pageNumber)
-    numberText = numberText.replace("%",numberText)
+        numberString = str(pageNumber)
+    numberText = pageNumberingInfo.textstring.replace("%",numberString)
 
     boldstart = '<b>' if pageNumberingInfo.fontbold != 0 else ''
     boldend = '</b>' if pageNumberingInfo.fontbold != 0 else ''
@@ -1119,7 +1114,7 @@ def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
         # Copilot thinks a fiddle factor is necessary due to imprecisions in the reportlab suite!
         # The fiddle factor calculation comes from trial and error! Surely there's a better solution?
     frameWidth = paraWidth + frameWidthFiddleFactor
-    frameHeight = paraHeight + 1
+    frameHeight = paraHeight + 3
 
     pagesize = (pdf._pagesize[0],pdf._pagesize[1]) # pagesize in rl units
     if productStyle == ProductStyle.AlbumDoubleSide:
