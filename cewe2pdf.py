@@ -97,7 +97,7 @@ from fontHandling import getMissingFontSubstitute, findAndRegisterFonts
 from imageUtils import autorot
 from lineScales import LineScales
 from mcfx import unpackMcfx
-from pageNumberingInfo import PageNumberingInfo
+from pageNumbering import getPageNumberXy, PageNumberingInfo, PageNumberPosition
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CreateParagraphStyle, Dequote, noteFontSubstitution
@@ -1015,7 +1015,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     if pageNumberElement is not None:
         pnpos = int(pageNumberElement.get('position'))
         if pnpos != 0: # 0 implies no numbering
-            logging.warning(f'Page numbering is not yet fully implemented')
             # make a page number description object to use later
             pageNumberingInfo = PageNumberingInfo(pageNumberElement)
 
@@ -1080,81 +1079,31 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     return True
 
 
-def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage):
-    if pageNumberingInfo is None or pageNumberingInfo.position == 0:
+def addPageNumber(pni, pdf, pageNumber, productStyle, oddpage):
+    if pni is None or pni.position == 0:
         return
 
-    if pageNumberingInfo.format == 1:
-        numberString = pageNumberingInfo.toRoman(pageNumber, lowerCase= True)
-    elif pageNumberingInfo.format == 2:
-        numberString = pageNumberingInfo.toRoman(pageNumber)
-    elif pageNumberingInfo.format == 3:
-        numberString = pageNumberingInfo.toAlphabetic(pageNumber, lowerCase=True)
-    elif pageNumberingInfo.format == 4:
-        numberString = pageNumberingInfo.toAlphabetic(pageNumber)
-    elif pageNumberingInfo.format == 5:
-        numberString = pageNumberingInfo.toBinary(pageNumber)
-    elif pageNumberingInfo.format == 6:
-        numberString = pageNumberingInfo.toHexadecimal(pageNumber)
-    else:
-        numberString = str(pageNumber)
-    numberText = pageNumberingInfo.textstring.replace("%",numberString)
-
-    boldstart = '<b>' if pageNumberingInfo.fontbold != 0 else ''
-    boldend = '</b>' if pageNumberingInfo.fontbold != 0 else ''
-    italicstart = '<i>' if pageNumberingInfo.fontitalics != 0 else ''
-    italicend = '</i>' if pageNumberingInfo.fontitalics != 0 else ''
-
-    paragraphText = f'<para>{boldstart}{italicstart}{numberText}{italicend}{boldend}</para>'
-    paragraph = Paragraph(paragraphText, pageNumberingInfo.paragraphStyle)
+    paragraphText = pni.getParagraphText(pageNumber)
+    paragraph = Paragraph(paragraphText, pni.paragraphStyle)
     paraWidth = paragraph.minWidth()
     _, paraHeight = paragraph.wrap(1000, 1000)
-
-    frameWidthFiddleFactor = 3 + pageNumberingInfo.fontsize * 1.5
-        # Copilot thinks a fiddle factor is necessary due to imprecisions in the reportlab suite!
-        # The fiddle factor calculation comes from trial and error! Surely there's a better solution?
+    frameWidthFiddleFactor = 3 + pni.fontsize * 1.5
+    # Copilot thinks a fiddle factor is necessary due to imprecisions in the reportlab suite!
+    # The fiddle factor calculation comes from trial and error! Surely there's a better solution?
     frameWidth = paraWidth + frameWidthFiddleFactor
     frameHeight = paraHeight + 3
 
-    pagesize = (pdf._pagesize[0],pdf._pagesize[1]) # pagesize in rl units
-    if productStyle == ProductStyle.AlbumDoubleSide:
-        sideWidth = pagesize[0] / 2
-        cx = sideWidth if oddpage else 0 # moving to the right hand side for odd pages
+    if 'singlePageNumberPosition' in defaultConfigSection:
+        pnp = PageNumberPosition.ToEnum(defaultConfigSection['singlePageNumberPosition'].strip())
     else:
-        sideWidth = pagesize[0]
-        cx = 0
-    sideHeight = pagesize[1]
+        pnp = PageNumberPosition.ORIGINAL
 
-    # finally can calculate the actual position
-    if pageNumberingInfo.position == 1: # outer top
-        cy = sideHeight - pageNumberingInfo.verticalMargin - frameHeight
-        if oddpage:
-            cx = cx + sideWidth - pageNumberingInfo.horizontalMargin - frameWidth
-        else:
-            cx = cx + pageNumberingInfo.horizontalMargin
-    elif pageNumberingInfo.position == 2: # centre top
-        cy = sideHeight - pageNumberingInfo.verticalMargin - frameHeight
-        cx = cx + 0.5 * (sideWidth - frameWidth)
-    elif pageNumberingInfo.position == 4: # outer bottom
-        cy = pageNumberingInfo.verticalMargin
-        if oddpage:
-            cx = cx + sideWidth - pageNumberingInfo.horizontalMargin - frameWidth
-        else:
-            cx = cx + pageNumberingInfo.horizontalMargin
-    elif pageNumberingInfo.position == 5: # centre bottom
-        cy = pageNumberingInfo.verticalMargin
-        cx = cx + 0.5 * (sideWidth - frameWidth)
-    else:
-        # can't actually happen because pageNumberingInfo checks it
-        return
-
-    transx = cx
-    transy = cy
+    transx, transy = getPageNumberXy(pnp, pni, pdf, frameWidth, frameHeight, productStyle, oddpage)
     pdf.translate(transx, transy)
     pdf_flowList = [paragraph]
     newFrame = ColorFrame(0, 0, frameWidth, frameHeight, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
     # newFrame.background = reportlab.lib.colors.aliceblue # uncomment for debugging
-    newFrame.background = pageNumberingInfo.bgcolor
+    newFrame.background = pni.bgcolor
     newFrame.addFromList(pdf_flowList, pdf)
     pdf.translate(-transx, -transy)
 

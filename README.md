@@ -109,6 +109,10 @@ defaultLineScale = 1.15
 fontLineScales =
 	Crafty Girls: 1.43
 
+# For an album with outer edge page numbering, force the number to the right on all
+# pages rather than keeping the original left on even, right on odd page placement
+singlePageNumberPosition = right
+
 # Define how the inside cover pages are processed in a keepDoublePages run
 #  Default False, if True then the inside cover pages on a keepDoublePages run will be white (as CEWE)
 #  rather than matching the background of the facing pages (i.e. the first and last usable pages)
