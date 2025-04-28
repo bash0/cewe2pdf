@@ -54,7 +54,7 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     return result
 
 
-def testModifiedMcfVersions(infile, attribute_modifications, albumFolderBasename, albumBasename):
+def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasename, albumBasename):
     # Parse the mcf file and find the <pagenumbering> element
     dom = parse(infile)
     pagenumbering_element = dom.getElementsByTagName("pagenumbering")[0]
@@ -128,7 +128,7 @@ def test_testEmptyPageOne():
         "f0p5": {"format": "0", "position": "5"},
     }
 
-    testModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
+    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
 
 
 if __name__ == '__main__':
