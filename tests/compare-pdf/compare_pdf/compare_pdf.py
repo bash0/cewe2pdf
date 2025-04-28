@@ -21,6 +21,15 @@ class ComparePDF:
         self.showdiffs = showdiffs
         self.logger = logging.getLogger('cewe2pdf.test')
 
+    def __del__(self):
+        # Destructor to clean up resources
+        self.cleanup()
+
+    def cleanup(self):
+        for doc in self.pdf_documents:
+            doc.close()
+        self.pdf_documents = []
+        self.pdf_paths = []
 
     def compare(self)-> bool:
         if len(self.pdf_paths) < 2:
