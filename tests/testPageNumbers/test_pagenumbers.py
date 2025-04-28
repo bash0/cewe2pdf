@@ -54,6 +54,13 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     return result
 
 
+def defineCommonVariables():
+    albumFolderBasename = 'testPageNumbers'
+    albumBasename = "test_pagenumbers"
+    inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
+    yyyymmdd = datetime.today().strftime("%Y%m%d")
+    return albumFolderBasename,albumBasename,inFile,yyyymmdd
+
 def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasename, albumBasename):
     # Parse the mcf file and find the <pagenumbering> element
     dom = parse(infile)
@@ -72,7 +79,6 @@ def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasenam
         outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
         pdfFile = f'{outFile}.pdf'
         latestResultFile = getLatestResultFile(albumFolderBasename, f"*{variationName}.mcf.pdf")
-
 
         # Write the variation mcf and build a book from it. The effort in getting the file
         # result in a particular form is done that we can potentiallt manually compare it with
@@ -95,10 +101,7 @@ def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasenam
         os.remove(f)
 
 def test_testEmptyPageOne():
-    albumFolderBasename = 'testPageNumbers'
-    albumBasename = "test_pagenumbers"
-    inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
-    yyyymmdd = datetime.today().strftime("%Y%m%d")
+    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
 
     styleid = "S"
     outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
@@ -112,7 +115,9 @@ def test_testEmptyPageOne():
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, True, 15)
 
-    # now use the same input mcf file to create and test variations in page numbering
+def test_formats():
+    # use the same input mcf file to create and test variations in page numbering
+    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     attribute_modifications = {
         # test all formats in position 4
         "f1p4": {"format": "1", "position": "4"},
@@ -121,16 +126,46 @@ def test_testEmptyPageOne():
         "f4p4": {"format": "4", "position": "4"},
         "f5p4": {"format": "5", "position": "4"},
         "f6p4": {"format": "6", "position": "4"},
+    }
+    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
+
+def test_positions():
+    # use the same input mcf file to create and test variations in page numbering
+    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
+    attribute_modifications = {
         # test all positions in format 0
         "f0p1": {"format": "0", "position": "1"},
         "f0p2": {"format": "0", "position": "2"},
         "f0p4": {"format": "0", "position": "4"},
         "f0p5": {"format": "0", "position": "5"},
     }
+    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
 
+def test_withtext():
+    # use the same input mcf file to create and test variations in page numbering
+    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
+    attribute_modifications = {
+        # test a variation on the text
+        "txt1": {"format": "0", "position": "5", "textstring": "Page %", "fontbold": "1", "fontitalics": "0", "fontsize": "18"},
+    }
+    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
+
+def test_color():
+    # use the same input mcf file to create and test variations in page numbering
+    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
+    attribute_modifications = {
+        # test a variation on the colors
+        "col1": {"format": "0", "position": "5", "textstring": "Page %", "fontitalics": "0", "fontsize": "14",
+                 "bgcolor": "#0d0000ff", # 13/255 = ~5% opaque (i.e. 85% transparent) pure blue
+                 "textcolor": "#ff0000ff"}, # 100% opaque (i.e. 0% transparent) pure blue
+    }
     checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
 
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
     test_testEmptyPageOne()
+    test_formats()
+    test_positions()
+    test_withtext()
+    test_color()
