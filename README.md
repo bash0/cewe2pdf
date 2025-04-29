@@ -109,6 +109,10 @@ defaultLineScale = 1.15
 fontLineScales =
 	Crafty Girls: 1.43
 
+# For an album with outer edge page numbering, force the number to the right on all
+# pages rather than keeping the original left on even, right on odd page placement
+singlePageNumberPosition = right
+
 # Define how the inside cover pages are processed in a keepDoublePages run
 #  Default False, if True then the inside cover pages on a keepDoublePages run will be white (as CEWE)
 #  rather than matching the background of the facing pages (i.e. the first and last usable pages)
@@ -241,6 +245,8 @@ compare_pdf --pdf <path_to_pdf1> --pdf <path_to_pdf2> ... [--showdiffs={sidebysi
 _--showdiffs=sidebyside_ lets you do a visual comparison, but often the differences are subtle and difficult to see (a different font for text is a typical subtle difference!). In that case _diffimage_ will show you where the pixels differ and often give you a good enough hint to understand what has changed. 
 ### Conventions for naming and retaining approved result pdfs
 In each test directory where pixel comparison forms part of the test, it is necessary to keep an approved version (maybe several) to compare against. These are kept in a folder conventionally named _previous_result_pdfs_, and are conventionally named as the original mcf name with a suffix containing the date (yyyymmdd) and a style letter ("S" for single side pdfs, "D" for double side pdfs). The test programs create output files using this naming convention in their own directory. If a new version is different from the latest version in _previous_result_pdfs_ __AND__ is deemed to be correct by the developer, then the new test output(s) can be moved to _previous_result_pdfs_ and checked in there, thus becoming the basis against which future test results will be compared.
+### Testing using programmed variations of the .mcf file
+The _testPageNumbers_ tests show how you can use python in your test code to modify the xml of the .mcf file. This allows you to make variations of your test without having specifically designed album files. When combined with pixel by pixel comparison this allows quite extensive regression tests to be created.
 ### Hints
 Tests using compare-pdf originally used the modification time to sort result pdfs and choose the latest approved version. This doesn't work on github, and we now use the file naming convention to sort the files. For interest, however, there is no touch(1) command on Windows, and powershell must be used to change the timestamp for a file, like this:
 ```
