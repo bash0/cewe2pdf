@@ -1,7 +1,7 @@
 # This test needs to be in its own directory, so it can have it's own cwew2pdf.ini.
 # Also we can store the asset files here.
 
-# Test rendering when page one is empty
+# Test of various object decorations
 
 #if you run this file directly, it won't have access to parent folder, so add it to python path
 import os, os.path
@@ -55,11 +55,30 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
 
 
 def defineCommonVariables():
-    albumFolderBasename = 'testPageNumbers'
-    albumBasename = "test_pagenumbers"
+    albumFolderBasename = 'testDecorations'
+    albumBasename = "test_decorations"
     inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
     yyyymmdd = datetime.today().strftime("%Y%m%d")
     return albumFolderBasename,albumBasename,inFile,yyyymmdd
+
+
+def createVariationMcf(dom, outFile):
+    # Write the variation mcf and build a book from it. The effort in getting the edited
+    # mcf file in a particular form is done that we can potentially manually compare it
+    # with the original mcf file and be sure that it is not changed in unexpected ways
+    with open(outFile, "w", encoding="utf-8") as file:
+        # Write a custom xml declaration including the encoding which is
+        # not emitted by the simplest one-line solution here:
+        #   file.write(dom.toxml())
+        file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+
+        # Write the xml content, skipping the declaration we have just done
+        pretty_xml = dom.documentElement.toprettyxml(indent="  ")
+
+        # Remove excess blank lines introduced by `toprettyxml`
+        clean_xml = "\n".join([line for line in pretty_xml.splitlines() if line.strip()])
+        file.write(clean_xml)
+
 
 def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasename, albumBasename):
     # Parse the mcf file and find the <pagenumbering> element
@@ -80,40 +99,25 @@ def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasenam
         pdfFile = f'{outFile}.pdf'
         latestResultFile = getLatestResultFile(albumFolderBasename, f"*{variationName}.mcf.pdf")
 
-        # Write the variation mcf and build a book from it. The effort in getting the file
-        # result in a particular form is done that we can potentiallt manually compare it with
-        # the original mcf and be sure that it is not changed in unexpected ways
-        with open(outFile, "w", encoding="utf-8") as file:
-            # Write a custom xml declaration including the encoding which is not emitted
-            # by the simplest one-line solution, file.write(dom.toxml())
-            file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-            # Write the xml content, skipping the declaration we have just done
-            pretty_xml = dom.documentElement.toprettyxml(indent="  ")
-            # Remove blank lines introduced by `toprettyxml`
-            clean_xml = "\n".join([line for line in pretty_xml.splitlines() if line.strip()])
-            file.write(clean_xml)
-            result = tryToBuildBook(outFile, pdfFile, latestResultFile, False, 28)
-            if result:
-                mustsee.info(f"Test variation {variationName} ok, variation files will be deleted")
-                filesToDelete.append(outFile)
-                filesToDelete.append(pdfFile)
+        createVariationMcf(dom, outFile)
+        result = tryToBuildBook(outFile, pdfFile, latestResultFile, False, 28)
+        if result:
+            mustsee.info(f"Test variation {variationName} ok, variation files will be deleted")
+            filesToDelete.append(outFile)
+            filesToDelete.append(pdfFile)
+
+    # do not delete the variation files until all test are run, so they
+    # are present while we are debugging
     for f in filesToDelete:
         os.remove(f)
 
-def test_pageNumbers():
+def test_decorations():
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
-
     styleid = "S"
     outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
-
-    styleid = "D"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
-    outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
-    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
-    tryToBuildBook(inFile, outFile, latestResultFile, True, 15)
 
 def test_formats():
     # use the same input mcf file to create and test variations in page numbering
@@ -164,8 +168,8 @@ def test_color():
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    test_pageNumbers()
-    test_formats()
-    test_positions()
-    test_withtext()
-    test_color()
+    test_decorations()
+    # test_formats()
+    # test_positions()
+    # test_withtext()
+    # test_color()
