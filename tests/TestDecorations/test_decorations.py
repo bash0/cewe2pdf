@@ -22,7 +22,7 @@ from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 from extraLoggers import mustsee # type: ignore
 
-from testutils import getLatestResultFile
+from testutils import getLatestResultFile, runModifications
 
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
@@ -61,56 +61,6 @@ def defineCommonVariables():
     yyyymmdd = datetime.today().strftime("%Y%m%d")
     return albumFolderBasename,albumBasename,inFile,yyyymmdd
 
-
-def createVariationMcf(dom, outFile):
-    # Write the variation mcf and build a book from it. The effort in getting the edited
-    # mcf file in a particular form is done that we can potentially manually compare it
-    # with the original mcf file and be sure that it is not changed in unexpected ways
-    with open(outFile, "w", encoding="utf-8") as file:
-        # Write a custom xml declaration including the encoding which is
-        # not emitted by the simplest one-line solution here:
-        #   file.write(dom.toxml())
-        file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-
-        # Write the xml content, skipping the declaration we have just done
-        pretty_xml = dom.documentElement.toprettyxml(indent="  ")
-
-        # Remove excess blank lines introduced by `toprettyxml`
-        clean_xml = "\n".join([line for line in pretty_xml.splitlines() if line.strip()])
-        file.write(clean_xml)
-
-
-def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasename, albumBasename):
-    # Parse the mcf file and find the <pagenumbering> element
-    dom = parse(infile)
-    pagenumbering_element = dom.getElementsByTagName("pagenumbering")[0]
-    if pagenumbering_element is None:
-        raise ValueError("No <pagenumbering> element found in {infile}")
-
-    # Iterate through modifications and create new versions
-    filesToDelete = []
-    for variationName, modifications in attribute_modifications.items():
-        for attr, value in modifications.items():
-            pagenumbering_element.setAttribute(attr, value)  # Modify attributes
-
-        # Save the modified xml to a new file
-        outFileBasename = f'{albumBasename}_{variationName}.mcf'
-        outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
-        pdfFile = f'{outFile}.pdf'
-        latestResultFile = getLatestResultFile(albumFolderBasename, f"*{variationName}.mcf.pdf")
-
-        createVariationMcf(dom, outFile)
-        result = tryToBuildBook(outFile, pdfFile, latestResultFile, False, 28)
-        if result:
-            mustsee.info(f"Test variation {variationName} ok, variation files will be deleted")
-            filesToDelete.append(outFile)
-            filesToDelete.append(pdfFile)
-
-    # do not delete the variation files until all test are run, so they
-    # are present while we are debugging
-    for f in filesToDelete:
-        os.remove(f)
-
 def test_decorations():
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     styleid = "S"
@@ -119,57 +69,23 @@ def test_decorations():
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
 
-def test_formats():
-    # use the same input mcf file to create and test variations in page numbering
-    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
-    attribute_modifications = {
-        # test all formats in position 4
-        "f1p4": {"format": "1", "position": "4"},
-        "f2p4": {"format": "2", "position": "4"},
-        "f3p4": {"format": "3", "position": "4"},
-        "f4p4": {"format": "4", "position": "4"},
-        "f5p4": {"format": "5", "position": "4"},
-        "f6p4": {"format": "6", "position": "4"},
-    }
-    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
+# def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasename, albumBasename):
+#     # Parse the mcf file and find the elements on which we want to do attribute modication variation
+#     dom = parse(infile)
+#     elementName = "toBeDefinedForDecorationVariations"
+#     elementToVary = dom.getElementsByTagName(elementName)[0]
+#     if elementToVary is None:
+#         raise ValueError(f"No <{elementName}> element found in {infile}")
+#     # Run attribute modification variations
+#     runModifications(tryToBuildBook, albumFolderBasename, albumBasename, dom, attribute_modifications, elementToVary)
 
-def test_positions():
-    # use the same input mcf file to create and test variations in page numbering
-    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
-    attribute_modifications = {
-        # test all positions in format 0
-        "f0p1": {"format": "0", "position": "1"},
-        "f0p2": {"format": "0", "position": "2"},
-        "f0p4": {"format": "0", "position": "4"},
-        "f0p5": {"format": "0", "position": "5"},
-    }
-    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
-
-def test_withtext():
-    # use the same input mcf file to create and test variations in page numbering
-    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
-    attribute_modifications = {
-        # test a variation on the text
-        "txt1": {"format": "0", "position": "5", "textstring": "Page %", "fontbold": "1", "fontitalics": "0", "fontsize": "18"},
-    }
-    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
-
-def test_color():
-    # use the same input mcf file to create and test variations in page numbering
-    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
-    attribute_modifications = {
-        # test a variation on the colors
-        "col1": {"format": "0", "position": "5", "textstring": "Page %", "fontitalics": "0", "fontsize": "14",
-                 "bgcolor": "#0d0000ff", # 13/255 = ~5% opaque (i.e. 85% transparent) pure blue
-                 "textcolor": "#ff0000ff"}, # 100% opaque (i.e. 0% transparent) pure blue
-    }
-    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
-
+# def test_variations():
+#     # use the same input mcf file to create and test variations. Haven't found any yet!
+#     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
+#     attribute_modifications = {}
+#     checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
     test_decorations()
-    # test_formats()
-    # test_positions()
-    # test_withtext()
-    # test_color()
+    # test_variations()

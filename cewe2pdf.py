@@ -444,14 +444,23 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
             bcolor = reportlab.lib.colors.HexColor(colorAttrib)
 
         adjustment = 0
+        gap = 0
+        if "gap" in border.attrib:
+            gapAttrib = border.get('gap')
+            gap = mcf2rl * floor(float(gapAttrib))
+        # position possibilities are: outsideWithGap outside inside centered insideWithGap
         if "position" in border.attrib:
             positionAttrib = border.get('position')
+            if positionAttrib == "insideWithGap":
+                adjustment = -bwidth * 0.5 - gap
             if positionAttrib == "inside":
                 adjustment = -bwidth * 0.5
             if positionAttrib == "centered":
                 adjustment = 0
             if positionAttrib == "outside":
                 adjustment = bwidth * 0.5
+            if positionAttrib == "outsideWithGap":
+                adjustment = bwidth * 0.5 + gap
 
         frameBottomLeft_x = -0.5 * (mcf2rl * areaWidth) - adjustment
         frameBottomLeft_y = -0.5 * (mcf2rl * areaHeight) - adjustment
