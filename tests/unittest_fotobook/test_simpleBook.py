@@ -57,26 +57,30 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     #os.remove(outFile)
 
 
-def runtest(albumFolderBasename, albumBasename, mcfSuffix, styleId, keepDoublePages, expectedPages):
+def runtest(main, albumFolderBasename, albumBasename, mcfSuffix, styleid, keepDoublePages, expectedPages):
     inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.{mcfSuffix}'))
     yyyymmdd = datetime.today().strftime("%Y%m%d")
-    outFileBasename = f'{albumBasename}.{mcfSuffix}.{yyyymmdd}{styleId}.pdf'
+    if (main):
+        # use an undated output file name when running as main rather than via pytest
+        outFileBasename = f'{albumBasename}.{mcfSuffix}.{styleid}.pdf'
+    else:
+        outFileBasename = f'{albumBasename}.{mcfSuffix}.{yyyymmdd}{styleid}.pdf'
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
-    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{mcfSuffix}.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]{styleId}.pdf")
+    latestResultFile = getLatestResultFile(albumFolderBasename, f"*{mcfSuffix}.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages)
 
 
-def test_simpleBookSinglePage():
-    runtest('unittest_fotobook', "unittest_fotobook", "mcf", "S", False, 28)
+def test_simpleBookSinglePage(main=False):
+    runtest(main, 'unittest_fotobook', "unittest_fotobook", "mcf", "S", False, 28)
 
 # You can uncomment these tests to also run different output variants, but basically
 #   this test is used to test the content of the pages and not the layout.
 #
-# def test_simpleBookDoublePage():
-#     runtest('unittest_fotobook', "unittest_fotobook", "mcf", "D", True, 15)
+# def test_simpleBookDoublePage(main=False):
+#     runtest(main, 'unittest_fotobook', "unittest_fotobook", "mcf", "D", True, 15)
 #
-# def test_simpleBookSinglePageMcfx():
-#     runtest('unittest_fotobook', "unittest_fotobook", "mcfx", "S", False, 28)
+# def test_simpleBookSinglePageMcfx(main=False):
+#     runtest(main, 'unittest_fotobook', "unittest_fotobook", "mcfx", "S", False, 28)
 
 
 if __name__ == '__main__':
@@ -90,7 +94,7 @@ if __name__ == '__main__':
     # the github environment (or here, prior to commit, with runAllTests.py)
     assertOnPixelComparisonFailure = False
 
-    test_simpleBookSinglePage()
+    test_simpleBookSinglePage(main=True)
 
-    #test_simpleBookDoublePage()
-    #test_simpleBookSinglePageMcfx()
+    #test_simpleBookDoublePage(main=True)
+    #test_simpleBookSinglePageMcfx(main=True)

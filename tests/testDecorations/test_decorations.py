@@ -91,5 +91,5 @@ def test_decorations(main=False):
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    test_decorations(True)
+    test_decorations(main=True)
     # test_variations()

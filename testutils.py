@@ -63,3 +63,12 @@ def runModifications(tryToBuildBook, albumFolderBasename, albumBasename, dom, at
     # are present while we are debugging
     for f in filesToDelete:
         os.remove(f)
+
+
+def getOutFileBasename(main, albumBasename, yyyymmdd, styleid):
+    if (main):
+        # use an undated output file name when running as main rather than via pytest
+        outFileBasename = f'{albumBasename}.mcf.{styleid}.pdf'
+    else:
+        outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    return outFileBasename

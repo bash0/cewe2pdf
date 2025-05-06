@@ -17,7 +17,7 @@ from pikepdf import Pdf
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 
-from testutils import getLatestResultFile
+from testutils import getOutFileBasename, getLatestResultFile
 
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
@@ -47,25 +47,26 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     return numPages
 
 
-def test_testEmptyPageOne():
+def defineCommonVariables():
     albumFolderBasename = 'testEmptyPageOne'
     albumBasename = "test_emptyPageOne"
     inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
     yyyymmdd = datetime.today().strftime("%Y%m%d")
+    return albumFolderBasename,albumBasename,inFile,yyyymmdd
 
+def test_testEmptyPageOne(main=False):
+    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     styleid = "S"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFileBasename = getOutFileBasename(main, albumBasename, yyyymmdd, styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
 
     styleid = "D"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFileBasename = getOutFileBasename(main, albumBasename, yyyymmdd, styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
-    tryToBuildBook(inFile, outFile, latestResultFile, True, 15)
-
-
+    tryToBuildBook(inFile, outFile, latestResultFile, True, 15)
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    test_testEmptyPageOne()
+    test_testEmptyPageOne(main=True)

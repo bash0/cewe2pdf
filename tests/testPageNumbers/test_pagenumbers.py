@@ -22,7 +22,7 @@ from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 from extraLoggers import mustsee # type: ignore
 
-from testutils import getLatestResultFile, runModifications
+from testutils import getLatestResultFile, getOutFileBasename, runModifications
 
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
@@ -71,17 +71,17 @@ def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasenam
     # Run attribute modification variations on the element found
     runModifications(tryToBuildBook, albumFolderBasename, albumBasename, dom, attribute_modifications, elementToVary)
 
-def test_pageNumbers():
+def test_pageNumbers(main=False):
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
 
     styleid = "S"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFileBasename = getOutFileBasename(main, albumBasename, yyyymmdd, styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
 
     styleid = "D"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFileBasename = getOutFileBasename(main, albumBasename, yyyymmdd, styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, True, 15)
@@ -135,7 +135,7 @@ def test_color():
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    test_pageNumbers()
+    test_pageNumbers(main=True)
     test_formats()
     test_positions()
     test_withtext()
