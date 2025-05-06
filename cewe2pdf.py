@@ -500,6 +500,13 @@ def findShadowBottomLeft(frameBottomLeft, angle, distance, swidth):
 
 
 def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
+    if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
+        # shadows were implemented in May 2025. Prior to that, you could have specified
+        # shadows on your photos for printing by CEWE but you would not have got them
+        # in the pdf version. And this might be what you want, so there is an option
+        # to stop shadow processing altogether
+        return
+
     # We assume that this is called from inside the rotation and translation operation
     # Ref https://cs.phx.photoprintit.com/hps-hilfe-online/no_no_5026/7.4/faq-fotos.html#q010
     # can't find an english version.

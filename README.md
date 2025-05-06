@@ -119,6 +119,10 @@ singlePageNumberPosition = right
 #  This has no effect on a single page width run, where the inside cover pages are simply omitted
 insideCoverWhite = False
 
+# Shadows were implemented in May 2025 (except blur) but can be turned off
+# Default False, if True then no shadows are created on objects
+noShadows = False
+
 # These possibilities are seldom needed in the latest versions of the program
 #extraBackgroundFolders =
 #	${PROGRAMDATA}/hps/${KEYACCOUNT}/addons/447/backgrounds/v1/backgrounds
