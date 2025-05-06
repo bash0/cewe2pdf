@@ -498,6 +498,9 @@ def findShadowBottomLeft(frameBottomLeft, angle, distance, swidth):
     # Return shadow rectangle bottom left coordinates
     return x + shadow_dx - swidth / 2, y + shadow_dy - swidth / 2
 
+def intensityToGrey(value):
+    colorComponentValue = 1 - (max(1, min(255, value)) / 255)
+    return reportlab.lib.colors.Color(colorComponentValue, colorComponentValue, colorComponentValue)
 
 def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
     if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
@@ -540,6 +543,12 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
             if distanceAttrib is not None:
                 sdistance = mcf2rl * floor(float(distanceAttrib))
 
+        intensity = 128
+        if "shadowIntensity" in shadow.attrib:
+            intensityAttrib = shadow.get('shadowIntensity')
+            if intensityAttrib is not None:
+                intensity = int(intensityAttrib) # range 1 .. 255, I think
+
         # you might think that sangle is the angle of the light source, but it is actually
         # the angle where the shadow should appear (exactly 180 degrees opposite). Not
         # unreasonable, when swidth sets the width of the shadow rather than how far away
@@ -556,6 +565,7 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
             findShadowBottomLeft((frameBottomLeft_x, frameBottomLeft_y), sangle, sdistance, swidth)
         shadowWidth = frameWidth + swidth
         shadowHeight = frameHeight + swidth
+        shadowColor = intensityToGrey(intensity) # reportlab.lib.colors.grey
 
         frm_table = Table(
             data=[[None]],
@@ -565,7 +575,7 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
                 # The two (0, 0) in each attribute represent the range of table cells that the style applies to.
                 # Since there's only one cell at (0, 0), it's used for both start and end of the range
                 ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-                ('BACKGROUND', (0, 0), (0, 0), reportlab.lib.colors.grey),
+                ('BACKGROUND', (0, 0), (0, 0), shadowColor),
                 ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
             ]
         )
