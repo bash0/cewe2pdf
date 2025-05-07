@@ -750,7 +750,9 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
             except Exception:
                 logging.exception('Exception')
 
-    # Add a frame object that can contain multiple paragraphs
+    # Add a frame object that can contain multiple paragraphs. Margins (padding) are specified in
+    # the editor in mm, arriving in the mcf in 1/10 mm, but appearing in the html with the unit "px".
+    # This is a bit strange, but ignoring the "px" and using mcf2rl seems to work ok.
     leftPad = mcf2rl * tablelmarg
     rightPad = mcf2rl * tablermarg
     bottomPad = mcf2rl * tablebmarg
