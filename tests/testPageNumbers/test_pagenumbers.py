@@ -22,7 +22,7 @@ from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 from extraLoggers import mustsee # type: ignore
 
-from testutils import getLatestResultFile
+from testutils import getLatestResultFile, getOutFileBasename, runModifications
 
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
@@ -62,55 +62,26 @@ def defineCommonVariables():
     return albumFolderBasename,albumBasename,inFile,yyyymmdd
 
 def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasename, albumBasename):
-    # Parse the mcf file and find the <pagenumbering> element
+    # Parse the mcf file and find the elements on which we want to do attribute modication variation
     dom = parse(infile)
-    pagenumbering_element = dom.getElementsByTagName("pagenumbering")[0]
-    if pagenumbering_element is None:
-        raise ValueError("No <pagenumbering> element found in {infile}")
+    elementName = "pagenumbering"
+    elementToVary = dom.getElementsByTagName(elementName)[0]
+    if elementToVary is None:
+        raise ValueError(f"No <{elementName}> element found in {infile}")
+    # Run attribute modification variations on the element found
+    runModifications(tryToBuildBook, albumFolderBasename, albumBasename, dom, attribute_modifications, elementToVary)
 
-    # Iterate through modifications and create new versions
-    filesToDelete = []
-    for variationName, modifications in attribute_modifications.items():
-        for attr, value in modifications.items():
-            pagenumbering_element.setAttribute(attr, value)  # Modify attributes
-
-        # Save the modified xml to a new file
-        outFileBasename = f'{albumBasename}_{variationName}.mcf'
-        outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
-        pdfFile = f'{outFile}.pdf'
-        latestResultFile = getLatestResultFile(albumFolderBasename, f"*{variationName}.mcf.pdf")
-
-        # Write the variation mcf and build a book from it. The effort in getting the file
-        # result in a particular form is done that we can potentiallt manually compare it with
-        # the original mcf and be sure that it is not changed in unexpected ways
-        with open(outFile, "w", encoding="utf-8") as file:
-            # Write a custom xml declaration including the encoding which is not emitted
-            # by the simplest one-line solution, file.write(dom.toxml())
-            file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-            # Write the xml content, skipping the declaration we have just done
-            pretty_xml = dom.documentElement.toprettyxml(indent="  ")
-            # Remove blank lines introduced by `toprettyxml`
-            clean_xml = "\n".join([line for line in pretty_xml.splitlines() if line.strip()])
-            file.write(clean_xml)
-            result = tryToBuildBook(outFile, pdfFile, latestResultFile, False, 28)
-            if result:
-                mustsee.info(f"Test variation {variationName} ok, variation files will be deleted")
-                filesToDelete.append(outFile)
-                filesToDelete.append(pdfFile)
-    for f in filesToDelete:
-        os.remove(f)
-
-def test_testEmptyPageOne():
+def test_pageNumbers(main=False):
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
 
     styleid = "S"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFileBasename = getOutFileBasename(main, albumBasename, yyyymmdd, styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
 
     styleid = "D"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFileBasename = getOutFileBasename(main, albumBasename, yyyymmdd, styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, True, 15)
@@ -164,7 +135,7 @@ def test_color():
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    test_testEmptyPageOne()
+    test_pageNumbers(main=True)
     test_formats()
     test_positions()
     test_withtext()

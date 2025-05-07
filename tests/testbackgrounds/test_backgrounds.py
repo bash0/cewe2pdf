@@ -17,7 +17,7 @@ from pikepdf import Pdf, PdfImage
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 
-from testutils import getLatestResultFile
+from testutils import getLatestResultFile, getOutFileBasename
 
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages, expectedEqualBackgroundPageLists):
@@ -92,31 +92,32 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     #os.remove(outFile)
 
 
+def defineCommonVariables():
+    albumFolderBasename = 'testbackgrounds'
+    albumBasename = "allblackbackgrounds"
+    inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
+    yyyymmdd = datetime.today().strftime("%Y%m%d")
+    return albumFolderBasename,albumBasename,inFile,yyyymmdd
 
-
-def test_testBackgrounds():
+def test_testBackgrounds(main=False):
     # allow us to see that we have the expected environment
     python_executable_path = sys.executable
     virtual_env_name = os.path.basename(os.path.dirname(python_executable_path))
     print(f"Virtual Environment: {virtual_env_name}")
 
-    albumFolderBasename = 'testbackgrounds'
-    albumBasename = "allblackbackgrounds"
-    inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
-    yyyymmdd = datetime.today().strftime("%Y%m%d")
-
+    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     styleid = "S"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFileBasename = getOutFileBasename(main, albumBasename,yyyymmdd,styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, False, 28, [[0,27],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]])
 
     styleid = "D"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    outFileBasename = getOutFileBasename(main, albumBasename,yyyymmdd,styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, True, 15, [[0],[1,2,3,4,5,6,7,8,9,10,11,12,13,14]])
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    test_testBackgrounds()
+    test_testBackgrounds(True)

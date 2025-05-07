@@ -131,6 +131,12 @@
     <Content Include="tests\testClipart\additional_fonts.txt" />
     <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250326S.pdf" />
     <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250412S.pdf" />
+    <Content Include="tests\testDecorations\additional_fonts.txt" />
+    <Content Include="tests\testDecorations\cewe2pdf.ini" />
+    <Content Include="tests\testDecorations\test_decorations.mcf" />
+    <Content Include="tests\TestDecorations\test_decorations_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\TestDecorations\test_decorations_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\TestDecorations\test_decorations_mcf-Dateien\z31qhpgx_1_greysquareblueborder.jpg" />
     <Content Include="tests\testEmptyPageOne\additional_fonts.txt" />
     <Content Include="tests\testEmptyPageOne\previous_result_pdfs\test_emptyPageOne.mcf.20250321D.pdf" />
     <Content Include="tests\testfontsubstitution\additional_fonts.txt" />
@@ -141,7 +147,6 @@
     <Content Include="tests\testPageNumbers\additional_fonts.txt" />
     <Content Include="tests\testPageNumbers\cewe2pdf.ini" />
     <Content Include="tests\testPageNumbers\test_pagenumbers.mcf" />
-    <Content Include="tests\testPageNumbers\test_pagenumbers.mcf~" />
     <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
@@ -275,6 +280,7 @@
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
     <Compile Include="tests\testbackgrounds\test_backgrounds.py" />
     <Compile Include="tests\testClipart\test_drawClipart.py" />
+    <Compile Include="tests\testDecorations\test_decorations.py" />
     <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
@@ -324,6 +330,9 @@
     <Folder Include="tests\testbackgrounds\previous_result_pdfs\" />
     <Folder Include="tests\testClipartColorReplacement\previous_result_pdfs\" />
     <Folder Include="tests\testClipart\previous_result_pdfs\" />
+    <Folder Include="tests\testDecorations\" />
+    <Folder Include="tests\TestDecorations\previous_result_pdfs\" />
+    <Folder Include="tests\TestDecorations\test_decorations_mcf-Dateien\" />
     <Folder Include="tests\testEmptyPageOne\previous_result_pdfs\" />
     <Folder Include="tests\testfontsubstitution\" />
     <Folder Include="tests\testFontSubstitution\previous_result_pdfs\" />

@@ -46,14 +46,21 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     #os.remove(outFile)
 
 
-def test_testClipartColorReplacement():
+def defineCommonVariables():
     albumFolderBasename = 'testClipartColorReplacement'
     albumBasename = "test_clipart_colorreplacement"
     inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
     yyyymmdd = datetime.today().strftime("%Y%m%d")
+    return albumFolderBasename,albumBasename,inFile,yyyymmdd
 
+def test_testClipartColorReplacement(main=False):
+    albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     styleid = "S"
-    outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
+    if (main):
+        # use an undated output file name when running as main rather than via pytest
+        outFileBasename = f'{albumBasename}.mcf.pdf'
+    else:
+        outFileBasename = f'{albumBasename}.mcf.{yyyymmdd}{styleid}.pdf'
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
@@ -61,4 +68,4 @@ def test_testClipartColorReplacement():
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    test_testClipartColorReplacement()
+    test_testClipartColorReplacement(main=True)

@@ -76,12 +76,14 @@ from math import sqrt, floor
 
 from pathlib import Path
 
+import reportlab.lib.colors
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph, Table
 # from reportlab.lib.styles import getSampleStyleSheet
 
+import numpy as np
 import PIL
 
 from packaging.version import parse as parse_version
@@ -390,6 +392,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     pdf.translate(img_transx, transy)   # we need to go to the center for correct rotation
     pdf.rotate(-areaRot)   # rotation around center of area
 
+    for decorationTag in area.findall('decoration'):
+        processDecorationShadow(decorationTag, areaHeight, areaWidth, pdf)
+
     # calculate the non-symmetric shift of the center, given the left pos and the width.
     frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
     frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
@@ -413,7 +418,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False, None)
 
     for decorationTag in area.findall('decoration'):
-        processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
+        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
 
     pdf.rotate(areaRot)
     pdf.translate(-img_transx, -transy)
@@ -422,10 +427,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     tempFileList.append(jpeg.name)
 
 
-def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
+def processDecorationBorders(decoration, areaHeight, areaWidth, pdf):
     # Draw a single cell table to represent border decoration (a box around the object)
     # We assume that this is called from inside the rotation and translation operation
-
     for border in decoration.findall('border'):
         if "enabled" in border.attrib:
             enabledAttrib = border.get('enabled')
@@ -444,14 +448,23 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
             bcolor = reportlab.lib.colors.HexColor(colorAttrib)
 
         adjustment = 0
+        gap = 0
+        if "gap" in border.attrib:
+            gapAttrib = border.get('gap')
+            gap = mcf2rl * floor(float(gapAttrib))
+        # position possibilities are: outsideWithGap outside inside centered insideWithGap
         if "position" in border.attrib:
             positionAttrib = border.get('position')
+            if positionAttrib == "insideWithGap":
+                adjustment = -bwidth * 0.5 - gap
             if positionAttrib == "inside":
                 adjustment = -bwidth * 0.5
             if positionAttrib == "centered":
                 adjustment = 0
             if positionAttrib == "outside":
                 adjustment = bwidth * 0.5
+            if positionAttrib == "outsideWithGap":
+                adjustment = bwidth * 0.5 + gap
 
         frameBottomLeft_x = -0.5 * (mcf2rl * areaWidth) - adjustment
         frameBottomLeft_y = -0.5 * (mcf2rl * areaHeight) - adjustment
@@ -471,6 +484,113 @@ def processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf):
         )
         frm_table.wrapOn(pdf, frameWidth, frameHeight)
         frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
+
+
+def findShadowBottomLeft(frameBottomLeft, angle, distance, swidth):
+    x, y = frameBottomLeft
+    if distance < 0.001:
+        # why on earth do I need this special case??
+        return x - swidth / 2, y - swidth / 2
+    # Compute shadow shift vector
+    angle_rad = np.radians(angle - 90)
+    shadow_dx = distance * np.cos(angle_rad)
+    shadow_dy = -distance * np.sin(angle_rad)  # Flip the Y-axis direction
+    # Return shadow rectangle bottom left coordinates
+    return x + shadow_dx - swidth / 2, y + shadow_dy - swidth / 2
+
+def intensityToGrey(value):
+    colorComponentValue = 1 - (max(1, min(255, value)) / 255)
+    return reportlab.lib.colors.Color(colorComponentValue, colorComponentValue, colorComponentValue)
+
+def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
+    if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
+        # shadows were implemented in May 2025. Prior to that, you could have specified
+        # shadows on your photos for printing by CEWE but you would not have got them
+        # in the pdf version. And this might be what you want, so there is an option
+        # to stop shadow processing altogether
+        return
+
+    # We assume that this is called from inside the rotation and translation operation
+    # Ref https://cs.phx.photoprintit.com/hps-hilfe-online/no_no_5026/7.4/faq-fotos.html#q010
+    # can't find an english version.
+
+    frameBottomLeft_x = -0.5 * (mcf2rl * areaWidth)
+    frameBottomLeft_y = -0.5 * (mcf2rl * areaHeight)
+    frameWidth = mcf2rl * areaWidth
+    frameHeight = mcf2rl * areaHeight
+
+    for shadow in decoration.findall('shadow'):
+        if "shadowEnabled" in shadow.attrib:
+            enabledAttrib = shadow.get('shadowEnabled')
+            if enabledAttrib != '1':
+                continue
+
+        # shadow width simulates "distance away of the light source". If the width is zero,
+        # then the light rays are parallel and the shadow is the same size as the object.
+        # So the width value is really about how much bigger the shadow is than the object.
+        swidth = 1
+        if "shadowWidthInMM" in shadow.attrib:
+            widthAttrib = shadow.get('shadowWidthInMM')
+            if widthAttrib is not None:
+                swidth = mcf2rl * floor(float(widthAttrib) * 10) # units are 1 mm not 0.1 mm!
+
+        # sdistance effectively moves the light source to the side of the centre, in the
+        # direction of sangle. When sdistance is zero then sangle is irrelevant. When sdistance
+        # is non-zero it offsets the shadow from the object, as determined by the sangle.
+        sdistance = 10
+        if "shadowDistance" in shadow.attrib:
+            distanceAttrib = shadow.get('shadowDistance')
+            if distanceAttrib is not None:
+                sdistance = mcf2rl * floor(float(distanceAttrib))
+
+        intensity = 128
+        if "shadowIntensity" in shadow.attrib:
+            intensityAttrib = shadow.get('shadowIntensity')
+            if intensityAttrib is not None:
+                intensity = int(intensityAttrib) # range 1 .. 255, I think
+
+        # you might think that sangle is the angle of the light source, but it is actually
+        # the angle where the shadow should appear (exactly 180 degrees opposite). Not
+        # unreasonable, when swidth sets the width of the shadow rather than how far away
+        # the light source is. I guess the theory is that the users are not physicists!
+        sangle = 135
+        if "shadowAngle" in shadow.attrib:
+            angleAttrib = shadow.get('shadowAngle')
+            if angleAttrib is not None:
+                sangle = floor(float(angleAttrib))
+        if sangle < 0.0: # mcf range -179 .. +180
+            sangle = sangle + 360 # range 0 .. 359
+
+        shadowBottomLeft_x, shadowBottomLeft_y = \
+            findShadowBottomLeft((frameBottomLeft_x, frameBottomLeft_y), sangle, sdistance, swidth)
+        shadowWidth = frameWidth + swidth
+        shadowHeight = frameHeight + swidth
+        shadowColor = intensityToGrey(intensity) # reportlab.lib.colors.grey
+
+        frm_table = Table(
+            data=[[None]],
+            colWidths=shadowWidth,
+            rowHeights=shadowHeight,
+            style=[
+                # The two (0, 0) in each attribute represent the range of table cells that the style applies to.
+                # Since there's only one cell at (0, 0), it's used for both start and end of the range
+                ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+                ('BACKGROUND', (0, 0), (0, 0), shadowColor),
+                ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
+            ]
+        )
+        frm_table.wrapOn(pdf, shadowWidth, shadowHeight)
+        frm_table.drawOn(pdf, shadowBottomLeft_x, shadowBottomLeft_y)
+
+def warnAndIgnoreEnabledDecorationShadow(decoration):
+    if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
+        return
+    for shadow in decoration.findall('shadow'):
+        if "shadowEnabled" in shadow.attrib:
+            enabledAttrib = shadow.get('shadowEnabled')
+            if enabledAttrib == '1':
+                logging.warning("Ignoring shadow specified on text, that is not implemented!")
+                continue
 
 
 def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy): # noqa: C901 (too complex)
@@ -517,6 +637,10 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
+
+    # we don't do shadowing on texts, but we could at least warn about that...
+    for decorationTag in area.findall('decoration'):
+        warnAndIgnoreEnabledDecorationShadow(decorationTag)
 
     # Get the background color. It is stored in an extra element.
     backgroundColor = None
@@ -640,7 +764,9 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
             except Exception:
                 logging.exception('Exception')
 
-    # Add a frame object that can contain multiple paragraphs
+    # Add a frame object that can contain multiple paragraphs. Margins (padding) are specified in
+    # the editor in mm, arriving in the mcf in 1/10 mm, but appearing in the html with the unit "px".
+    # This is a bit strange, but ignoring the "px" and using mcf2rl seems to work ok.
     leftPad = mcf2rl * tablelmarg
     rightPad = mcf2rl * tablermarg
     bottomPad = mcf2rl * tablebmarg
@@ -699,7 +825,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     newFrame.addFromList(pdf_flowableList, pdf)
 
     for decorationTag in area.findall('decoration'):
-        processAreaDecorationTag(decorationTag, areaHeight, areaWidth, pdf)
+        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
 
     pdf.rotate(areaRot)
     pdf.translate(-transx, -transy)
@@ -759,7 +885,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
         mcf2rl * -0.5 * areaWidth, mcf2rl * -0.5 * areaHeight,
         width=mcf2rl * areaWidth, height=mcf2rl * areaHeight, mask='auto')
     if decoration is not None:
-        processAreaDecorationTag(decoration, areaHeight, areaWidth, pdf)
+        processDecorationBorders(decoration, areaHeight, areaWidth, pdf)
     pdf.rotate(areaRot)
     pdf.translate(-img_transx, -transy)
 
