@@ -582,6 +582,16 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
         frm_table.wrapOn(pdf, shadowWidth, shadowHeight)
         frm_table.drawOn(pdf, shadowBottomLeft_x, shadowBottomLeft_y)
 
+def warnAndIgnoreEnabledDecorationShadow(decoration):
+    if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
+        return
+    for shadow in decoration.findall('shadow'):
+        if "shadowEnabled" in shadow.attrib:
+            enabledAttrib = shadow.get('shadowEnabled')
+            if enabledAttrib == '1':
+                logging.warning("Ignoring shadow specified on text, that is not implemented!")
+                continue
+
 
 def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy): # noqa: C901 (too complex)
     # note: it would be better to use proper html processing here
@@ -627,6 +637,10 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
+
+    # we don't do shadowing on texts, but we could at least warn about that...
+    for decorationTag in area.findall('decoration'):
+        warnAndIgnoreEnabledDecorationShadow(decorationTag)
 
     # Get the background color. It is stored in an extra element.
     backgroundColor = None

@@ -5,11 +5,6 @@ import os.path
 from pathlib import Path
 from extraLoggers import mustsee
 
-# Parse the mcf file to create variations using xml.dom.minidom rather than xml.etree.ElementTree
-# Copilot suggested this choice because etree is bad at parsing CDATA
-from xml.dom.minidom import Document
-
-
 def getLatestResultFile(albumFolderBasename, pattern: str) -> str:
     resultpdfpattern = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", 'previous_result_pdfs', pattern))
     resultpdffiles = glob.glob(resultpdfpattern)
@@ -23,8 +18,10 @@ def getLatestResultFile(albumFolderBasename, pattern: str) -> str:
 
 def createVariationMcf(dom, outFile):
     # Write the variation mcf and build a book from it. The effort in getting the edited
-    # mcf file in a particular form is done that we can potentially manually compare it
-    # with the original mcf file and be sure that it is not changed in unexpected ways
+    #  mcf file in a particular form is done that we can potentially manually compare it
+    #  with the original mcf file and be sure that it is not changed in unexpected ways
+    # Parse the mcf file to create variations using xml.dom.minidom rather than xml.etree.ElementTree
+    #  Copilot suggested this choice because etree is bad at parsing CDATA
     with open(outFile, "w", encoding="utf-8") as file:
         # Write a custom xml declaration including the encoding which is
         # not emitted by the simplest one-line solution here:
