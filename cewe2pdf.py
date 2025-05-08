@@ -103,6 +103,7 @@ from pageNumbering import getPageNumberXy, PageNumberingInfo, PageNumberPosition
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CreateParagraphStyle, Dequote, noteFontSubstitution
+from textart import handleTextArt
 
 
 # PageType is a concept for processing in this code, not something used by CEWE
@@ -637,6 +638,13 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
+
+    # if this is text art, then we do the whole thing differently. Detect that.
+    cwtextart = area.findall('decoration/cwtextart')
+    if len(cwtextart) > 0:
+        #htmlparas = body.findall(".//p")
+        handleTextArt(pdf, body, cwtextart, bodyfont, bodyfs)
+        return
 
     # we don't do shadowing on texts, but we could at least warn about that...
     for decorationTag in area.findall('decoration'):
