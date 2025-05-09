@@ -1,12 +1,8 @@
-import html
-import logging
 import math
-
 import reportlab
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
-from lxml import etree
 
 def parse_html_text(html):
     """Parses an HTML string, applying default styles from <body> while handling <p>, <span>, <i>, and <b>."""
@@ -15,7 +11,7 @@ def parse_html_text(html):
 
     # Default values (override if <body> specifies styles)
     default_font = "Helvetica"
-    default_size = 18
+    default_size = maxfontsize = 14
     default_color = colors.black
 
     # Extract global styles from <body> if present
@@ -27,6 +23,7 @@ def parse_html_text(html):
             default_font = styles["font-family"].split(",")[0].replace('"', '').replace("'", '')
         if "font-size" in styles:
             default_size = int(styles["font-size"].replace("pt", "").strip())
+            maxfontsize = max(maxfontsize, default_size)
         if "color" in styles:
             default_color = colors.HexColor(styles["color"])
 
@@ -46,6 +43,11 @@ def parse_html_text(html):
             font_name = styles["font-family"].split(",")[0].replace('"', '').replace("'", '')
         if "font-size" in styles:
             font_size = int(styles["font-size"].replace("pt", "").strip())
+            maxfontsize = max(maxfontsize, font_size)
+        if "font-weight" in styles:
+            is_bold = int(styles["font-weight"].strip()) > 400
+        if "font-style" in styles:
+            is_italic = styles["font-style"].strip() == 'italic'
         if "color" in styles:
             font_color = colors.HexColor(styles["color"])
 
@@ -56,41 +58,24 @@ def parse_html_text(html):
             is_italic = True
 
         if elem.name == "p":
-            # Extract only direct text from <p>, excluding nested elements and ignoring accidental newlines
+            # Extract only direct text from <p>, excluding nested elements and ignoring newlines
             paragraph_text = ''.join(t.strip() for t in elem.contents if isinstance(t, str))
         else:
             paragraph_text = elem.text # .strip()
 
         # Add paragraph breaks for <p> tags
         if elem.name == "p":
-            # paragraph_text += "\n"
             paragraph_text += ' '
 
         # Format text representation
         for char in paragraph_text:
             parsed_data.append((char, font_name, font_size, font_color, is_bold, is_italic))
 
-    return parsed_data
+    return parsed_data, maxfontsize
 
 
-def draw_styled_text_on_arc(c, html, center, radius, start_angle_deg, clockwise=True):
-    """
-    Draws styled text along a circular arc, applying bold and italic styles dynamically.
-    Parameters:
-      c               : ReportLab canvas object.
-      html            : HTML string containing styled text.
-      center          : Tuple (cx, cy) for circle center.
-      radius          : Base radius of the arc.
-      start_angle_deg : Starting angle (in degrees).
-      clockwise       : Boolean flag to determine letter flow direction.
-    """
-    cx, cy = center
-    parsed_text = parse_html_text(html)  # Use the new HTML parser
-
-    # Reverse text placement if `clockwise=False`
-    if not clockwise:
-        parsed_text.reverse()
-
+def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise, inside):
+    cx, cy = (0,0) # center
     current_angle = start_angle_deg
 
     for char, font_name, font_size, font_color, is_bold, is_italic in parsed_text:
@@ -104,126 +89,79 @@ def draw_styled_text_on_arc(c, html, center, radius, start_angle_deg, clockwise=
         else:
             full_font = font_name
 
-        # Set font properties dynamically
-        c.setFont(full_font, font_size)
-        c.setFillColor(font_color)
-
         # Measure the character's width
         letter_width = pdfmetrics.stringWidth(char, full_font, font_size)
 
         # Compute letter positioning and rotation
+
+        # Convert the letter width to an angular span (in degrees) on the circle.
         letter_angle_deg = (letter_width / radius) * (180 / math.pi)
         letter_center_angle = current_angle + (letter_angle_deg / 2 if clockwise else -letter_angle_deg / 2)
-        angle_rad = math.radians(letter_center_angle)
+        letter_center_radians = math.radians(letter_center_angle)
 
-        x = cx + radius * math.cos(angle_rad)
-        y = cy + radius * math.sin(angle_rad)
+        x = cx + radius * math.cos(letter_center_radians)
+        y = cy + radius * math.sin(letter_center_radians)
 
-        c.saveState()
-        c.translate(x, y)
-        c.rotate(letter_center_angle + 90)
-        c.drawString(-letter_width / 2, 0, char)
-        c.restoreState()
+        if c is not None: # actually draw the text, rather than just calculating the size
+            c.setFont(full_font, font_size)
+            c.setFillColor(font_color)
+            c.saveState()
+            c.translate(x, y)
+            # Rotate appropriately, flip direction when inside=True.
+            c.rotate(letter_center_angle - 90 if inside else letter_center_angle + 90)
+            c.drawString(-letter_width / 2, 0, char)
+            c.restoreState()
 
         # Adjust angle progression
         current_angle += letter_angle_deg if clockwise else -letter_angle_deg
 
+    # return the angular extent
+    angle_extent = current_angle - start_angle_deg if clockwise else start_angle_deg - current_angle
+    return angle_extent
 
 
-def draw_text_on_arc(c, text, center, radius, start_angle_deg, fontName, fontSize, fontColor, inside=False):
+def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True, inside=False):
     """
-    Draws text along a circular arc with options for font metrics, color, and correct inside text orientation.
-    Code courtesy of Copilot!
-
+    Draws styled text along a circular arc, applying bold and italic styles dynamically.
     Parameters:
       c               : ReportLab canvas object.
-      text            : Text string to be rendered.
-      center          : Tuple (cx, cy) representing the center of the circle.
-      radius          : Base radius of the circle.
-      start_angle_deg : Starting angle (in degrees) for the text.
-      fontName        : Name of the font to use (e.g., 'Helvetica').
-      fontSize        : Font size in points.
-      fontColor       : The color for the text (e.g., colors.blue).
-      inside          : Boolean flag; if True, text is drawn along the inner edge ("upside down"), maintaining correct order.
+      bodyhtml        : HTML string containing styled text.
+      radius          : Base radius of the arc.
+      start_angle_deg : Starting angle (in degrees).
+      clockwise       : Boolean flag to determine letter flow direction.
     """
-    cx, cy = center
+    # print(bodyhtml)
+
+    parsed_text, maxfontsize = parse_html_text(bodyhtml)
 
     # Determine effective radius.
-    effective_radius = radius if not inside else radius - fontSize
+    ascenderHeight = maxfontsize * 0.65 # a good enough guess for the height of the ascenders?
+    effective_radius = radius if not inside else radius - ascenderHeight
 
-    # Set the font and fill color.
-    c.setFont(fontName, fontSize)
-    c.setFillColor(fontColor)
+    # Reverse text placement if necessary
+    if clockwise and inside:
+        parsed_text.reverse()
 
-    # Reverse text order when inside=True to maintain correct orientation.
-    characters = text[::-1] if inside else text
-
-    current_angle = start_angle_deg  # Starting angle for the first character
-
-    for char in characters:
-        # Measure the width of the character using font metrics.
-        letter_width = pdfmetrics.stringWidth(char, fontName, fontSize)
-
-        # Convert the letter width to an angular span (in degrees) on the circle.
-        letter_angle_deg = (letter_width / effective_radius) * (180 / math.pi)
-
-        # Compute the center angle for this character's arc segment.
-        letter_center_angle = current_angle + letter_angle_deg / 2
-        angle_rad = math.radians(letter_center_angle)
-
-        # Calculate the (x, y) coordinates on the circle using the effective radius.
-        x = cx + effective_radius * math.cos(angle_rad)
-        y = cy + effective_radius * math.sin(angle_rad)
-
-        # Save the canvas state before applying transformations.
-        c.saveState()
-
-        c.translate(x, y)
-
-        # Rotate appropriately�flip direction when inside=True.
-        c.rotate(letter_center_angle - 90 if inside else letter_center_angle + 90)
-
-        # Draw the character, offsetting horizontally by half its width to center it.
-        c.drawString(-letter_width / 2, 0, char)
-
-        # Restore the canvas state before processing the next character.
-        c.restoreState()
-
-        # Update the current angle by the angular width of the printed character.
-        current_angle += letter_angle_deg
+    # we have to first calculate the angle used by the entire text without drawing it so
+    # that we can place it symmetrically around the given start angle
+    angular_extent = processParsedText(parsed_text, None, radius, start_angle_deg, clockwise, inside)
+    processParsedText(parsed_text, c, radius, start_angle_deg + 90 - (angular_extent / 2), clockwise, inside)
 
 
-def handleTextArt(pdf, body, cwtextart, fontname, fontsize):
+def handleTextArt(pdf, radius, bodyhtml, cwtextart):
     if "enabled" in cwtextart[0].attrib:
         enabledAttrib = cwtextart[0].get('enabled')
         if enabledAttrib != '1':
             return
 
-    # print(f"cwtextart {cwtextart}")
-    # text = ""
-    # for p in htmlparas:
-    #     htmlspans = p.findall(".*")
-    #     if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
-    #         text = text + p.text
-    #     else:
-    #         if p.text is not None:
-    #             text = text + p.text
-    #         for item in htmlspans:
-    #             if item.tag == 'br':
-    #                 br = item
-    #                 text = text + br.tail
-    #             elif item.tag == 'span':
-    #                 span = item
-    #                 if span.text is not None:
-    #                     text = text + html.escape(span.text)
-    #                 brs = span.findall(".//br")
-    #                 if len(brs) > 0:
-    #                     for br in brs:
-    #                         text = text + br.tail
-    #                 if span.tail is not None:
-    #                     text = text +  html.escape(span.tail)
+    widthAngle = 0
+    if "widthAngle" in cwtextart[0].attrib:
+        widthAngleAttrib = cwtextart[0].get('widthAngle')
+        widthAngle = int(widthAngleAttrib)
 
-    # draw_text_on_arc(pdf, body, (0,0), 100, 270, fontname, fontsize, reportlab.lib.colors.red, True)
-    bodyxml = etree.tostring(body, pretty_print=True, encoding="unicode")
-    print(bodyxml)
-    draw_styled_text_on_arc(pdf, bodyxml, (0,0), 100, 0, clockwise=False)
+    clockwise = True
+    if "direction" in cwtextart[0].attrib:
+        directionAttrib = cwtextart[0].get('direction')
+        clockwise = directionAttrib == '1'
+
+    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, clockwise=clockwise, inside=True)

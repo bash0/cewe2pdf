@@ -635,15 +635,20 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 tablermarg = floor(float(tablestyle['margin-right'].strip("px")))
             except: # noqa: E722
                 logging.warning(f"Ignoring invalid table margin settings {tableStyleAttrib}")
+    leftPad = mcf2rl * tablelmarg
+    rightPad = mcf2rl * tablermarg
+    bottomPad = mcf2rl * tablebmarg
+    topPad = mcf2rl * tabletmarg
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
 
-    # if this is text art, then we do the whole thing differently. Detect that.
+    # if this is text art, then we do the whole thing differently.
     cwtextart = area.findall('decoration/cwtextart')
     if len(cwtextart) > 0:
-        #htmlparas = body.findall(".//p")
-        handleTextArt(pdf, body, cwtextart, bodyfont, bodyfs)
+        bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
+        radius = topPad # it looks as though they use this for the radius?
+        handleTextArt(pdf, radius, bodyhtml, cwtextart)
         return
 
     # we don't do shadowing on texts, but we could at least warn about that...
@@ -775,10 +780,6 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     # Add a frame object that can contain multiple paragraphs. Margins (padding) are specified in
     # the editor in mm, arriving in the mcf in 1/10 mm, but appearing in the html with the unit "px".
     # This is a bit strange, but ignoring the "px" and using mcf2rl seems to work ok.
-    leftPad = mcf2rl * tablelmarg
-    rightPad = mcf2rl * tablermarg
-    bottomPad = mcf2rl * tablebmarg
-    topPad = mcf2rl * tabletmarg
     frameWidth = mcf2rl * areaWidth
     frameHeight = mcf2rl * areaHeight
     frameBottomLeft_x = -0.5 * frameWidth
