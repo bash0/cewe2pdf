@@ -646,8 +646,10 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     # if this is text art, then we do the whole thing differently.
     cwtextart = area.findall('decoration/cwtextart')
     if len(cwtextart) > 0:
+        for decorationTag in area.findall('decoration'):
+            processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
         bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
-        radius = topPad # it looks as though they use this for the radius?
+        radius = topPad - leftPad # is this really what they use for the radius?
         handleTextArt(pdf, radius, bodyhtml, cwtextart)
         return
 

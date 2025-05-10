@@ -135,8 +135,8 @@ def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True
     parsed_text, maxfontsize = parse_html_text(bodyhtml)
 
     # Determine effective radius.
-    ascenderHeight = maxfontsize * 0.65 # a good enough guess for the height of the ascenders?
-    effective_radius = radius if not inside else radius - ascenderHeight
+    ascenderHeight = maxfontsize * 0.3 # a fiddle factor for the height of the ascenders?
+    effectiveRadius = radius if not inside else radius - ascenderHeight
 
     # Reverse text placement if necessary
     if clockwise and inside:
@@ -144,8 +144,9 @@ def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True
 
     # we have to first calculate the angle used by the entire text without drawing it so
     # that we can place it symmetrically around the given start angle
-    angular_extent = processParsedText(parsed_text, None, radius, start_angle_deg, clockwise, inside)
-    processParsedText(parsed_text, c, radius, start_angle_deg + 90 - (angular_extent / 2), clockwise, inside)
+    angular_extent = processParsedText(parsed_text, None, effectiveRadius, start_angle_deg, clockwise, inside)
+    centredStartAngle = -start_angle_deg + 90 - (angular_extent / 2)
+    processParsedText(parsed_text, c, effectiveRadius, centredStartAngle, clockwise, inside)
 
 
 def handleTextArt(pdf, radius, bodyhtml, cwtextart):
@@ -162,6 +163,6 @@ def handleTextArt(pdf, radius, bodyhtml, cwtextart):
     clockwise = True
     if "direction" in cwtextart[0].attrib:
         directionAttrib = cwtextart[0].get('direction')
-        clockwise = directionAttrib == '1'
+        direction = directionAttrib == '1'
 
-    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, clockwise=clockwise, inside=True)
+    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, clockwise=direction, inside=True)
