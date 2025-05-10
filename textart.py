@@ -1,5 +1,4 @@
 import math
-import reportlab
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
@@ -74,7 +73,7 @@ def parse_html_text(html):
     return parsed_data, maxfontsize
 
 
-def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise, inside):
+def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise):
     cx, cy = (0,0) # center
     current_angle = start_angle_deg
 
@@ -96,7 +95,7 @@ def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise, inside
 
         # Convert the letter width to an angular span (in degrees) on the circle.
         letter_angle_deg = (letter_width / radius) * (180 / math.pi)
-        letter_center_angle = current_angle + (letter_angle_deg / 2 if clockwise else -letter_angle_deg / 2)
+        letter_center_angle = current_angle + letter_angle_deg / 2
         letter_center_radians = math.radians(letter_center_angle)
 
         x = cx + radius * math.cos(letter_center_radians)
@@ -107,20 +106,20 @@ def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise, inside
             c.setFillColor(font_color)
             c.saveState()
             c.translate(x, y)
-            # Rotate appropriately, flip direction when inside=True.
-            c.rotate(letter_center_angle - 90 if inside else letter_center_angle + 90)
+            # Rotate appropriately for direction
+            c.rotate(letter_center_angle - 90 if clockwise else letter_center_angle + 90)
             c.drawString(-letter_width / 2, 0, char)
             c.restoreState()
 
         # Adjust angle progression
-        current_angle += letter_angle_deg if clockwise else -letter_angle_deg
+        current_angle += letter_angle_deg
 
     # return the angular extent
-    angle_extent = current_angle - start_angle_deg if clockwise else start_angle_deg - current_angle
+    angle_extent = current_angle - start_angle_deg
     return angle_extent
 
 
-def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True, inside=False):
+def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True):
     """
     Draws styled text along a circular arc, applying bold and italic styles dynamically.
     Parameters:
@@ -135,18 +134,18 @@ def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True
     parsed_text, maxfontsize = parse_html_text(bodyhtml)
 
     # Determine effective radius.
-    ascenderHeight = maxfontsize * 0.3 # a fiddle factor for the height of the ascenders?
-    effectiveRadius = radius if not inside else radius - ascenderHeight
+    fiddleFactor = maxfontsize * 0.3 # a fiddle factor for the height of the ascenders?
+    effectiveRadius = radius - fiddleFactor if clockwise else radius + fiddleFactor
 
     # Reverse text placement if necessary
-    if clockwise and inside:
+    if clockwise:
         parsed_text.reverse()
 
     # we have to first calculate the angle used by the entire text without drawing it so
     # that we can place it symmetrically around the given start angle
-    angular_extent = processParsedText(parsed_text, None, effectiveRadius, start_angle_deg, clockwise, inside)
+    angular_extent = processParsedText(parsed_text, None, effectiveRadius, start_angle_deg, clockwise)
     centredStartAngle = -start_angle_deg + 90 - (angular_extent / 2)
-    processParsedText(parsed_text, c, effectiveRadius, centredStartAngle, clockwise, inside)
+    processParsedText(parsed_text, c, effectiveRadius, centredStartAngle, clockwise)
 
 
 def handleTextArt(pdf, radius, bodyhtml, cwtextart):
@@ -165,4 +164,4 @@ def handleTextArt(pdf, radius, bodyhtml, cwtextart):
         directionAttrib = cwtextart[0].get('direction')
         direction = directionAttrib == '1'
 
-    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, clockwise=direction, inside=True)
+    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, clockwise=direction)

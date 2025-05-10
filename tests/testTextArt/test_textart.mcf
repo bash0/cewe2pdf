@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="bfef4b35-8302-4463-a16e-8049fd02617a" imagedir="test_textart_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="0f8a5955-e1e3-4ba4-93a3-89f4ef9536f3" imagedir="test_textart_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="6d33070b-374a-429d-8cf7-ee33e3c49c59" projectIDCreatedEpoch="1746769714"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-05-10 07:42"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-05-10 08:51"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-04-23 07:21"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -9,7 +9,7 @@
         <outline width="1"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="40" VerticalIndentMargin="40" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.0.0"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
@@ -105,10 +105,10 @@ p, li { white-space: pre-wrap; }
             <position height="1200" left="335.328" rotation="0" top="1245.92" width="1200" zposition="7000"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
-                <cwtextart direction="1" enabled="1" widthAngle="45"/>
+                <cwtextart direction="1" enabled="1" widthAngle="270"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:563px; margin-bottom:40px; margin-left:40px; margin-right:40px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="40" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:563px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -272,5 +272,5 @@ p, li { white-space: pre-wrap; }
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships/>
-    <statistics assistantUsed="0" countPauses="63" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="402492" fotosAdded="52" fotosRemoved="25" pauseTime="361941" sessionsUsed="18"/>
+    <statistics assistantUsed="0" countPauses="64" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="406670" fotosAdded="52" fotosRemoved="25" pauseTime="362993" sessionsUsed="18"/>
 </fotobook>
