@@ -640,18 +640,22 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     bottomPad = mcf2rl * tablebmarg
     topPad = mcf2rl * tabletmarg
 
-    pdf.translate(transx, transy)
-    pdf.rotate(-areaRot)
-
     # if this is text art, then we do the whole thing differently.
     cwtextart = area.findall('decoration/cwtextart')
     if len(cwtextart) > 0:
+        pdf.translate(transx, transy)
+        pdf.rotate(-areaRot)
         for decorationTag in area.findall('decoration'):
             processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
         bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
         radius = topPad - leftPad # is this really what they use for the radius?
         handleTextArt(pdf, radius, bodyhtml, cwtextart)
+        pdf.rotate(areaRot)
+        pdf.translate(-transx, -transy)
         return
+
+    pdf.translate(transx, transy)
+    pdf.rotate(-areaRot)
 
     # we don't do shadowing on texts, but we could at least warn about that...
     for decorationTag in area.findall('decoration'):

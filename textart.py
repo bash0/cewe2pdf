@@ -62,10 +62,6 @@ def parse_html_text(html):
         else:
             paragraph_text = elem.text # .strip()
 
-        # Add paragraph breaks for <p> tags
-        if elem.name == "p":
-            paragraph_text += ' '
-
         # Format text representation
         for char in paragraph_text:
             parsed_data.append((char, font_name, font_size, font_color, is_bold, is_italic))
@@ -102,9 +98,9 @@ def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise):
         y = cy + radius * math.sin(letter_center_radians)
 
         if c is not None: # actually draw the text, rather than just calculating the size
+            c.saveState()
             c.setFont(full_font, font_size)
             c.setFillColor(font_color)
-            c.saveState()
             c.translate(x, y)
             # Rotate appropriately for direction
             c.rotate(letter_center_angle - 90 if clockwise else letter_center_angle + 90)
@@ -116,6 +112,13 @@ def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise):
 
     # return the angular extent
     angle_extent = current_angle - start_angle_deg
+
+    # uncomment this to see the arc, amongst other things you can see that the
+    # text is drawn with the baseline on the arc
+    if c is not None:
+        print(f"Start angle {start_angle_deg}, extent {angle_extent}, radius {radius}, clockwise {clockwise}")
+        c.arc(-radius, -radius, +radius, +radius, startAng=start_angle_deg, extent=angle_extent)
+
     return angle_extent
 
 
@@ -134,8 +137,9 @@ def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True
     parsed_text, maxfontsize = parse_html_text(bodyhtml)
 
     # Determine effective radius.
-    fiddleFactor = maxfontsize * 0.3 # a fiddle factor for the height of the ascenders?
-    effectiveRadius = radius - fiddleFactor if clockwise else radius + fiddleFactor
+    fiddleFactor = maxfontsize * 0.4 if clockwise else maxfontsize * 0.9
+    # adjusts for the fact that it is the text baseline that is on the arc
+    effectiveRadius = radius + fiddleFactor
 
     # Reverse text placement if necessary
     if clockwise:
@@ -143,8 +147,9 @@ def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True
 
     # we have to first calculate the angle used by the entire text without drawing it so
     # that we can place it symmetrically around the given start angle
-    angular_extent = processParsedText(parsed_text, None, effectiveRadius, start_angle_deg, clockwise)
-    centredStartAngle = -start_angle_deg + 90 - (angular_extent / 2)
+    ourStartAngle = 90 - start_angle_deg if clockwise else start_angle_deg - 90
+    angularExtent = processParsedText(parsed_text, None, effectiveRadius, start_angle_deg, clockwise)
+    centredStartAngle = ourStartAngle - (angularExtent * 0.5)
     processParsedText(parsed_text, c, effectiveRadius, centredStartAngle, clockwise)
 
 
@@ -159,7 +164,7 @@ def handleTextArt(pdf, radius, bodyhtml, cwtextart):
         widthAngleAttrib = cwtextart[0].get('widthAngle')
         widthAngle = int(widthAngleAttrib)
 
-    clockwise = True
+    direction = True
     if "direction" in cwtextart[0].attrib:
         directionAttrib = cwtextart[0].get('direction')
         direction = directionAttrib == '1'
