@@ -69,7 +69,7 @@ def parse_html_text(html):
     return parsed_data, maxfontsize
 
 
-def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise):
+def processParsedText(parsed_text, c, originalRadius, start_angle_deg, clockwise):
     cx, cy = (0,0) # center
     current_angle = start_angle_deg
 
@@ -87,13 +87,18 @@ def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise):
         # Measure the character's width
         letter_width = pdfmetrics.stringWidth(char, full_font, font_size)
 
-        # Compute letter positioning and rotation
 
-        # Convert the letter width to an angular span (in degrees) on the circle.
-        letter_angle_deg = (letter_width / radius) * (180 / math.pi)
+        # Convert the letter width to an angular span (in degrees) on the circle
+        # using the original radius so that the letters are the same for both
+        # clockwise and anticlockwise
+        letter_angle_deg = (letter_width / originalRadius) * (180 / math.pi)
         letter_center_angle = current_angle + letter_angle_deg / 2
         letter_center_radians = math.radians(letter_center_angle)
 
+        # Compute letter positioning and rotation
+        # For clockwise we need to reduce the radius and to move the letter
+        # placement inwards, putting the top of the letter up against the arc
+        radius = originalRadius - font_size * 0.6 if clockwise else originalRadius
         x = cx + radius * math.cos(letter_center_radians)
         y = cy + radius * math.sin(letter_center_radians)
 
@@ -115,9 +120,9 @@ def processParsedText(parsed_text, c, radius, start_angle_deg, clockwise):
 
     # uncomment this to see the arc, amongst other things you can see that the
     # text is drawn with the baseline on the arc
-    if c is not None:
-        print(f"Start angle {start_angle_deg}, extent {angle_extent}, radius {radius}, clockwise {clockwise}")
-        c.arc(-radius, -radius, +radius, +radius, startAng=start_angle_deg, extent=angle_extent)
+    # if c is not None:
+    #     print(f"Start angle {start_angle_deg}, extent {angle_extent}, originalRadius {originalRadius}, radius {radius}, clockwise {clockwise}")
+    #     c.arc(-originalRadius, -originalRadius, +originalRadius, +originalRadius, startAng=start_angle_deg, extent=angle_extent)
 
     return angle_extent
 
@@ -136,9 +141,11 @@ def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True
 
     parsed_text, maxfontsize = parse_html_text(bodyhtml)
 
-    # Determine effective radius.
-    fiddleFactor = maxfontsize * 0.4 if clockwise else maxfontsize * 0.9
-    # adjusts for the fact that it is the text baseline that is on the arc
+    # Determine effective radius. This adjusts the radius by an empirically
+    # determined value to account for the placement of the baseline in the
+    # letter. This radius will be the same for both clockwise and anti, but
+    # we'll have to adjust the letters individually in relation to this
+    fiddleFactor = maxfontsize * 0.9
     effectiveRadius = radius + fiddleFactor
 
     # Reverse text placement if necessary

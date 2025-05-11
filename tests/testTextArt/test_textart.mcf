@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="1e15c7bc-4c8b-4af6-ad8e-fd8c599e14a3" imagedir="test_textart_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="9c1264f5-01a1-4897-952f-091f0fba323b" imagedir="test_textart_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="6d33070b-374a-429d-8cf7-ee33e3c49c59" projectIDCreatedEpoch="1746769714"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-05-10 16:13"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-05-11 20:47"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-04-23 07:21"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -77,30 +77,6 @@ p, li { white-space: pre-wrap; }
         <designElementIDs background="201" layout="125061"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
-        <area areatype="clipartarea">
-            <position height="50" left="3318.63" rotation="0" top="2174.34" width="613.227" zposition="101"/>
-            <designElementIDs clipart="63457"/>
-            <decoration/>
-            <clipart designElementId="63457">
-                <ClipartConfiguration applySpotColor="0">
-                    <colors>
-                        <color source="#000000" target="#00ff00"/>
-                    </colors>
-                </ClipartConfiguration>
-            </clipart>
-        </area>
-        <area areatype="clipartarea">
-            <position height="50" left="3316.63" rotation="270" top="2174.34" width="614" zposition="102"/>
-            <designElementIDs clipart="63457"/>
-            <decoration/>
-            <clipart designElementId="63457">
-                <ClipartConfiguration applySpotColor="0">
-                    <colors>
-                        <color source="#000000" target="#00ff00"/>
-                    </colors>
-                </ClipartConfiguration>
-            </clipart>
-        </area>
         <area areatype="textarea">
             <position height="490" left="371.127" rotation="0" top="111.466" width="490" zposition="7000"/>
             <decoration>
@@ -114,7 +90,6 @@ p, li { white-space: pre-wrap; }
         <area areatype="textarea">
             <position height="490" left="371.127" rotation="0" top="621.967" width="490" zposition="7001"/>
             <decoration>
-                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
                 <cwtextart direction="1" enabled="1" widthAngle="45"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
@@ -134,7 +109,6 @@ p, li { white-space: pre-wrap; }
         <area areatype="textarea">
             <position height="490" left="371.127" rotation="0" top="1642.97" width="490" zposition="7003"/>
             <decoration>
-                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
                 <cwtextart direction="1" enabled="1" widthAngle="120"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
@@ -171,7 +145,6 @@ p, li { white-space: pre-wrap; }
         <area areatype="textarea">
             <position height="490" left="1148.47" rotation="0" top="621.588" width="490" zposition="7007"/>
             <decoration>
-                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
                 <cwtextart direction="0" enabled="1" widthAngle="45"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
@@ -191,7 +164,6 @@ p, li { white-space: pre-wrap; }
         <area areatype="textarea">
             <position height="490" left="1148.47" rotation="0" top="1642.59" width="490" zposition="7009"/>
             <decoration>
-                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
                 <cwtextart direction="0" enabled="1" widthAngle="120"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
@@ -213,16 +185,6 @@ p, li { white-space: pre-wrap; }
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Anticlockwise</span></p></td></tr></table></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
-            </text>
-        </area>
-        <area areatype="textarea">
-            <position height="490" left="2514.82" rotation="0" top="235.147" width="490" zposition="7012"/>
-            <decoration>
-                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
-                <cwtextart direction="1" enabled="1" widthAngle="0"/>
-            </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -261,23 +223,119 @@ p, li { white-space: pre-wrap; }
             </text>
         </area>
         <area areatype="textarea">
-            <position height="490" left="2600" rotation="0" top="320" width="490" zposition="7018"/>
+            <position height="490" left="2452.5" rotation="0" top="110.588" width="490" zposition="7018"/>
             <decoration>
-                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
-                <cwtextart direction="1" enabled="1" widthAngle="0"/>
+                <cwtextart direction="1" enabled="1" widthAngle="225"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="490" left="2685" rotation="0" top="405" width="490" zposition="7019"/>
+            <position height="490" left="2452.5" rotation="0" top="621.588" width="490" zposition="7019"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
-                <cwtextart direction="1" enabled="1" widthAngle="0"/>
+                <cwtextart direction="1" enabled="1" widthAngle="270"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="490" left="2452.5" rotation="0" top="1131.59" width="490" zposition="7020"/>
+            <decoration>
+                <cwtextart direction="1" enabled="1" widthAngle="315"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="490" left="2452.5" rotation="0" top="1642.59" width="490" zposition="7021"/>
+            <decoration>
+                <cwtextart direction="1" enabled="1" widthAngle="340"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="50" left="2592.5" rotation="0" top="49.5882" width="210" zposition="7023"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Clockwise</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="490" left="3229.5" rotation="0" top="110.588" width="490" zposition="7024"/>
+            <decoration>
+                <cwtextart direction="0" enabled="1" widthAngle="225"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="490" left="3229.5" rotation="0" top="621.588" width="490" zposition="7025"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
+                <cwtextart direction="0" enabled="1" widthAngle="270"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="490" left="3229.5" rotation="0" top="1131.59" width="490" zposition="7026"/>
+            <decoration>
+                <cwtextart direction="0" enabled="1" widthAngle="315"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="490" left="3229.5" rotation="0" top="1642.59" width="490" zposition="7027"/>
+            <decoration>
+                <cwtextart direction="0" enabled="1" widthAngle="340"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="50" left="3334.5" rotation="0" top="49.5882" width="281" zposition="7029"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Anticlockwise</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="50" left="2984.5" rotation="0" top="316.588" width="210" zposition="7030"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">-135</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="50" left="2984.5" rotation="0" top="827.588" width="210" zposition="7031"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">-90</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="50" left="2984.5" rotation="0" top="1337.59" width="210" zposition="7032"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">-45</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="50" left="2984.5" rotation="0" top="1848.59" width="210" zposition="7033"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">-20</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -292,6 +350,50 @@ p, li { white-space: pre-wrap; }
         <designElementIDs background="201" layout="125061"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="clipartarea">
+            <position height="50" left="736.176" rotation="0" top="544.029" width="490" zposition="100"/>
+            <designElementIDs clipart="63457"/>
+            <decoration/>
+            <clipart designElementId="63457">
+                <ClipartConfiguration applySpotColor="0">
+                    <colors>
+                        <color source="#000000" target="#00ff00"/>
+                    </colors>
+                </ClipartConfiguration>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="50" left="731.971" rotation="270" top="542.412" width="478.765" zposition="101"/>
+            <designElementIDs clipart="63457"/>
+            <decoration/>
+            <clipart designElementId="63457">
+                <ClipartConfiguration applySpotColor="0">
+                    <colors>
+                        <color source="#000000" target="#00ff00"/>
+                    </colors>
+                </ClipartConfiguration>
+            </clipart>
+        </area>
+        <area areatype="textarea">
+            <position height="490" left="736.353" rotation="0" top="324.029" width="490" zposition="7000"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
+                <cwtextart direction="1" enabled="1" widthAngle="90"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="490" left="736.353" rotation="0" top="324.029" width="490" zposition="7001"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="centered" width="4"/>
+                <cwtextart direction="0" enabled="1" widthAngle="90"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table border="0" style="-qt-table-type: root; margin-top:171px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ff595d;">The </span><span style=" font-weight:600; font-style:italic; color:#ff595d;">quick</span><span style=" color:#ff595d;"> </span><span style=" color:#825456;">brown</span><span style=" color:#ff595d;"> fox</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,18,-1,5,50,0,0,0,0,0" foregroundColor="#ffff595d" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
     </page>
     <page designStyleID="0" pagenr="5" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
@@ -441,5 +543,5 @@ p, li { white-space: pre-wrap; }
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships/>
-    <statistics assistantUsed="0" countPauses="67" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="433166" fotosAdded="52" fotosRemoved="25" pauseTime="386110" sessionsUsed="18"/>
+    <statistics assistantUsed="0" countPauses="77" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="536035" fotosAdded="52" fotosRemoved="25" pauseTime="483364" sessionsUsed="18"/>
 </fotobook>
