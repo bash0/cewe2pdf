@@ -69,7 +69,7 @@ def parse_html_text(html):
     return parsed_data, maxfontsize
 
 
-def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwise, maxfontsize):
+def processParsedText(parsed_text, c, originalRadius, start_angle_deg, clockwise):
     cx, cy = (0,0) # center
     current_angle = start_angle_deg
 
@@ -87,6 +87,7 @@ def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwi
         # Measure the character's width
         letter_width = pdfmetrics.stringWidth(char, full_font, font_size)
 
+
         # Convert the letter width to an angular span (in degrees) on the circle
         # using the original radius so that the letters are the same for both
         # clockwise and anticlockwise
@@ -97,19 +98,19 @@ def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwi
         # Compute letter positioning and rotation
         # For clockwise we need to reduce the radius and to move the letter
         # placement inwards, putting the top of the letter up against the arc
-        radius = originalRadius - maxfontsize * 0.7 if clockwise else originalRadius
+        radius = originalRadius - font_size * 0.6 if clockwise else originalRadius
         x = cx + radius * math.cos(letter_center_radians)
         y = cy + radius * math.sin(letter_center_radians)
 
-        if pdf is not None: # actually draw the text, rather than just calculating the size
-            pdf.saveState()
-            pdf.setFont(full_font, font_size)
-            pdf.setFillColor(font_color)
-            pdf.translate(x, y)
+        if c is not None: # actually draw the text, rather than just calculating the size
+            c.saveState()
+            c.setFont(full_font, font_size)
+            c.setFillColor(font_color)
+            c.translate(x, y)
             # Rotate appropriately for direction
-            pdf.rotate(letter_center_angle - 90 if clockwise else letter_center_angle + 90)
-            pdf.drawString(-letter_width / 2, 0, char)
-            pdf.restoreState()
+            c.rotate(letter_center_angle - 90 if clockwise else letter_center_angle + 90)
+            c.drawString(-letter_width / 2, 0, char)
+            c.restoreState()
 
         # Adjust angle progression
         current_angle += letter_angle_deg
@@ -126,7 +127,7 @@ def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwi
     return angle_extent
 
 
-def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, clockwise=True):
+def draw_styled_text_on_arc(c, bodyhtml, radius, start_angle_deg, clockwise=True):
     """
     Draws styled text along a circular arc, applying bold and italic styles dynamically.
     Parameters:
@@ -153,12 +154,10 @@ def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, clockwise=Tr
 
     # we have to first calculate the angle used by the entire text without drawing it so
     # that we can place it symmetrically around the given start angle
-    givenStartAngle = 90 - start_angle_deg if clockwise else start_angle_deg - 90
-    angularExtent = processParsedText(parsed_text, None, effectiveRadius, start_angle_deg,
-        clockwise, maxfontsize)
-    centredStartAngle = givenStartAngle - (angularExtent * 0.5)
-
-    processParsedText(parsed_text, pdf, effectiveRadius, centredStartAngle, clockwise, maxfontsize)
+    ourStartAngle = 90 - start_angle_deg if clockwise else start_angle_deg - 90
+    angularExtent = processParsedText(parsed_text, None, effectiveRadius, start_angle_deg, clockwise)
+    centredStartAngle = ourStartAngle - (angularExtent * 0.5)
+    processParsedText(parsed_text, c, effectiveRadius, centredStartAngle, clockwise)
 
 
 def handleTextArt(pdf, radius, bodyhtml, cwtextart):
