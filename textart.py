@@ -1,7 +1,9 @@
+import logging
 import math
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
+from fontHandling import getMissingFontSubstitute
 
 def parse_html_text(html):
     """Parses an HTML string, applying default styles from <body> while handling <p>, <span>, <i>, and <b>."""
@@ -70,11 +72,14 @@ def parse_html_text(html):
 
 
 def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwise, maxfontsize):
+    notifiedFontError = False
     cx, cy = (0,0) # center
     current_angle = start_angle_deg
 
     for char, font_name, font_size, font_color, is_bold, is_italic in parsed_text:
-        # Adjust font style based on <b> and <i> attributes
+        # Adjust font style based on <b> and <i> attributes. This reliance on a naming convention
+        # is a bit weak, though there are only a few fonts / font families which do not follow it.
+        # You can find those unconventional fonts by setting the config logger message level to info.
         if is_bold and is_italic:
             full_font = f"{font_name} Bold Italic"
         elif is_bold:
@@ -84,8 +89,17 @@ def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwi
         else:
             full_font = font_name
 
-        # Measure the character's width
-        letter_width = pdfmetrics.stringWidth(char, full_font, font_size)
+        # Measure the character's width. This will fail with a KeyError if the
+        # font is missing, which it might be for unconventionally named fonts
+        try:
+            letter_width = pdfmetrics.stringWidth(char, full_font, font_size)
+        except KeyError:
+            fail_font = full_font
+            full_font = getMissingFontSubstitute(font_name) # honouring any configured font substitutions
+            if not notifiedFontError: # just one message per text art
+                logging.error(f"Unregistered font in TextArt: {fail_font}, font substitution: {full_font}")
+                notifiedFontError = True
+            letter_width = pdfmetrics.stringWidth(char, full_font, font_size)
 
         # Convert the letter width to an angular span (in degrees) on the circle
         # using the original radius so that the letters are the same for both
