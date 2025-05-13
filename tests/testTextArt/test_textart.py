@@ -72,7 +72,7 @@ def test_textart(main=False):
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
 
-# def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasename, albumBasename):
+# def checkModifiedMcfVersions(main, infile, attribute_modifications, albumFolderBasename, albumBasename):
 #     # Parse the mcf file and find the elements on which we want to do attribute modication variation
 #     dom = parse(infile)
 #     elementName = "toBeDefinedForDecorationVariations"
@@ -80,13 +80,13 @@ def test_textart(main=False):
 #     if elementToVary is None:
 #         raise ValueError(f"No <{elementName}> element found in {infile}")
 #     # Run attribute modification variations
-#     runModifications(tryToBuildBook, albumFolderBasename, albumBasename, dom, attribute_modifications, elementToVary)
+#     runModifications(main, tryToBuildBook, albumFolderBasename, albumBasename, dom, attribute_modifications, elementToVary)
 
 # def test_variations():
 #     # use the same input mcf file to create and test variations. Haven't found any yet!
 #     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
 #     attribute_modifications = {}
-#     checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
+#     checkModifiedMcfVersions(main, inFile, attribute_modifications, albumFolderBasename, albumBasename)
 
 if __name__ == '__main__':
     #only executed when this file is run directly.

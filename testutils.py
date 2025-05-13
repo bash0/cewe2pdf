@@ -35,7 +35,7 @@ def createVariationMcf(dom, outFile):
         file.write(clean_xml)
 
 
-def runModifications(tryToBuildBook, albumFolderBasename, albumBasename, dom, attribute_modifications, elementToModify):
+def runModifications(main, tryToBuildBook, albumFolderBasename, albumBasename, dom, attribute_modifications, elementToModify):
     # build a pdf with the supplied tryToBuildBook method with the sets of attribute modifications
     # on the supplied element to modify in the document dom
     filesToDelete = []
@@ -50,16 +50,26 @@ def runModifications(tryToBuildBook, albumFolderBasename, albumBasename, dom, at
         latestResultFile = getLatestResultFile(albumFolderBasename, f"*{variationName}.mcf.pdf")
 
         createVariationMcf(dom, outFile)
-        result = tryToBuildBook(outFile, pdfFile, latestResultFile, False, 28)
+        try:
+            result = tryToBuildBook(outFile, pdfFile, latestResultFile, False, 28)
+        except AssertionError:
+            if not main:
+                # if we're not testing "by hand" (i.e. we're using pytest) then raise
+                # the exception further and abandon the test
+                raise
+            # but if we're testing by hand, continue to complete all the tests in the run
+            mustsee.error(f"Test variation {variationName} had an assertion error, but continuing in a non-pytest run")
+            result = False
         if result:
-            mustsee.info(f"Test variation {variationName} ok, variation files will be deleted")
+            mustsee.info(f"Test variation {variationName} ok, variation files added to deletion list")
             filesToDelete.append(outFile)
             filesToDelete.append(pdfFile)
 
     # do not delete the variation files until all test are run, so they
     # are present while we are debugging
-    for f in filesToDelete:
-        os.remove(f)
+    if not main:
+        for f in filesToDelete:
+            os.remove(f)
 
 
 def getOutFileBasename(main, albumBasename, yyyymmdd, styleid):
