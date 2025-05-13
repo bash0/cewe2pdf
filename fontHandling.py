@@ -180,6 +180,23 @@ def buildFontsToRegisterFromTtfFiles(ttfFiles, fontList, fontFamilyList):
         if redefinedCount > 0:
             configlogger.warning(f"Multiple ttf files found for {redefinedCount} fonts, increase the cewe2pdf.config log level to see redefinitions")
 
+def verifyFontNameConventions(m_familyname, normal=None, bold=None, italic=None, boldItalic=None):
+    # It seems usual that the bold, italic and boldItalic fonts are named with the normal name
+    # plus the words "bold", "italic", "bold italic". Let's verify that, because TextArt relies
+    # on it! There are few exceptions, and they're probably not likely to occur in practice
+    nonConventional = False
+    if bold is not None:
+        if bold.lower() != f"{normal.lower()} bold":
+            nonConventional = True
+    if italic is not None:
+        if italic.lower() != f"{normal.lower()} italic":
+            nonConventional = True
+    if boldItalic is not None:
+        if boldItalic.lower() != f"{normal.lower()} bold italic":
+            nonConventional = True
+    if nonConventional:
+        configlogger.info(f"Unconventional font names in family '{m_familyname}': n='{normal}' b='{bold}' i='{italic}' bi='{boldItalic}'")
+
 def getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontList):
     if defaultConfigSection is None:
         return []
@@ -210,6 +227,7 @@ def getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontList):
                 pdfmetrics.registerFontFamily(m_familyname, normal=m_n, bold=m_b, italic=m_i, boldItalic=m_bi)
                 explicitFamilyNames.append(m_familyname)
                 configlogger.warning(f"Using configured font family '{m_familyname}': '{m_n}','{m_b}','{m_i}','{m_bi}'")
+                verifyFontNameConventions(m_familyname, normal=m_n, bold=m_b, italic=m_i, boldItalic=m_bi)
         else:
             configlogger.error(f'Invalid FontFamilies line ignored (!= 5 comma-separated strings): {explicitFontFamily}')
     return explicitFamilyNames
@@ -262,6 +280,7 @@ def registerFontFamilies(fontFamilies, explicitlyRegisteredFamilyNames):
             if familyName not in explicitlyRegisteredFamilyNames:
                 pdfmetrics.registerFontFamily(familyName, **fontFamily)
                 configlogger.info(f"Registered fontfamily '{familyName}': {fontFamily}")
+                verifyFontNameConventions(familyName, **fontFamily)
             else:
                 configlogger.info(f"Font family '{familyName}' was already registered from configuration file")
 

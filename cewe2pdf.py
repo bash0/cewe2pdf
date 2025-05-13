@@ -103,6 +103,7 @@ from pageNumbering import getPageNumberXy, PageNumberingInfo, PageNumberPosition
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CreateParagraphStyle, Dequote, noteFontSubstitution
+from textart import handleTextArt
 
 
 # PageType is a concept for processing in this code, not something used by CEWE
@@ -634,6 +635,24 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 tablermarg = floor(float(tablestyle['margin-right'].strip("px")))
             except: # noqa: E722
                 logging.warning(f"Ignoring invalid table margin settings {tableStyleAttrib}")
+    leftPad = mcf2rl * tablelmarg
+    rightPad = mcf2rl * tablermarg
+    bottomPad = mcf2rl * tablebmarg
+    topPad = mcf2rl * tabletmarg
+
+    # if this is text art, then we do the whole thing differently.
+    cwtextart = area.findall('decoration/cwtextart')
+    if len(cwtextart) > 0:
+        pdf.translate(transx, transy)
+        pdf.rotate(-areaRot)
+        for decorationTag in area.findall('decoration'):
+            processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
+        bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
+        radius = topPad - leftPad # is this really what they use for the radius?
+        handleTextArt(pdf, radius, bodyhtml, cwtextart)
+        pdf.rotate(areaRot)
+        pdf.translate(-transx, -transy)
+        return
 
     pdf.translate(transx, transy)
     pdf.rotate(-areaRot)
@@ -767,10 +786,6 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     # Add a frame object that can contain multiple paragraphs. Margins (padding) are specified in
     # the editor in mm, arriving in the mcf in 1/10 mm, but appearing in the html with the unit "px".
     # This is a bit strange, but ignoring the "px" and using mcf2rl seems to work ok.
-    leftPad = mcf2rl * tablelmarg
-    rightPad = mcf2rl * tablermarg
-    bottomPad = mcf2rl * tablebmarg
-    topPad = mcf2rl * tabletmarg
     frameWidth = mcf2rl * areaWidth
     frameHeight = mcf2rl * areaHeight
     frameBottomLeft_x = -0.5 * frameWidth

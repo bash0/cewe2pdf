@@ -149,6 +149,12 @@
     <Content Include="tests\testPageNumbers\test_pagenumbers.mcf" />
     <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\testTextArt\additional_fonts.txt" />
+    <Content Include="tests\testTextArt\cewe2pdf.ini" />
+    <Content Include="tests\testTextArt\previous_result_pdfs\test_textart.mcf.20250511S.pdf" />
+    <Content Include="tests\testTextArt\test_textart.mcf" />
+    <Content Include="tests\testTextArt\test_textart.mcf~" />
+    <Content Include="tests\testTextArt\test_textart_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
     <Content Include="tests\unittest_fotobook\cewe2pdf.ini" />
     <Content Include="tests\hps\5026\.gitkeep" />
@@ -286,6 +292,7 @@
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
+    <Compile Include="tests\testTextArt\test_textart.py" />
     <Compile Include="tests\unittest_fotobook\test_simpleBook.py" />
     <Compile Include="tests\test_webp_loading\test_webp_loading.py" />
     <Compile Include="testutils.py">
@@ -294,6 +301,7 @@
     <Compile Include="text.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="textart.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />
@@ -339,6 +347,9 @@
     <Folder Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\" />
     <Folder Include="tests\testPageNumbers\" />
     <Folder Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\" />
+    <Folder Include="tests\testTextArt\" />
+    <Folder Include="tests\testTextArt\previous_result_pdfs\" />
+    <Folder Include="tests\testTextArt\test_textart_mcf-Dateien\" />
     <Folder Include="tests\test_webp_loading\" />
     <Folder Include="tests\unittest_fotobook\" />
     <Folder Include="tests\Resources\" />
