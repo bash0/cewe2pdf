@@ -1,5 +1,5 @@
-cairosvg>=2.4.2
-fonttools>=4.25.1
+cairosvg>=2.4.2,<2.8.0
+fonttools>=4.25.1,<4.58.0
 lxml>=4.4.1
 packaging<24,>=16.8
 pillow>=5.4.1
@@ -11,3 +11,4 @@ pytest>=7.4.4
 flake8>=7.0.0
 pymupdf>=1.25.5
 opencv-python>=4.11.0
+beautifulsoup4>=4.13.4
