@@ -61,7 +61,7 @@ def defineCommonVariables():
     yyyymmdd = datetime.today().strftime("%Y%m%d")
     return albumFolderBasename,albumBasename,inFile,yyyymmdd
 
-def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasename, albumBasename):
+def checkModifiedMcfVersions(main, infile, attribute_modifications, albumFolderBasename, albumBasename):
     # Parse the mcf file and find the elements on which we want to do attribute modication variation
     dom = parse(infile)
     elementName = "pagenumbering"
@@ -69,7 +69,7 @@ def checkModifiedMcfVersions(infile, attribute_modifications, albumFolderBasenam
     if elementToVary is None:
         raise ValueError(f"No <{elementName}> element found in {infile}")
     # Run attribute modification variations on the element found
-    runModifications(tryToBuildBook, albumFolderBasename, albumBasename, dom, attribute_modifications, elementToVary)
+    runModifications(main, tryToBuildBook, albumFolderBasename, albumBasename, dom, attribute_modifications, elementToVary)
 
 def test_pageNumbers(main=False):
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
@@ -86,7 +86,7 @@ def test_pageNumbers(main=False):
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
     tryToBuildBook(inFile, outFile, latestResultFile, True, 15)
 
-def test_formats():
+def test_formats(main=False):
     # use the same input mcf file to create and test variations in page numbering
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     attribute_modifications = {
@@ -98,9 +98,9 @@ def test_formats():
         "f5p4": {"format": "5", "position": "4"},
         "f6p4": {"format": "6", "position": "4"},
     }
-    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
+    checkModifiedMcfVersions(main, inFile, attribute_modifications, albumFolderBasename, albumBasename)
 
-def test_positions():
+def test_positions(main=False):
     # use the same input mcf file to create and test variations in page numbering
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     attribute_modifications = {
@@ -110,18 +110,18 @@ def test_positions():
         "f0p4": {"format": "0", "position": "4"},
         "f0p5": {"format": "0", "position": "5"},
     }
-    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
+    checkModifiedMcfVersions(main, inFile, attribute_modifications, albumFolderBasename, albumBasename)
 
-def test_withtext():
+def test_withtext(main=False):
     # use the same input mcf file to create and test variations in page numbering
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     attribute_modifications = {
         # test a variation on the text
         "txt1": {"format": "0", "position": "5", "textstring": "Page %", "fontbold": "1", "fontitalics": "0", "fontsize": "18"},
     }
-    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
+    checkModifiedMcfVersions(main, inFile, attribute_modifications, albumFolderBasename, albumBasename)
 
-def test_color():
+def test_color(main=False):
     # use the same input mcf file to create and test variations in page numbering
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     attribute_modifications = {
@@ -130,13 +130,13 @@ def test_color():
                  "bgcolor": "#0d0000ff", # 13/255 = ~5% opaque (i.e. 85% transparent) pure blue
                  "textcolor": "#ff0000ff"}, # 100% opaque (i.e. 0% transparent) pure blue
     }
-    checkModifiedMcfVersions(inFile, attribute_modifications, albumFolderBasename, albumBasename)
+    checkModifiedMcfVersions(main, inFile, attribute_modifications, albumFolderBasename, albumBasename)
 
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
     test_pageNumbers(main=True)
-    test_formats()
-    test_positions()
-    test_withtext()
-    test_color()
+    test_formats(main=True)
+    test_positions(main=True)
+    test_withtext(main=True)
+    test_color(main=True)

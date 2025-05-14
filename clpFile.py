@@ -32,6 +32,7 @@ class ClpFile():
            But it should work for typical cliparts with a size of less then a few megabytes."""
 
         inFilePath = Path(fileName)
+        # self.nameSavedForDebugging = str(inFilePath)
         # open and read the whole file to memory
         contents = ClpFile._invalidContent
         with open(inFilePath, "rt") as fileClp: # pylint: disable=unspecified-encoding
@@ -204,7 +205,8 @@ class ClpFile():
         if ("fill" not in svgDataText) and ("stroke" not in svgDataText):
             for curReplacement in colorReplacementList:
                 if curReplacement[0] == "#000000":
-                    self.svgData = svgDataText.replace('<path ', f'<path fill="{curReplacement[1]}" stroke="{curReplacement[1]}" ')
+                    replacement = svgDataText.replace('<path ', f'<path fill="{curReplacement[1]}" stroke="{curReplacement[1]}" ')
+                    self.svgData = replacement.encode(encoding="utf-8")
                     return self
         # More issue #85 stuff. This is for clipart 129188, 14466-CLIP-EMBOSS-GD.xml and similar.
         # It's a hollow figure with no fill and a black rectangular frame. This will hopefully fix
@@ -212,7 +214,8 @@ class ClpFile():
         if ('fill="none"' in svgDataText) and ("stroke" not in svgDataText):
             for curReplacement in colorReplacementList:
                 if curReplacement[0] == "#000000":
-                    self.svgData = svgDataText.replace('fill="none"', f'fill="none" stroke="{curReplacement[1]}" ')
+                    replacement = svgDataText.replace('fill="none"', f'fill="none" stroke="{curReplacement[1]}" ')
+                    self.svgData = replacement.encode(encoding="utf-8")
                     return self
         # As long as we continue to make assumptions that the cliparts are so simple that we
         # can textually find and replace fill and stroke, then we're surely going to find more
