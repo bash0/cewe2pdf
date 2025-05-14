@@ -20,10 +20,14 @@ def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder
     if cewe_folder:
         fontDirs.append(CeweInfo.getCeweFontsFolder(cewe_folder))
 
-    # if a user has installed fonts locally on his machine, then we need to look there as well
-    localFontFolder = localfont_dir()
-    if os.path.exists(localFontFolder):
-        fontDirs.append(str(localFontFolder))
+    # If a user has installed fonts locally on his machine, then we look there as well
+    # This behaviour can be inhibited with the presence of an environment variable to
+    # make the local run more like what will happen when it is run by the github check-in
+    # workflow
+    if os.getenv("IGNORELOCALFONTS") is None:
+        localFontFolder = localfont_dir()
+        if os.path.exists(localFontFolder):
+            fontDirs.append(str(localFontFolder))
 
     try:
         searchlocations = (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__)))
