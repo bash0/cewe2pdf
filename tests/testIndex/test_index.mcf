@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="315ee1cd-54eb-4daa-9903-0aab83b6ab1f" imagedir="test_index_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="5a3a8537-4f86-49c1-8260-b7d84fff835d" imagedir="test_index_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="23203486-488d-40bc-bf32-f8d06c549871" projectIDCreatedEpoch="1748892211"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-06-03 15:07"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-06-03 19:31"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-04-23 07:21"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -9,7 +9,7 @@
         <outline width="1"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="4" VerticalIndentMargin="4" backgroundColor="#00000000" font="Arial Rounded MT Bold,15,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="2" VerticalIndentMargin="2" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.0.0"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
@@ -58,18 +58,26 @@ p, li { white-space: pre-wrap; }
         <bundlesize height="2700" width="4100"/>
         <designElementIDs background="201"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
-        <area areatype="textarea" backgroundcolor="4289655497">
-            <position height="66.0857" left="2863.28" rotation="322" top="972.261" width="390.474" zposition="7000"/>
+        <area areatype="imagearea">
+            <position height="2505.87" left="2202.86" rotation="0" top="107.426" width="1772.01" zposition="100"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:4px; margin-bottom:2px; margin-left:2px; margin-right:2px;"><tr><td style="border: none;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Actual first page</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNHCENTER,ALIGNVCENTER" IndentMargin="2" VerticalIndentMargin="50" backgroundColor="#ffaef2c9" font="Liberation Sans,14,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <image filename="safecontainer:/kq49iq7z_1_junk3-2.png" useABK="1">
+                <cutout left="0" scale="1.07135" top="-0.00541085"/>
+                <quality noise="100" sharpness="100" texture="0"/>
+            </image>
+        </area>
+        <area areatype="textarea">
+            <position height="511.696" left="2299" rotation="0" top="526.205" width="1020.44" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Liberation Sans'; font-size:14pt; font-weight:600; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:35px; margin-bottom:2px; margin-left:2px; margin-right:2px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-size:12pt; font-weight:400; color:#000000;">This index was generated as part of the pdf album, converted to png, the white background deleted, and then it was inserted here, as a demonstration.</span></p><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%; font-size:12pt; font-weight:400; color:#000000;"><br /></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-size:12pt; font-weight:400; color:#000000;">In other words, it is </span><span style=" font-size:12pt; text-decoration: underline; color:#000000;">not</span><span style=" font-size:12pt; font-weight:400; color:#000000;"> updated in place when you change something in the album. Only the regenerated index on the last page will be updated!</span></p><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%; font-size:12pt; font-weight:400; color:#000000;"><br /></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-size:12pt; font-weight:400; color:#000000;">There's an issue for us to solve.</span></p></td></tr></table></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="2" VerticalIndentMargin="2" backgroundColor="#00000000" font="Liberation Sans,14,-1,5,75,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
     <page designStyleID="0" pagenr="1" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
-        <designElementIDs background="201" layout="125061"/>
-        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <designElementIDs background="6001" layout="125061"/>
+        <background alignment="3" designElementId="6001" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
     </page>
     <page designStyleID="0" pagenr="2" rotation="0" type="normalpage">
@@ -305,6 +313,10 @@ p, li { white-space: pre-wrap; }
         <background alignment="3" designElementId="201" rotation="0" type="1"/>
     </page>
     <userfeedback></userfeedback>
-    <fotoRelationships/>
-    <statistics assistantUsed="0" countPauses="20" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="81453" fotosAdded="2" fotosRemoved="2" pauseTime="69054" sessionsUsed="10"/>
+    <fotoRelationships>
+        <foto id="file:///D:/temp/junk3-2.png">
+            <foto id="safecontainer:/kq49iq7z_1_junk3-2.png" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
+    </fotoRelationships>
+    <statistics assistantUsed="0" countPauses="21" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="97269" fotosAdded="4" fotosRemoved="3" pauseTime="83112" sessionsUsed="10"/>
 </fotobook>

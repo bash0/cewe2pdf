@@ -140,6 +140,27 @@ noShadows = False
 #	root:            ERROR[2], WARNING[4], INFO[38]
 ```
 
+#### Indexing an album
+It is possible to ask cewe2pdf to generate an index for the album, where index terms are selected using a combination of of font and font size used in a text area. The index is added as the last page of the pdf (i.e. after the back cover). The index page background is white and the text is black, but there are a variety of other configuration options which can be specified in a separate section of the .ini file.
+```
+[INDEX]
+indexing = True
+indexEntryFonts =
+	Arial Rounded MT Bold, 14
+indexFont = Helvetica
+indexFontSize = 12
+lineSpacing = 1.15
+topMargin = 10
+bottomMargin = 10
+leftMargin = 10
+rightMargin = 10
+pageWidth = 210
+pageHeight = 291 # A4 is 297. 291 is the size of the paper in a 30x30 album
+```
+This feature may be useful in, for example, an album which represents a day-by-day record of some period of time. The headings for each day in the album can be specified in a font/fontsize combination which is not used for any other purpose in the album, and the index will then present a short day-by-day summary with page number references.
+
+It is of course possible to take the index page from the pdf and place the index into the album itself, so that it can be printed in the "fancy" edition. One way to do that, while keeping it in style with the rest of the album, is to extract the generated index page from the album pdf to its own pdf file (e.g. print just that page). Convert that index pdf file to png (e.g. with an online converter such as https://pdf2png.com/), edit the png to delete all the white pixels (e.g. with paint.net, magic wand, hold down shift when you click to get *all* the white pixels), and then include the edited file into the album. The deletion of the background white ensures that you can see the album background ok!
+
 ### additional_fonts.txt
 The code knows where to find the fonts delivered with the Cewe software, but if you use non-Cewe fonts then you must specify the location of those fonts. For historical reasons configuration of fonts is done with a separate (optional) configuration file, ``additional_fonts.txt``. The file should contain one line per font file or font directory to be added. Both `.ttf` or `.otf` files are read.
 

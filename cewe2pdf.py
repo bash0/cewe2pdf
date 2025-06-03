@@ -1157,7 +1157,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     bg_notFoundDirList = set([]) # keep a list of background folders that are not found, to prevent multiple errors for the same cause.
 
-    albumIndex = Index(defaultConfigSection)
+    try:
+        albumIndex = Index(configuration['INDEX'])
+    except KeyError as iex:
+        albumIndex = Index(None)
 
     # Load fonts
     availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder)

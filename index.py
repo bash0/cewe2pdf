@@ -1,8 +1,10 @@
+import logging
 from reportlab.lib.units import mm
 
-from configUtils import getConfigurationBool
+from configUtils import getConfigurationBool, getConfigurationFloat, getConfigurationInt
 
 class Index():
+
     def __init__(self, configSection):
         self.indexEntries = {}
         if configSection is None:
@@ -18,6 +20,17 @@ class Index():
                 font = members[0].strip()
                 size = int(members[1].strip())
                 self.indexEntryDefs.append((font, size))
+
+        self.indexFont = configSection.get("indexFont", "Helvetica").strip()
+        self.indexFontSize = getConfigurationInt(configSection, "indexFontSize", 12, 10)
+        self.lineSpacing = getConfigurationFloat(configSection, "lineSpacing", 1.15, 1.1)
+        self.topMarginMm = getConfigurationInt(configSection, "topMargin", 10, 10)
+        self.bottomMarginMm = getConfigurationInt(configSection, "bottomMargin", 10, 10)
+        self.leftMarginMm = getConfigurationInt(configSection, "leftMargin", 10, 10)
+        self.rightMarginMm = getConfigurationInt(configSection, "rightMargin", 15, 10)
+        self.pageWidth = getConfigurationInt(configSection, "pageWidth", 210, 100)
+        self.pageHeight = getConfigurationInt(configSection, "pageHeight", 291, 100)
+            # A4 is 297. 291 is the size of the paper in a 30x30 album
 
     def CheckForIndexEntry(self, font, fontsize):
         if not self.indexing:
@@ -43,52 +56,43 @@ class Index():
     def GenerateIndexPage(self, pdf):
         if not self.indexing:
             return
-
-        # Here are some values which we might want to configure in a later edition
-        indexFont = "Helvetica"
-        indexFontSize = 12
-        lineSpacing = 1.15
-        topMarginMm = 10
-        bottomMarginMm = 10
-        leftMarginMm = 10
-        rightMarginMm = 15
-
+        logging.info(f"Generating index page")
         # pdfPageSize = pdf._pagesize # internal to reportlab, could make it a method parameter
         # pageWidth = pdfPageSize[0]
         # pageHeight = pdfPageSize[1]
         # Reset the page size so that the index would print nicely on e.g. A4
-        pageWidth = 210 * mm
-        pageHeight = 291 * mm # A4 is 297. 291 is the size of the paper in a 30x30 album
-        pdf.setPageSize((pageWidth, pageHeight))
+        page_width = self.pageWidth * mm
+        page_height = self.pageHeight * mm
+        pdf.setPageSize((page_width, page_height))
 
-        top_margin = topMarginMm * mm
-        bottom_margin = bottomMarginMm * mm
-        left_margin = leftMarginMm * mm
-        right_margin = pageWidth - rightMarginMm * mm
-        line_spacing = indexFontSize * lineSpacing # Adjust as needed for readability
+        top_margin = self.topMarginMm * mm
+        bottom_margin = self.bottomMarginMm * mm
+        left_margin = self.leftMarginMm * mm
+        right_margin = page_width - self.rightMarginMm * mm
+        line_spacing = self.indexFontSize * self.lineSpacing # Adjust as needed for readability
 
         def pageSetup():
-            pdf.setFont(indexFont, indexFontSize)  # Set a readable font
-            ypos = pageHeight - top_margin  # Start from top margin
+            pdf.setFont(self.indexFont, self.indexFontSize)  # Set a readable font
+            ypos = page_height - top_margin - self.indexFontSize  # Start from top margin
             return ypos
 
         y_position = pageSetup()
 
         for page, texts in sorted(self.indexEntries.items()):
             for text in texts:
-                text_width = pdf.stringWidth(text, indexFont, indexFontSize)
+                text_width = pdf.stringWidth(text, self.indexFont, self.indexFontSize)
                 page_number_str = f"{page}"
-                page_number_width = pdf.stringWidth(page_number_str, indexFont, indexFontSize)
+                page_number_width = pdf.stringWidth(page_number_str, self.indexFont, self.indexFontSize)
 
                 dot_spacing = right_margin - (left_margin + text_width + page_number_width)
-                dots = '.' * int(dot_spacing / pdf.stringWidth('.', indexFont, indexFontSize))
+                dots = '.' * int(dot_spacing / pdf.stringWidth('.', self.indexFont, self.indexFontSize))
 
                 pdf.drawString(left_margin, y_position, text)
                 pdf.drawString(left_margin + text_width, y_position, dots)
                 pdf.drawString(right_margin - page_number_width, y_position, page_number_str)
 
                 y_position -= line_spacing
-                if y_position < top_margin:
+                if y_position < bottom_margin:
                     pdf.showPage()
                     y_position = pageSetup()
 
