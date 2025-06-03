@@ -102,7 +102,8 @@ from mcfx import unpackMcfx
 from pageNumbering import getPageNumberXy, PageNumberingInfo, PageNumberPosition
 from passepartout import Passepartout
 from pathutils import findFileInDirs
-from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CreateParagraphStyle, Dequote, noteFontSubstitution
+from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle, Dequote, noteFontSubstitution
+from index import Index
 from textart import handleTextArt
 
 
@@ -170,6 +171,7 @@ tempFileList = []  # we need to remove all the temporary files at the end
 # pdf_styleN = pdf_styles['Normal']
 pdf_flowableList = []
 
+albumIndex = None # set after we have got the configuration information
 clipartDict = dict[int, str]()    # a dictionary for clipart element IDs to file name
 clipartPathList = tuple[str]()
 passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
@@ -583,6 +585,7 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
         frm_table.wrapOn(pdf, shadowWidth, shadowHeight)
         frm_table.drawOn(pdf, shadowBottomLeft_x, shadowBottomLeft_y)
 
+
 def warnAndIgnoreEnabledDecorationShadow(decoration):
     if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
         return
@@ -594,7 +597,7 @@ def warnAndIgnoreEnabledDecorationShadow(decoration):
                 continue
 
 
-def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy): # noqa: C901 (too complex)
+def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy, pgno): # noqa: C901 (too complex)
     # note: it would be better to use proper html processing here
     htmlxml = etree.XML(textTag.text)
     body = htmlxml.find('.//body')
@@ -675,6 +678,10 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     # unset by CreateParagraphStyle
     # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00")
 
+    # There may be multiple "index entry" paragraphs in the text area.
+    # Concatenating them to just one index entry seems to work in practice
+    indexEntryText = None
+
     htmlparas = body.findall(".//p")
     for p in htmlparas:
         maxfs = 0  # cannot use the bodyfs as a default, there may not actually be any text at body size
@@ -710,6 +717,9 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
             usefs = maxfs if maxfs > 0 else bodyfs
             pdf_styleN.leading = usefs * finalLeadingFactor # line spacing (text + leading)
             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+            originalFont = CollectItemFontFamily(p, family)
+            if albumIndex.CheckForIndexEntry(originalFont, bodyfs):
+                indexEntryText = Index.AppendIndexText(indexEntryText, p.text)
 
         else:
             paragraphText = '<para autoLeading="max">'
@@ -748,6 +758,9 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
 
                     if span.text is not None:
                         paragraphText = AppendText(paragraphText, html.escape(span.text))
+                        originalFont = CollectItemFontFamily(span, family)
+                        if albumIndex.CheckForIndexEntry(originalFont, spanfs):
+                            indexEntryText = Index.AppendIndexText(indexEntryText, span.text)
 
                     # there might be (one or more, or only one?) line break within the span.
                     brs = span.findall(".//br")
@@ -782,6 +795,9 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception:
                 logging.exception('Exception')
+
+    if indexEntryText:
+        albumIndex.AddIndexEntry(pgno, indexEntryText)
 
     # Add a frame object that can contain multiple paragraphs. Margins (padding) are specified in
     # the editor in mm, arriving in the mcf in 1/10 mm, but appearing in the html with the unit "px".
@@ -951,7 +967,7 @@ def processElements(additional_fonts, fotobook, imagedir,
 
         # process text
         for textTag in area.findall('text'):
-            processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy)
+            processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, areaWidth, pdf, transx, transy, pageNumber)
 
         # Clip-Art
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
@@ -1007,6 +1023,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     global bg_res  # pylint: disable=global-statement
     global defaultConfigSection  # pylint: disable=global-statement
     global pageNumberingInfo  # pylint: disable=global-statement
+    global albumIndex  # pylint: disable=global-statement
 
     clipartDict = {}    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
@@ -1140,6 +1157,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     bg_notFoundDirList = set([]) # keep a list of background folders that are not found, to prevent multiple errors for the same cause.
 
+    albumIndex = Index(defaultConfigSection)
+
     # Load fonts
     availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder)
 
@@ -1192,6 +1211,11 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # generate all the requested pages
     processPages(fotobook, mcfBaseFolder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
         cewe_folder, availableFonts, backgroundLocations, bg_notFoundDirList)
+
+    # At this point we have an index of items (selected on the basis of their font characteristics)
+    #   albumIndex.ShowIndex()
+    # Create a final pdf page containing the index
+    albumIndex.GenerateIndexPage(pdf)
 
     # save final output pdf
     try:

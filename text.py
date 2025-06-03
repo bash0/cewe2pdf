@@ -105,6 +105,17 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
     return spanfont, spanfs, spanweight, spanstyle
 
 
+def CollectItemFontFamily(item, dfltfont):
+    if item is None:
+        return dfltfont
+    itemfont = dfltfont
+    itemstyle = dict([kv.split(':') for kv in
+                    item.get('style').lstrip(' ').rstrip(';').split('; ')])
+    if 'font-family' in itemstyle:
+        itemfont = itemstyle['font-family'].strip("'")
+    return itemfont
+
+
 def AppendText(paratext, newtext):
     if newtext is None:
         return paratext

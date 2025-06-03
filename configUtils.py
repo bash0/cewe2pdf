@@ -18,7 +18,7 @@ def getConfigurationBool(configSection, itemName, defaultValue):
     returnValue = defaultValue
     if configSection is not None:
         try:
-            # eg getConfigurationBool(defaultConfigSection, 'insideCoverWhite', False)
+            # eg getConfigurationBool(defaultConfigSection, 'insideCoverWhite', 'False')
             bv = configSection.get(itemName, defaultValue)
             returnValue = bv.lower() == "true"
         except ValueError:
