@@ -80,7 +80,7 @@ def test_index(main=False):
     outFileBasename = getOutFileBasename(main, albumBasename, yyyymmdd, styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
-    tryToBuildBook(inFile, outFile, latestResultFile, False, 29)
+    tryToBuildBook(inFile, outFile, latestResultFile, False, 28)
 
 if __name__ == '__main__':
     #only executed when this file is run directly.

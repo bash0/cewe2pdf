@@ -1215,16 +1215,20 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     processPages(fotobook, mcfBaseFolder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
         cewe_folder, availableFonts, backgroundLocations, bg_notFoundDirList)
 
-    # At this point we have an index of items (selected on the basis of their font characteristics)
-    #   albumIndex.ShowIndex()
-    # Create a final pdf page containing the index
-    albumIndex.GenerateIndexPage(pdf)
-
     # save final output pdf
     try:
         pdf.save()
     except Exception as ex:
         logging.error(f'Could not save the output file: {str(ex)}')
+
+    # At this point we have an index of items (selected on the basis of their font characteristics)
+    #   albumIndex.ShowIndex()
+    indexPdfFileName = albumIndex.SaveIndexPdf(outputFileName, albumTitle, pagesize)
+    indexPngFileName = Index.SaveIndexPng(indexPdfFileName)
+    Index.MergeAlbumAndIndexPng(outputFileName, 1, indexPngFileName)
+    # delete the index pdf, but leave the index png which could be added to the original
+    # with the cewe editor, and then you get it in the printed edition as well
+    os.remove(indexPdfFileName)
 
     pdf = []
 
