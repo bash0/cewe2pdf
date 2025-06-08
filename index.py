@@ -34,8 +34,7 @@ class Index():
         self.leftMarginMm = getConfigurationInt(configSection, "leftMargin", 10, 10)
         self.rightMarginMm = getConfigurationInt(configSection, "rightMargin", 15, 10)
         self.pageWidth = getConfigurationInt(configSection, "pageWidth", 210, 100)
-        self.pageHeight = getConfigurationInt(configSection, "pageHeight", 291, 100)
-            # A4 is 297. 291 is the size of the paper in a 30x30 album
+        self.pageHeight = getConfigurationInt(configSection, "pageHeight", 291, 100) # A4 is 297. 291 is the size of the paper in a 30x30 album
         self.indexMarkerText = configSection.get("indexMarkerText", "Contents").strip()
         self.horizontalMarginPercent = getConfigurationInt(configSection, "horizontalMarginPercent", 10, 5)
         self.verticalMarginPercent = getConfigurationInt(configSection, "verticalMarginPercent", 10, 5)
@@ -64,7 +63,7 @@ class Index():
     def GenerateIndexPage(self, pdf):
         if not self.indexing:
             return
-        logging.info(f"Generating index page")
+        logging.info("Generating index page")
         page_width = self.pageWidth * mm
         page_height = self.pageHeight * mm
         pdf.setPageSize((page_width, page_height))

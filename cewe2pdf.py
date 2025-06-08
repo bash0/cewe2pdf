@@ -102,7 +102,8 @@ from mcfx import unpackMcfx
 from pageNumbering import getPageNumberXy, PageNumberingInfo, PageNumberPosition
 from passepartout import Passepartout
 from pathutils import findFileInDirs
-from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText, CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle, Dequote, noteFontSubstitution
+from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText
+from text import CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle, Dequote, noteFontSubstitution
 from index import Index
 from textart import handleTextArt
 
@@ -1159,7 +1160,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     try:
         albumIndex = Index(configuration['INDEX'])
-    except KeyError as iex:
+    except KeyError:
         albumIndex = Index(None)
 
     # Load fonts
