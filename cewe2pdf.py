@@ -1225,7 +1225,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     #   albumIndex.ShowIndex()
     indexPdfFileName = albumIndex.SaveIndexPdf(outputFileName, albumTitle, pagesize)
     indexPngFileName = Index.SaveIndexPng(indexPdfFileName)
-    Index.MergeAlbumAndIndexPng(outputFileName, 1, indexPngFileName)
+    Index.MergeAlbumAndIndexPng(outputFileName, "Index on this page!", indexPngFileName)
     # delete the index pdf, but leave the index png which could be added to the original
     # with the cewe editor, and then you get it in the printed edition as well
     os.remove(indexPdfFileName)

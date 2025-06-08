@@ -166,7 +166,7 @@ class Index():
         return cropped_image
 
     @staticmethod
-    def MergeAlbumAndIndexPng(albumPdfFileName, pagenr, indexPngFileName):
+    def MergeAlbumAndIndexPng(albumPdfFileName, indexMarkerText, indexPngFileName):
         # Load the index png
         indexImage = Image.open(indexPngFileName)
         idx_width_px, idx_height_px = indexImage.size  # Get dimensions
@@ -176,14 +176,28 @@ class Index():
         idx_width_pt = idx_width_px * (72 / dpi_x)
         idx_height_pt = idx_height_px * (72 / dpi_y)
 
-        # Load the album PDF
+        # Load the album PDF and find the page where the user wants the index
         albumDoc = fitz.open(albumPdfFileName)
-        page = albumDoc[pagenr]
+        page = None
+        for pg in albumDoc:
+            marker_positions = pg.search_for(indexMarkerText)
+            if not marker_positions:
+                continue
+            else:
+                page = pg
+                marker_rect = marker_positions[0]
+                # Remove marker text while leaving everything else unchanged
+                page.add_redact_annot(marker_rect)
+                page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
+                break
+
+        if page is None:
+            return
         page_width, page_height = page.rect.width, page.rect.height
 
         # Define margins in terms of page size
-        margin_x = page_width * 0.1
-        margin_y = page_height * 0.05
+        margin_x = page_width * 10/100
+        margin_y = page_height * 10/100
 
         # Max available size for the image (without exceeding margins)
         max_width_pt = page_width - 2 * margin_x
