@@ -36,6 +36,9 @@ class Index():
         self.pageWidth = getConfigurationInt(configSection, "pageWidth", 210, 100)
         self.pageHeight = getConfigurationInt(configSection, "pageHeight", 291, 100)
             # A4 is 297. 291 is the size of the paper in a 30x30 album
+        self.indexMarkerText = configSection.get("indexMarkerText", "Contents").strip()
+        self.horizontalMarginPercent = getConfigurationInt(configSection, "horizontalMarginPercent", 10, 5)
+        self.verticalMarginPercent = getConfigurationInt(configSection, "verticalMarginPercent", 10, 5)
 
     def CheckForIndexEntry(self, font, fontsize):
         if not self.indexing:
@@ -100,6 +103,8 @@ class Index():
         pdf.showPage()
 
     def SaveIndexPdf(self, outputFileName, albumTitle, pagesize):
+        if not self.indexing:
+            return
         # Initialize a pdf canvas for the index
         indexFileName = Index.GetIndexName(outputFileName)
         pdf = canvas.Canvas(indexFileName, pagesize=pagesize)
@@ -112,12 +117,13 @@ class Index():
             logging.error(f'Could not save the index output file: {str(ex)}')
         return indexFileName
 
-    @staticmethod
-    def SaveIndexPng(indexPdfFileName):
+    def SaveIndexPng(self, indexPdfFileName):
+        if not self.indexing:
+            return
         doc = fitz.open(indexPdfFileName)
         image = Index._convert_to_opencv(doc.load_page(0), dpi=150)
-        transparent_image = Index.make_white_transparent(image)
-        cropped_image = Index.crop_transparent_borders(transparent_image)
+        transparent_image = Index._make_white_transparent(image)
+        cropped_image = Index._crop_transparent_borders(transparent_image)
         indexPngFileName = indexPdfFileName.replace(".pdf",".png")
         # this should write with standard 300 dpi
         cv2.imwrite(indexPngFileName, cropped_image, [cv2.IMWRITE_PNG_COMPRESSION, 9])
@@ -127,7 +133,7 @@ class Index():
         return indexPngFileName
 
     @staticmethod
-    def make_white_transparent(image):
+    def _make_white_transparent(image):
         # Convert to BGRA (with alpha channel)
         image_rgba = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
         # Set white pixels to transparent
@@ -152,7 +158,7 @@ class Index():
         return img
 
     @staticmethod
-    def crop_transparent_borders(image_rgba):
+    def _crop_transparent_borders(image_rgba):
         # Find all pixels where alpha > 0 (i.e. not fully transparent)
         alpha_channel = image_rgba[:, :, 3]
         non_transparent_coords = np.argwhere(alpha_channel > 0)
@@ -165,8 +171,9 @@ class Index():
         cropped_image = image_rgba[top_left[0]:bottom_right[0], top_left[1]:bottom_right[1]]
         return cropped_image
 
-    @staticmethod
-    def MergeAlbumAndIndexPng(albumPdfFileName, indexMarkerText, indexPngFileName):
+    def MergeAlbumAndIndexPng(self, albumPdfFileName, indexPngFileName):
+        if not self.indexing:
+            return
         # Load the index png
         indexImage = Image.open(indexPngFileName)
         idx_width_px, idx_height_px = indexImage.size  # Get dimensions
@@ -179,25 +186,61 @@ class Index():
         # Load the album PDF and find the page where the user wants the index
         albumDoc = fitz.open(albumPdfFileName)
         page = None
+        img_width = 0
         for pg in albumDoc:
-            marker_positions = pg.search_for(indexMarkerText)
+            marker_positions = pg.search_for(self.indexMarkerText)
             if not marker_positions:
                 continue
             else:
                 page = pg
-                marker_rect = marker_positions[0]
-                # Remove marker text while leaving everything else unchanged
-                page.add_redact_annot(marker_rect)
-                page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
-                break
+                # Potentially remove marker text while leaving everything else unchanged. But it's
+                # a bit nicer if the marker text is something concrete on the index page, for
+                # example a heading "Contents" or "Index" or similar
+                #   marker_rect = marker_positions[0]
+                #   page.add_redact_annot(marker_rect)
+                #   page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
 
-        if page is None:
+                # Look to see if the (human) album editor has added a previous version of the index
+                # image which would be the case if he generates his pdf version and then takes the
+                # image into the version which he plans to send for quality printing. We'll want to
+                # delete the old index image and replace it with the new one provided here
+                images = page.get_images(full=True)
+                for img in images:
+                    xref = img[0]  # Image reference ID
+                    img_info = albumDoc.extract_image(xref)
+                    img_ext = img_info["ext"]  # Image format (ought to be PNG, since transparency exists)
+                    if img_ext.lower() != 'png':
+                        continue
+                    # Convert image bytes to NumPy array
+                    img_bytes = img_info["image"]  # Raw image bytes
+                    image_array = np.frombuffer(img_bytes, dtype=np.uint8)
+                    # Unfortunately the cewe editor seems to lose the alpha channel on the inserted
+                    # index image, so we can't use that to help us identify the old index image on the
+                    # page. So we just load as RGB, with no transparency.
+                    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+                    # Quite how this works I don't know, but the previously transparent pixels
+                    # are now white. If this image is largely white, then it is *probably* the
+                    # old index image we are looking for.
+                    white_pixel_count = np.sum((image == [255, 255, 255]).all(axis=2))
+                    total_pixels = image.shape[0] * image.shape[1]
+                    white_ratio = white_pixel_count / total_pixels
+                    # High white ratio (chosen by experimentation) suggests a converted transparent image
+                    if white_ratio > 0.8:
+                        page.delete_image(xref)
+                        break
+                    # another possible way to identify the old index image is the width, which will be
+                    # the same as the new image (even if it has been resized in the album editor)
+                    img_width = img[2]
+                    if img_width == idx_width_px:
+                        page.delete_image(xref)
+
+        if page is None: # we didn't find a page on which we can place the new index image
             return
         page_width, page_height = page.rect.width, page.rect.height
 
         # Define margins in terms of page size
-        margin_x = page_width * 10/100
-        margin_y = page_height * 10/100
+        margin_x = page_width * self.horizontalMarginPercent/100
+        margin_y = page_height * self.verticalMarginPercent/100
 
         # Max available size for the image (without exceeding margins)
         max_width_pt = page_width - 2 * margin_x

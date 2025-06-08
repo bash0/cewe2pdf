@@ -1221,16 +1221,18 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     except Exception as ex:
         logging.error(f'Could not save the output file: {str(ex)}')
 
-    # At this point we have an index of items (selected on the basis of their font characteristics)
-    #   albumIndex.ShowIndex()
-    indexPdfFileName = albumIndex.SaveIndexPdf(outputFileName, albumTitle, pagesize)
-    indexPngFileName = Index.SaveIndexPng(indexPdfFileName)
-    Index.MergeAlbumAndIndexPng(outputFileName, "Index on this page!", indexPngFileName)
-    # delete the index pdf, but leave the index png which could be added to the original
-    # with the cewe editor, and then you get it in the printed edition as well
-    os.remove(indexPdfFileName)
-
     pdf = []
+
+    if albumIndex.indexing:
+        # At this point we have an index of items (selected on the basis of their font characteristics)
+        #   albumIndex.ShowIndex()
+        indexPdfFileName = albumIndex.SaveIndexPdf(outputFileName, albumTitle, pagesize)
+        indexPngFileName = albumIndex.SaveIndexPng(indexPdfFileName)
+        albumIndex.MergeAlbumAndIndexPng(outputFileName, indexPngFileName)
+        # delete the index pdf, but leave the index png which could be added to the original
+        # with the cewe editor, and then you get it in the printed edition as well
+        if os.path.exists(indexPdfFileName):
+            os.remove(indexPdfFileName)
 
     # force the release of objects which might be holding on to picture file references
     # so that they will not prevent the removal of the files as we clean up and exit
