@@ -140,6 +140,49 @@ noShadows = False
 #	root:            ERROR[2], WARNING[4], INFO[38]
 ```
 
+#### Indexing an album
+It is possible to ask cewe2pdf to generate an index for the album, where index terms are selected using a combination of of font and font size used in a text area. The index is initially generated as a separate pdf file with black text on white background. The index pdf is used to create an index image file, a png in which the background is transparent. That png image is then merged into the album pdf, being placed on any page containing an index marker identifier.
+
+This feature may be useful in, for example, an album which represents a day-by-day record of some period of time. The headings for each day in the album can be specified in a font/fontsize combination which is not used for any other purpose in the album, and the index will then present a short day-by-day summary with page number references.
+
+It is normal to allow cewe2pdf to delete the index pdf but to retain the index png. That allows you to manually insert the index png onto the index page in the album editor, and thus have it as part of the album which is sent for quality printing (if you do that!). If you rerun the album pdf generation, creating a new index png to be merged into the album, the merge process will remove any old index png from the index page before adding the new one (based on best-effort recognition of the image in the pdf!)
+
+The page on which the index is to be placed is recognised by the presence of a text on the page. The text is identified with a regular expression defined in the .ini file, and would often be a visible text such as "Contents". If you don't want a visible text, you can always set the colour of the text to "None". Other things on the index page (photos, clip-art, text, etc) are left undisturbed and should be visible since the background of the index image is transparent.
+
+There are a host of index configuration options which can be specified in a separate section of the .ini file. No indexing will take place unless there is an __INDEX__ section and the __indexing__ value is __True__
+```
+[INDEX]
+indexing = False
+indexEntryFonts =
+	Arial Rounded MT Bold, 15
+indexFont = Helvetica
+indexFontSize = 12
+lineSpacing = 1.1
+pageWidth = 210
+pageHeight = 291 # A4 is 297. 291 is the size of the paper in a 30x30 album
+indexMarkerRegex = ^Contents$
+topMargin = 5
+bottomMargin = 0
+leftMargin = 7
+rightMargin = 7
+deleteIndexPdf = True
+deleteIndexPng = False
+```
+__indexEntryFonts__ specifies one or more font / font sizw combinations which will be used to recognise index terms in the album
+
+__indexFont, indexFontSize, lineSpacing, pageWidth, pageHeight__ determine how the index entries are formatted on the index pdf page
+
+__indexMarkerRegex__ specifies the regular expression against which all text items in the album are tested. Any page with a matching text will be used for insertion of the index png
+
+__topMargin__ etc determine the placement of the index png on the index page. The image is scaled appropriately to fit.
+
+__deleteIndexPdf__ etc determine whether or not the generated files are deleted after the album pdf has been updated.
+
+There are also margin settings for the creation of the index pdf, __pdfTopMargin__ etc. These may be useful if you intend to keep and use the generated index pdf, but default to 1 so that the pdf page is filled and the image margins are the most important.
+
+#### Large index limitations
+The current code only handles a single index page. If there are more index terms than fit on a single page, the index pdf will be correct, but the index image will only take the first page.
+
 ### additional_fonts.txt
 The code knows where to find the fonts delivered with the Cewe software, but if you use non-Cewe fonts then you must specify the location of those fonts. For historical reasons configuration of fonts is done with a separate (optional) configuration file, ``additional_fonts.txt``. The file should contain one line per font file or font directory to be added. Both `.ttf` or `.otf` files are read.
 

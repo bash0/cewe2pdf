@@ -144,6 +144,17 @@
     <Content Include="tests\testFontSubstitution\previous_result_pdfs\testfontsubstitution.mcf.20250411S.pdf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testIndexLarge\additional_fonts.txt" />
+    <Content Include="tests\testIndexLarge\cewe2pdf.ini" />
+    <Content Include="tests\testIndexLarge\test_indexLarge.mcf" />
+    <Content Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\6ds3xtbb_1_20200306_111748.jpg" />
+    <Content Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\ud3dqwdw_1_test_index.mcf.s.idx.png" />
+    <Content Include="tests\testIndex\additional_fonts.txt" />
+    <Content Include="tests\testIndex\cewe2pdf.ini" />
+    <Content Include="tests\testIndex\test_index.mcf" />
+    <Content Include="tests\testIndex\test_index_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testPageNumbers\additional_fonts.txt" />
     <Content Include="tests\testPageNumbers\cewe2pdf.ini" />
     <Content Include="tests\testPageNumbers\test_pagenumbers.mcf" />
@@ -269,6 +280,7 @@
     <Compile Include="imageUtils.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="index.py" />
     <Compile Include="lineScales.py">
       <SubType>Code</SubType>
     </Compile>
@@ -290,6 +302,8 @@
     <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
+    <Compile Include="tests\testIndexLarge\test_indexLarge.py" />
+    <Compile Include="tests\testIndex\test_index.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
     <Compile Include="tests\testTextArt\test_textart.py" />
@@ -345,6 +359,11 @@
     <Folder Include="tests\testfontsubstitution\" />
     <Folder Include="tests\testFontSubstitution\previous_result_pdfs\" />
     <Folder Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\" />
+    <Folder Include="tests\testIndexLarge\" />
+    <Folder Include="tests\testIndexLarge\previous_result_pdfs\" />
+    <Folder Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\" />
+    <Folder Include="tests\testIndex\" />
+    <Folder Include="tests\testIndex\test_index_mcf-Dateien\" />
     <Folder Include="tests\testPageNumbers\" />
     <Folder Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\" />
     <Folder Include="tests\testTextArt\" />
