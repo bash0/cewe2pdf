@@ -1,7 +1,8 @@
-import fitz  # PyMuPDF
 import cv2
+import fitz  # PyMuPDF
 import numpy as np
 import logging
+import re
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from PIL import Image
@@ -35,7 +36,7 @@ class Index():
         self.rightMarginMm = getConfigurationInt(configSection, "rightMargin", 15, 10)
         self.pageWidth = getConfigurationInt(configSection, "pageWidth", 210, 100)
         self.pageHeight = getConfigurationInt(configSection, "pageHeight", 291, 100) # A4 is 297. 291 is the size of the paper in a 30x30 album
-        self.indexMarkerText = configSection.get("indexMarkerText", "Contents").strip()
+        self.indexMarkerRegex = configSection.get("indexMarkerRegex", "Contents").strip()
         self.horizontalMarginPercent = getConfigurationInt(configSection, "horizontalMarginPercent", 10, 5)
         self.verticalMarginPercent = getConfigurationInt(configSection, "verticalMarginPercent", 10, 5)
 
@@ -184,21 +185,27 @@ class Index():
 
         # Load the album PDF and find the page where the user wants the index
         albumDoc = fitz.open(albumPdfFileName)
+        pattern = re.compile(self.indexMarkerRegex)
         page = None
         img_width = 0
         for pg in albumDoc:
-            marker_positions = pg.search_for(self.indexMarkerText)
-            if not marker_positions:
+            blocks = pg.get_text("blocks")  # Extract text in block format
+            markerFound = False
+            for block in blocks:
+                blockText, (x0, y0, x1, y1) = block[4], block[:4]  # Text & bbox
+                if pattern.search(blockText):  # Check if regex matches any part of block text
+                    markerFound = True
+                    markerrect = fitz.Rect(x0, y0, x1, y1)
+            if not markerFound:
                 continue
             else:
                 page = pg
                 # Potentially remove marker text while leaving everything else unchanged. But it's
                 # a bit nicer if the marker text is something concrete on the index page, for
-                # example a heading "Contents" or "Index" or similar
-                #   marker_rect = marker_positions[0]
-                #   page.add_redact_annot(marker_rect)
-                #   page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
-
+                # example a heading "Contents" or "Index" or similar. Removal of the markers would
+                # be something like this
+                #    page.add_redact_annot(markerrect)
+                #    page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
                 # Look to see if the (human) album editor has added a previous version of the index
                 # image which would be the case if he generates his pdf version and then takes the
                 # image into the version which he plans to send for quality printing. We'll want to

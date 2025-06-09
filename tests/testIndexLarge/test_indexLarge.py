@@ -57,8 +57,8 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
 
 
 def defineCommonVariables():
-    albumFolderBasename = 'testIndex'
-    albumBasename = "test_index"
+    albumFolderBasename = 'testIndexLarge'
+    albumBasename = "test_indexLarge"
     inFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", f'{albumBasename}.mcf'))
     yyyymmdd = datetime.today().strftime("%Y%m%d")
     return albumFolderBasename,albumBasename,inFile,yyyymmdd
