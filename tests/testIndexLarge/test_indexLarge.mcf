@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="0e0f3504-d58b-41ab-b156-ee555f38772c" imagedir="test_indexLarge_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="a1d513b0-8ba7-405f-a48c-2bd34a395b36" imagedir="test_indexLarge_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="23203486-488d-40bc-bf32-f8d06c549871" projectIDCreatedEpoch="1749458992"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-06-09 11:22"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="7.4.4" programversionBuild="20240826" savetime="2025-06-09 12:06"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-04-23 07:21"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -77,6 +77,14 @@ p, li { white-space: pre-wrap; }
         <designElementIDs background="6001" layout="125061"/>
         <background alignment="1" designElementId="6001" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="imagearea">
+            <position height="2550.97" left="83.7447" rotation="0" top="64.5932" width="1856.51" zposition="100"/>
+            <decoration/>
+            <image filename="safecontainer:/abz8em19_1_test_indexlarge.mcf.20250609s.idx.png" useABK="1">
+                <cutout left="-35.33" scale="1.53194" top="0"/>
+                <quality noise="100" sharpness="100" texture="0"/>
+            </image>
+        </area>
         <area areatype="textarea">
             <position height="87" left="740.921" rotation="0" top="2564" width="438" zposition="7001"/>
             <decoration/>
@@ -669,6 +677,10 @@ p, li { white-space: pre-wrap; }
         <background alignment="3" designElementId="201" rotation="0" type="1"/>
     </page>
     <userfeedback></userfeedback>
-    <fotoRelationships/>
-    <statistics assistantUsed="0" countPauses="35" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="135467" fotosAdded="18" fotosRemoved="17" pauseTime="108712" sessionsUsed="16"/>
+    <fotoRelationships>
+        <foto id="file:///D:/Users/pete/Source/GitHub/cewe2pdf/tests/testIndexLarge/test_indexLarge.mcf.20250609S.idx.png">
+            <foto id="safecontainer:/abz8em19_1_test_indexlarge.mcf.20250609s.idx.png" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
+    </fotoRelationships>
+    <statistics assistantUsed="0" countPauses="36" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="138109" fotosAdded="19" fotosRemoved="17" pauseTime="111113" sessionsUsed="16"/>
 </fotobook>
