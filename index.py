@@ -30,15 +30,24 @@ class Index():
         self.indexFont = configSection.get("indexFont", "Helvetica").strip()
         self.indexFontSize = getConfigurationInt(configSection, "indexFontSize", 12, 10)
         self.lineSpacing = getConfigurationFloat(configSection, "lineSpacing", 1.15, 1.1)
-        self.topMarginMm = getConfigurationInt(configSection, "topMargin", 10, 10)
-        self.bottomMarginMm = getConfigurationInt(configSection, "bottomMargin", 10, 10)
-        self.leftMarginMm = getConfigurationInt(configSection, "leftMargin", 10, 10)
-        self.rightMarginMm = getConfigurationInt(configSection, "rightMargin", 15, 10)
         self.pageWidth = getConfigurationInt(configSection, "pageWidth", 210, 100)
         self.pageHeight = getConfigurationInt(configSection, "pageHeight", 291, 100) # A4 is 297. 291 is the size of the paper in a 30x30 album
         self.indexMarkerRegex = configSection.get("indexMarkerRegex", "Contents").strip()
-        self.horizontalMarginPercent = getConfigurationInt(configSection, "horizontalMarginPercent", 10, 5)
-        self.verticalMarginPercent = getConfigurationInt(configSection, "verticalMarginPercent", 10, 5)
+        # The margins here are for the placement of the index image on the index page
+        mm2pt = 72/25.4
+        self.mergeTopMarginPt = getConfigurationInt(configSection, "topMargin", 10, 0) * mm2pt
+        self.mergeBottomMarginPt = getConfigurationInt(configSection, "bottomMargin", 10, 0) * mm2pt
+        self.mergeLeftMarginPt = getConfigurationInt(configSection, "leftMargin", 10, 0) * mm2pt
+        self.mergeRightMarginPt = getConfigurationInt(configSection, "rightMargin", 10, 0) * mm2pt
+        # The margins on the generated index pdf are rarely configured since we currently
+        # delete it after we have generated the png from it
+        self.pdfTopMarginMm = getConfigurationInt(configSection, "pdfTopMargin", 1, 0)
+        self.pdfBottomMarginMm = getConfigurationInt(configSection, "pdfBottomMargin", 1, 0)
+        self.pdfLeftMarginMm = getConfigurationInt(configSection, "pdfLeftMargin", 1, 0)
+        self.pdfRightMarginMm = getConfigurationInt(configSection, "pdfRightMargin", 1, 0)
+        # which files do we want to keep
+        self.deleteIndexPdf = getConfigurationBool(configSection, "deleteIndexPdf", "True")
+        self.deleteIndexPng = getConfigurationBool(configSection, "deleteIndexPng", "False")
 
     def CheckForIndexEntry(self, font, fontsize):
         if not self.indexing:
@@ -69,10 +78,10 @@ class Index():
         page_height = self.pageHeight * mm
         pdf.setPageSize((page_width, page_height))
 
-        top_margin = self.topMarginMm * mm
-        bottom_margin = self.bottomMarginMm * mm
-        left_margin = self.leftMarginMm * mm
-        right_margin = page_width - self.rightMarginMm * mm
+        top_margin = self.pdfTopMarginMm * mm
+        bottom_margin = self.pdfBottomMarginMm * mm
+        left_margin = self.pdfLeftMarginMm * mm
+        right_margin = page_width - self.pdfRightMarginMm * mm
         line_spacing = self.indexFontSize * self.lineSpacing # Adjust as needed for readability
 
         def pageSetup():
@@ -123,12 +132,28 @@ class Index():
         doc = fitz.open(indexPdfFileName)
         image = Index._convert_to_opencv(doc.load_page(0), dpi=150)
         transparent_image = Index._make_white_transparent(image)
-        cropped_image = Index._crop_transparent_borders(transparent_image)
+
+        # I used to crop the image to reduce the size of the final png image
+        #   cropped_image = Index._crop_transparent_borders(transparent_image)
+        # but the effect was that indexes in different albums were scaled differently,
+        # making it impossible to have consistent font size and margin sizes in the
+        # various .ini files and get the same resulting text sizes on the merged index page.
+        # By using the uncropped image we're always merging in a png image of the same size,
+        # and the text is scaled in the same way (slightly down so that the full page size
+        # of the index pdf now fits into a full page of the album but with margins)
+        # So all generated indexes now come out with the same size text on the merged index
+        # page. My guess is that a human editor including a smallish index png onto the
+        # index page in the album editor prior to sending it for quality printing might
+        # choose to scale it up for better readability, but that's his choice. He could
+        # also choose to increase the index font size in the .ini file - but at least he now
+        # does so from a consistent starting point for the size of the generated index text
+        final_image = transparent_image
+
         indexPngFileName = indexPdfFileName.replace(".pdf",".png")
         # this should write with standard 300 dpi
-        cv2.imwrite(indexPngFileName, cropped_image, [cv2.IMWRITE_PNG_COMPRESSION, 9])
+        cv2.imwrite(indexPngFileName, final_image, [cv2.IMWRITE_PNG_COMPRESSION, 9])
         # another possible technique ... convert NumPy array to Pillow Image
-        #   image = Image.fromarray(cropped_image)
+        #   image = Image.fromarray(final_image)
         #   image.save(indexPngFileName, dpi=(300, 300))
         return indexPngFileName
 
@@ -179,6 +204,7 @@ class Index():
         idx_width_px, idx_height_px = indexImage.size  # Get dimensions
         # Get DPI (default to 300 if not specified)
         dpi_x, dpi_y = indexImage.info.get("dpi", (300, 300))
+        indexImage.close()
         # Convert image size to PDF points
         idx_width_pt = idx_width_px * (72 / dpi_x)
         idx_height_pt = idx_height_px * (72 / dpi_y)
@@ -192,10 +218,15 @@ class Index():
             blocks = pg.get_text("blocks")  # Extract text in block format
             markerFound = False
             for block in blocks:
-                blockText, (x0, y0, x1, y1) = block[4], block[:4]  # Text & bbox
-                if pattern.search(blockText):  # Check if regex matches any part of block text
-                    markerFound = True
-                    markerrect = fitz.Rect(x0, y0, x1, y1)
+                x0, y0, x1, y1, text = block[:5]  # Extract bounding box and text
+                # Split block text into individual lines since adjacent text items can
+                # be returned as one block
+                lines = text.split("\n")
+                for line in lines:
+                    if pattern.search(line):  # Check regex against each line separately
+                        markerFound = True
+                        markerRect = fitz.Rect(x0, y0, x1, y1)
+                        # full block rect, this needs refining if the marker is to be removed
             if not markerFound:
                 continue
             else:
@@ -244,13 +275,9 @@ class Index():
             return
         page_width, page_height = page.rect.width, page.rect.height
 
-        # Define margins in terms of page size
-        margin_x = page_width * self.horizontalMarginPercent/100
-        margin_y = page_height * self.verticalMarginPercent/100
-
         # Max available size for the image (without exceeding margins)
-        max_width_pt = page_width - 2 * margin_x
-        max_height_pt = page_height - 2 * margin_y
+        max_width_pt = page_width - self.mergeLeftMarginPt - self.mergeRightMarginPt
+        max_height_pt = page_height - self.mergeBottomMarginPt - self.mergeTopMarginPt
 
         # Scale the image proportionally to fit within the available space
         scale_factor = min(max_width_pt / idx_width_pt, max_height_pt / idx_height_pt)
@@ -259,7 +286,7 @@ class Index():
 
         # Compute position
         x0 = (page_width - scaled_width_pt) / 2 # centered horizontally
-        y0 = margin_y # centering vertically: y0 = (page_height - scaled_height_pt) / 2
+        y0 = self.mergeTopMarginPt
         rect = fitz.Rect(x0, y0, x0 + scaled_width_pt, y0 + scaled_height_pt)
 
         # Insert the scaled and centered image into the PDF

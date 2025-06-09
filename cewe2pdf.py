@@ -1230,10 +1230,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         indexPdfFileName = albumIndex.SaveIndexPdf(outputFileName, albumTitle, pagesize)
         indexPngFileName = albumIndex.SaveIndexPng(indexPdfFileName)
         albumIndex.MergeAlbumAndIndexPng(outputFileName, indexPngFileName)
-        # delete the index pdf, but leave the index png which could be added to the original
-        # with the cewe editor, and then you get it in the printed edition as well
-        if os.path.exists(indexPdfFileName):
+        # most usual is to delete the index pdf, but leave the index png which could be added
+        # to the original with the cewe editor, and then you get it in the printed edition as well
+        if albumIndex.deleteIndexPdf and os.path.exists(indexPdfFileName):
             os.remove(indexPdfFileName)
+        if albumIndex.deleteIndexPng and os.path.exists(indexPngFileName):
+            os.remove(indexPngFileName)
 
     # force the release of objects which might be holding on to picture file references
     # so that they will not prevent the removal of the files as we clean up and exit
