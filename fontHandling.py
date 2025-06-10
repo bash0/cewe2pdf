@@ -10,6 +10,8 @@ from extraLoggers import mustsee, configlogger
 from otf import getTtfsFromOtfs
 from pathutils import localfont_dir, findFileInDirs, findFilesInDir
 
+fontSubstitutions = list[str]() # used to avoid repeated messages
+
 
 def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder): # pylint: disable=too-many-statements
     ttfFiles = []
@@ -341,4 +343,30 @@ def getMissingFontSubstitute(family):
     else:
         bodyfont = 'Helvetica'
         # reportlabs actually offers Helvetica, which is a bit strange since it is a proprietary font.
+    return bodyfont
+
+
+def noteFontSubstitution(family, replacement):
+    fontSubstitutionPair = family + "/" + replacement
+    fontSubsNotedAlready = fontSubstitutionPair in fontSubstitutions
+    if not fontSubsNotedAlready:
+        fontSubstitutions.append(fontSubstitutionPair)
+    if logging.root.isEnabledFor(logging.DEBUG):
+        # At DEBUG level we log all font substitutions, making it easier to find them in the mcf
+        logging.debug(f"Using font family = '{replacement}' (wanted {family})")
+        return
+    # At other logging levels we simply log the first font substitution
+    if not fontSubsNotedAlready:
+        logging.warning(f"Using font family = '{replacement}' (wanted {family})")
+
+
+def getAvailableFont(family, pdf, additional_fonts):
+    reportlabFonts = pdf.getAvailableFonts()
+    if family in reportlabFonts:
+        bodyfont = family
+    elif family in additional_fonts:
+        bodyfont = family
+    else:
+        bodyfont = getMissingFontSubstitute(family)
+        noteFontSubstitution(family, bodyfont)
     return bodyfont

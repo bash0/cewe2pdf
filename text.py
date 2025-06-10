@@ -6,10 +6,8 @@ import reportlab.lib.enums
 
 from reportlab.lib.styles import ParagraphStyle
 
-from fontHandling import getMissingFontSubstitute
+from fontHandling import getAvailableFont, getMissingFontSubstitute, noteFontSubstitution
 from lineScales import LineScales
-
-fontSubstitutions = list[str]() # used to avoid repeated messages
 
 
 def CreateParagraphStyle(textcolor, font, fontsize):
@@ -61,20 +59,6 @@ def Dequote(s):
     # we can not delete now, because file is opened by pdf library
 
 
-def noteFontSubstitution(family, replacement):
-    fontSubstitutionPair = family + "/" + replacement
-    fontSubsNotedAlready = fontSubstitutionPair in fontSubstitutions
-    if not fontSubsNotedAlready:
-        fontSubstitutions.append(fontSubstitutionPair)
-    if logging.root.isEnabledFor(logging.DEBUG):
-        # At DEBUG level we log all font substitutions, making it easier to find them in the mcf
-        logging.debug(f"Using font family = '{replacement}' (wanted {family})")
-        return
-    # At other logging levels we simply log the first font substitution
-    if not fontSubsNotedAlready:
-        logging.warning(f"Using font family = '{replacement}' (wanted {family})")
-
-
 def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
     if item is None:
         return dfltfont, dfltfs, bweight, {}
@@ -85,14 +69,7 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
                     item.get('style').lstrip(' ').rstrip(';').split('; ')])
     if 'font-family' in spanstyle:
         spanfamily = spanstyle['font-family'].strip("'")
-        reportlabFonts = pdf.getAvailableFonts()
-        if spanfamily in reportlabFonts:
-            spanfont = spanfamily
-        elif spanfamily in additional_fonts:
-            spanfont = spanfamily
-        if spanfamily != spanfont:
-            spanfont = getMissingFontSubstitute(spanfamily)
-            noteFontSubstitution(spanfamily, spanfont)
+        spanfont = getAvailableFont(spanfamily, pdf, additional_fonts)
 
     if 'font-weight' in spanstyle:
         try:

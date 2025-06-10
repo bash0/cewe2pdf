@@ -95,7 +95,7 @@ from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from configUtils import getConfigurationBool, getConfigurationInt
 from extraLoggers import mustsee, configlogger, VerifyMessageCounts, printMessageCountSummaries
-from fontHandling import getMissingFontSubstitute, findAndRegisterFonts
+from fontHandling import getAvailableFont, getMissingFontSubstitute, findAndRegisterFonts, noteFontSubstitution
 from imageUtils import autorot
 from lineScales import LineScales
 from mcfx import unpackMcfx
@@ -103,7 +103,7 @@ from pageNumbering import getPageNumberXy, PageNumberingInfo, PageNumberPosition
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText
-from text import CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle, Dequote, noteFontSubstitution
+from text import CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle, Dequote
 from index import Index
 from textart import handleTextArt
 
@@ -608,14 +608,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaHeight, areaRot, are
     except: # noqa: E722
         bodyfs = 12
     family = bstyle['font-family'].strip("'")
-    reportlabFonts = pdf.getAvailableFonts()
-    if family in reportlabFonts:
-        bodyfont = family
-    elif family in additional_fonts:
-        bodyfont = family
-    else:
-        bodyfont = getMissingFontSubstitute(family)
-        noteFontSubstitution(family, bodyfont)
+    bodyfont = getAvailableFont(family, pdf, additional_fonts)
 
     try:
         bweight = int(Dequote(bstyle['font-weight']))
@@ -1175,13 +1168,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
 
-    pageNumberElement = fotobook.find('pagenumbering')
-    if pageNumberElement is not None:
-        pnpos = int(pageNumberElement.get('position'))
-        if pnpos != 0: # 0 implies no numbering
-            # make a page number description object to use later
-            pageNumberingInfo = PageNumberingInfo(pageNumberElement)
-
     pageCount = int(articleConfigElement.get('normalpages')) + 2
     # The normalpages attribute in the mcf is the number of "usable" inside pages, excluding the front and back covers and the blank inside
     #  cover pages. Add 2 so that pagecount represents the actual number of printed pdf pages we expect in the normal single sided
@@ -1211,6 +1197,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # initialize a pdf canvas
     pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
     pdf.setTitle(albumTitle)
+
+    pageNumberElement = fotobook.find('pagenumbering')
+    if pageNumberElement is not None:
+        pnpos = int(pageNumberElement.get('position'))
+        if pnpos != 0: # 0 implies no numbering
+            # make a page number description object to use later
+            pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, availableFonts)
 
     # generate all the requested pages
     processPages(fotobook, mcfBaseFolder, imageFolder, productstyle, pdf, pageCount, pageNumbers,

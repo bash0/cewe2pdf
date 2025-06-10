@@ -6,6 +6,7 @@ import reportlab.lib.styles
 from reportlab.lib.styles import ParagraphStyle
 from ceweInfo import ProductStyle
 from colorUtils import ReorderColorBytesMcf2Rl
+from fontHandling import getAvailableFont
 
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
@@ -48,7 +49,7 @@ class PageNumberFormat(Enum):
 
 
 class PageNumberingInfo:
-    def __init__(self, pageNumberElement):
+    def __init__(self, pageNumberElement, pdf, availableFonts):
         """
         Constructor that initializes the page numbering info from the given lxml element.
         """
@@ -60,7 +61,8 @@ class PageNumberingInfo:
         self.format = PageNumberFormat.ToEnum(pageNumberElement.get('format','0'))
         self.horizontalMargin = int(pageNumberElement.get('margin','50')) * mcf2rl # * 0.1 mm
         self.verticalMargin = int(pageNumberElement.get('verticalMargin','50')) * mcf2rl # * 0.1 mm
-        self.fontfamily = pageNumberElement.get('fontfamily','Liberation Sans')
+        fontfamily = pageNumberElement.get('fontfamily','Liberation Sans')
+        self.fontfamily = getAvailableFont(fontfamily, pdf, availableFonts)
         self.fontsize = int(pageNumberElement.get('fontsize','12'))
         self.fontbold = int(pageNumberElement.get('fontbold','0'))
         self.fontitalics = int(pageNumberElement.get('fontitalics','0'))
