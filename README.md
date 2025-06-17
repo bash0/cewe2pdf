@@ -68,7 +68,7 @@ sudo dnf install python3-lxml python3-reportlab python-cairosvg fonttools python
 ```
 On Debian:
 ```
-sudo apt install python3-cairosvg python3-fonttools python3-lxml python3-packaging python3-pillow python3-reportlab python3-yaml
+sudo apt install python3-cairosvg python3-fonttools python3-lxml python3-packaging python3-pillow python3-reportlab python3-yaml python3-opencv python3-fitz
 ```
 Locate the directory where your CEWE album software is installed. You can recognize it by the many `.so` files and some subdirs like `Resources`).
 Put this directory name into a configuration file ``cewe2pdf.ini`` (or, I guess, the now deprecated ``cewe_folder.txt``)
