@@ -83,7 +83,7 @@ import reportlab.lib.colors
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
-from reportlab.platypus import Paragraph, Table
+from reportlab.platypus import Paragraph, Table, TopPadder
 from reportlab.lib.styles import ParagraphStyle
 # from reportlab.lib.styles import getSampleStyleSheet
 
@@ -121,7 +121,7 @@ class PageType(Enum):
     EmptyPage = 4 # the intentional blanks inside the front and back covers (both have pagenr 0)
     BackInsideCover = 5 # the obligatory empty page to the right of the last page in keep double pages
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name # to print the enum name without the class
 
 
@@ -139,9 +139,9 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
     # Running in a PyInstaller bundle, ref https://pyinstaller.org/en/stable/runtime-information.html#run-time-information
     # Add the local directory to the PATH. This is needed for compiled (i.e. frozen)
     #  programs on Windows to find dlls (cairo dlls, in particular).
-    realpath: str = os.path.realpath(sys.argv[0])
-    exename: str = os.path.basename(realpath)
-    dllpath: str = os.path.dirname(realpath)
+    realpath = os.path.realpath(sys.argv[0])
+    exename = os.path.basename(realpath)
+    dllpath = os.path.dirname(realpath)
     print(f"Frozen python {exename} running from {dllpath}")
     if dllpath not in os.environ["PATH"]:
         print(f"Adding {dllpath} to PATH")
@@ -174,13 +174,12 @@ tempFileList = []  # we need to remove all the temporary files at the end
 # reportlab defaults
 # pdf_styles = getSampleStyleSheet()
 # pdf_styleN = pdf_styles['Normal']
-pdf_flowableList = []
 
 albumIndex = None # set after we have got the configuration information
-clipartDict: dict[int, str] = dict[int, str]()    # a dictionary for clipart element IDs to file name
-clipartPathList: tuple[str] = tuple[str]()
+clipartDict = dict[int, str]()    # a dictionary for clipart element IDs to file name
+clipartPathList = tuple[str]()
 passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
-passepartoutFolders: tuple[str] = tuple[str]() # global variable with the folders for passepartout frames
+passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
 defaultConfigSection = None
 pageNumberingInfo = None # if the album requests page numbering then we keep the details here
 
@@ -255,7 +254,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                     logging.warning(
                         f"value of background attribute not supported: type =  {backgroundTag.get('type')}")
             try:
-                bgPath: str = ""
+                bgPath = ""
                 bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
                 logging.debug(f"Reading background file: {bgPath}")
 
@@ -281,7 +280,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
 
 
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir,
-                        productstyle, mcfBaseFolder, pagetype, pdf, pw, transx, transy) -> None:
+                        productstyle, mcfBaseFolder, pagetype, pdf, pw, transx, transy):
     # open raw image file
     if imageTag.get('filename') is None:
         return
@@ -334,9 +333,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
             logging.error(f"Can't find passepartout for {passepartoutid}")
         else:
             pptXmlFileName = passepartoutDict[passepartoutid]
-            pptXmlInfo: decorationXmlInfo | None = Passepartout.extractInfoFromXml(pptXmlFileName, passepartoutid)
-            frameClipartFileName: str = Passepartout.getClipartFullName(pptXmlInfo)
-            maskClipartFileName: str = Passepartout.getMaskFullName(pptXmlInfo)
+            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName, passepartoutid)
+            frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
+            maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
             logging.debug(f"Using mask file: {maskClipartFileName}")
             # draw the passepartout clipart file.
             # Adjust the position of the real image depending on the frame
@@ -368,13 +367,13 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # re-scale the image if it is much bigger than final resolution in PDF
     # set desired DPI based on where the image is used. The background gets a lower DPI.
     if imageTag.tag == 'imagebackground' and pagetype != 'cover':
-        res: int = bg_res
+        res = bg_res
     else:
-        res: int = image_res
+        res = image_res
     # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
     new_w = int(0.5 + imgCropWidth_mcfunit * res / 254.)
     new_h = int(0.5 + imgCropHeight_mcfunit * res / 254.)
-    factor: float = sqrt(new_w * new_h / float(im.size[0] * im.size[1]))
+    factor = sqrt(new_w * new_h / float(im.size[0] * im.size[1]))
     if factor <= 0.8:
         im = im.resize(
             (new_w, new_h), pil_antialias)
@@ -382,11 +381,11 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     # apply the frame mask from the passepartout to the image
     if maskClipartFileName is not None:
-        maskClp: ClpFile = loadClipart(maskClipartFileName, clipartPathList)
+        maskClp = loadClipart(maskClipartFileName, clipartPathList)
         im = maskClp.applyAsAlphaMaskToFoto(im)
 
     # re-compress image
-    jpeg: _TemporaryFileWrapper[bytes] = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
+    jpeg = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
     # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
     jpeg.close()
     if im.mode in ('RGBA', 'P'):
@@ -435,10 +434,10 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     tempFileList.append(jpeg.name)
 
 
-def processDecorationBorders(decoration, areaHeight, areaWidth, pdf) -> None:
+def processDecorationBorders(decoration, areaHeight, areaWidth, pdf):
     # Draw a single cell table to represent border decoration (a box around the object)
     # We assume that this is called from inside the rotation and translation operation
-    for border in decoration.findall('border'):        
+    for border in decoration.findall('border'):
         if "enabled" in border.attrib:
             enabledAttrib = border.get('enabled')
             if enabledAttrib != '1':
@@ -450,7 +449,7 @@ def processDecorationBorders(decoration, areaHeight, areaWidth, pdf) -> None:
             if widthAttrib is not None:
                 bwidth = mcf2rl * floor(float(widthAttrib)) # units are 1/10 mm
 
-        bcolor: Color = reportlab.lib.colors.blue
+        bcolor = reportlab.lib.colors.blue
         if "color" in border.attrib:
             colorAttrib = border.get('color')
             # The border colour is weirdly handled by CEWE. The transparency seems to
@@ -458,7 +457,7 @@ def processDecorationBorders(decoration, areaHeight, areaWidth, pdf) -> None:
             if colorAttrib == '#00000000':
                 # Not a border - don't draw it
                 return
-            bcolor: Color = reportlab.lib.colors.HexColor(colorAttrib)
+            bcolor = reportlab.lib.colors.HexColor(colorAttrib)
 
         adjustment = 0
         gap = 0
@@ -511,11 +510,11 @@ def findShadowBottomLeft(frameBottomLeft, angle, distance, swidth):
     # Return shadow rectangle bottom left coordinates
     return x + shadow_dx - swidth / 2, y + shadow_dy - swidth / 2
 
-def intensityToGrey(value) -> Color:
-    colorComponentValue: float = 1 - (max(1, min(255, value)) / 255)
+def intensityToGrey(value):
+    colorComponentValue = 1 - (max(1, min(255, value)) / 255)
     return reportlab.lib.colors.Color(colorComponentValue, colorComponentValue, colorComponentValue)
 
-def processDecorationShadow(decoration, areaHeight, areaWidth, pdf) -> None:
+def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
     if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
         # shadows were implemented in May 2025. Prior to that, you could have specified
         # shadows on your photos for printing by CEWE but you would not have got them
@@ -570,15 +569,15 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf) -> None:
         if "shadowAngle" in shadow.attrib:
             angleAttrib = shadow.get('shadowAngle')
             if angleAttrib is not None:
-                sangle: int = floor(float(angleAttrib))
+                sangle = floor(float(angleAttrib))
         if sangle < 0.0: # mcf range -179 .. +180
-            sangle: int = sangle + 360 # range 0 .. 359
+            sangle = sangle + 360 # range 0 .. 359
 
         shadowBottomLeft_x, shadowBottomLeft_y = \
             findShadowBottomLeft((frameBottomLeft_x, frameBottomLeft_y), sangle, sdistance, swidth)
         shadowWidth = frameWidth + swidth
         shadowHeight = frameHeight + swidth
-        shadowColor: Color = intensityToGrey(intensity) # reportlab.lib.colors.grey
+        shadowColor = intensityToGrey(intensity) # reportlab.lib.colors.grey
 
         frm_table = Table(
             data=[[None]],
@@ -596,7 +595,7 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf) -> None:
         frm_table.drawOn(pdf, shadowBottomLeft_x, shadowBottomLeft_y)
 
 
-def warnAndIgnoreEnabledDecorationShadow(decoration) -> None:
+def warnAndIgnoreEnabledDecorationShadow(decoration):
     if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
         return
     for shadow in decoration.findall('shadow'):
@@ -606,11 +605,12 @@ def warnAndIgnoreEnabledDecorationShadow(decoration) -> None:
                 logging.warning("Ignoring shadow specified on text, that is not implemented!")
                 continue
 
-
+# Note that transCx, transCy are the center of the area
 def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, pgno): # noqa: C901 (too complex)
     # note: it would be better to use proper html processing here
     import re
 
+    # Process each opening tag, merging duplicate style attributes
     def merge_duplicate_styles(match):
         """Merge duplicate style attributes in a single tag."""
         full_tag = match.group(0)  # e.g., '<li style="..." style="...">'
@@ -634,13 +634,13 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # Find some actual text content near this tag (not HTML tags)
             # Look ahead after this tag for text content
             search_start = tag_pos + len(full_tag)
-            search_end: int = min(len(textTag.text), search_start + 200)
+            search_end = min(len(textTag.text), search_start + 200)
             nearby = textTag.text[search_start:search_end]
             # Extract text between tags
-            text_content: str = re.sub(r'<[^>]*>', '', nearby)[:20].strip()
-            context: str = f"near text: '{text_content}'" if text_content else "at start/end"
+            text_content = re.sub(r'<[^>]*>', '', nearby)[:20].strip()
+            context = f"near text: '{text_content}'" if text_content else "at start/end"
         else:
-            context: str = ""
+            context = ""
 
         logging.warning(f"Merging duplicate 'style' attributes in <{tag_name}> tag ({len(styles)} instances) {context}")
         logging.warning(f"  Styles: {styles}")
@@ -654,18 +654,18 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
                 if not s.endswith(';'):
                     s += ';'
                 merged_parts.append(s)
-        merged_style: str = ' '.join(merged_parts).strip()
+        merged_style = ' '.join(merged_parts).strip()
 
         # Replace: keep first style="..." and remove all subsequent ones
         # First, remove ALL style attributes
-        tag_without_styles: str = re.sub(style_pattern, '', full_tag)
+        tag_without_styles = re.sub(style_pattern, '', full_tag)
 
         # Then add the merged style back as the first attribute
         # Find position after tag name to insert style
         tag_name_match: Match[str] | None = re.match(r'(<\w+)(\s|>)', tag_without_styles)
         if tag_name_match:
             prefix: str | Any = tag_name_match.group(1)  # e.g., '<li'
-            rest: str = tag_without_styles[len(prefix):]  # everything after tag name
+            rest = tag_without_styles[len(prefix):]  # everything after tag name
             return f'{prefix} style="{merged_style}"{rest}'
 
         # Fallback: shouldn't reach here, but return original if parsing fails
@@ -674,13 +674,15 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # Preprocess text to fix CEWE bugs: merge duplicate style attributes
     # CEWE sometimes generates invalid XML like: <li style="..." style="...">
     # We need to merge these into a single style attribute
-    text_content: str = re.sub(r'<\w+[^>]*>', merge_duplicate_styles, textTag.text)
+    text_content = re.sub(r'<\w+[^>]*>', merge_duplicate_styles, textTag.text)
     
-    # Validate that we haven't lost any actual text content (only fixed attributes)
-    # Strip all HTML tags and compare character counts
-    original_text_only: str = re.sub(r'<[^>]*>', '', textTag.text)
-    processed_text_only: str = re.sub(r'<[^>]*>', '', text_content)
-    
+    # Validate that we haven't lost any actual text content
+    # Strip all style then HTML tags and compare character counts
+    orig_no_style = re.sub(r'<style[^>]*>.*?</style>', '', textTag.text, flags=re.DOTALL)
+    original_text_only = re.sub(r'<[^>]+>', '', orig_no_style)
+    processed_text_only_no_style = re.sub(r'<style[^>]*>.*?</style>', '', text_content, flags=re.DOTALL)
+    processed_text_only = re.sub(r'<[^>]+>', '', processed_text_only_no_style)
+
     if len(original_text_only) != len(processed_text_only):
         logging.error("=" * 80)
         logging.error("PREPROCESSING VALIDATION FAILED: Text content length changed!")
@@ -723,14 +725,14 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         else:
             # Try to extract column from error message (e.g., "column 3838")
             import re
-            match: Match[str] | None = re.search(r'column (\d+)', str(e))
-            col: int | None = int(match.group(1)) if match else None
+            match = re.search(r'column (\d+)', str(e))
+            col = int(match.group(1)) if match else None
         
         if col is not None:
             # Show context around the error (30 chars before and after)
             start = max(0, col - 30)
-            end: int = min(len(text_content), col + 30)
-            context: str = text_content[start:end]
+            end = min(len(text_content), col + 30)
+            context = text_content[start:end]
             marker_pos = min(30, col - start)
             
             logging.error(f"Context around column {col} in preprocessed text:")
@@ -744,7 +746,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     body = htmlxml.find('.//body')
     bstyle = dict([kv.split(':') for kv in body.get('style').lstrip(' ').rstrip(';').split('; ')])
     try:
-        bodyfs: int = floor(float(bstyle['font-size'].strip("pt")))
+        bodyfs = floor(float(bstyle['font-size'].strip("pt")))
     except: # noqa: E722
         bodyfs = 12
     family = bstyle['font-family'].strip("'")
@@ -766,10 +768,10 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             tablestyle = dict([kv.split(':') for kv in
                 table.get('style').lstrip(' ').rstrip(';').split('; ')])
             try:
-                tabletmarg: int = floor(float(tablestyle['margin-top'].strip("px")))
-                tablebmarg: int = floor(float(tablestyle['margin-bottom'].strip("px")))
-                tablelmarg: int = floor(float(tablestyle['margin-left'].strip("px")))
-                tablermarg: int = floor(float(tablestyle['margin-right'].strip("px")))
+                tabletmarg = floor(float(tablestyle['margin-top'].strip("px")))
+                tablebmarg = floor(float(tablestyle['margin-bottom'].strip("px")))
+                tablelmarg = floor(float(tablestyle['margin-left'].strip("px")))
+                tablermarg = floor(float(tablestyle['margin-right'].strip("px")))
             except: # noqa: E722
                 logging.warning(f"Ignoring invalid table margin settings {tableStyleAttrib}")
     leftPad = mcf2rl * tablelmarg
@@ -789,13 +791,6 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
                 
     logging.debug(f"Text area: center=({transCx},{transCy}), dimensions={areaWidth}x{areaHeight}, topPad={topPad}, bottomPad={bottomPad}, verticallyCenter={verticallyCenter}, tabletmarg={tabletmarg}, tablebmarg={tablebmarg}")
     
-    # When vertical centering is enabled, ignore the HTML margin-top and margin-bottom
-    # The text should be centered in the full area, not offset by these margins
-    if verticallyCenter:
-        logging.debug(f"Vertical centering enabled: ignoring HTML margins (topPad was {topPad}, bottomPad was {bottomPad})")
-        topPad = 0
-        bottomPad = 0
-
     # if this is text art, then we do the whole thing differently.
     cwtextart = area.findall('decoration/cwtextart')
     if len(cwtextart) > 0:
@@ -813,6 +808,15 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     pdf.translate(transCx, transCy)
     pdf.rotate(-areaRot)
 
+    # When vertical centering is enabled, ignore the HTML margin-top and margin-bottom
+    # The text should be centered in the full area, not offset by these margins. The actual
+    # centering is performed later after we know the actual text height.
+    if verticallyCenter:
+        logging.debug(f"Vertical centering enabled: ignoring HTML margins (topPad was {topPad}, bottomPad was {bottomPad})")
+        topPad = 0.0
+        bottomPad = 0.0
+
+
     # we don't do shadowing on texts, but we could at least warn about that...
     for decorationTag in area.findall('decoration'):
         warnAndIgnoreEnabledDecorationShadow(decorationTag)
@@ -821,7 +825,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     backgroundColor = None
     backgroundColorAttrib = area.get('backgroundcolor')
     if backgroundColorAttrib is not None:
-        backgroundColor: Color = ReorderColorBytesMcf2Rl(backgroundColorAttrib)
+        backgroundColor = ReorderColorBytesMcf2Rl(backgroundColorAttrib)
 
     # See the comment below in processTextCore about text wrapping issues. This seems to be
     # caused by cewe2pdf rendering fonts with a slightly thicker stroke than CEWE's Qt renderer.
@@ -832,18 +836,21 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     scaleFactor = 1.0
     indexEntryText = None
 
-    # In case we have to shrink font and redo, we gather the pdf flowables in a temporary variable first.
-    tmp_pdf_flowableList = []
+    # The code used to use a global variable to store the flowables. This leads to problems where a 
+    # flowable in one text area can, in extreme circumstances, appear in another. So, we use a local variable.
+    pdf_flowableList = []
+
     while True:
-        tmp_pdf_flowableList = []
-        # Normally we only call processTextCore once. But, if we encounter the text wrapping issue, we will try again.
+        # Reset it each time we go round this loop. Normally we only call processTextCore once. 
+        # But, if we encounter the text wrapping issue, we will try again.
+        pdf_flowableList = []
         textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth = \
-            processTextCore(tmp_pdf_flowableList, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
+            processTextCore(pdf_flowableList, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
             bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
         if not textWrapProblem or iterationsToShrinkFontWhenNecessary == 0:
             if not textWrapProblem:
-                if scaleFactor < 1.0: logging.info(f'Successfully shrunk text by {scaleFactor} to fit frame. Frame height has not been increased.')
-
+                if scaleFactor < 1.0: 
+                    logging.info(f'Successfully shrunk text by {scaleFactor} to fit frame. Frame height has not been increased.')
             else:
                 # We exhausted all attempts to shrink font to fit
                 logging.warning(f'Could not fit text into frame after shrinking font designated number of times. Frame height has been increased.')
@@ -857,24 +864,25 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     if indexEntryText:
         albumIndex.AddIndexEntry(pgno, indexEntryText)
 
-    # Move from temporary to actual.
-    pdf_flowableList.extend(tmp_pdf_flowableList)
-
-    # Apply vertical centering if ALIGNVCENTER is specified
-    # When vertically centering, shrink frame to fit text exactly and position it centered
-    verticalCenterOffset = 0
+    # Apply vertical centering if ALIGNVCENTER is specified. We previously set topPad and bottomPad
+    # to zero. Now we have the actual text height, we can calculate the required padding to center
+    # the text vertically in the area.
     if verticallyCenter and finalTotalHeight < (mcf2rl * areaHeight):
         # Original area height from XML
         originalFrameHeight = mcf2rl * areaHeight
         # Use exact text height for the frame
-        frameHeight = finalTotalHeight
+        #frameHeight = finalTotalHeight
         # Calculate offset to center this smaller frame in the original area
         emptySpace = originalFrameHeight - finalTotalHeight
         verticalCenterOffset = emptySpace / 2.0
-        
+        # Technically these should both be equal, but text looks more accurately centered
+        # if we adjust them by 1.0 point in opposite directions
+        bottomPad=verticalCenterOffset+1.0
+        topPad=verticalCenterOffset-1.0
+        logging.debug(original_text_only)
         logging.debug(f"VERTICAL CENTERING: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, emptySpace={emptySpace:.2f}, verticalCenterOffset={verticalCenterOffset:.2f}")
 
-    newFrame = ColorFrame(frameBottomLeft_x, frameBottomLeft_y + verticalCenterOffset,
+    newFrame = ColorFrame(frameBottomLeft_x, frameBottomLeft_y,
         frameWidth, frameHeight,
         leftPadding=leftPad, bottomPadding=bottomPad,
         rightPadding=rightPad, topPadding=topPad,
@@ -895,107 +903,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     pdf.translate(-transCx, -transCy)
 
 
-# Process each opening tag, merging duplicate style attributes
-
-def processTextCore(tmp_pdf_flowableList, additional_fonts, areaHeight, areaWidth, body, bodyfont: str | Any, bodyfs: int,
-                    bottomPad: float | int | Any, bstyle: dict[Any, Any], bweight: int, family,
-                    leftPad: float | int | Any, pdf, rightPad: float | int | Any, topPad: float | int | Any,
-                    fontScaleFactor: float) -> \
-tuple[bool, str |Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any]:
-    # set default para style in case there are no spans to set it.
-    pdf_styleN: ParagraphStyle = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, fontScaleFactor)
-
-    # for debugging the background colour may be useful, but it is not used in production
-    # since we started to use ColorFrame to colour the background, and it is thus left
-    # unset by CreateParagraphStyle
-    # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00")
-
-    # There may be multiple "index entry" paragraphs in the text area.
-    # Concatenating them to just one index entry seems to work in practice
-    indexEntryText = None
-    # Keep track of recent text so we can provide informative errors.
-    recentParagraphText: str = ''
-
-    # Track all direct children of body to validate we process everything
-    all_body_children = list(body)
-    unprocessed_children = set(all_body_children)  # Will remove elements as we process them
-
-    indexEntryText, recentParagraphText = processTextParas(tmp_pdf_flowableList, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText,
-                                      pdf, pdf_styleN, fontScaleFactor, unprocessed_children)
-
-    recentParagraphText: str = processTextUL(tmp_pdf_flowableList, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN,
-                                  fontScaleFactor, unprocessed_children)
-
-    # The <table> tag contains margin info, not actual content - mark it as processed
-    table = body.find('table')
-    if table is not None:
-        unprocessed_children.discard(table)
-
-    # Validate: warn about any body children that we didn't process
-    if unprocessed_children:
-        logging.warning("=" * 80)
-        logging.warning("TEXT CONTENT BEING SILENTLY IGNORED!")
-        logging.warning(f"Found {len(unprocessed_children)} unprocessed elements as direct children of <body>:")
-        for child in unprocessed_children:
-            child_text: str = ''.join(child.itertext())[:100]  # Get text content, first 100 chars
-            logging.warning(f"  Ignoring <{child.tag}> with {len(list(child))} children")
-            logging.warning(f"    Text content preview: {child_text}")
-            logging.warning(f"    XML: {etree.tostring(child, encoding='unicode')[:200]}...")
-        logging.warning("=" * 80)
-
-    # Add a frame object that can contain multiple paragraphs. Margins (padding) are specified in
-    # the editor in mm, arriving in the mcf in 1/10 mm, but appearing in the html with the unit "px".
-    # This is a bit strange, but ignoring the "px" and using mcf2rl seems to work ok.
-    frameWidth = mcf2rl * areaWidth
-    frameHeight = mcf2rl * areaHeight
-    frameBottomLeft_x = -0.5 * frameWidth
-    frameBottomLeft_y = -0.5 * frameHeight
-
-    finalTotalHeight: float | Any | int = topPad + bottomPad  # built up in the text height check loop
-    finalTotalWidth = frameWidth  # should never be exceeded in the text height check loop
-    availableTextHeight = frameHeight - topPad - bottomPad
-    availableTextWidth = frameWidth - leftPad - rightPad
-    
-    logging.debug(f"Frame calculation: frameWidth={frameWidth:.2f}, frameHeight={frameHeight:.2f}, topPad={topPad:.2f}, bottomPad={bottomPad:.2f}, availableTextHeight={availableTextHeight:.2f}")
-
-    # Go through all flowables and test if the fit in the frame. If not increase the frame height.
-    # To solve the problem, that if each paragraph will fit indivdually, and also all together,
-    # we need to keep track of the total summed height+
-    for flowableListItem in tmp_pdf_flowableList:
-        neededTextWidth, neededTextHeight = flowableListItem.wrap(availableTextWidth, availableTextHeight)
-        finalTotalHeight += neededTextHeight
-        availableTextHeight -= neededTextHeight
-        if neededTextWidth > availableTextWidth:
-            # I have never seen this happen, but check anyway
-            logging.error('A set of paragraphs too wide for its frame. INTERNAL ERROR!')
-            finalTotalWidth = neededTextWidth + leftPad + rightPad
-            
-    logging.debug(f"After wrapping flowables: finalTotalHeight={finalTotalHeight:.2f} (includes topPad + bottomPad), actual text height={finalTotalHeight - topPad - bottomPad:.2f}")
-
-    textWrapProblem = finalTotalHeight > frameHeight
-    if textWrapProblem:
-        # One of the possible causes here is that wrap function has used an extra line (because
-        #  of some slight mismatch in character widths and a frame that matches too precisely?)
-        #  so that a word wraps over when it shouldn't. I don't know how to fix that sensibly.
-        #  Increasing the height is NOT a good visual solution, because the line wrap is still
-        #  not where the user expects it - increasing the width would almost be more sensible!
-        # Another suspected cause is in the use of multiple font sizes in one text. Perhaps the
-        #  line scale (interline space) gets confused by this?
-        logging.warning(
-            'A set of paragraphs would not fit inside its frame. We may need to increase the frame height.')
-        # We will later log whether the frame height actually needed to be increased or not
-        logging.warning(
-            ' Try widening the text box just slightly to avoid an unexpected word wrap, or increasing the height yourself')
-        logging.warning(f' Most recent paragraph text: {recentParagraphText}')
-        frameHeight = finalTotalHeight
-    else:
-        frameHeight = max(frameHeight, finalTotalHeight)
-
-    frameWidth = max(frameWidth, finalTotalWidth)
-    return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth
-
-
-def processTextParas(tmp_pdf_flowableList, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
+def processTextParas(pdf_flowableList, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
                      family, indexEntryText: Any | None, pdf, pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> tuple[Any, str]:
     htmlparas = body.findall(".//p")
 
@@ -1014,30 +922,27 @@ def processTextParas(tmp_pdf_flowableList, paragraphText: str, additional_fonts,
 
         # there will be a paragraph style with various attributes, most of which we do not handle.
         # But this is where the line spacing is defined, with the line-height attribute
-        pLineHeight = 1.0  # normal line spacing by default
+        pLineHeight = 1.0 # normal line spacing by default
         pStyleAttribute = p.get('style')
         if pStyleAttribute is not None:
             pStyle = dict([kv.split(':') for kv in
-                           p.get('style').lstrip(' ').rstrip(';').split('; ')])
+                p.get('style').lstrip(' ').rstrip(';').split('; ')])
             if 'line-height' in pStyle.keys():
                 try:
-                    pLineHeight: float = floor(float(pStyle['line-height'].strip("%"))) / 100.0
-                except:  # noqa: E722
+                    pLineHeight = floor(float(pStyle['line-height'].strip("%")))/100.0
+                except: # noqa: E722
                     logging.warning(f"Ignoring invalid paragraph line-height setting {pStyleAttribute}")
         finalLeadingFactor = LineScales.lineScaleForFont(bodyfont) * pLineHeight
 
         htmlspans = p.findall(".*")
-        logging.debug(f"Paragraph has {len(htmlspans)} child elements")
-        for child in htmlspans[:3]:  # Log first 3 to see what they are
-            logging.debug(f"  Child tag: {child.tag}")
-        if len(htmlspans) < 1:  # i.e. there are no spans, just a paragraph
+        if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
             paragraphText = '<para autoLeading="max">'
             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
-                                                         additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
+                additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
-            pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
-            tmp_pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+            pdf_styleN.leading = usefs * finalLeadingFactor # line spacing (text + leading)
+            pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             originalFont = CollectItemFontFamily(p, family)
             if albumIndex.CheckForIndexEntry(originalFont, bodyfs):
                 indexEntryText = Index.AppendIndexText(indexEntryText, p.text)
@@ -1050,7 +955,7 @@ def processTextParas(tmp_pdf_flowableList, paragraphText: str, additional_fonts,
             # the first span just continues that leading text
             if p.text is not None:
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
-                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
+                    additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
                 usefs = maxfs if maxfs > 0 else bodyfs
                 pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
 
@@ -1063,16 +968,16 @@ def processTextParas(tmp_pdf_flowableList, paragraphText: str, additional_fonts,
                     paragraphText += '&nbsp;</para>'
                     usefs = maxfs if maxfs > 0 else bodyfs
                     pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
-                    tmp_pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+                    pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
                     paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf,
-                                                                 additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
+                        additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
 
                 elif item.tag == 'span':
                     span = item
                     spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additional_fonts, bodyfont,
-                                                                              bodyfs, bweight, fontScaleFactor)
+                        bodyfs, bweight, fontScaleFactor)
 
                     maxfs = max(maxfs, spanfs)
 
@@ -1094,13 +999,13 @@ def processTextParas(tmp_pdf_flowableList, paragraphText: str, additional_fonts,
                             paragraphText += '</para>'
                             usefs = maxfs if maxfs > 0 else bodyfs
                             pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
-                            tmp_pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+                            pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
                             # now add the tail text of each br in the span style
                             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf,
-                                                                         additional_fonts, bodyfont, bodyfs, bweight,
-                                                                         bstyle, fontScaleFactor)
+                                additional_fonts, bodyfont, bodyfs, bweight,
+                                bstyle, fontScaleFactor)
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
@@ -1116,13 +1021,109 @@ def processTextParas(tmp_pdf_flowableList, paragraphText: str, additional_fonts,
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
                 pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
-                tmp_pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
+                pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception:
                 logging.exception('Exception')
     return indexEntryText, paragraphText
 
+def processTextCore(pdf_flowableList, additional_fonts, areaHeight, areaWidth, body, bodyfont: str | Any, bodyfs: int,
+                    bottomPad: float | int | Any, bstyle: dict[Any, Any], bweight: int, family,
+                    leftPad: float | int | Any, pdf, rightPad: float | int | Any, topPad: float | int | Any,
+                    fontScaleFactor: float) -> \
+tuple[bool, str |Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any]:
+    # set default para style in case there are no spans to set it.
+    pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, fontScaleFactor)
 
-def processTextUL(tmp_pdf_flowableList, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
+    # for debugging the background colour may be useful, but it is not used in production
+    # since we started to use ColorFrame to colour the background, and it is thus left
+    # unset by CreateParagraphStyle
+    # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00")
+
+    # There may be multiple "index entry" paragraphs in the text area.
+    # Concatenating them to just one index entry seems to work in practice
+    indexEntryText = None
+    # Keep track of recent text so we can provide informative errors.
+    recentParagraphText = ''
+
+    # Track all direct children of body to validate we process everything
+    all_body_children = list(body)
+    unprocessed_children = set(all_body_children)  # Will remove elements as we process them
+
+    indexEntryText, recentParagraphText = processTextParas(pdf_flowableList, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText,
+                                      pdf, pdf_styleN, fontScaleFactor, unprocessed_children)
+
+    recentParagraphText = processTextUL(pdf_flowableList, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN,
+                                  fontScaleFactor, unprocessed_children)
+
+    # The <table> tag contains margin info, not actual content - mark it as processed
+    table = body.find('table')
+    if table is not None:
+        unprocessed_children.discard(table)
+
+    # Validate: warn about any body children that we didn't process
+    if unprocessed_children:
+        logging.warning("=" * 80)
+        logging.warning("TEXT CONTENT BEING SILENTLY IGNORED!")
+        logging.warning(f"Found {len(unprocessed_children)} unprocessed elements as direct children of <body>:")
+        for child in unprocessed_children:
+            child_text = ''.join(child.itertext())[:100]  # Get text content, first 100 chars
+            logging.warning(f"  Ignoring <{child.tag}> with {len(list(child))} children")
+            logging.warning(f"    Text content preview: {child_text}")
+            logging.warning(f"    XML: {etree.tostring(child, encoding='unicode')[:200]}...")
+        logging.warning("=" * 80)
+
+    # Add a frame object that can contain multiple paragraphs. Margins (padding) are specified in
+    # the editor in mm, arriving in the mcf in 1/10 mm, but appearing in the html with the unit "px".
+    # This is a bit strange, but ignoring the "px" and using mcf2rl seems to work ok.
+    frameWidth = mcf2rl * areaWidth
+    frameHeight = mcf2rl * areaHeight
+    frameBottomLeft_x = -0.5 * frameWidth
+    frameBottomLeft_y = -0.5 * frameHeight
+
+    finalTotalHeight = topPad + bottomPad # built up in the text height check loop
+    finalTotalWidth = frameWidth # should never be exceeded in the text height check loop
+    availableTextHeight = frameHeight - topPad - bottomPad
+    availableTextWidth = frameWidth - leftPad - rightPad
+    
+    logging.debug(f"Frame calculation: frameWidth={frameWidth:.2f}, frameHeight={frameHeight:.2f}, topPad={topPad:.2f}, bottomPad={bottomPad:.2f}, availableTextHeight={availableTextHeight:.2f}")
+
+    # Go through all flowables and test if the fit in the frame. If not increase the frame height.
+    # To solve the problem, that if each paragraph will fit indivdually, and also all together,
+    # we need to keep track of the total summed height+
+    for flowableListItem in pdf_flowableList:
+        neededTextWidth, neededTextHeight = flowableListItem.wrap(availableTextWidth, availableTextHeight)
+        finalTotalHeight += neededTextHeight
+        availableTextHeight -= neededTextHeight
+        if neededTextWidth > availableTextWidth:
+            # I have never seen this happen, but check anyway
+            logging.error('A set of paragraphs too wide for its frame. INTERNAL ERROR!')
+            finalTotalWidth = neededTextWidth + leftPad + rightPad
+            
+    logging.debug(f"After wrapping flowables: finalTotalHeight={finalTotalHeight:.2f} (includes topPad + bottomPad), actual text height={finalTotalHeight - topPad - bottomPad:.2f}")
+
+    textWrapProblem = finalTotalHeight > frameHeight
+    if textWrapProblem:
+        # One of the possible causes here is that wrap function has used an extra line (because
+        #  of some slight mismatch in character widths and a frame that matches too precisely?)
+        #  so that a word wraps over when it shouldn't. I don't know how to fix that sensibly.
+        #  Increasing the height is NOT a good visual solution, because the line wrap is still
+        #  not where the user expects it - increasing the width would almost be more sensible!
+        # Another suspected cause is in the use of multiple font sizes in one text. Perhaps the
+        #  line scale (interline space) gets confused by this?
+        logging.warning(
+            f'A set of paragraphs would not fit inside its frame (frameHeight={frameHeight:.2f},finalTotalHeight={finalTotalHeight:.2f}). We may need to increase the frame height.')
+        # We will later log whether the frame height actually needed to be increased or not
+        logging.warning(
+            ' Try widening the text box just slightly to avoid an unexpected word wrap, or increasing the height yourself')
+        logging.warning(f' Most recent paragraph text: {recentParagraphText}')
+        frameHeight = finalTotalHeight
+    else:
+        frameHeight = max(frameHeight, finalTotalHeight)
+
+    frameWidth = max(frameWidth, finalTotalWidth)
+    return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth
+
+def processTextUL(pdf_flowableList, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
                   pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> str:
     # Process <ul> (unordered list) elements - bulleted lists
     htmllists = body.findall("ul")
@@ -1141,7 +1142,7 @@ def processTextUL(tmp_pdf_flowableList, paragraphText: str, additional_fonts, bo
             # Hanging indent: first line at 0, subsequent lines indented
             # Calculate indent based on font size - approximately 2x the font size
             # accounts for bullet width + space
-            bullet_indent: float = bodyfs * 1.65  # Adjust multiplier if needed (1.5 - 2.5 range)
+            bullet_indent = bodyfs * 1.65  # Adjust multiplier if needed (1.5 - 2.5 range)
             list_styleN.leftIndent = bullet_indent  # Where wrapped lines start
             list_styleN.firstLineIndent = -bullet_indent / 2  # Pull first line (with bullet) back halfway position 0
             bullet_txt = '• '
@@ -1164,7 +1165,7 @@ def processTextUL(tmp_pdf_flowableList, paragraphText: str, additional_fonts, bo
                                 li.get('style').lstrip(' ').rstrip(';').split('; ')])
                 if 'line-height' in liStyle.keys():
                     try:
-                        pLineHeight: float = floor(float(liStyle['line-height'].strip("%"))) / 100.0
+                        pLineHeight = floor(float(liStyle['line-height'].strip("%"))) / 100.0
                     except:  # noqa: E722
                         logging.warning(f"Ignoring invalid list item line-height setting {liStyleAttribute}")
             finalLeadingFactor = LineScales.lineScaleForFont(bodyfont) * pLineHeight
@@ -1184,7 +1185,7 @@ def processTextUL(tmp_pdf_flowableList, paragraphText: str, additional_fonts, bo
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
                 list_styleN.leading = usefs * finalLeadingFactor
-                tmp_pdf_flowableList.append(Paragraph(paragraphText, list_styleN))
+                pdf_flowableList.append(Paragraph(paragraphText, list_styleN))
             else:
                 # List item with spans and other formatting
                 bullet_plus_text = bullet_txt + (li.text != None and li.text or "")
@@ -1244,13 +1245,13 @@ def processTextUL(tmp_pdf_flowableList, paragraphText: str, additional_fonts, bo
                     paragraphText += '</para>'
                     usefs = maxfs if maxfs > 0 else bodyfs
                     list_styleN.leading = usefs * finalLeadingFactor
-                    tmp_pdf_flowableList.append(Paragraph(paragraphText, list_styleN))
+                    pdf_flowableList.append(Paragraph(paragraphText, list_styleN))
                 except Exception:
                     logging.exception('Exception')
     return paragraphText
 
 
-def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, clipArtDecoration) -> None:
+def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, clipArtDecoration):
     clipartID = int(clipartElement.get('designElementId'))
 
     # designElementId 0 seems to be a special empty placeholder
@@ -1260,7 +1261,7 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
     # Load the clipart
     fileName = None
     if clipartID in clipartDict:
-        fileName: str = clipartDict[clipartID]
+        fileName = clipartDict[clipartID]
     # verify preconditions to avoid exception loading the clip art file, which would break the page count
     if not fileName:
         logging.error(f"Problem getting file name for clipart ID: {clipartID}")
@@ -1276,16 +1277,16 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
     insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY, clipArtDecoration)
 
 
-def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY, decoration) -> None:
+def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY, decoration):
     img_transx = transx
 
-    res: int = image_res # use the foreground resolution setting for clipart
+    res = image_res # use the foreground resolution setting for clipart
 
     # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
     new_w = int(0.5 + areaWidth * res / 254.)
     new_h = int(0.5 + areaHeight * res / 254.)
 
-    clipart: ClpFile = loadClipart(fileName, clipartPathList)
+    clipart = loadClipart(fileName, clipartPathList)
     if len(clipart.svgData) <= 0:
         logging.error(f"Clipart file could not be loaded: {fileName}")
         # avoiding exception in the processing below here
@@ -1310,7 +1311,7 @@ def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHe
 
 
 def processElements(additional_fonts, fotobook, imagedir,
-                    productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW, lastpage) -> None:
+                    productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW, lastpage):
     if AlbumInfo.isAlbumDoubleSide(productstyle) and pagetype == PageType.Normal and not oddpage and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
@@ -1371,7 +1372,7 @@ def processElements(additional_fonts, fotobook, imagedir,
 
 def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
         page, pageNumber, pageCount, pagetype, productstyle, oddpage,
-        bg_notFoundDirList, additional_fonts, lastpage) -> None:
+        bg_notFoundDirList, additional_fonts, lastpage):
     logging.info(f"Side {pageNumber} ({pagetype}): parsing pagenr {page.get('pagenr')} of {pageCount}")
 
     bundlesize = page.find("./bundlesize")
@@ -1379,7 +1380,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
         pw = float(bundlesize.get('width'))
         ph = float(bundlesize.get('height'))
         if AlbumInfo.isAlbumSingleSide(productstyle):
-            pw: float = pw / 2 # reduce the page width to a single page width for single sided
+            pw = pw / 2 # reduce the page width to a single page width for single sided
     else:
         # Assume A4 page size
         pw = 2100
@@ -1403,7 +1404,7 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     processElements(additional_fonts, fotobook, imagedir, productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, ph, pw, lastpage)
 
 
-def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None, outputFileName=None) -> bool: # noqa: C901 (too complex)
+def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None, outputFileName=None): # noqa: C901 (too complex)
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
     global passepartoutDict  # pylint: disable=global-statement
@@ -1425,7 +1426,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # check for new format (version 7.3.?, ca 2023, issue https://github.com/bash0/cewe2pdf/issues/119)
     mcfxFormat = albumname.endswith(".mcfx")
     if mcfxFormat:
-        albumPathObj: Path = Path(albumname).resolve()
+        albumPathObj = Path(albumname).resolve()
         unpackedFolder, mcfxmlname = unpackMcfx(albumPathObj, mcfxTmpDir)
     else:
         unpackedFolder = None
@@ -1435,7 +1436,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     albumBaseFolder = str(Path(albumname).resolve().parent)
 
     # we'll need the mcf folder to find mcf relative image file names
-    mcfPathObj: Path = Path(mcfxmlname).resolve()
+    mcfPathObj = Path(mcfxmlname).resolve()
     mcfBaseFolder = str(mcfPathObj.parent)
 
     # parse the input mcf xml file
@@ -1444,10 +1445,10 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         with open(mcfxmlname, 'rb') as mcffile:
             mcf = etree.parse(mcffile)
     except Exception as e:
-        invalidmsg: str = f"Cannot open mcf file {mcfxmlname}"
+        invalidmsg = f"Cannot open mcf file {mcfxmlname}"
         if mcfxFormat:
-            invalidmsg: str = invalidmsg + f" (unpacked from {albumname})"
-        invalidmsg: str = invalidmsg + f": {repr(e)}"
+            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
+        invalidmsg = invalidmsg + f": {repr(e)}"
         logging.error(invalidmsg)
         sys.exit(1)
 
@@ -1465,13 +1466,13 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     defaultConfigSection = None
     # find cewe folder using the original cewe_folder.txt file
     try:
-        configFolderFileName: str = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
-        with open(configFolderFileName, 'r') as cewe_file: # this works on all relevant platforms so pylint: disable=unspecified-encoding
-            cewe_folder: str = cewe_file.read().strip()
+        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
+        with open(configFolderFileName, 'r') as cewe_file:  # this works on all relevant platforms so pylint: disable=unspecified-encoding
+            cewe_folder = cewe_file.read().strip()
             CeweInfo.checkCeweFolder(cewe_folder)
             keyAccountNumber = CeweInfo.getKeyAccountNumber(cewe_folder)
             keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber)
-            backgroundLocations: tuple[str, ...] | tuple[str, str, str, str, *tuple[str, ...]] = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
+            backgroundLocations = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
 
     except: # noqa: E722
         # arrives here if the original cewe_folder.txt file is missing, which we really expect it to be these days.
@@ -1481,7 +1482,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         # Order of the files is important, because config entires are
         #  overwritten when they appear in the later config files.
         # We want the config file in the .mcf directory to be the most important file.
-        filesread: list[str] = configuration.read(['cewe2pdf.ini', os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
+        filesread = configuration.read(['cewe2pdf.ini', os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
         if len(filesread) < 1:
             logging.error('You must create cewe_folder.txt or cewe2pdf.ini to specify the cewe_folder')
             sys.exit(1)
@@ -1494,7 +1495,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
                 logging.error('You must create cewe_folder.txt or modify cewe2pdf.ini to define cewe_folder')
                 sys.exit(1)
 
-            cewe_folder: str = defaultConfigSection['cewe_folder'].strip()
+            cewe_folder = defaultConfigSection['cewe_folder'].strip()
             CeweInfo.checkCeweFolder(cewe_folder)
 
             keyAccountNumber = CeweInfo.getKeyAccountNumber(cewe_folder, defaultConfigSection)
@@ -1504,23 +1505,23 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
             keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber, defaultConfigSection)
 
-            baseBackgroundLocations: tuple[str, ...] | tuple[str, str, str, str, *tuple[str, ...]] = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
+            baseBackgroundLocations = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
 
             # add any extra background folders, substituting environment variables
-            xbg: list[str] = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()  # newline separated list of folders
-            fxbg: list[str] = list(filter(lambda bg: (len(bg) != 0), xbg)) # filter out empty entries
-            f2xbg: tuple[str, ...] = tuple(map(lambda bg: os.path.expandvars(bg), fxbg)) # expand environment vars pylint: disable=unnecessary-lambda
-            backgroundLocations: tuple[str, ...] = baseBackgroundLocations + f2xbg
+            xbg = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()  # newline separated list of folders
+            fxbg = list(filter(lambda bg: (len(bg) != 0), xbg)) # filter out empty entries
+            f2xbg = tuple(map(lambda bg: os.path.expandvars(bg), fxbg)) # expand environment vars pylint: disable=unnecessary-lambda
+            backgroundLocations = baseBackgroundLocations + f2xbg
 
             # adds extra clipart ids, with absolute file references
-            xca: list[str] = defaultConfigSection.get('extraClipArts', '').splitlines()  # newline separated list of id, filename pairs
-            fxca: list[str] = list(filter(lambda ca: (len(ca) != 0), xca)) # filter out empty entries
-            f2xca: tuple[str, ...] = tuple(map(lambda ca: os.path.expandvars(ca), fxca)) # expand environment vars pylint: disable=unnecessary-lambda
+            xca = defaultConfigSection.get('extraClipArts', '').splitlines()  # newline separated list of id, filename pairs
+            fxca = list(filter(lambda ca: (len(ca) != 0), xca)) # filter out empty entries
+            f2xca = tuple(map(lambda ca: os.path.expandvars(ca), fxca)) # expand environment vars pylint: disable=unnecessary-lambda
             for ca in f2xca:
-                definition: list[str] = ca.split(',')
+                definition = ca.split(',')
                 if len(definition) == 2:
                     clipartId = int(definition[0])
-                    file: str = definition[1].strip()
+                    file = definition[1].strip()
                     clipartDict[clipartId] = file
 
             # read passepartout folders and substitute environment variables
@@ -1563,7 +1564,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
 
-    pageCount: int = int(articleConfigElement.get('normalpages')) + 2
+    pageCount = int(articleConfigElement.get('normalpages')) + 2
     # The normalpages attribute in the mcf is the number of "usable" inside pages, excluding the front and back covers and the blank inside
     #  cover pages. Add 2 so that pagecount represents the actual number of printed pdf pages we expect in the normal single sided
     #  pdf print (a basic album is 26 inside pages, plus front and back cover, i.e. 28). If we use keepDoublePages, then we'll
@@ -1576,16 +1577,16 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     clipartPathList = readClipArtConfigXML(cewe_folder, keyAccountFolder, clipartDict)
 
     # find the correct size for the album format (if we know!) and set the product style
-    pagesize: tuple[float, float] = reportlab.lib.pagesizes.A4
-    productstyle: ProductStyle = ProductStyle.AlbumSingleSide
+    pagesize = reportlab.lib.pagesizes.A4
+    productstyle = ProductStyle.AlbumSingleSide
     productname = fotobook.get('productname')
     if productname in AlbumInfo.formats: # IMO this is clearest so pylint: disable=consider-using-get
         pagesize = AlbumInfo.formats[productname]
     if productname in AlbumInfo.styles: # IMO this is clearest so pylint: disable=consider-using-get
-        productstyle: ProductStyle = AlbumInfo.styles[productname]
+        productstyle = AlbumInfo.styles[productname]
     if keepDoublePages:
         if productstyle == ProductStyle.AlbumSingleSide:
-            productstyle: ProductStyle = ProductStyle.AlbumDoubleSide
+            productstyle = ProductStyle.AlbumDoubleSide
         elif productstyle == ProductStyle.MemoryCard:
             logging.warning('keepdoublepages option is irrelevant and ignored for a memory card product')
 
@@ -1627,7 +1628,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     # force the release of objects which might be holding on to picture file references
     # so that they will not prevent the removal of the files as we clean up and exit
-    objectscollected: int = gc.collect()
+    objectscollected = gc.collect()
     logging.info(f'GC collected objects : {objectscollected}')
 
     printMessageCountSummaries()
@@ -1644,29 +1645,29 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     return True
 
 
-def addPageNumber(pni, pdf, pageNumber, productStyle, oddpage) -> None:
+def addPageNumber(pni, pdf, pageNumber, productStyle, oddpage):
     if pni is None or pni.position == 0:
         return
 
     paragraphText = pni.getParagraphText(pageNumber)
     paragraph = Paragraph(paragraphText, pni.paragraphStyle)
-    paraWidth: float = paragraph.minWidth()
+    paraWidth = paragraph.minWidth()
     _, paraHeight = paragraph.wrap(1000, 1000)
     frameWidthFiddleFactor = 3 + pni.fontsize * 1.5
     # Copilot thinks a fiddle factor is necessary due to imprecisions in the reportlab suite!
     # The fiddle factor calculation comes from trial and error! Surely there's a better solution?
     frameWidth = paraWidth + frameWidthFiddleFactor
-    frameHeight: float = paraHeight + 3
+    frameHeight = paraHeight + 3
 
     if 'singlePageNumberPosition' in defaultConfigSection:
-        pnp: PageNumberPosition = PageNumberPosition.ToEnum(defaultConfigSection['singlePageNumberPosition'].strip())
+        pnp = PageNumberPosition.ToEnum(defaultConfigSection['singlePageNumberPosition'].strip())
     else:
-        pnp: PageNumberPosition = PageNumberPosition.ORIGINAL
+        pnp = PageNumberPosition.ORIGINAL
 
     transx, transy = getPageNumberXy(pnp, pni, pdf, frameWidth, frameHeight, productStyle, oddpage)
     pdf.translate(transx, transy)
-    pdf_flowList: list[Paragraph] = [paragraph]
-    newFrame: ColorFrame = ColorFrame(0, 0, frameWidth, frameHeight, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
+    pdf_flowList = [paragraph]
+    newFrame = ColorFrame(0, 0, frameWidth, frameHeight, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
     # newFrame.background = reportlab.lib.colors.aliceblue # uncomment for debugging
     newFrame.background = pni.bgcolor
     newFrame.addFromList(pdf_flowList, pdf)
@@ -1687,7 +1688,7 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
 
     for n in range(pageCount): # starting at 0
         try:
-            pagetype: PageType = PageType.Unknown
+            pagetype = PageType.Unknown
             lastpage = IsLastPage(n) # bool assign is clearer with parens so pylint: disable=superfluous-parens
 
             # The <page> sections all have a pagenr attribute. The normal pages run from pagenr 1 to pagenr 26 while there are
@@ -1702,9 +1703,9 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                     # have just found. That fullcover "page 0" (bundle) contains all the stuff for the back cover
                     # on the left side, and the front cover on the right sight (and the spine, as it happens)
                     page = fullcoverpages[0]
-                    oddpage: bool = (n == 0) # bool assign is clearer with parens so pylint: disable=superfluous-parens
-                    pagetype: PageType = PageType.Cover
-                    pageNumber: int = n
+                    oddpage = (n == 0) # bool assign is clearer with parens so pylint: disable=superfluous-parens
+                    pagetype = PageType.Cover
+                    pageNumber = n
                     # for double-page-layout: the last page is already the left side of the book cover. So skip rendering the last page
                     if (AlbumInfo.isAlbumDoubleSide(productstyle) and IsBackCover(pageNumber)):
                         page = None
@@ -1734,20 +1735,20 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                 if len(realFirstPageList) > 0 and (pageNumbers is None or 0 in pageNumbers):
                     # for this special page we need to do run parseInputPage twice for one output page in the PDF.
                     # The background needs to be drawn first, or it would obscure any other other elements.
-                    pagetype: PageType = PageType.SingleSide
+                    pagetype = PageType.SingleSide
                     lastpage = False
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         realFirstPageList[0], pageNumber, pageCount, pagetype, productstyle, oddpage,
                         bg_notFoundDirList, availableFonts, lastpage)
-                pagetype: PageType = PageType.EmptyPage
+                pagetype = PageType.EmptyPage
 
             elif AlbumInfo.isAlbumProduct(productstyle) and lastpage: # album last page is special because of inside cover
-                pageNumber: int = n
+                pageNumber = n
                 if pageNumbers is None or pageNumber in pageNumbers:
                     # process the actual last page
-                    oddpage: bool = IsOddPage(pageNumber)
+                    oddpage = IsOddPage(pageNumber)
                     page = getPageElementForPageNumber(fotobook, n)
-                    pagetype: PageType = PageType.Normal
+                    pagetype = PageType.Normal
                     parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, imagedir, pdf,
                         page, pageNumber, pageCount, PageType.Normal, productstyle, oddpage,
                         bg_notFoundDirList, availableFonts, lastpage)
@@ -1763,18 +1764,18 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
                 if len(page) >= 1:
                     # set up to process the special section for the inside cover
                     page = page[0]
-                    pageNumber: int = n + 1
-                    oddpage: bool = IsOddPage(pageNumber)
-                    pagetype: PageType = PageType.BackInsideCover
+                    pageNumber = n + 1
+                    oddpage = IsOddPage(pageNumber)
+                    pagetype = PageType.BackInsideCover
                 else:
                     logging.error(f'Failed to locate final emptypage when processing last page {n}')
                     page = None # catastrophe
 
             else:
-                pageNumber: int = n
-                oddpage: bool = IsOddPage(pageNumber)
+                pageNumber = n
+                oddpage = IsOddPage(pageNumber)
                 page = getPageElementForPageNumber(fotobook, n)
-                pagetype: PageType = PageType.Normal
+                pagetype = PageType.Normal
 
             if pageNumbers is not None and pageNumber not in pageNumbers:
                 continue
@@ -1807,7 +1808,7 @@ def processPages(fotobook, mcfBaseFolder, imagedir, productstyle, pdf, pageCount
             logging.error(f'error on page {n}: {pageex.args[0]}')
 
 
-def collectArgsAndConvert() -> bool:
+def collectArgsAndConvert():
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
         pass
 
@@ -1841,12 +1842,12 @@ def collectArgsAndConvert() -> bool:
     if args.inputFile is None:
         # from July 2024 you must specify a file name. Check if there are any obvious candidates
         # which we could use in an example text
-        fnames: list[str] = [i for i in os.listdir(os.curdir) if os.path.isfile(i) and (i.endswith('.mcf') or i.endswith('.mcfx'))]
+        fnames = [i for i in os.listdir(os.curdir) if os.path.isfile(i) and (i.endswith('.mcf') or i.endswith('.mcfx'))]
         if len(fnames) >= 1:
             # There is one or more mcf(x) file! Show him how to specify the first such file as an example.
-            exampleFile: str = os.path.join(os.getcwd(), fnames[0])
+            exampleFile = os.path.join(os.getcwd(), fnames[0])
             if ' ' in exampleFile:
-                exampleFile: str = f'\"{exampleFile}\"'
+                exampleFile = f'\"{exampleFile}\"'
             parser.epilog = f"{epilogText} {exampleFile}\n \n"
         parser.parse_args(['-h'])
         sys.exit(1)
@@ -1890,7 +1891,7 @@ def collectArgsAndConvert() -> bool:
     return convertMcf(args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData, outputFileName=outFile)
 
 
-def cleanUpTempFiles(fileList, unpackedFolder) -> None:
+def cleanUpTempFiles(fileList, unpackedFolder):
     for tmpFileName in fileList:
         if os.path.exists(tmpFileName):
             os.remove(tmpFileName)
@@ -1901,4 +1902,4 @@ def cleanUpTempFiles(fileList, unpackedFolder) -> None:
 if __name__ == '__main__':
     # only executed when this file is run directly.
     # we need trick to have both: default and fixed formats.
-    resultFlag: bool = collectArgsAndConvert()
+    resultFlag = collectArgsAndConvert()
