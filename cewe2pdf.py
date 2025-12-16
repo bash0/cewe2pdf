@@ -83,6 +83,8 @@ import reportlab.lib.colors
 import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.pdfmetrics import stringWidth as _stringWidth
 from reportlab.platypus import Paragraph, Table, TopPadder
 from reportlab.lib.styles import ParagraphStyle
 # from reportlab.lib.styles import getSampleStyleSheet
@@ -830,7 +832,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # See the comment below in processTextCore about text wrapping issues. This seems to be
     # caused by cewe2pdf rendering fonts with a slightly thicker stroke than CEWE's Qt renderer.
     # It is unclear why that is. However a workaround here is that we can compensate, only when
-    # needed, by applying a 0.99 scale factor to the font rendering. We do that up to 3 times.
+    # needed, by applying a 0.99^n scale factor to the font rendering. We do that up to n=3 times.
+    # Generally it resolves the wrapping issue with n=1.
 
     iterationsToShrinkFontWhenNecessary = 3
     scaleFactor = 1.0
@@ -839,13 +842,16 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # The code used to use a global variable to store the flowables. This leads to problems where a 
     # flowable in one text area can, in extreme circumstances, appear in another. So, we use a local variable.
     pdf_flowableList = []
+    pdf_styleN = None
 
     while True:
         # Reset it each time we go round this loop. Normally we only call processTextCore once. 
         # But, if we encounter the text wrapping issue, we will try again.
         pdf_flowableList = []
+        # set default para style in case there are no spans to set it.
+        pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
         textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth = \
-            processTextCore(pdf_flowableList, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
+            processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
             bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
         if not textWrapProblem or iterationsToShrinkFontWhenNecessary == 0:
             if not textWrapProblem:
@@ -874,14 +880,55 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         #frameHeight = finalTotalHeight
         # Calculate offset to center this smaller frame in the original area
         emptySpace = originalFrameHeight - finalTotalHeight
-        verticalCenterOffset = emptySpace / 2.0
-        # Technically these should both be equal, but text looks more accurately centered
-        # if we adjust them by 1.0 point in opposite directions
-        bottomPad=verticalCenterOffset+1.0
-        topPad=verticalCenterOffset-1.0
-        logging.debug(original_text_only)
-        logging.debug(f"VERTICAL CENTERING: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, emptySpace={emptySpace:.2f}, verticalCenterOffset={verticalCenterOffset:.2f}")
+        a, d = pdfmetrics.getAscentDescent(pdf_styleN.fontName, pdf_styleN.fontSize * scaleFactor)
+        logging.debug(f"Font={pdf_styleN.fontName}, size={pdf_styleN.fontSize}, scaleFactor={scaleFactor:.2f}, metrics: a={a:.2f}, d={d:.2f}")
+        if (a is not None and finalTotalHeight < 2*(a-d)):
+            # We have a single line of text. To vertically center it, we need to re-lay it out with zero leading.
+            # This seems to be the only way to get it exactly right (which is both visually preferable and something
+            # that CEWE does very well). Leading is extra space designed to ensure multiple lines of text don't overlap.
+            # We only have a single line, so any leading is unhelpful and messes up the centering.
+            pdf_flowableList = [] # Throw away previous layout
+            # set default para style in case there are no spans to set it.
+            pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
+            # use forceLeading=1.0 to force minimal leading.  Even with 1.0 there is generally a bit of spare points of space
+            # above the text. This is because fonts are laid out using "Em squares", which are larger than the actual glyphs.
+            # So we still need to do some padding adjustment below. 
+            textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth = \
+                processTextCore(pdf_flowableList, pdf_styleN, 1.0, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
+                bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
+            # Recalculate for the new height.
+            emptySpace = originalFrameHeight - finalTotalHeight
+            # Looks like 1 line of text only. Adjust centering to improve visual appearance of balance
+            heightWithLeading = 1.0 * pdf_styleN.fontSize * scaleFactor
+            # Note that d is negative.
+            fontH = a-d
+            # Assume leading is 100% above.
+            justTheLeading = heightWithLeading - a
+            perceivedTextH = a  # we ignore descent for perceived height
+            perceivedSpace = originalFrameHeight - perceivedTextH
+            topPad = perceivedSpace/2 - justTheLeading
+            # Now calculate bottomPad so that total height is correct
+            bottomPad = emptySpace - topPad
+            logging.debug(f"Top: {topPad:.2f}, justTheLeading {justTheLeading:.2f}, text {a:.2f}, desc {-d:.2f}, bottom {bottomPad:.2f} = TOTAL {(topPad+justTheLeading+a-d+bottomPad):.2f} vs frameH {originalFrameHeight:.2f}")
+            logging.debug(f"Single line spacing decision for vertical centering: justTheLeading={justTheLeading:.2f}, emptySpace={emptySpace:.2f}, perceivedSpace={perceivedSpace:.2f}, perceivedTextH={perceivedTextH:.2f},bottomPad={bottomPad:.2f}, topPad={topPad:.2f}")
+            # Note that bottomPad + topPad = perceivedSpace + d
+            # So rearranging, bottomPad + topPad + a - d = perceivedSpace + a
+            # (to validate our arithmetic)
+        else:
+            # Looks like 2 or more lines of text. Perceptual center is nearly symmetric; the 
+            # difference is much less significant than for single lines of text.
+            verticalCenterOffset = emptySpace / 2.0
+            # Technically these should both be equal, but visual perception is better
+            # if we adjust them by 1.0 point in opposite directions
+            bottomPad=verticalCenterOffset+1.0
+            topPad=verticalCenterOffset-1.0
+            logging.debug(f"Multi-line spacing decision for vertical centering: emptySpace={emptySpace}, bottomPad={bottomPad}, topPad={topPad}, verticalCenterOffset={verticalCenterOffset:.2f}")
 
+        logging.debug(original_text_only)
+        logging.debug(f"VERTICAL CENTERING: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, emptySpace={emptySpace:.2f}")
+
+
+    # Now we know the padding (either because it was set long ago, or because we just calculated it for vertical centering)
     newFrame = ColorFrame(frameBottomLeft_x, frameBottomLeft_y,
         frameWidth, frameHeight,
         leftPadding=leftPad, bottomPadding=bottomPad,
@@ -903,7 +950,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     pdf.translate(-transCx, -transCy)
 
 
-def processTextParas(pdf_flowableList, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
+def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
                      family, indexEntryText: Any | None, pdf, pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> tuple[Any, str]:
     htmlparas = body.findall(".//p")
 
@@ -941,7 +988,7 @@ def processTextParas(pdf_flowableList, paragraphText: str, additional_fonts, bod
                 additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
-            pdf_styleN.leading = usefs * finalLeadingFactor # line spacing (text + leading)
+            pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor # line spacing (text + leading)
             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             originalFont = CollectItemFontFamily(p, family)
             if albumIndex.CheckForIndexEntry(originalFont, bodyfs):
@@ -957,7 +1004,7 @@ def processTextParas(pdf_flowableList, paragraphText: str, additional_fonts, bod
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
                     additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
                 usefs = maxfs if maxfs > 0 else bodyfs
-                pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
+                pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
 
             # now run round the htmlspans
             for item in htmlspans:
@@ -967,7 +1014,7 @@ def processTextParas(pdf_flowableList, paragraphText: str, additional_fonts, bod
                     # but if it is not there then an empty paragraph goes missing :-(
                     paragraphText += '&nbsp;</para>'
                     usefs = maxfs if maxfs > 0 else bodyfs
-                    pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
+                    pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = '<para autoLeading="max">'
@@ -998,7 +1045,7 @@ def processTextParas(pdf_flowableList, paragraphText: str, additional_fonts, bod
                             # terminate the current pdf para and add it to the flow
                             paragraphText += '</para>'
                             usefs = maxfs if maxfs > 0 else bodyfs
-                            pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
+                            pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
                             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
@@ -1020,24 +1067,23 @@ def processTextParas(pdf_flowableList, paragraphText: str, additional_fonts, bod
             try:
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
-                pdf_styleN.leading = usefs * finalLeadingFactor  # line spacing (text + leading)
+                pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception:
                 logging.exception('Exception')
     return indexEntryText, paragraphText
 
-def processTextCore(pdf_flowableList, additional_fonts, areaHeight, areaWidth, body, bodyfont: str | Any, bodyfs: int,
+def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts, areaHeight, areaWidth, body, bodyfont: str | Any, bodyfs: int,
                     bottomPad: float | int | Any, bstyle: dict[Any, Any], bweight: int, family,
                     leftPad: float | int | Any, pdf, rightPad: float | int | Any, topPad: float | int | Any,
                     fontScaleFactor: float) -> \
 tuple[bool, str |Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any]:
-    # set default para style in case there are no spans to set it.
-    pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, fontScaleFactor)
 
     # for debugging the background colour may be useful, but it is not used in production
     # since we started to use ColorFrame to colour the background, and it is thus left
     # unset by CreateParagraphStyle
     # pdf_styleN.backColor = reportlab.lib.colors.HexColor("0xFFFF00")
+    pdf_styleN.leading = bodyfs * fontScaleFactor
 
     # There may be multiple "index entry" paragraphs in the text area.
     # Concatenating them to just one index entry seems to work in practice
@@ -1049,10 +1095,10 @@ tuple[bool, str |Any, float | int | Any, float | Any, float | Any, float | Any, 
     all_body_children = list(body)
     unprocessed_children = set(all_body_children)  # Will remove elements as we process them
 
-    indexEntryText, recentParagraphText = processTextParas(pdf_flowableList, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText,
+    indexEntryText, recentParagraphText = processTextParas(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText,
                                       pdf, pdf_styleN, fontScaleFactor, unprocessed_children)
 
-    recentParagraphText = processTextUL(pdf_flowableList, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN,
+    recentParagraphText = processTextUL(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN,
                                   fontScaleFactor, unprocessed_children)
 
     # The <table> tag contains margin info, not actual content - mark it as processed
@@ -1084,8 +1130,6 @@ tuple[bool, str |Any, float | int | Any, float | Any, float | Any, float | Any, 
     finalTotalWidth = frameWidth # should never be exceeded in the text height check loop
     availableTextHeight = frameHeight - topPad - bottomPad
     availableTextWidth = frameWidth - leftPad - rightPad
-    
-    logging.debug(f"Frame calculation: frameWidth={frameWidth:.2f}, frameHeight={frameHeight:.2f}, topPad={topPad:.2f}, bottomPad={bottomPad:.2f}, availableTextHeight={availableTextHeight:.2f}")
 
     # Go through all flowables and test if the fit in the frame. If not increase the frame height.
     # To solve the problem, that if each paragraph will fit indivdually, and also all together,
@@ -1098,8 +1142,6 @@ tuple[bool, str |Any, float | int | Any, float | Any, float | Any, float | Any, 
             # I have never seen this happen, but check anyway
             logging.error('A set of paragraphs too wide for its frame. INTERNAL ERROR!')
             finalTotalWidth = neededTextWidth + leftPad + rightPad
-            
-    logging.debug(f"After wrapping flowables: finalTotalHeight={finalTotalHeight:.2f} (includes topPad + bottomPad), actual text height={finalTotalHeight - topPad - bottomPad:.2f}")
 
     textWrapProblem = finalTotalHeight > frameHeight
     if textWrapProblem:
@@ -1123,7 +1165,7 @@ tuple[bool, str |Any, float | int | Any, float | Any, float | Any, float | Any, 
     frameWidth = max(frameWidth, finalTotalWidth)
     return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth
 
-def processTextUL(pdf_flowableList, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
+def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
                   pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> str:
     # Process <ul> (unordered list) elements - bulleted lists
     htmllists = body.findall("ul")
@@ -1184,7 +1226,7 @@ def processTextUL(pdf_flowableList, paragraphText: str, additional_fonts, body, 
                                                              additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
-                list_styleN.leading = usefs * finalLeadingFactor
+                list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
                 pdf_flowableList.append(Paragraph(paragraphText, list_styleN))
             else:
                 # List item with spans and other formatting
@@ -1194,7 +1236,7 @@ def processTextUL(pdf_flowableList, paragraphText: str, additional_fonts, body, 
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
                                                              additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
                 usefs = maxfs if maxfs > 0 else bodyfs
-                list_styleN.leading = usefs * finalLeadingFactor
+                list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
 
                 # Process child elements (spans, br, etc.)
                 for item in lispans:
@@ -1244,7 +1286,7 @@ def processTextUL(pdf_flowableList, paragraphText: str, additional_fonts, body, 
                 try:
                     paragraphText += '</para>'
                     usefs = maxfs if maxfs > 0 else bodyfs
-                    list_styleN.leading = usefs * finalLeadingFactor
+                    list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
                     pdf_flowableList.append(Paragraph(paragraphText, list_styleN))
                 except Exception:
                     logging.exception('Exception')
