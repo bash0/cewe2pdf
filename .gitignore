@@ -73,3 +73,8 @@ nosetests.xml
 .idea/modules.xml
 .idea/vcs.xml
 .idea/inspectionProfiles/profiles_settings.xml
+.DS_Store
+tests/testTextWrapVAlignBorder/test_textWrapVAlignBorder.xmcf/data.mcf
+tests/testTextWrapVAlignBorder/test_textWrapVAlignBorder.xmcf/folderid.xml
+tests/testTextWrapVAlignBorder/test_textWrapVAlignBorder.xmcf/Icon
+tests/testTextWrapVAlignBorder/test_textWrapVAlignBorder.xmcf/Icon
