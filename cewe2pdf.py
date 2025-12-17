@@ -872,7 +872,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
     # Apply vertical centering if ALIGNVCENTER is specified. We previously set topPad and bottomPad
     # to zero. Now we have the actual text height, we can calculate the required padding to center
-    # the text vertically in the area.
+    # the text vertically in the area.  With these subtle calculations we can get (almost) pixel 
+    # perfect centering for normal fonts, and decent centering of "weird" fonts.
     if verticallyCenter and finalTotalHeight < (mcf2rl * areaHeight):
         # Original area height from XML
         originalFrameHeight = mcf2rl * areaHeight
@@ -887,6 +888,15 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # This seems to be the only way to get it exactly right (which is both visually preferable and something
             # that CEWE does very well). Leading is extra space designed to ensure multiple lines of text don't overlap.
             # We only have a single line, so any leading is unhelpful and messes up the centering.
+
+
+            # Occasional fonts - in particular "CEWE Head" produce incorrect results for ascent and descent.
+            # The ascent is larger than the fontSize. Practical experimentation shows that this seems to be 
+            # driven by large amounts of unaccounted for padding/leading applied on top and bottom. In this case our only
+            # solution is to divide the apparent empty space equally between top and bottom. This may not
+            # be pixel perfect, but it is the best we can do without more precise font information.      
+            weirdFont = a > pdf_styleN.fontSize
+
             pdf_flowableList = [] # Throw away previous layout
             # set default para style in case there are no spans to set it.
             pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
@@ -896,21 +906,29 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth = \
                 processTextCore(pdf_flowableList, pdf_styleN, 1.0, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
                 bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
+
             # Recalculate for the new height.
             emptySpace = originalFrameHeight - finalTotalHeight
-            # Looks like 1 line of text only. Adjust centering to improve visual appearance of balance
-            heightWithLeading = 1.0 * pdf_styleN.fontSize * scaleFactor
-            # Note that d is negative.
-            fontH = a-d
-            # Assume leading is 100% above.
-            justTheLeading = heightWithLeading - a
-            perceivedTextH = a  # we ignore descent for perceived height
-            perceivedSpace = originalFrameHeight - perceivedTextH
-            topPad = perceivedSpace/2 - justTheLeading
-            # Now calculate bottomPad so that total height is correct
-            bottomPad = emptySpace - topPad
-            logging.debug(f"Top: {topPad:.2f}, justTheLeading {justTheLeading:.2f}, text {a:.2f}, desc {-d:.2f}, bottom {bottomPad:.2f} = TOTAL {(topPad+justTheLeading+a-d+bottomPad):.2f} vs frameH {originalFrameHeight:.2f}")
-            logging.debug(f"Single line spacing decision for vertical centering: justTheLeading={justTheLeading:.2f}, emptySpace={emptySpace:.2f}, perceivedSpace={perceivedSpace:.2f}, perceivedTextH={perceivedTextH:.2f},bottomPad={bottomPad:.2f}, topPad={topPad:.2f}")
+            logging.debug(f"Recalc: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, emptySpace={emptySpace:.2f}")
+            if weirdFont:
+                topPad = emptySpace/2.0
+                # Now calculate bottomPad so that total height is correct
+                bottomPad = emptySpace - topPad
+                logging.debug(f"Weird font, so splitting emptySpace={emptySpace:.2f} equally")
+            else:
+                heightWithLeading = 1.0 * pdf_styleN.fontSize * scaleFactor
+                # Note that d is negative.
+                fontH = a-d
+                # Assume leading is 100% above.
+                justTheLeading = heightWithLeading - a
+                perceivedTextH = a  # we ignore descent for perceived height
+                perceivedSpace = originalFrameHeight - perceivedTextH
+                topPad = perceivedSpace/2.0 - justTheLeading
+                # Now calculate bottomPad so that total height is correct
+                bottomPad = emptySpace - topPad
+                logging.debug(f"Top: {topPad:.2f}, justTheLeading {justTheLeading:.2f}, text {a:.2f}, desc {-d:.2f} & bottom {bottomPad:.2f} = TOTAL {(topPad+justTheLeading+a+bottomPad):.2f} vs frameH {originalFrameHeight:.2f}")
+                logging.debug(f"Single line spacing decision for vertical centering: justTheLeading={justTheLeading:.2f}, emptySpace={emptySpace:.2f}, perceivedSpace={perceivedSpace:.2f}, perceivedTextH={perceivedTextH:.2f},bottomPad={bottomPad:.2f}, topPad={topPad:.2f}")
+
             # Note that bottomPad + topPad = perceivedSpace + d
             # So rearranging, bottomPad + topPad + a - d = perceivedSpace + a
             # (to validate our arithmetic)
