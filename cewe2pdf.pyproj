@@ -31,9 +31,13 @@
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
     <Content Include="cewe2pdf.spec" />
+    <Content Include="environments\cewe2pdfenvlinux.yml" />
+    <Content Include="environments\cewe2pdfenvwindows.yml" />
+    <Content Include="environments\environments.md" />
     <Content Include="tests\compare-pdf\LICENSE" />
     <Content Include="tests\compare-pdf\README.md" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
+    <Content Include="tests\Resources\photofun\backgrounds\447.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6044.jpg" />
     <Content Include="tests\Resources\photofun\decorations\106793\106793.json" />
@@ -320,6 +324,7 @@
   <ItemGroup>
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
+    <Folder Include="environments\" />
     <Folder Include="tests" />
     <Folder Include="tests\compare-pdf\" />
     <Folder Include="tests\compare-pdf\compare_pdf\" />

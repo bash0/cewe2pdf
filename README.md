@@ -299,3 +299,35 @@ Tests using compare-pdf originally used the modification time to sort result pdf
 ```
 (Get-ChildItem .\testalbum.mcf.20250326.pdf).LastWriteTime = New-object DateTime 2025,03,26,19,00,00
 ```
+### Cleaning up temporary files 
+Running tests during development can leave temporary output files lying around. Cleaning these away is a bit tricky, because it's important not to delete the approved result pdfs. On Windows you can locate these files with a powershell command like this:
+```
+Get-ChildItem -Recurse -File -Filter *.pdf |
+Where-Object {
+    $_.FullName -notmatch '\\previous_result_pdfs\\' -and
+    $_.Name -match '^[^\\]*\d{8}[DS]\.pdf$'
+}
+```
+and then delete them (via the recycle bin) with
+```
+$shell = New-Object -ComObject Shell.Application
+Get-ChildItem -Recurse -File -Filter *.pdf |
+Where-Object {
+    $_.FullName -notmatch '\\previous_result_pdfs\\' -and
+    $_.Name -match '^[^\\]*\d{8}[DS]\.pdf$'
+} |
+ForEach-Object {
+    $shell.Namespace(0).ParseName($_.FullName).InvokeVerb("delete")
+}
+```
+If you want a dry run first, just replace the `InvokeVerb("delete")` line with:
+```
+Write-Output "Would delete: $($_.FullName)"
+```
+Finding the files on Linux is rather easier :-):
+```
+find . -type f -name "*.pdf" \
+  ! -path "*/previous_result_pdfs/*" \
+  | grep -E "/[^/]*[0-9]{8}[DS]\.pdf$"
+```
+You can of course make the pattern matching a little more cautious if you want to be absolutely sure you don't delete something important!
