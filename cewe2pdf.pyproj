@@ -37,6 +37,7 @@
     <Content Include="tests\compare-pdf\LICENSE" />
     <Content Include="tests\compare-pdf\README.md" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
+    <Content Include="tests\Resources\photofun\backgrounds\447.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6044.jpg" />
     <Content Include="tests\Resources\photofun\decorations\106793\106793.json" />
