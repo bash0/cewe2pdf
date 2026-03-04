@@ -159,6 +159,10 @@
     <Content Include="tests\testIndex\cewe2pdf.ini" />
     <Content Include="tests\testIndex\test_index.mcf" />
     <Content Include="tests\testIndex\test_index_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testLists\additional_fonts.txt" />
+    <Content Include="tests\testLists\cewe2pdf.ini" />
+    <Content Include="tests\testLists\testlists.mcf" />
+    <Content Include="tests\testlists\testlists_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testPageNumbers\additional_fonts.txt" />
     <Content Include="tests\testPageNumbers\cewe2pdf.ini" />
     <Content Include="tests\testPageNumbers\test_pagenumbers.mcf" />
@@ -308,6 +312,7 @@
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
     <Compile Include="tests\testIndexLarge\test_indexLarge.py" />
     <Compile Include="tests\testIndex\test_index.py" />
+    <Compile Include="tests\testLists\test_lists.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
     <Compile Include="tests\testTextArt\test_textart.py" />
@@ -369,6 +374,9 @@
     <Folder Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\" />
     <Folder Include="tests\testIndex\" />
     <Folder Include="tests\testIndex\test_index_mcf-Dateien\" />
+    <Folder Include="tests\testLists\" />
+    <Folder Include="tests\testLists\previous_result_pdfs\" />
+    <Folder Include="tests\testlists\testlists_mcf-Dateien\" />
     <Folder Include="tests\testPageNumbers\" />
     <Folder Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\" />
     <Folder Include="tests\testTextArt\" />
