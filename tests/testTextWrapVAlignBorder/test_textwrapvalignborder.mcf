@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="9896" article_name="XXL%20Landscape%20CEWE%20PHOTOBOOK%20with%20Classic%20Paper" externalProjectId="" folderID="a692aae4-9756-4982-8b27-72d14347f945" imagedir="" isDataMcf="0" productname="ALB42" startdatecalendarium="" useSpineLogo="0" version="4.0">
+    <project createdWithHPSVersion="8.0.5" createdWithHPSVersionBuild="20251014" multiPurposeText="" projectID="51494842-57ae-4b0d-bc66-d35f05155c7a" projectIDCreatedEpoch="1764861676"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="8.0.5" programversionBuild="20251014" savetime="2025-12-15 20:39"/>
+    <creationHistory clientId="37" clientVersion="7.4.3-20240328-default" creationDate="2024-06-12 08:14"/>
+    <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
+    <addOns/>
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="CEWE Head" fontitalics="0" fontsize="18" format="0" margin="156" position="0" textcolor="#ff000000" textstring="%" verticalMargin="70">
+        <outline width="1"/>
+    </pagenumbering>
+    <extra>
+        <lastTextFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#93000000" font="Helvetica,51,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ffffffff" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <imageQuality version="1.2.6"/>
+    </extra>
+    <page designStyleID="1158346" designStyleTemplateName="collage_cover_back" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2960" width="7870"/>
+        <designElementIDs background="201" layout="384100" styles_v2="1158346"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="384100" layout="1" templatename="raster_landscape_middle_cover_large_000130"/>
+        <area areatype="spinetextarea">
+            <position height="106" left="2505" rotation="90" top="1427" width="2860" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'CEWE Head'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">X CEWE Vertical Alignment and Border X</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea" backgroundcolor="2466250752">
+            <position height="308" left="4391.59" rotation="0" top="2602" width="3427.96" zposition="7001"/>
+            <decoration>
+                <border applySpotColor="0" color="#00000000" enabled="1" gap="10" position="outside" width="20"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="title"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'CEWE Head'; font-size:51pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ffffff;">X CEWE Vertical Alignment and Border X</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#93000000" font="CEWE Head,51,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ffffffff" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea" backgroundcolor="2466250752">
+            <position height="414" left="4168.4" rotation="0" top="1600.12" width="3353.18" zposition="7002"/>
+            <decoration>
+                <border applySpotColor="0" color="#00000000" enabled="1" gap="10" position="outside" width="20"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="title"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:51pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ffffff;">X Liberation Vertical Alignment and B X</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#93000000" font="Liberation Sans,51,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ffffffff" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea" backgroundcolor="2466250752">
+            <position height="360" left="4168.77" rotation="0" top="1092.98" width="3348.45" zposition="7003"/>
+            <decoration>
+                <border applySpotColor="0" color="#00000000" enabled="1" gap="10" position="outside" width="20"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="title"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Helvetica'; font-size:51pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#ffffff;">X Helvetica Vertical Alignment and B X</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#93000000" font="Helvetica,51,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ffffffff" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="cover_spine" pagenr="0" rotation="0" type="spine">
+        <bundlesize height="2960" width="7870"/>
+        <designElementIDs background="201" styles_v2="1158346"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="collage_1_cover_front" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2960" width="7870"/>
+        <designElementIDs background="201" layout="1168346" styles_v2="1158346"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="1168346" layout="1" templatename="collage_1_cover_front_landscape"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="201"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <area areatype="textarea" backgroundcolor="4294694749">
+            <position height="106" left="4007.46" rotation="0" top="1430.63" width="3392.09" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="headline"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#004e41;">A very long line of text is often rendered slightly too heavily, compared to CEWE Creator, and this means the character widths are a tiny fraction wider, which causes the text to wrap - unexpectedly. By spotting this issue and imperceptibly reducing the font size (by, say, 1%), we can usually fix the issue. While this is not a 100% bug fix, it is the best alternative so far. </span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#fffbd75d" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff004e41" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="1110355" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="1110355" layout="1" templatename="19289-travel-memories_page_027_landscape"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="schema_landscape_007"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="XXL-8.1 DIN A4"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="XXL-8.8 DIN A4_x"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="5" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="schema_landscape_026"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="6" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="384109" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="7" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="schema_landscape_006_y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="8" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="XXL-10.3 DIN A4"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="9" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="schema_landscape_013"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="10" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125022" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125022" layout="1" templatename="fotobook_full_landscape_3"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="11" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125022" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125022" layout="1" templatename="fotobook_full_landscape_47"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="12" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="5.12"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="13" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="schema_landscape_015_y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="14" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125022" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125022" layout="1" templatename="fotobook_full_landscape_63_x, y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="15" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125022" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125022" layout="1" templatename="fotobook_full_landscape_56_x, y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="16" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125022" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125022" layout="1" templatename="fotobook_full_landscape_81_x"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="17" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="schema_landscape_006_y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="18" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="9.2.1"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="19" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="schema_landscape_036_y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="20" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125027" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125027" layout="1" templatename="2.1.14ls_x, y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="21" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125022" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125022" layout="1" templatename="fotobook_full_landscape_59_y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="22" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="schema_landscape_039"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="23" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125027" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125027" layout="1" templatename="2.1.13ls_x, y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="24" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="XXL-11.4 DIN A4"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="25" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="XXL-11.4 DIN A4"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="26" rotation="0" type="normalpage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="212" layout="125026" styles_v2="1158346"/>
+        <background alignment="4" designElementId="212" rotation="0" type="1"/>
+        <background designElementId="125026" layout="1" templatename="schema_landscape_006_y"/>
+    </page>
+    <page designStyleID="1158346" designStyleTemplateName="default_page" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2900" width="7640"/>
+        <designElementIDs background="201" styles_v2="1158346"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships/>
+    <statistics assistantUsed="0" countPauses="704" elapsedTimeGross="2024-06-12T08:14:34" elapsedTimeNet="5781585" fotosAdded="512" fotosRemoved="192" pauseTime="5110119" sessionsUsed="36"/>
+</fotobook>
