@@ -310,17 +310,22 @@ Where-Object {
 ```
 and then delete them (via the recycle bin) with
 ```
-$shell = New-Object -ComObject Shell.Application
+Add-Type -AssemblyName Microsoft.VisualBasic
+
 Get-ChildItem -Recurse -File -Filter *.pdf |
 Where-Object {
     $_.FullName -notmatch '\\previous_result_pdfs\\' -and
-    $_.Name -match '^[^\\]*\d{8}[DS]\.pdf$'
+    $_.Name -match '^\w*\d{8}[DS]\.pdf$'
 } |
 ForEach-Object {
-    $shell.Namespace(0).ParseName($_.FullName).InvokeVerb("delete")
+    [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile(
+        $_.FullName,
+        'OnlyErrorDialogs',
+        'SendToRecycleBin'
+    )
 }
 ```
-If you want a dry run first, just replace the `InvokeVerb("delete")` line with:
+If you want a dry run first, just replace the DeleteFile section with:
 ```
 Write-Output "Would delete: $($_.FullName)"
 ```
