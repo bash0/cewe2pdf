@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="9171" article_name="CEWE%20FOTOBOK%20stor%20Softcover%20standard%20digitaltrykk" externalProjectId="" folderID="35806420-3b6c-4875-9135-5512ad9a47b8" imagedir="testlists_mcf-Dateien" isDataMcf="0" productname="ALB14" startdatecalendarium="" useSpineLogo="1" version="4.0">
+    <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="306d26ac-44e7-4894-957c-78bb7bb7000f" projectIDCreatedEpoch="1772625619"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="8.0.5" programversionBuild="20251014" savetime="2026-03-04 19:30"/>
+    <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-03-29 07:01"/>
+    <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
+    <addOns/>
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="CEWE Head" fontitalics="0" fontsize="12" format="0" margin="110" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
+        <outline width="0"/>
+    </pagenumbering>
+    <extra>
+        <lastTextFormat Alignment="ALIGNTOP,ALIGNLEFT" IndentMargin="17" VerticalIndentMargin="17" backgroundColor="#00000000" font="Bodoni,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="138"/>
+        <imageQuality version="1.2.6"/>
+    </extra>
+    <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2700" width="4128"/>
+        <designElementIDs background="201" layout="384109"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
+        <area areatype="spinetextarea">
+            <position height="38" left="764" rotation="270" top="1331" width="2600" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked::marker { content: "\2612"; }
+</style></head><body style=" font-family:'CEWE Head'; font-size:6pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,6,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="spine">
+        <bundlesize height="2700" width="4128"/>
+        <designElementIDs background="201"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2700" width="4128"/>
+        <designElementIDs background="201" layout="422099"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="422099" layout="1" templatename="fullcoverpage_with_title"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <area areatype="textarea">
+            <position height="572.75" left="2279.43" rotation="0" top="208.948" width="592.653" zposition="7000"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff47723" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Bodoni'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-size:14pt; color:#000000;">Here is a bullet list pasted from Google docs</span></p><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%; font-size:14pt; color:#000000;"><br /></p><ul style="margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;"><li style=" color:#000000; background-color:transparent;" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;">Bullet one</li><li style=" color:#000000; background-color:transparent;" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;">Bullet two is long enough to go over several lines</li><li style=" color:#000000; background-color:transparent;" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;">a third bullet</li><li style=" color:#000000; background-color:transparent;" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;">and a fourth</li></ul></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTOP,ALIGNLEFT" IndentMargin="17" VerticalIndentMargin="50" backgroundColor="#00000000" font="Bodoni,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="468" left="2275.36" rotation="0" top="835.999" width="593" zposition="7001"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff47723" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Bodoni'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Here is a numbered list pasted from Google docs</span></p><p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%; color:#000000;"><br /></p><ol style="margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;"><li style=" color:#000000;" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%; background-color:transparent;"><span style=" background-color:transparent;">Number one</span></li><li style=" color:#000000; background-color:transparent;" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;">Number two</li><li style=" color:#000000; background-color:transparent;" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;">a third number </li><li style=" color:#000000; background-color:transparent;" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;">and a fourth</li></ol></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTOP,ALIGNLEFT" IndentMargin="21" VerticalIndentMargin="50" backgroundColor="#00000000" font="Bodoni,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="572.75" left="2983.53" rotation="0" top="208.948" width="592.653" zposition="7002"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Bodoni'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">This is text typed normally in a text box, not pasted from another application.</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTOP,ALIGNLEFT" IndentMargin="17" VerticalIndentMargin="50" backgroundColor="#00000000" font="Bodoni,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="5" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="6" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="7" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="8" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="9" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="10" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="11" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="12" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="13" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="14" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="15" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="16" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="17" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="18" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="19" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="20" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="21" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="22" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="23" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="24" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="25" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="26" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships/>
+    <statistics assistantUsed="0" countPauses="18" elapsedTimeGross="2025-03-29T07:01:21" elapsedTimeNet="117665" fotosAdded="0" fotosRemoved="0" pauseTime="94015" sessionsUsed="8"/>
+</fotobook>
