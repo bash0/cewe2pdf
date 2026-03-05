@@ -10,12 +10,14 @@ from fontHandling import getAvailableFont, getMissingFontSubstitute, noteFontSub
 from lineScales import LineScales
 
 
-def CreateParagraphStyle(textcolor, font, fontsize):
+def CreateParagraphStyle(textcolor, font, fontsize, font_size_adjust):
+    # apply a tiny adjustment to the font size used by ReportLab for measuring
+    adjusted_fs = fontsize * font_size_adjust
     parastyle = ParagraphStyle(None, None,
         alignment=reportlab.lib.enums.TA_LEFT,  # will often be overridden
-        fontSize=fontsize,
+        fontSize=adjusted_fs,
         fontName=font,
-        leading=fontsize * LineScales.lineScaleForFont(font),  # line spacing (text + leading)
+        leading=adjusted_fs * LineScales.lineScaleForFont(font),  # line spacing (text + leading)
         borderPadding=0,
         borderWidth=0,
         leftIndent=0,
@@ -59,7 +61,7 @@ def Dequote(s):
     # we can not delete now, because file is opened by pdf library
 
 
-def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
+def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight, fontScaleFactor):
     if item is None:
         return dfltfont, dfltfs, bweight, {}
     spanfont = dfltfont
@@ -78,7 +80,13 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight):
             spanweight = 400
 
     if 'font-size' in spanstyle:
-        spanfs = floor(float(spanstyle['font-size'].strip("pt")))
+        # preserve fractional point sizes and apply the global adjustment
+        try:
+            spanfs = float(spanstyle['font-size'].strip("pt"))
+        except Exception:
+            spanfs = float(dfltfs)
+    # apply the small adjustment multiplier
+    spanfs = spanfs * fontScaleFactor
     return spanfont, spanfs, spanweight, spanstyle
 
 
@@ -111,7 +119,8 @@ def AppendSpanStart(paragraphText, font, fsize, fweight, fstyle, outerstyle):
     Remember this is not really HTML, though it looks that way.
     See 6.2 Paragraph XML Markup Tags in the reportlabs user guide.
     """
-    paragraphText = AppendText(paragraphText, '<font name="' + font + '"' + ' size=' + str(fsize))
+    # format font size with two decimals so ReportLab receives a stable float
+    paragraphText = AppendText(paragraphText, '<font name="' + font + '"' + ' size=' + ("{:.2f}".format(fsize)))
 
     if 'color' in fstyle:
         paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])
@@ -143,8 +152,8 @@ def AppendSpanEnd(paragraphText, weight, style, outerstyle):
     return paragraphText
 
 
-def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle): # pylint: disable= too-many-arguments
-    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additional_fonts, bodyfont, bodyfs, bweight)
+def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor): # pylint: disable= too-many-arguments
+    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additional_fonts, bodyfont, bodyfs, bweight, fontScaleFactor)
     paragraphText = AppendSpanStart(paragraphText, pfont, pfs, pweight, pstyle, bstyle)
     if text is None:
         paragraphText = AppendText(paragraphText, "")
