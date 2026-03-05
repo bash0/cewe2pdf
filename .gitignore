@@ -74,7 +74,6 @@ nosetests.xml
 .idea/vcs.xml
 .idea/inspectionProfiles/profiles_settings.xml
 .DS_Store
-tests/testTextWrapVAlignBorder/test_textWrapVAlignBorder.xmcf/data.mcf
-tests/testTextWrapVAlignBorder/test_textWrapVAlignBorder.xmcf/folderid.xml
-tests/testTextWrapVAlignBorder/test_textWrapVAlignBorder.xmcf/Icon
-tests/testTextWrapVAlignBorder/test_textWrapVAlignBorder.xmcf/Icon
+# macOS custom folder icon file is stored as "Icon" plus a hidden control character.
+# Match that hidden-character variant anywhere in the repo.
+**/Icon?
