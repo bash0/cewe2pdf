@@ -174,6 +174,13 @@
     <Content Include="tests\testTextArt\test_textart.mcf" />
     <Content Include="tests\testTextArt\test_textart.mcf~" />
     <Content Include="tests\testTextArt\test_textart_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\testTextBox\additional_fonts.txt" />
+    <Content Include="tests\testTextBox\cewe2pdf.ini" />
+    <Content Include="tests\testTextWrapVAlignBorder\cewe2pdf.ini" />
+    <Content Include="tests\testTextWrapVAlignBorder\previous_result_pdfs\test_textwrapvalignborder.mcf.20251216S.pdf" />
+    <Content Include="tests\testTextWrapVAlignBorder\previous_result_pdfs\test_textwrapvalignborder.mcf.20251217S.pdf" />
+    <Content Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder.mcf" />
+    <Content Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder_mcf-Dateien\folderid.xml" />
     <Content Include="tests\unittest_fotobook\additional_fonts.txt" />
     <Content Include="tests\unittest_fotobook\cewe2pdf.ini" />
     <Content Include="tests\hps\5026\.gitkeep" />
@@ -252,6 +259,7 @@
     <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250413D.pdf" />
     <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcf.20250413S.pdf" />
     <Content Include="tests\unittest_fotobook\previous_result_pdfs\unittest_fotobook.mcfx.20250413S.pdf" />
+    <Content Include="tests\testTextBox\testTextBox.mcf" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook.mcf" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook.mcf.pdf" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook.mcfx" />
@@ -316,6 +324,8 @@
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
     <Compile Include="tests\testTextArt\test_textart.py" />
+    <Compile Include="tests\testTextBox\test_textBox.py" />
+    <Compile Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder.py" />
     <Compile Include="tests\unittest_fotobook\test_simpleBook.py" />
     <Compile Include="tests\test_webp_loading\test_webp_loading.py" />
     <Compile Include="testutils.py">
@@ -382,6 +392,11 @@
     <Folder Include="tests\testTextArt\" />
     <Folder Include="tests\testTextArt\previous_result_pdfs\" />
     <Folder Include="tests\testTextArt\test_textart_mcf-Dateien\" />
+    <Folder Include="tests\testTextBox\" />
+    <Folder Include="tests\testTextBox\previous_result_pdfs\" />
+    <Folder Include="tests\testTextWrapVAlignBorder\" />
+    <Folder Include="tests\testTextWrapVAlignBorder\previous_result_pdfs\" />
+    <Folder Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder_mcf-Dateien\" />
     <Folder Include="tests\test_webp_loading\" />
     <Folder Include="tests\unittest_fotobook\" />
     <Folder Include="tests\Resources\" />
