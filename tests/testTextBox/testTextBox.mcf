@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="19cbf15c-8985-4cf8-b3a0-9e5baf772f09" imagedir="unittest_fotobook_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
-    <project createdWithHPSVersion="7.0.1" createdWithHPSVersionBuild="20191025" multiPurposeText="" projectID="69675965-93ed-4a07-b25f-7dc31eedcc67" projectIDCreatedEpoch="1744525043"/>
-    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="7.4.4" programversionBuild="20240826" savetime="2025-05-06 08:48"/>
+<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="6e55bb89-56cd-42a7-a884-ff12fd00c433" imagedir="testTextBox_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+    <project createdWithHPSVersion="7.0.1" createdWithHPSVersionBuild="20191025" multiPurposeText="" projectID="69675965-93ed-4a07-b25f-7dc31eedcc67" projectIDCreatedEpoch="1772799580"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="8.0.5" programversionBuild="20251014" savetime="2026-03-06 19:13"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
-    <addOns/>
+    <addOns>
+        <addOn ordertxt="FLF11" priceClass="FLF11" variant="flyleafcolor:white"/>
+    </addOns>
     <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
         <outline width="0"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="2" VerticalIndentMargin="2" backgroundColor="#00000000" font="Arial Narrow,11,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
-        <imageQuality version="1.0.0"/>
+        <lastTextFormat Alignment="ALIGNTRAILING,ALIGNBOTTOM,ALIGNABSOLUTE" IndentMargin="21" VerticalIndentMargin="21" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <imageQuality version="1.2.6"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
         <bundlesize height="2750" width="4290"/>
@@ -19,8 +21,8 @@
         <area areatype="spinetextarea">
             <position height="106" left="820" rotation="270" top="1322" width="2650" zposition="7000"/>
             <decoration/>
-            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Stafford'; font-size:8pt; font-weight:600; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:6px; margin-bottom:0px; margin-left:0px; margin-right:0px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#df1900;">Front title	</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Testing text boxes<br /></span><span style=" font-family:'FranklinGothic'; font-size:12pt; color:#1b7dd4;"> Including</span><span style=" font-size:12pt; font-weight:400; color:#000000;">Horizontal and vertical alignment and margins</span></p></td></tr></table></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Stafford,8,-1,5,75,0,0,0,0,0" foregroundColor="#ffffffff" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600; color:#df1900;">Front title:	</span><span style=" font-weight:400; color:#000000;">Testing text boxes</span><span style=" font-family:'Stafford'; font-weight:400; color:#000000;"><br /></span><span style=" font-weight:600; color:#1b7dd4;">Including:</span><span style=" font-weight:600; color:#df1900;">  </span><span style=" font-weight:400; color:#000000;">Horizontal and vertical alignment and margins</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="EB Garamond,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ffffffff" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -39,29 +41,127 @@
         <bundlesize height="2700" width="4100"/>
         <designElementIDs background="201" styles_v2="1226557"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
-	</page>
+    </page>
     <page designStyleID="-1" pagenr="1" rotation="0" type="normalpage">
-		<bundlesize height="2700" width="4100"/>
-		<designElementIDs background="201" layout="125061" styles_v2="1226557"/>
-		<background alignment="1" designElementId="201" rotation="0" type="1"/>
-		<background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
-	</page>
-    <page designStyleID="-1" pagenr="2" rotation="0" type="normalpage">
-		<bundlesize height="2700" width="4100"/>
-		<designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
-		<background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
-		<area areatype="textarea">
-			<position height="468.25" left="504.27" rotation="0" top="382.705" width="1319.21" zposition="7000"/>
-			<decoration>
-				<border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
-			</decoration>
-			<text applySpotColor="0" areaTextType="content">
-				<![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Calibri'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><table style="-qt-table-type: root; margin-top:5px; margin-bottom:5px; margin-left:5px; margin-right:5px;"><tr><td style="border: none;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This is on page 2.</span></p><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This is the second page that can be used.</span></p></td></tr></table></body></html>]]><outline width="0"/>
-				<textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,16,-1,5,50,0,0,0,0,0" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
-			</text>
-		</area>
-	</page>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="textarea">
+            <position height="305.367" left="208.241" rotation="0" top="241.318" width="643.203" zposition="7000"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This is left and top aligned text with a 0.0 mm edge margin set</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTOP,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="305" left="208.241" rotation="0" top="612.755" width="643" zposition="7001"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This is left and top aligned text with a 2.1 mm edge margin set</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTOP,ALIGNLEADING" IndentMargin="21" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="306" left="208.241" rotation="0" top="983.825" width="643" zposition="7002"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This is centred and centred text with a 0.0 mm edge margin set</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="305" left="208.241" rotation="0" top="1355.89" width="643" zposition="7003"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This is centred and centred text with a 2.1 mm edge margin set</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="21" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="306" left="208.241" rotation="0" top="1726.96" width="643" zposition="7004"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This is right and bottom aligned text with a 0.0 mm edge margin set</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTRAILING,ALIGNBOTTOM" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="310" left="208.241" rotation="0" top="2094.03" width="643" zposition="7005"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">This is right and bottom aligned text with a 2.1 mm edge margin set</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTRAILING,ALIGNBOTTOM" IndentMargin="21" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="156.207" left="1081.36" rotation="0" top="241.318" width="643" zposition="7006"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Single line left, top, 0.0</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTOP,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="156.207" left="1081.36" rotation="0" top="612.755" width="643" zposition="7007"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Single line left, top, 2.1</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTOP,ALIGNLEADING" IndentMargin="21" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="156.207" left="1081.36" rotation="0" top="983.825" width="643" zposition="7008"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Single line ctr, ctr, 0.0</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="156.207" left="1081.36" rotation="0" top="1355.89" width="643" zposition="7009"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Single line ctr, ctr, 0.0</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="21" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="156.207" left="1081.36" rotation="0" top="1726.96" width="643" zposition="7010"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Single, right, bottom, 0.0</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTRAILING,ALIGNBOTTOM" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="180" left="1081.36" rotation="0" top="2094.03" width="643" zposition="7011"/>
+            <decoration>
+                <border applySpotColor="0" color="#ff1b7dd4" enabled="1" gap="10" position="centered" width="4"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Single, right, bottom, 2.1</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNTRAILING,ALIGNBOTTOM" IndentMargin="21" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
     <page designStyleID="-1" pagenr="3" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
         <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
@@ -69,11 +169,11 @@
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
     </page>
     <page designStyleID="-1" pagenr="4" rotation="0" type="normalpage">
-		<bundlesize height="2700" width="4100"/>
-		<designElementIDs background="201" layout="125061" styles_v2="1226557"/>
-		<background alignment="1" designElementId="201" rotation="0" type="1"/>
-		<background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
-	</page>
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
     <page designStyleID="-1" pagenr="5" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
         <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
@@ -81,11 +181,11 @@
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
     </page>
     <page designStyleID="-1" pagenr="6" rotation="0" type="normalpage">
-		<bundlesize height="2700" width="4100"/>
-		<designElementIDs background="201" layout="125061" styles_v2="1226557"/>
-		<background alignment="1" designElementId="201" rotation="0" type="1"/>
-		<background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
-	</page>
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
     <page designStyleID="-1" pagenr="7" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
         <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
@@ -212,5 +312,6 @@
         <background alignment="3" designElementId="201" rotation="0" type="1"/>
     </page>
     <userfeedback></userfeedback>
-    <statistics assistantUsed="0" countPauses="70" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="465055" fotosAdded="9" fotosRemoved="5" pauseTime="380100" sessionsUsed="51"/>
+    <fotoRelationships/>
+    <statistics assistantUsed="0" countPauses="73" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="476212" fotosAdded="9" fotosRemoved="5" pauseTime="387971" sessionsUsed="53"/>
 </fotobook>

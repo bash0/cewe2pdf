@@ -759,9 +759,15 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     except: # noqa: E722
         bweight = 400
 
+    # from about CEWE 8.0, approx late 2025, the textFormat element has become important
+    textFormatElement = textTag.find('textFormat')
+    indentMargin = -1.0
+
     # issue https://github.com/bash0/cewe2pdf/issues/58 - margins are not being used
     # assume (based on empirical evidence!) that there is just one table, and collect
-    # the margin values.
+    # the margin values. This "table" code will no longer be used in an mcf created with the
+    # CEWE 8.0 software, because the margin values have been moved to the textFormat element, but 
+    # it is still needed for MCFs created with CEWE 7.0 and earlier, so we keep it in place.
     tabletmarg = tablebmarg = tablelmarg = tablermarg = 0
     table = htmlxml.find('.//body/table')
     if table is not None:
@@ -776,48 +782,55 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
                 tablermarg = floor(float(tablestyle['margin-right'].strip("px")))
             except: # noqa: E722
                 logging.warning(f"Ignoring invalid table margin settings {tableStyleAttrib}")
+    else:
+        # if there is no table, then we look for margin settings on the textFormat. Actually it looks
+        # like margin settings can appear on paragraphs and spans as well, but we haven't seen values 
+        # other than 0 in the MCFs we have looked at, so we will ignore that issue for now.
+		# And right now I don't see how VerticalIndentMargin is used, so we don't use it
+        if textFormatElement is not None:
+            indentMarginAttribute = textFormatElement.get('IndentMargin')
+            if indentMarginAttribute is not None:
+                try:
+                    indentMargin = floor(float(indentMarginAttribute))
+                    tabletmarg = tablebmarg = tablelmarg = tablermarg = indentMargin
+                except: # noqa: E722
+                    logging.warning(f"Invalid IndentMargin attribute {indentMarginAttribute}")
+
     leftPad = mcf2rl * tablelmarg
     rightPad = mcf2rl * tablermarg
     bottomPad = mcf2rl * tablebmarg
     topPad = mcf2rl * tabletmarg
 
     # Parse textFormat element for vertical centering alignment
-    verticallyCenter = False
-    textFormatElement = textTag.find('textFormat')
+    verticallyCenter = verticallyBottom = False
     if textFormatElement is not None:
         # Read alignment attribute to check for ALIGNVCENTER
         alignmentAttrib = textFormatElement.get('Alignment')
         if alignmentAttrib is not None:
             if 'ALIGNVCENTER' in alignmentAttrib:
                 verticallyCenter = True
+            elif 'ALIGNBOTTOM' in alignmentAttrib:
+                verticallyBottom = True
                 
     logging.debug(f"Text area: center=({transCx},{transCy}), dimensions={areaWidth}x{areaHeight}, topPad={topPad}, bottomPad={bottomPad}, verticallyCenter={verticallyCenter}, tabletmarg={tabletmarg}, tablebmarg={tablebmarg}")
     
     # if this is text art, then we do the whole thing differently.
     cwtextart = area.findall('decoration/cwtextart')
     if len(cwtextart) > 0:
-        pdf.translate(transCx, transCy)
-        pdf.rotate(-areaRot)
-        for decorationTag in area.findall('decoration'):
-            processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
-        bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
-        radius = topPad - leftPad # is this really what they use for the radius?
-        handleTextArt(pdf, radius, bodyhtml, cwtextart)
-        pdf.rotate(areaRot)
-        pdf.translate(-transCx, -transCy)
+        processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad, cwtextart)
         return
 
     pdf.translate(transCx, transCy)
     pdf.rotate(-areaRot)
 
-    # When vertical centering is enabled, ignore the HTML margin-top and margin-bottom
-    # The text should be centered in the full area, not offset by these margins. The actual
-    # centering is performed later after we know the actual text height.
+    # When vertical centering is enabled in an MCF, we ignore the margins. The text should be 
+    # centered in the full area, not offset by these margins. The actual centering is performed 
+    # later after we know the actual text height.
     if verticallyCenter:
-        logging.debug(f"Vertical centering enabled: ignoring HTML margins (topPad was {topPad}, bottomPad was {bottomPad})")
+        logging.debug(f"Vertical centering enabled: ignoring topPad={topPad}, bottomPad={bottomPad}, indentMargin={indentMargin}")
         topPad = 0.0
         bottomPad = 0.0
-
+        indentMargin = 0.0
 
     # we don't do shadowing on texts, but we could at least warn about that...
     for decorationTag in area.findall('decoration'):
@@ -889,7 +902,6 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # that CEWE does very well). Leading is extra space designed to ensure multiple lines of text don't overlap.
             # We only have a single line, so any leading is unhelpful and messes up the centering.
 
-
             # Occasional fonts - in particular "CEWE Head" produce incorrect results for ascent and descent.
             # The ascent is larger than the fontSize. Practical experimentation shows that this seems to be 
             # driven by large amounts of unaccounted for padding/leading applied on top and bottom. In this case our only
@@ -945,8 +957,15 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         logging.debug(original_text_only)
         logging.debug(f"VERTICAL CENTERING: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, emptySpace={emptySpace:.2f}")
 
+    if verticallyBottom and finalTotalHeight < (mcf2rl * areaHeight):
+        # Original area height from XML
+        originalFrameHeight = mcf2rl * areaHeight
+        emptySpace = originalFrameHeight - finalTotalHeight
+        bottomPad = 0.0
+        topPad = emptySpace
+        logging.debug(f"VERTICAL BOTTOM: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, emptySpace={emptySpace:.2f}, bottomPad={bottomPad:.2f}, topPad={topPad:.2f}")
 
-    # Now we know the padding (either because it was set long ago, or because we just calculated it for vertical centering)
+    # Now we know the padding (either because it was set long ago, or because we just calculated it for vertical placement)
     newFrame = ColorFrame(frameBottomLeft_x, frameBottomLeft_y,
         frameWidth, frameHeight,
         leftPadding=leftPad, bottomPadding=bottomPad,
@@ -964,6 +983,18 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     for decorationTag in area.findall('decoration'):
         processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
 
+    pdf.rotate(areaRot)
+    pdf.translate(-transCx, -transCy)
+
+
+def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad, cwtextart):
+    pdf.translate(transCx, transCy)
+    pdf.rotate(-areaRot)
+    for decorationTag in area.findall('decoration'):
+        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
+    bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
+    radius = topPad - leftPad # is this really what they use for the radius?
+    handleTextArt(pdf, radius, bodyhtml, cwtextart)
     pdf.rotate(areaRot)
     pdf.translate(-transCx, -transCy)
 
