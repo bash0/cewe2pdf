@@ -74,7 +74,6 @@ import configparser  # to read config file, see https://docs.python.org/3/librar
 from enum import Enum
 from io import BytesIO
 from math import sqrt, floor
-from operator import truediv
 
 from pathlib import Path
 from typing import Any
@@ -84,8 +83,8 @@ import reportlab.lib.pagesizes
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.pdfmetrics import stringWidth as _stringWidth
-from reportlab.platypus import Paragraph, Table, TopPadder
+# from reportlab.pdfbase.pdfmetrics import stringWidth as _stringWidth
+from reportlab.platypus import Paragraph, Table
 from reportlab.lib.styles import ParagraphStyle
 # from reportlab.lib.styles import getSampleStyleSheet
 
@@ -101,7 +100,7 @@ from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from configUtils import getConfigurationBool, getConfigurationInt
 from extraLoggers import mustsee, configlogger, VerifyMessageCounts, printMessageCountSummaries
-from fontHandling import getAvailableFont, getMissingFontSubstitute, findAndRegisterFonts, noteFontSubstitution
+from fontHandling import getAvailableFont, findAndRegisterFonts
 from imageUtils import autorot
 from lineScales import LineScales
 from mcfx import unpackMcfx
@@ -610,7 +609,6 @@ def warnAndIgnoreEnabledDecorationShadow(decoration):
 # Note that transCx, transCy are the center of the area
 def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, pgno): # noqa: C901 (too complex)
     # note: it would be better to use proper html processing here
-    import re
 
     def extract_text_sections(fragment, sep=" / "):
         from lxml.html import fromstring
@@ -741,7 +739,6 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             col = e.position[1] if len(e.position) > 1 else None
         else:
             # Try to extract column from error message (e.g., "column 3838")
-            import re
             match = re.search(r'column (\d+)', str(e))
             col = int(match.group(1)) if match else None
 
@@ -827,7 +824,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             elif 'ALIGNBOTTOM' in alignmentAttrib:
                 verticallyBottom = True
 
-    logging.debug(f"Text area: center=({transCx},{transCy}), dimensions={areaWidth}x{areaHeight}, topPad={topPad}, bottomPad={bottomPad}, verticallyCenter={verticallyCenter}, tabletmarg={tabletmarg}, tablebmarg={tablebmarg}")
+    logging.debug(f"Text area: center=({transCx},{transCy}), dimensions={areaWidth}x{areaHeight}, topPad={topPad},"
+        " bottomPad={bottomPad}, verticallyCenter={verticallyCenter}, tabletmarg={tabletmarg}, tablebmarg={tablebmarg}")
 
     # if this is text art, then we do the whole thing differently.
     cwtextart = area.findall('decoration/cwtextart')
@@ -881,7 +879,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         # set default para style in case there are no spans to set it.
         pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
         textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
-            processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs, bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
+            processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth,
+                body, bodyfont, bodyfs, bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
         if not textWrapProblem or iterationsToShrinkFontWhenNecessary == 0:
             if not textWrapProblem:
                 if scaleFactor < 1.0:
@@ -890,7 +889,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
                 # We exhausted all attempts to shrink font to fit
                 WarnHeightProblem(recentText, frameHeight, firstFinalTotalHeight)
             break
-        if (iterationsToShrinkFontWhenNecessary == maxShrinkCount):
+        if iterationsToShrinkFontWhenNecessary == maxShrinkCount:
             # first time, keep the ideal final total height
             firstFinalTotalHeight = finalTotalHeight
         iterationsToShrinkFontWhenNecessary -= 1
@@ -949,7 +948,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             else:
                 heightWithLeading = 1.0 * pdf_styleN.fontSize * scaleFactor
                 # Note that d is negative.
-                fontH = a-d
+                # fontH = a-d
                 # Assume leading is 100% above.
                 justTheLeading = heightWithLeading - a
                 perceivedTextH = a  # we ignore descent for perceived height
@@ -957,8 +956,11 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
                 topPad = perceivedSpace/2.0 - justTheLeading
                 # Now calculate bottomPad so that total height is correct
                 bottomPad = emptySpace - topPad
-                logging.debug(f"Top: {topPad:.2f}, justTheLeading {justTheLeading:.2f}, text {a:.2f}, desc {-d:.2f} & bottom {bottomPad:.2f} = TOTAL {(topPad+justTheLeading+a+bottomPad):.2f} vs frameH {originalFrameHeight:.2f}")
-                logging.debug(f"Single line spacing decision for vertical centering: justTheLeading={justTheLeading:.2f}, emptySpace={emptySpace:.2f}, perceivedSpace={perceivedSpace:.2f}, perceivedTextH={perceivedTextH:.2f},bottomPad={bottomPad:.2f}, topPad={topPad:.2f}")
+                logging.debug(f"Top: {topPad:.2f}, justTheLeading {justTheLeading:.2f}, text {a:.2f}, desc {-d:.2f} & bottom {bottomPad:.2f} = "
+                    "TOTAL {(topPad+justTheLeading+a+bottomPad):.2f} vs frameH {originalFrameHeight:.2f}")
+                logging.debug(f"Single line spacing decision for vertical centering: justTheLeading={justTheLeading:.2f}, "
+                    "emptySpace={emptySpace:.2f}, perceivedSpace={perceivedSpace:.2f}, perceivedTextH={perceivedTextH:.2f}, "
+                    "bottomPad={bottomPad:.2f}, topPad={topPad:.2f}")
 
             # Note that bottomPad + topPad = perceivedSpace + d
             # So rearranging, bottomPad + topPad + a - d = perceivedSpace + a
@@ -971,10 +973,12 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # if we adjust them by 1.0 point in opposite directions
             bottomPad = verticalCenterOffset + 1.0
             topPad = verticalCenterOffset - 1.0
-            logging.debug(f"Multi-line spacing decision for vertical centering: emptySpace={emptySpace}, bottomPad={bottomPad}, topPad={topPad}, verticalCenterOffset={verticalCenterOffset:.2f}")
+            logging.debug(f"Multi-line spacing decision for vertical centering: emptySpace={emptySpace},"
+                " bottomPad={bottomPad}, topPad={topPad}, verticalCenterOffset={verticalCenterOffset:.2f}")
 
         logging.debug(original_text_only)
-        logging.debug(f"VERTICAL CENTERING: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, emptySpace={emptySpace:.2f}")
+        logging.debug(f"VERTICAL CENTERING: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, "
+            "emptySpace={emptySpace:.2f}")
 
     if verticallyBottom and finalTotalHeight < (mcf2rl * areaHeight):
         # Original area height from XML
@@ -982,7 +986,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         emptySpace = originalFrameHeight - finalTotalHeight
         bottomPad = 0.0
         topPad = emptySpace
-        logging.debug(f"VERTICAL BOTTOM: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, emptySpace={emptySpace:.2f}, bottomPad={bottomPad:.2f}, topPad={topPad:.2f}")
+        logging.debug(f"VERTICAL BOTTOM: originalFrameHeight={originalFrameHeight:.2f}, finalTotalHeight={finalTotalHeight:.2f}, "
+            "emptySpace={emptySpace:.2f}, bottomPad={bottomPad:.2f}, topPad={topPad:.2f}")
 
     # Now we know the padding (either because it was set long ago, or because we just calculated it for vertical placement)
     newFrame = ColorFrame(frameBottomLeft_x, frameBottomLeft_y,
@@ -1018,8 +1023,10 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
     pdf.translate(-transCx, -transCy)
 
 
-def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
-                     family, indexEntryText: Any | None, pdf, pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> tuple[Any, str]:
+def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,
+        bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
+        family, indexEntryText: Any | None, pdf, pdf_styleN, fontScaleFactor: float,
+        unprocessed_children: set[Any]) -> tuple[Any, str]:
     htmlparas = body.findall(".//p")
 
     for p in htmlparas:
@@ -1113,7 +1120,8 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                             # terminate the current pdf para and add it to the flow
                             paragraphText += '</para>'
                             usefs = maxfs if maxfs > 0 else bodyfs
-                            pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
+                            pdf_styleN.leading = \
+                                usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
                             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
                             paragraphText = '<para autoLeading="max">'
@@ -1163,11 +1171,12 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
     all_body_children = list(body)
     unprocessed_children = set(all_body_children)  # Will remove elements as we process them
 
-    indexEntryText, recentParagraphText = processTextParas(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText,
-                                      pdf, pdf_styleN, fontScaleFactor, unprocessed_children)
+    indexEntryText, recentParagraphText = processTextParas(pdf_flowableList, forceLeading, recentParagraphText,
+        additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText, pdf, pdf_styleN,
+        fontScaleFactor, unprocessed_children)
 
-    recentParagraphText = processTextUL(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN,
-                                  fontScaleFactor, unprocessed_children)
+    recentParagraphText = processTextUL(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts,
+        body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN, fontScaleFactor, unprocessed_children)
 
     # The <table> tag contains margin info, not actual content - mark it as processed
     table = body.find('table')
@@ -1231,8 +1240,9 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
     return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentParagraphText
 
 
-def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
-                  pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> str:
+def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,
+        bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
+        pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> str:
     # Process <ul> (unordered list) elements - bulleted lists
     htmllists = body.findall("ul")
 

@@ -15,7 +15,8 @@ def getConfigurationInt(configSection, itemName, defaultValue, minimumValue):
         if returnValue < minimumValue:
             logging.error(f'Configuration value supplied for {itemName} is less than {minimumValue}, using {minimumValue}')
             returnValue = minimumValue
-    return returnValue
+    return returnValue
+
 
 def getConfigurationFloat(configSection, itemName, defaultValue, minimumValue):
     returnValue = minimumValue

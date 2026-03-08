@@ -1,12 +1,9 @@
-from math import floor
-
 import html
-import logging
 import reportlab.lib.enums
 
 from reportlab.lib.styles import ParagraphStyle
 
-from fontHandling import getAvailableFont, getMissingFontSubstitute, noteFontSubstitution
+from fontHandling import getAvailableFont
 from lineScales import LineScales
 
 
@@ -152,7 +149,8 @@ def AppendSpanEnd(paragraphText, weight, style, outerstyle):
     return paragraphText
 
 
-def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor): # pylint: disable= too-many-arguments
+def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, bodyfont, bodyfs,
+        bweight, bstyle, fontScaleFactor): # pylint: disable= too-many-arguments
     pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additional_fonts, bodyfont, bodyfs, bweight, fontScaleFactor)
     paragraphText = AppendSpanStart(paragraphText, pfont, pfs, pweight, pstyle, bstyle)
     if text is None:
