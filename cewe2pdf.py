@@ -642,7 +642,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
         # Log warning about duplicate styles with context
         # Extract tag name for context
-        tag_name_match: Match[str] | None = re.match(r'<(\w+)', full_tag)
+        tag_name_match: re.Match[str] | None = re.match(r'<(\w+)', full_tag)
         tag_name: str | Any = tag_name_match.group(1) if tag_name_match else 'unknown'
 
         # Get position of this tag in the original text to show nearby text content
@@ -679,7 +679,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
         # Then add the merged style back as the first attribute
         # Find position after tag name to insert style
-        tag_name_match: Match[str] | None = re.match(r'(<\w+)(\s|>)', tag_without_styles)
+        tag_name_match: re.Match[str] | None = re.match(r'(<\w+)(\s|>)', tag_without_styles)
         if tag_name_match:
             prefix: str | Any = tag_name_match.group(1)  # e.g., '<li'
             rest = tag_without_styles[len(prefix):]  # everything after tag name
@@ -692,7 +692,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # CEWE sometimes generates invalid XML like: <li style="..." style="...">
     # We need to merge these into a single style attribute
     text_content = re.sub(r'<\w+[^>]*>', merge_duplicate_styles, textTag.text)
-    
+
     # Validate that we haven't lost any actual text content
     # Strip all style then HTML tags and compare character counts
     orig_no_style = re.sub(r'<style[^>]*>.*?</style>', '', textTag.text, flags=re.DOTALL)
@@ -714,7 +714,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         logging.error(processed_text_only)
         logging.error("=" * 80)
         raise ValueError("Text preprocessing corrupted content - text length mismatch")
-    
+
     try:
         htmlxml = etree.XML(text_content)
         # Log what we successfully parsed
@@ -735,7 +735,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         logging.error(f"Preprocessed text content ({len(text_content)} characters):")
         logging.error(text_content)
         logging.error("-" * 80)
-        
+
         # Try to highlight the problematic portion based on column number
         if hasattr(e, 'position') and e.position:
             col = e.position[1] if len(e.position) > 1 else None
@@ -744,22 +744,22 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             import re
             match = re.search(r'column (\d+)', str(e))
             col = int(match.group(1)) if match else None
-        
+
         if col is not None:
             # Show context around the error (30 chars before and after)
             start = max(0, col - 30)
             end = min(len(text_content), col + 30)
             context = text_content[start:end]
             marker_pos = min(30, col - start)
-            
+
             logging.error(f"Context around column {col} in preprocessed text:")
             logging.error(f"  {context}")
             logging.error(f"  {' ' * marker_pos}^ (error position)")
-        
+
         logging.error("=" * 80)
         # Re-throw the error for now
         raise
-    
+
     body = htmlxml.find('.//body')
     bstyle = dict([kv.split(':') for kv in body.get('style').lstrip(' ').rstrip(';').split('; ')])
     try:
@@ -781,7 +781,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # issue https://github.com/bash0/cewe2pdf/issues/58 - margins are not being used
     # assume (based on empirical evidence!) that there is just one table, and collect
     # the margin values. This "table" code will no longer be used in an mcf created with the
-    # CEWE 8.0 software, because the margin values have been moved to the textFormat element, but 
+    # CEWE 8.0 software, because the margin values have been moved to the textFormat element, but
     # it is still needed for MCFs created with CEWE 7.0 and earlier, so we keep it in place.
     tabletmarg = tablebmarg = tablelmarg = tablermarg = 0
     table = htmlxml.find('.//body/table')
@@ -799,9 +799,9 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
                 logging.warning(f"Ignoring invalid table margin settings {tableStyleAttrib}")
     else:
         # if there is no table, then we look for margin settings on the textFormat. Actually it looks
-        # like margin settings can appear on paragraphs and spans as well, but we haven't seen values 
+        # like margin settings can appear on paragraphs and spans as well, but we haven't seen values
         # other than 0 in the MCFs we have looked at, so we will ignore that issue for now.
-		# And right now I don't see how VerticalIndentMargin is used, so we don't use it
+        # And right now I don't see how VerticalIndentMargin is used, so we don't use it
         if textFormatElement is not None:
             indentMarginAttribute = textFormatElement.get('IndentMargin')
             if indentMarginAttribute is not None:
@@ -826,9 +826,9 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
                 verticallyCenter = True
             elif 'ALIGNBOTTOM' in alignmentAttrib:
                 verticallyBottom = True
-                
+
     logging.debug(f"Text area: center=({transCx},{transCy}), dimensions={areaWidth}x{areaHeight}, topPad={topPad}, bottomPad={bottomPad}, verticallyCenter={verticallyCenter}, tabletmarg={tabletmarg}, tablebmarg={tablebmarg}")
-    
+
     # if this is text art, then we do the whole thing differently.
     cwtextart = area.findall('decoration/cwtextart')
     if len(cwtextart) > 0:
@@ -838,8 +838,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     pdf.translate(transCx, transCy)
     pdf.rotate(-areaRot)
 
-    # When vertical centering is enabled in an MCF, we ignore the margins. The text should be 
-    # centered in the full area, not offset by these margins. The actual centering is performed 
+    # When vertical centering is enabled in an MCF, we ignore the margins. The text should be
+    # centered in the full area, not offset by these margins. The actual centering is performed
     # later after we know the actual text height.
     if verticallyCenter:
         logging.debug(f"Vertical centering enabled: ignoring topPad={topPad}, bottomPad={bottomPad}, indentMargin={indentMargin}")
@@ -868,13 +868,13 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     scaleFactor = 1.0
     indexEntryText = None
 
-    # The code used to use a global variable to store the flowables. This leads to problems where a 
+    # The code used to use a global variable to store the flowables. This leads to problems where a
     # flowable in one text area can, in extreme circumstances, appear in another. So, we use a local variable.
     pdf_flowableList = []
     pdf_styleN = None
 
     while True:
-        # Reset it each time we go round this loop. Normally we only call processTextCore once. 
+        # Reset it each time we go round this loop. Normally we only call processTextCore once.
         # But, if we encounter the text wrapping issue, we will try again.
         pdf_flowableList = []
         # set default para style in case there are no spans to set it.
@@ -883,7 +883,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs, bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
         if not textWrapProblem or iterationsToShrinkFontWhenNecessary == 0:
             if not textWrapProblem:
-                if scaleFactor < 1.0: 
+                if scaleFactor < 1.0:
                     logging.info(f'Shrunk text by {scaleFactor} to fit frame: {extract_text_sections(recentText)}')
             else:
                 # We exhausted all attempts to shrink font to fit
@@ -903,13 +903,13 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
     # Apply vertical centering if ALIGNVCENTER is specified. We previously set topPad and bottomPad
     # to zero. Now we have the actual text height, we can calculate the required padding to center
-    # the text vertically in the area.  With these subtle calculations we can get (almost) pixel 
+    # the text vertically in the area.  With these subtle calculations we can get (almost) pixel
     # perfect centering for normal fonts, and decent centering of "weird" fonts.
     if verticallyCenter and finalTotalHeight < (mcf2rl * areaHeight):
         # Original area height from XML
         originalFrameHeight = mcf2rl * areaHeight
         # Use exact text height for the frame
-        #frameHeight = finalTotalHeight
+        # frameHeight = finalTotalHeight
         # Calculate offset to center this smaller frame in the original area
         emptySpace = originalFrameHeight - finalTotalHeight
         a, d = pdfmetrics.getAscentDescent(pdf_styleN.fontName, pdf_styleN.fontSize * scaleFactor)
@@ -921,10 +921,10 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # We only have a single line, so any leading is unhelpful and messes up the centering.
 
             # Occasional fonts - in particular "CEWE Head" produce incorrect results for ascent and descent.
-            # The ascent is larger than the fontSize. Practical experimentation shows that this seems to be 
+            # The ascent is larger than the fontSize. Practical experimentation shows that this seems to be
             # driven by large amounts of unaccounted for padding/leading applied on top and bottom. In this case our only
             # solution is to divide the apparent empty space equally between top and bottom. This may not
-            # be pixel perfect, but it is the best we can do without more precise font information.      
+            # be pixel perfect, but it is the best we can do without more precise font information.
             weirdFont = a > pdf_styleN.fontSize
 
             pdf_flowableList = [] # Throw away previous layout
@@ -932,7 +932,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
             # use forceLeading=1.0 to force minimal leading.  Even with 1.0 there is generally a bit of spare points of space
             # above the text. This is because fonts are laid out using "Em squares", which are larger than the actual glyphs.
-            # So we still need to do some padding adjustment below. 
+            # So we still need to do some padding adjustment below.
             textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
                 processTextCore(pdf_flowableList, pdf_styleN, 1.0, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
                 bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
@@ -963,13 +963,13 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # So rearranging, bottomPad + topPad + a - d = perceivedSpace + a
             # (to validate our arithmetic)
         else:
-            # Looks like 2 or more lines of text. Perceptual center is nearly symmetric; the 
+            # Looks like 2 or more lines of text. Perceptual center is nearly symmetric; the
             # difference is much less significant than for single lines of text.
             verticalCenterOffset = emptySpace / 2.0
             # Technically these should both be equal, but visual perception is better
             # if we adjust them by 1.0 point in opposite directions
-            bottomPad=verticalCenterOffset+1.0
-            topPad=verticalCenterOffset-1.0
+            bottomPad = verticalCenterOffset + 1.0
+            topPad = verticalCenterOffset - 1.0
             logging.debug(f"Multi-line spacing decision for vertical centering: emptySpace={emptySpace}, bottomPad={bottomPad}, topPad={topPad}, verticalCenterOffset={verticalCenterOffset:.2f}")
 
         logging.debug(original_text_only)
@@ -1144,7 +1144,7 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
                     bottomPad: float | int | Any, bstyle: dict[Any, Any], bweight: int, family,
                     leftPad: float | int | Any, pdf, rightPad: float | int | Any, topPad: float | int | Any,
                     fontScaleFactor: float) -> \
-tuple[bool, str | Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any, str | Any]:
+        tuple[bool, str | Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any, str | Any]:
 
     # for debugging the background colour may be useful, but it is not used in production
     # since we started to use ColorFrame to colour the background, and it is thus left
@@ -1219,8 +1219,8 @@ tuple[bool, str | Any, float | int | Any, float | Any, float | Any, float | Any,
         #  not where the user expects it - increasing the width would almost be more sensible!
         # Another suspected cause is in the use of multiple font sizes in one text. Perhaps the
         #  line scale (interline space) gets confused by this?
-        # From Mar 2026 the code outside of this will iterate up to 3 times, shrinking the font 
-        # slightly to see if it helps. If it doesn't then we increase the frame height as a last 
+        # From Mar 2026 the code outside of this will iterate up to 3 times, shrinking the font
+        # slightly to see if it helps. If it doesn't then we increase the frame height as a last
         # resort, just like we did previously
         frameHeight = finalTotalHeight
     else:
@@ -1286,7 +1286,7 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
             if len(lispans) < 1:
                 # Simple list item with just text, no spans
                 # Prepend bullet to the text so it gets styled
-                bullet_plus_text = bullet_txt + (li.text != None and li.text or "")
+                bullet_plus_text = bullet_txt + (li.text if li.text is not None else "")
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
                                                              additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
                 paragraphText += '</para>'
@@ -1295,7 +1295,7 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
                 pdf_flowableList.append(Paragraph(paragraphText, list_styleN))
             else:
                 # List item with spans and other formatting
-                bullet_plus_text = bullet_txt + (li.text != None and li.text or "")
+                bullet_plus_text = bullet_txt + (li.text if li.text is not None else "")
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
                                                              additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
