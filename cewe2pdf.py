@@ -867,6 +867,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     iterationsToShrinkFontWhenNecessary = maxShrinkCount
     scaleFactor = 1.0
     indexEntryText = None
+    firstFinalTotalHeight = 0.0
 
     # The code used to use a global variable to store the flowables. This leads to problems where a
     # flowable in one text area can, in extreme circumstances, appear in another. So, we use a local variable.
