@@ -301,7 +301,7 @@ missingFontSubstitutions = {
     "Calibri": "Liberation Sans Narrow",
     "CalligraphScript": "Dancing Script",
     "CEWE Head": "Liberation Sans",
-    "FranklinGothic": "Liberation Sans Narrow",
+    "FranklinGothic": "Archivo Narrow",
     "Pecita": "Dancing Script",
     "Stafford": "Liberation Sans Narrow",
     "Balloon Caps": "Liberation Sans Narrow",

@@ -612,6 +612,21 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # note: it would be better to use proper html processing here
     import re
 
+    def extract_text_sections(fragment, sep=" / "):
+        from lxml.html import fromstring
+        tree = fromstring(fragment)
+        # Collect each text node as a separate chunk, thus abandoning all the "markup" and
+        # hopefully making it easier for the user to recognise the text from his album
+        chunks = [t.strip() for t in tree.itertext() if t.strip()]
+        return sep.join(chunks)
+
+    def WarnHeightProblem(recentParagraphText, frameHeight, finalTotalHeight):
+        logging.warning(
+            f"""Text would not fit inside its frame after {maxShrinkCount} shrinks (frameHeight={frameHeight:.2f},finalTotalHeight={finalTotalHeight:.2f})
+                Try widening the text box to avoid an unexpected word wrap, or increase the height
+                Most recent paragraph text: {extract_text_sections(recentParagraphText)}
+                The frame height has been programmatically increased for this run.""")
+
     # Process each opening tag, merging duplicate style attributes
     def merge_duplicate_styles(match):
         """Merge duplicate style attributes in a single tag."""
@@ -848,7 +863,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # needed, by applying a 0.99^n scale factor to the font rendering. We do that up to n=3 times.
     # Generally it resolves the wrapping issue with n=1.
 
-    iterationsToShrinkFontWhenNecessary = 3
+    maxShrinkCount = 3
+    iterationsToShrinkFontWhenNecessary = maxShrinkCount
     scaleFactor = 1.0
     indexEntryText = None
 
@@ -863,21 +879,23 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         pdf_flowableList = []
         # set default para style in case there are no spans to set it.
         pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
-        textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth = \
-            processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
-            bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
+        textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
+            processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs, bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
         if not textWrapProblem or iterationsToShrinkFontWhenNecessary == 0:
             if not textWrapProblem:
                 if scaleFactor < 1.0: 
-                    logging.info(f'Successfully shrunk text by {scaleFactor} to fit frame. Frame height has not been increased.')
+                    logging.info(f'Shrunk text by {scaleFactor} to fit frame: {extract_text_sections(recentText)}')
             else:
                 # We exhausted all attempts to shrink font to fit
-                logging.warning(f'Could not fit text into frame after shrinking font designated number of times. Frame height has been increased.')
+                WarnHeightProblem(recentText, frameHeight, firstFinalTotalHeight)
             break
+        if (iterationsToShrinkFontWhenNecessary == maxShrinkCount):
+            # first time, keep the ideal final total height
+            firstFinalTotalHeight = finalTotalHeight
         iterationsToShrinkFontWhenNecessary -= 1
         scaleAdjustment = 0.99 # Constant.
         scaleFactor *= scaleAdjustment
-        logging.warning(f'Trying to shrink font by {scaleFactor} to fit the frame without wrapping issues')
+        logging.debug(f'Trying to shrink font by {scaleFactor} to fit the frame without wrapping issues')
 
     # Just add one index entry
     if indexEntryText:
@@ -915,7 +933,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # use forceLeading=1.0 to force minimal leading.  Even with 1.0 there is generally a bit of spare points of space
             # above the text. This is because fonts are laid out using "Em squares", which are larger than the actual glyphs.
             # So we still need to do some padding adjustment below. 
-            textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth = \
+            textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
                 processTextCore(pdf_flowableList, pdf_styleN, 1.0, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
                 bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
 
@@ -1126,7 +1144,7 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
                     bottomPad: float | int | Any, bstyle: dict[Any, Any], bweight: int, family,
                     leftPad: float | int | Any, pdf, rightPad: float | int | Any, topPad: float | int | Any,
                     fontScaleFactor: float) -> \
-tuple[bool, str |Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any]:
+tuple[bool, str | Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any, str | Any]:
 
     # for debugging the background colour may be useful, but it is not used in production
     # since we started to use ColorFrame to colour the background, and it is thus left
@@ -1201,18 +1219,16 @@ tuple[bool, str |Any, float | int | Any, float | Any, float | Any, float | Any, 
         #  not where the user expects it - increasing the width would almost be more sensible!
         # Another suspected cause is in the use of multiple font sizes in one text. Perhaps the
         #  line scale (interline space) gets confused by this?
-        logging.warning(
-            f'A set of paragraphs would not fit inside its frame (frameHeight={frameHeight:.2f},finalTotalHeight={finalTotalHeight:.2f}). We may need to increase the frame height.')
-        # We will later log whether the frame height actually needed to be increased or not
-        logging.warning(
-            ' Try widening the text box just slightly to avoid an unexpected word wrap, or increasing the height yourself')
-        logging.warning(f' Most recent paragraph text: {recentParagraphText}')
+        # From Mar 2026 the code outside of this will iterate up to 3 times, shrinking the font 
+        # slightly to see if it helps. If it doesn't then we increase the frame height as a last 
+        # resort, just like we did previously
         frameHeight = finalTotalHeight
     else:
         frameHeight = max(frameHeight, finalTotalHeight)
 
     frameWidth = max(frameWidth, finalTotalWidth)
-    return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth
+    return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentParagraphText
+
 
 def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body, bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
                   pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> str:
