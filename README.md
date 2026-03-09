@@ -4,7 +4,9 @@ A program (a set of python scripts) to turn cewe photobooks into pdf documents.
 The CEWE pdf export is achieved by interpreting the mcf xml-files
 and compiling a pdf document which looks like the cewe photo book.
 
-There are many capabilities in the Cewe album editor which are not supported by `cewe2pdf`, so an exact conversion cannot be guaranteed. The script is mostly based on reverse-engineering and guessing. It is not meeting any official specifications. So don't be surprised if one or another feature doesn't work. However, improvements are always appreciated!
+There are many capabilities in the Cewe album editor which are not supported by `cewe2pdf`, so an exact conversion cannot be guaranteed. The script is mostly based on reverse-engineering and guessing. It is not meeting any official specifications, so don't be surprised if one or another feature doesn't work. However, improvements are always appreciated!
+
+The current tests run with albums created with the 8.0 version of the editor. We don't explicitly test that files from older versions of the editor still work (though code to handle them may still be there) so the safest bet to recreate a pdf from an old album file is surely to load it into the latest album editor and save it again.
 
 You will need Python 3.9 (or later, but be careful about going past 3.10.14, which is what the github checkin action on the base version uses)
 
