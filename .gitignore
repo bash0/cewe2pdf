@@ -68,3 +68,12 @@ nosetests.xml
 /junk*.pdf
 /tests/testIndex/test_index.mcf.*S.idx.png
 /tests/testIndexLarge/test_indexLarge.mcf.*S.idx.png
+.idea/cewe2pdf.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.DS_Store
+# macOS custom folder icon file is stored as "Icon" plus a hidden control character.
+# Match that hidden-character variant anywhere in the repo.
+**/Icon?

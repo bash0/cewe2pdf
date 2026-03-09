@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9171" article_name="CEWE%20FOTOBOK%20stor%20Softcover%20standard%20digitaltrykk" externalProjectId="" folderID="bb272ad9-0b2b-498f-b534-d374eccaf62b" imagedir="testfontsubstitution_mcf-Dateien" isDataMcf="0" productname="ALB14" startdatecalendarium="" useSpineLogo="1" version="4.0">
+<fotobook art_id="9171" article_name="CEWE%20FOTOBOK%20stor%20Softcover%20standard%20digitaltrykk" externalProjectId="" folderID="106a5dd8-61f3-4ea7-b30d-123b3a911258" imagedir="testfontsubstitution_mcf-Dateien" isDataMcf="0" productname="ALB14" startdatecalendarium="" useSpineLogo="1" version="4.0">
     <project createdWithHPSVersion="7.4.4" createdWithHPSVersionBuild="20240826" multiPurposeText="" projectID="9c7098ea-9e57-4db7-a83c-6e4ed777877a" projectIDCreatedEpoch="1752248923"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="8.0.5" programversionBuild="20251014" savetime="2026-03-05 20:40"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="8.0.5" programversionBuild="20251014" savetime="2026-03-08 13:26"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-03-29 07:01"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -9,7 +9,7 @@
         <outline width="0"/>
     </pagenumbering>
     <extra>
-        <lastTextFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Stafford,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="FranklinGothic,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.2.6"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
@@ -28,7 +28,7 @@ li.unchecked::marker { content: "\2610"; }
 li.checked::marker { content: "\2612"; }
 </style></head><body style=" font-family:'CEWE Head'; font-size:6pt; font-weight:400; font-style:normal;">
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,6,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,6,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -87,7 +87,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Arial'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -96,7 +96,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Arial Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Narrow</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -105,7 +105,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Arial Rounded MT Bold'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Rounded MT Bold.</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial Rounded MT Bold,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial Rounded MT Bold,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -114,7 +114,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Bodoni'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Bodoni</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Bodoni,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Bodoni,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -123,7 +123,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Calibri'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Calibri</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Calibri,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -132,7 +132,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'CalligraphScript'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in CalligraphScript</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="CalligraphScript,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="CalligraphScript,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -141,7 +141,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'CEWE Head'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in CEWE Head</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="CEWE Head,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="CEWE Head,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -150,16 +150,16 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Stafford'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Stafford</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Stafford,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Stafford,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="69" left="120.147" rotation="0" top="1916.18" width="466.391" zposition="7010"/>
+            <position height="69" left="120.147" rotation="0" top="1916.18" width="492.473" zposition="7010"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'FranklinGothic'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in FranklinGothic</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="FranklinGothic,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="FranklinGothic,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -168,7 +168,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -177,7 +177,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Narrow</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -186,7 +186,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Poppins'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Arial Rounded MT Bold</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -195,7 +195,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'EB Garamond'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Bodoni</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -204,7 +204,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Calibri</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -213,7 +213,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Edwardian Script ITC'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-family:'Dancing Script'; color:#000000;">Text in CalligraphScript</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Edwardian Script ITC,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Edwardian Script ITC,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -222,7 +222,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-family:'Liberation Sans'; color:#000000;">Text in CEWE Head</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -231,23 +231,23 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Stafford</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
-            <position height="69" left="120.147" rotation="0" top="1999.51" width="466.391" zposition="7021"/>
+            <position height="69" left="120.147" rotation="0" top="1999.51" width="492.473" zposition="7021"/>
             <decoration>
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in FranklinGothic</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Archivo Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in FranklinGothic</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Archivo Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
             <position height="294" left="120.147" rotation="0" top="114.706" width="1672.85" zposition="7022"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Arial'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-size:12pt; color:#000000;">This shows how text in various fonts appears when that font is not available and a substitution is made. The top text of a pair is in the named font. The lower text, which says the same, is in the font which will be used as a substitution. The idea is that we can see what the text looks like in the substitution font - we want the substituions to be roughly the same weight, and perhaps most importantly, no wider. The text boxes are adjusted to the width of the text in the original font. The substitution is supposed to fit inside as well.</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNTOP,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNTOP" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Arial,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -256,7 +256,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Balloon Caps'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000;">Text in Balloon Caps</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Balloon Caps,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Balloon Caps,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -265,7 +265,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000;">Text in Balloon Caps</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -274,7 +274,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Balloon Caps'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-family:'Pecita'; color:#000000;">Text in Pecita</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Balloon Caps,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Balloon Caps,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -283,7 +283,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans Narrow'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Dancing Script'; color:#000000;">Text in Pecita</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans Narrow,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -292,7 +292,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Pecita'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Segoe UI Symbol'; color:#000000; background-color:#ffffff;">©☹♡</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Pecita,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Pecita,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -301,7 +301,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Segoe UI Symbol'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000; background-color:#ffffff;">©☹♡</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Segoe UI Symbol,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="50" backgroundColor="#00000000" font="Segoe UI Symbol,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -456,5 +456,5 @@ li.checked::marker { content: "\2612"; }
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships/>
-    <statistics assistantUsed="0" countPauses="15" elapsedTimeGross="2025-03-29T07:01:21" elapsedTimeNet="92815" fotosAdded="0" fotosRemoved="0" pauseTime="71455" sessionsUsed="8"/>
+    <statistics assistantUsed="0" countPauses="16" elapsedTimeGross="2025-03-29T07:01:21" elapsedTimeNet="105256" fotosAdded="0" fotosRemoved="0" pauseTime="83362" sessionsUsed="11"/>
 </fotobook>

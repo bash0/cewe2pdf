@@ -1,8 +1,8 @@
+import logging
+import re
 import cv2
 import fitz  # PyMuPDF
 import numpy as np
-import logging
-import re
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from PIL import Image
@@ -128,7 +128,7 @@ class Index():
 
     def SaveIndexPng(self, indexPdfFileName):
         if not self.indexing:
-            return
+            return None
         doc = fitz.open(indexPdfFileName)
         image = Index._convert_to_opencv(doc.load_page(0), dpi=150)
         transparent_image = Index._make_white_transparent(image)
@@ -225,7 +225,7 @@ class Index():
                 for line in lines:
                     if pattern.search(line):  # Check regex against each line separately
                         markerFound = True
-                        markerRect = fitz.Rect(x0, y0, x1, y1)
+                        # markerRect = fitz.Rect(x0, y0, x1, y1)
                         # full block rect, this needs refining if the marker is to be removed
             if not markerFound:
                 continue

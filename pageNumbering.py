@@ -188,14 +188,14 @@ def horizontalPageNumberAdjustment(pnp, pageNumberingInfo, sideWidth, frameWidth
     if productStyle == ProductStyle.AlbumSingleSide:
         if pnp == PageNumberPosition.RIGHT:
             return sideWidth - pageNumberingInfo.horizontalMargin - frameWidth
-        elif pnp == PageNumberPosition.LEFT:
+        if pnp == PageNumberPosition.LEFT:
             return pageNumberingInfo.horizontalMargin
 
     # all other cases drop through here to original outer edge page number position
     if oddpage:
         return sideWidth - pageNumberingInfo.horizontalMargin - frameWidth
-    else:
-        return pageNumberingInfo.horizontalMargin
+
+    return pageNumberingInfo.horizontalMargin
 
 
 def getPageNumberXy(pnp, pageNumberingInfo, pdf, frameWidth, frameHeight, productStyle, oddpage):
