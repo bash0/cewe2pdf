@@ -1,7 +1,7 @@
 cairosvg>=2.4.2
 fonttools>=4.25.1
 lxml>=4.4.1
-packaging<24,>=16.8
+packaging>=24.0,<25
 pillow>=5.4.1
 pikepdf>=6.2.9
 pyyaml>=5.3.1
