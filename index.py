@@ -1,6 +1,7 @@
 import logging
 import re
-import cv2
+# pylint: disable=no-member
+import cv2 # the no_member warning is a false positive, cv2 is imported correctly and used in the code
 import fitz  # PyMuPDF
 import numpy as np
 from reportlab.lib.units import mm
@@ -9,7 +10,7 @@ from PIL import Image
 
 from configUtils import getConfigurationBool, getConfigurationFloat, getConfigurationInt
 
-class Index():
+class Index(): # pylint: disable=too-many-instance-attributes
 
     def __init__(self, configSection):
         self.indexEntries = {}
@@ -113,7 +114,7 @@ class Index():
 
     def SaveIndexPdf(self, outputFileName, albumTitle, pagesize):
         if not self.indexing:
-            return
+            return None
         # Initialize a pdf canvas for the index
         indexFileName = Index.GetIndexName(outputFileName)
         pdf = canvas.Canvas(indexFileName, pagesize=pagesize)
@@ -122,7 +123,7 @@ class Index():
         self.GenerateIndexPage(pdf)
         try:
             pdf.save()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-exception-caught
             logging.error(f'Could not save the index output file: {str(ex)}')
         return indexFileName
 
@@ -218,7 +219,7 @@ class Index():
             blocks = pg.get_text("blocks")  # Extract text in block format
             markerFound = False
             for block in blocks:
-                x0, y0, x1, y1, text = block[:5]  # Extract bounding box and text
+                x0, y0, x1, y1, text = block[:5]  # Extract bounding box and text pylint: disable=unused-variable # noqa: F841
                 # Split block text into individual lines since adjacent text items can
                 # be returned as one block
                 lines = text.split("\n")
@@ -229,47 +230,46 @@ class Index():
                         # full block rect, this needs refining if the marker is to be removed
             if not markerFound:
                 continue
-            else:
-                page = pg
-                # Potentially remove marker text while leaving everything else unchanged. But it's
-                # a bit nicer if the marker text is something concrete on the index page, for
-                # example a heading "Contents" or "Index" or similar. Removal of the markers would
-                # be something like this
-                #    page.add_redact_annot(markerrect)
-                #    page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
-                # Look to see if the (human) album editor has added a previous version of the index
-                # image which would be the case if he generates his pdf version and then takes the
-                # image into the version which he plans to send for quality printing. We'll want to
-                # delete the old index image and replace it with the new one provided here
-                images = page.get_images(full=True)
-                for img in images:
-                    xref = img[0]  # Image reference ID
-                    img_info = albumDoc.extract_image(xref)
-                    img_ext = img_info["ext"]  # Image format (ought to be PNG, since transparency exists)
-                    if img_ext.lower() != 'png':
-                        continue
-                    # Convert image bytes to NumPy array
-                    img_bytes = img_info["image"]  # Raw image bytes
-                    image_array = np.frombuffer(img_bytes, dtype=np.uint8)
-                    # Unfortunately the cewe editor seems to lose the alpha channel on the inserted
-                    # index image, so we can't use that to help us identify the old index image on the
-                    # page. So we just load as RGB, with no transparency.
-                    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-                    # Quite how this works I don't know, but the previously transparent pixels
-                    # are now white. If this image is largely white, then it is *probably* the
-                    # old index image we are looking for.
-                    white_pixel_count = np.sum((image == [255, 255, 255]).all(axis=2))
-                    total_pixels = image.shape[0] * image.shape[1]
-                    white_ratio = white_pixel_count / total_pixels
-                    # High white ratio (chosen by experimentation) suggests a converted transparent image
-                    if white_ratio > 0.8:
-                        page.delete_image(xref)
-                        break
-                    # another possible way to identify the old index image is the width, which will be
-                    # the same as the new image (even if it has been resized in the album editor)
-                    img_width = img[2]
-                    if img_width == idx_width_px:
-                        page.delete_image(xref)
+            page = pg
+            # Potentially remove marker text while leaving everything else unchanged. But it's
+            # a bit nicer if the marker text is something concrete on the index page, for
+            # example a heading "Contents" or "Index" or similar. Removal of the markers would
+            # be something like this
+            #    page.add_redact_annot(markerrect)
+            #    page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
+            # Look to see if the (human) album editor has added a previous version of the index
+            # image which would be the case if he generates his pdf version and then takes the
+            # image into the version which he plans to send for quality printing. We'll want to
+            # delete the old index image and replace it with the new one provided here
+            images = page.get_images(full=True)
+            for img in images:
+                xref = img[0]  # Image reference ID
+                img_info = albumDoc.extract_image(xref)
+                img_ext = img_info["ext"]  # Image format (ought to be PNG, since transparency exists)
+                if img_ext.lower() != 'png':
+                    continue
+                # Convert image bytes to NumPy array
+                img_bytes = img_info["image"]  # Raw image bytes
+                image_array = np.frombuffer(img_bytes, dtype=np.uint8)
+                # Unfortunately the cewe editor seems to lose the alpha channel on the inserted
+                # index image, so we can't use that to help us identify the old index image on the
+                # page. So we just load as RGB, with no transparency.
+                image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+                # Quite how this works I don't know, but the previously transparent pixels
+                # are now white. If this image is largely white, then it is *probably* the
+                # old index image we are looking for.
+                white_pixel_count = np.sum((image == [255, 255, 255]).all(axis=2))
+                total_pixels = image.shape[0] * image.shape[1]
+                white_ratio = white_pixel_count / total_pixels
+                # High white ratio (chosen by experimentation) suggests a converted transparent image
+                if white_ratio > 0.8:
+                    page.delete_image(xref)
+                    break
+                # another possible way to identify the old index image is the width, which will be
+                # the same as the new image (even if it has been resized in the album editor)
+                img_width = img[2]
+                if img_width == idx_width_px:
+                    page.delete_image(xref)
 
         if page is None: # we didn't find a page on which we can place the new index image
             return

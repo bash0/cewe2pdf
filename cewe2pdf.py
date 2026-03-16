@@ -611,7 +611,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # note: it would be better to use proper html processing here
 
     def extract_text_sections(fragment, sep=" / "):
-        from lxml.html import fromstring
+        from lxml.html import fromstring # local import avoids conflict pylint: disable=import-outside-toplevel
         tree = fromstring(fragment)
         # Collect each text node as a separate chunk, thus abandoning all the "markup" and
         # hopefully making it easier for the user to recognise the text from his album
@@ -735,7 +735,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         logging.error("-" * 80)
 
         # Try to highlight the problematic portion based on column number
-        if hasattr(e, 'position') and e.position:
+        if hasattr(e, 'position') and e.position: # pylint: disable=unsubscriptable-object
             col = e.position[1] if len(e.position) > 1 else None
         else:
             # Try to extract column from error message (e.g., "column 3838")

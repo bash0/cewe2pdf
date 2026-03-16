@@ -1,13 +1,13 @@
 cairosvg>=2.4.2
 fonttools>=4.25.1
 lxml>=4.4.1
-packaging<24,>=16.8
+packaging>=24.0,<25
 pillow>=5.4.1
 pikepdf>=6.2.9
 pyyaml>=5.3.1
 reportlab>=3.5.23
-pylint>=3.2.2
-pytest>=7.4.4
+pylint>=3.3.0
+pytest>=8.0.0
 flake8>=7.0.0
 pymupdf>=1.25.5
 opencv-python>=4.11.0

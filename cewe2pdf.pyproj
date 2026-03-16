@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>CondaEnv|CondaEnv|cewe2pdfenv</InterpreterId>
+    <InterpreterId>CondaEnv|CondaEnv|cewe2pdf312</InterpreterId>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
     <CommandLineArguments>D:\Users\pete\Source\GitHub\cewe2pdf\tests\unittest_fotobook\unittest_fotobook.mcf</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
@@ -34,6 +34,7 @@
     <Content Include="environments\cewe2pdfenvlinux.yml" />
     <Content Include="environments\cewe2pdfenvwindows.yml" />
     <Content Include="environments\environments.md" />
+    <Content Include="pytest.ini" />
     <Content Include="tests\compare-pdf\LICENSE" />
     <Content Include="tests\compare-pdf\README.md" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
@@ -425,6 +426,7 @@
     <Folder Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\" />
   </ItemGroup>
   <ItemGroup>
+    <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf312" />
     <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdfenv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
