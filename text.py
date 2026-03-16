@@ -80,7 +80,7 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight, font
         # preserve fractional point sizes and apply the global adjustment
         try:
             spanfs = float(spanstyle['font-size'].strip("pt"))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             spanfs = float(dfltfs)
     # apply the small adjustment multiplier
     spanfs = spanfs * fontScaleFactor
@@ -117,7 +117,7 @@ def AppendSpanStart(paragraphText, font, fsize, fweight, fstyle, outerstyle):
     See 6.2 Paragraph XML Markup Tags in the reportlabs user guide.
     """
     # format font size with two decimals so ReportLab receives a stable float
-    paragraphText = AppendText(paragraphText, '<font name="' + font + '"' + ' size=' + ("{:.2f}".format(fsize)))
+    paragraphText = AppendText(paragraphText, f'<font name="{font}" size={fsize:.2f}')
 
     if 'color' in fstyle:
         paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])

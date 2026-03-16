@@ -34,6 +34,7 @@
     <Content Include="environments\cewe2pdfenvlinux.yml" />
     <Content Include="environments\cewe2pdfenvwindows.yml" />
     <Content Include="environments\environments.md" />
+    <Content Include="pytest.ini" />
     <Content Include="tests\compare-pdf\LICENSE" />
     <Content Include="tests\compare-pdf\README.md" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
