@@ -317,7 +317,7 @@ Add-Type -AssemblyName Microsoft.VisualBasic
 Get-ChildItem -Recurse -File -Filter *.pdf |
 Where-Object {
     $_.FullName -notmatch '\\previous_result_pdfs\\' -and
-    $_.Name -match '^\w*\d{8}[DS]\.pdf$'
+    $_.Name -match '^[^\\]*\d{8}[DS]\.pdf$'
 } |
 ForEach-Object {
     [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile(
