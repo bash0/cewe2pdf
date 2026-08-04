@@ -125,6 +125,12 @@ class PageType(Enum):
     def __str__(self):
         return self.name # to print the enum name without the class
 
+class CornerShape(Enum):
+    Default = "default"
+    Convex = "convex"
+    Notched = "notched"
+    Bevelled = "bevelled"
+    Unknown = "unknown"
 
 # work around a breaking change in pil 10.0.0, see
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
@@ -385,6 +391,18 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         maskClp = loadClipart(maskClipartFileName, clipartPathList)
         im = maskClp.applyAsAlphaMaskToFoto(im)
 
+    # issue https://github.com/bash0/cewe2pdf/issues/251 asks for corner decorations. This
+    # implementation deals with convex (rounded) corners, taken from the top-left corner.
+    # The other corner shapes are not implemented, nor are differing corners.
+    cornerShape, corner_length_mcf = getTopLeftCornerInfo(area)
+    if cornerShape != CornerShape.Convex:
+        if corner_length_mcf > 0:
+            logging.warning(f"Corner shape '{cornerShape.value}' is not implemented; ignoring corner decoration.")
+    elif corner_length_mcf > 0:
+        cornerRadius_px = int(round(corner_length_mcf * im.width / imgCropWidth_mcfunit))
+        cornerRadius_px = min(cornerRadius_px, im.width // 2, im.height // 2)
+        im = applyCornerMask(im, cornerRadius_px)
+
     # re-compress image
     jpeg = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
     # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
@@ -433,6 +451,55 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     # we now have temporary file, that we need to delete after pdf creation
     tempFileList.append(jpeg.name)
+
+
+def getTopLeftCornerInfo(area):
+    """
+    Return the shape and length, in MCF units, of an enabled top-left corner.
+    """
+    for decoration in area.findall('decoration'):
+        for corners in decoration.findall('corners'):
+            if corners.get('enabled') != 'yes':
+                continue
+
+            topLeftCorner = corners.find("corner[@where='top-left']")
+            if topLeftCorner is None:
+                continue
+
+            cornerLength = topLeftCorner.get('length')
+            cornerShapeText = topLeftCorner.get('shape', 'default')
+
+            try:
+                cornerShape = CornerShape(cornerShapeText)
+            except ValueError:
+                cornerShape = CornerShape.Unknown
+
+            if cornerLength is not None:
+                return cornerShape, float(cornerLength)
+
+            return cornerShape, 0
+
+    return CornerShape.Default, 0
+
+def applyCornerMask(im, radius):
+    """
+    Apply identical rounded corners to all four corners of an image.
+
+    radius is in pixels.
+    Returns an RGBA PIL image.
+    """
+
+    from PIL import Image, ImageChops, ImageDraw
+
+    if im.mode != "RGBA":
+        im = im.convert("RGBA")
+    width, height = im.size
+    corner_mask = Image.new("L", (width, height), 0)
+    draw = ImageDraw.Draw(corner_mask)
+    draw.rounded_rectangle((0, 0, width, height), radius=radius, fill=255)
+
+    im.putalpha(ImageChops.multiply(im.getchannel("A"), corner_mask)) # retain the original alpha channel if present
+    return im
 
 
 def processDecorationBorders(decoration, areaHeight, areaWidth, pdf):
