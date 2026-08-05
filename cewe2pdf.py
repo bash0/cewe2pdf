@@ -55,7 +55,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # extend the search path so Cairo will find its dlls.
 # only needed when the program is frozen (i.e. compiled).
-from asyncio.windows_events import NULL
 import sys
 
 import logging
