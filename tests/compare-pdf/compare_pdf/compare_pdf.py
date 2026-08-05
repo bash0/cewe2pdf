@@ -94,8 +94,17 @@ class ComparePDF:
             for i in range(len(images)):
                 for j in range(i + 1, len(images)):
                     if not np.array_equal(images[i], images[j]):
+                        diffImage = cv2.absdiff(images[i], images[j])
+                        diffArray = np.asarray(diffImage)
+                        if diffArray.ndim == 2:
+                            differentPixelMask = diffArray != 0
+                        else:
+                            differentPixelMask = np.any(diffArray != 0, axis=2)
+                        differentPixels = np.count_nonzero(differentPixelMask)
+                        totalPixels = differentPixelMask.size
+                        differentPercent = 100 * differentPixels / totalPixels
                         self.logger.warning(
-                            f"Page {page_num} image from {self.pdf_paths[i]} differs from image from {self.pdf_paths[j]}")
+                            f"Page {page_num} image in {self.pdf_paths[i]} differs ({differentPixels:,} px, {differentPercent:.4f}%) from image {self.pdf_paths[j]}")
                     # Optionally show each page for debugging purposes, style determined by a command line option
                     if self.showdiffs == ShowDiffsStyle.SideBySide:
                         # The following lines display the two images side by side
