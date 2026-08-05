@@ -76,7 +76,7 @@ from io import BytesIO
 from math import sqrt, floor
 
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 import reportlab.lib.colors
 import reportlab.lib.pagesizes
@@ -131,6 +131,16 @@ class CornerShape(Enum):
     Notched = "notched"
     Bevelled = "bevelled"
     Unknown = "unknown"
+
+class CornerInfo(NamedTuple):
+    shape: CornerShape = CornerShape.Default
+    length_mcf: float = 0
+
+class CornersInfo(NamedTuple):
+    topLeft: CornerInfo = CornerInfo()
+    topRight: CornerInfo = CornerInfo()
+    bottomLeft: CornerInfo = CornerInfo()
+    bottomRight: CornerInfo = CornerInfo()
 
 # work around a breaking change in pil 10.0.0, see
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
@@ -394,14 +404,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # issue https://github.com/bash0/cewe2pdf/issues/251 asks for corner decorations. This
     # implementation deals with convex (rounded) corners, taken from the top-left corner.
     # The other corner shapes are not implemented, nor are differing corners.
-    cornerShape, corner_length_mcf = getTopLeftCornerInfo(area)
-    if cornerShape != CornerShape.Convex:
-        if corner_length_mcf > 0:
-            logging.warning(f"Corner shape '{cornerShape.value}' is not implemented; ignoring corner decoration.")
-    elif corner_length_mcf > 0:
-        cornerRadius_px = int(round(corner_length_mcf * im.width / imgCropWidth_mcfunit))
-        cornerRadius_px = min(cornerRadius_px, im.width // 2, im.height // 2)
-        im = applyCornerMask(im, cornerRadius_px)
+    cornersInfo = getCornersInfo(area)
+    im = applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit)
 
     # re-compress image
     jpeg = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
@@ -453,52 +457,162 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     tempFileList.append(jpeg.name)
 
 
-def getTopLeftCornerInfo(area):
-    """
-    Return the shape and length, in MCF units, of an enabled top-left corner.
-    """
+def getCornerInfo(corners, where):
+    """Return shape and length, in MCF units, for one named corner."""
+    corner = corners.find(f"corner[@where='{where}']")
+    if corner is None:
+        return CornerInfo()
+
+    cornerLength = corner.get('length')
+    cornerShapeText = corner.get('shape', 'default')
+
+    try:
+        cornerShape = CornerShape(cornerShapeText)
+    except ValueError:
+        cornerShape = CornerShape.Unknown
+
+    if cornerLength is None:
+        return CornerInfo(cornerShape, 0)
+
+    return CornerInfo(cornerShape, float(cornerLength))
+
+
+def getCornersInfo(area):
+    """Return shape and length information for all enabled image corners."""
     for decoration in area.findall('decoration'):
         for corners in decoration.findall('corners'):
             if corners.get('enabled') != 'yes':
                 continue
 
-            topLeftCorner = corners.find("corner[@where='top-left']")
-            if topLeftCorner is None:
-                continue
+            return CornersInfo(
+                topLeft=getCornerInfo(corners, 'top-left'),
+                topRight=getCornerInfo(corners, 'top-right'),
+                bottomLeft=getCornerInfo(corners, 'bottom-left'),
+                bottomRight=getCornerInfo(corners, 'bottom-right')
+            )
 
-            cornerLength = topLeftCorner.get('length')
-            cornerShapeText = topLeftCorner.get('shape', 'default')
+    return CornersInfo()
 
-            try:
-                cornerShape = CornerShape(cornerShapeText)
-            except ValueError:
-                cornerShape = CornerShape.Unknown
 
-            if cornerLength is not None:
-                return cornerShape, float(cornerLength)
-
-            return cornerShape, 0
-
-    return CornerShape.Default, 0
-
-def applyCornerMask(im, radius):
+def applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit):
     """
-    Apply identical rounded corners to all four corners of an image.
+    Apply convex and bevelled corner masks to an image.
 
-    radius is in pixels.
-    Returns an RGBA PIL image.
+    Corner lengths are supplied in MCF units (0.1 mm).
     """
-
     from PIL import Image, ImageChops, ImageDraw
+
+    def getCornerRadius_px(cornerInfo):
+        if cornerInfo.shape == CornerShape.Default:
+            return 0
+
+        radius_px = int(round(
+            cornerInfo.length_mcf * im.width / imgCropWidth_mcfunit
+        ))
+        return max(0, min(radius_px, im.width // 2, im.height // 2))
+
+    topLeftRadius_px = getCornerRadius_px(cornersInfo.topLeft)
+    topRightRadius_px = getCornerRadius_px(cornersInfo.topRight)
+    bottomLeftRadius_px = getCornerRadius_px(cornersInfo.bottomLeft)
+    bottomRightRadius_px = getCornerRadius_px(cornersInfo.bottomRight)
+
+    if max(topLeftRadius_px, topRightRadius_px,
+           bottomLeftRadius_px, bottomRightRadius_px) == 0:
+        return im
 
     if im.mode != "RGBA":
         im = im.convert("RGBA")
-    width, height = im.size
-    corner_mask = Image.new("L", (width, height), 0)
-    draw = ImageDraw.Draw(corner_mask)
-    draw.rounded_rectangle((0, 0, width, height), radius=radius, fill=255)
 
-    im.putalpha(ImageChops.multiply(im.getchannel("A"), corner_mask)) # retain the original alpha channel if present
+    width, height = im.size
+    mask = Image.new("L", (width, height), 255)
+    draw = ImageDraw.Draw(mask)
+
+    if topLeftRadius_px > 0:
+        radius = topLeftRadius_px
+        cornerInfo = cornersInfo.topLeft
+
+        if cornerInfo.shape == CornerShape.Convex:
+            draw.rectangle((0, 0, radius, radius), fill=0)
+            draw.pieslice((0, 0, 2 * radius, 2 * radius),
+                          start=180, end=270, fill=255)
+
+        elif cornerInfo.shape == CornerShape.Bevelled:
+            draw.polygon([(0, 0), (radius, 0), (0, radius)], fill=0)
+
+        else:
+            logging.warning(
+                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
+                "ignoring top-left corner decoration."
+            )
+
+    if topRightRadius_px > 0:
+        radius = topRightRadius_px
+        cornerInfo = cornersInfo.topRight
+
+        if cornerInfo.shape == CornerShape.Convex:
+            draw.rectangle((width - radius, 0, width, radius), fill=0)
+            draw.pieslice((width - 2 * radius, 0, width, 2 * radius),
+                          start=270, end=360, fill=255)
+
+        elif cornerInfo.shape == CornerShape.Bevelled:
+            draw.polygon(
+                [(width - radius, 0), (width, 0), (width, radius)],
+                fill=0
+            )
+
+        else:
+            logging.warning(
+                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
+                "ignoring top-right corner decoration."
+            )
+
+    if bottomLeftRadius_px > 0:
+        radius = bottomLeftRadius_px
+        cornerInfo = cornersInfo.bottomLeft
+
+        if cornerInfo.shape == CornerShape.Convex:
+            draw.rectangle((0, height - radius, radius, height), fill=0)
+            draw.pieslice((0, height - 2 * radius, 2 * radius, height),
+                          start=90, end=180, fill=255)
+
+        elif cornerInfo.shape == CornerShape.Bevelled:
+            draw.polygon(
+                [(0, height - radius), (0, height), (radius, height)],
+                fill=0
+            )
+
+        else:
+            logging.warning(
+                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
+                "ignoring bottom-left corner decoration."
+            )
+
+    if bottomRightRadius_px > 0:
+        radius = bottomRightRadius_px
+        cornerInfo = cornersInfo.bottomRight
+
+        if cornerInfo.shape == CornerShape.Convex:
+            draw.rectangle((width - radius, height - radius, width, height),
+                           fill=0)
+            draw.pieslice((width - 2 * radius, height - 2 * radius,
+                           width, height),
+                          start=0, end=90, fill=255)
+
+        elif cornerInfo.shape == CornerShape.Bevelled:
+            draw.polygon(
+                [(width - radius, height), (width, height),
+                 (width, height - radius)],
+                fill=0
+            )
+
+        else:
+            logging.warning(
+                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
+                "ignoring bottom-right corner decoration."
+            )
+
+    # Retain alpha already present, for example from a passepartout mask.
+    im.putalpha(ImageChops.multiply(im.getchannel("A"), mask))
     return im
 
 
