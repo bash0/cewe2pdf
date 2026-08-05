@@ -76,7 +76,7 @@ from io import BytesIO
 from math import sqrt, floor
 
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 import reportlab.lib.colors
 import reportlab.lib.pagesizes
@@ -125,6 +125,22 @@ class PageType(Enum):
     def __str__(self):
         return self.name # to print the enum name without the class
 
+class CornerShape(Enum):
+    Default = "default"
+    Convex = "convex"
+    Notched = "notched"
+    Bevelled = "bevelled"
+    Unknown = "unknown"
+
+class CornerInfo(NamedTuple):
+    shape: CornerShape = CornerShape.Default
+    length_mcf: float = 0
+
+class CornersInfo(NamedTuple):
+    topLeft: CornerInfo = CornerInfo()
+    topRight: CornerInfo = CornerInfo()
+    bottomLeft: CornerInfo = CornerInfo()
+    bottomRight: CornerInfo = CornerInfo()
 
 # work around a breaking change in pil 10.0.0, see
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
@@ -385,6 +401,12 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         maskClp = loadClipart(maskClipartFileName, clipartPathList)
         im = maskClp.applyAsAlphaMaskToFoto(im)
 
+    # issue https://github.com/bash0/cewe2pdf/issues/251 asks for corner decorations. This
+    # implementation deals with convex (rounded) corners, taken from the top-left corner.
+    # The other corner shapes are not implemented, nor are differing corners.
+    cornersInfo = getCornersInfo(area)
+    im = applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit)
+
     # re-compress image
     jpeg = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
     # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
@@ -401,7 +423,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     pdf.rotate(-areaRot)   # rotation around center of area
 
     for decorationTag in area.findall('decoration'):
-        processDecorationShadow(decorationTag, areaHeight, areaWidth, pdf)
+        processDecorationShadow(decorationTag, areaHeight, areaWidth, pdf, cornersInfo)
 
     # calculate the non-symmetric shift of the center, given the left pos and the width.
     frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
@@ -426,7 +448,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False, None)
 
     for decorationTag in area.findall('decoration'):
-        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
+        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, cornersInfo)
 
     pdf.rotate(areaRot)
     pdf.translate(-img_transx, -transy)
@@ -435,7 +457,284 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     tempFileList.append(jpeg.name)
 
 
-def processDecorationBorders(decoration, areaHeight, areaWidth, pdf):
+def getCornerInfo(corners, where):
+    """Return shape and length, in MCF units, for one named corner."""
+    corner = corners.find(f"corner[@where='{where}']")
+    if corner is None:
+        return CornerInfo()
+
+    cornerLength = corner.get('length')
+    cornerShapeText = corner.get('shape', 'default')
+
+    try:
+        cornerShape = CornerShape(cornerShapeText)
+    except ValueError:
+        cornerShape = CornerShape.Unknown
+
+    if cornerLength is None:
+        return CornerInfo(cornerShape, 0)
+
+    return CornerInfo(cornerShape, float(cornerLength))
+
+
+def getCornersInfo(area):
+    """Return shape and length information for all enabled image corners."""
+    for decoration in area.findall('decoration'):
+        for corners in decoration.findall('corners'):
+            if corners.get('enabled') != 'yes':
+                continue
+
+            return CornersInfo(
+                topLeft=getCornerInfo(corners, 'top-left'),
+                topRight=getCornerInfo(corners, 'top-right'),
+                bottomLeft=getCornerInfo(corners, 'bottom-left'),
+                bottomRight=getCornerInfo(corners, 'bottom-right')
+            )
+
+    return CornersInfo()
+
+
+def buildCornerPath(pdf, left, bottom, width, height, cornersInfo=None,
+                    radiusAdjustment=0):
+    """
+    Build a PDF path for a rectangle with optional convex or bevelled corners.
+
+    radiusAdjustment expands or contracts the outline, for example when a
+    border is inside or outside the image area.
+    """
+    kappa = 0.5522847498
+
+    if cornersInfo is None:
+        path = pdf.beginPath()
+        path.moveTo(left, bottom)
+        path.lineTo(left + width, bottom)
+        path.lineTo(left + width, bottom + height)
+        path.lineTo(left, bottom + height)
+        path.close()
+        return path
+
+    def getRadius(cornerInfo):
+        if cornerInfo.shape not in (
+                CornerShape.Convex, CornerShape.Bevelled):
+            return 0
+
+        radius = mcf2rl * cornerInfo.length_mcf + radiusAdjustment
+        return max(0, min(radius, width / 2, height / 2))
+
+    topLeftRadius = getRadius(cornersInfo.topLeft)
+    topRightRadius = getRadius(cornersInfo.topRight)
+    bottomLeftRadius = getRadius(cornersInfo.bottomLeft)
+    bottomRightRadius = getRadius(cornersInfo.bottomRight)
+
+    topLeftShape = cornersInfo.topLeft.shape if topLeftRadius > 0 else CornerShape.Default
+    topRightShape = cornersInfo.topRight.shape if topRightRadius > 0 else CornerShape.Default
+    bottomLeftShape = cornersInfo.bottomLeft.shape if bottomLeftRadius > 0 else CornerShape.Default
+    bottomRightShape = cornersInfo.bottomRight.shape if bottomRightRadius > 0 else CornerShape.Default
+
+    right = left + width
+    top = bottom + height
+
+    path = pdf.beginPath()
+    path.moveTo(left + bottomLeftRadius, bottom)
+
+    # Bottom-right corner
+    path.lineTo(right - bottomRightRadius, bottom)
+    if bottomRightShape == CornerShape.Convex:
+        radius = bottomRightRadius
+        path.curveTo(
+            right - radius + kappa * radius, bottom,
+            right, bottom + radius - kappa * radius,
+            right, bottom + radius
+        )
+    elif bottomRightShape == CornerShape.Bevelled:
+        path.lineTo(right, bottom + bottomRightRadius)
+    else:
+        path.lineTo(right, bottom)
+
+    # Top-right corner
+    path.lineTo(right, top - topRightRadius)
+    if topRightShape == CornerShape.Convex:
+        radius = topRightRadius
+        path.curveTo(
+            right, top - radius + kappa * radius,
+            right - radius + kappa * radius, top,
+            right - radius, top
+        )
+    elif topRightShape == CornerShape.Bevelled:
+        path.lineTo(right - topRightRadius, top)
+    else:
+        path.lineTo(right, top)
+
+    # Top-left corner
+    path.lineTo(left + topLeftRadius, top)
+    if topLeftShape == CornerShape.Convex:
+        radius = topLeftRadius
+        path.curveTo(
+            left + radius - kappa * radius, top,
+            left, top - radius + kappa * radius,
+            left, top - radius
+        )
+    elif topLeftShape == CornerShape.Bevelled:
+        path.lineTo(left, top - topLeftRadius)
+    else:
+        path.lineTo(left, top)
+
+    # Bottom-left corner
+    path.lineTo(left, bottom + bottomLeftRadius)
+    if bottomLeftShape == CornerShape.Convex:
+        radius = bottomLeftRadius
+        path.curveTo(
+            left, bottom + radius - kappa * radius,
+            left + radius - kappa * radius, bottom,
+            left + radius, bottom
+        )
+    elif bottomLeftShape == CornerShape.Bevelled:
+        path.lineTo(left + bottomLeftRadius, bottom)
+    else:
+        path.lineTo(left, bottom)
+
+    path.close()
+    return path
+
+
+def hasImplementedCorners(cornersInfo):
+    if cornersInfo is None:
+        return False
+    for cornerInfo in (
+            cornersInfo.topLeft,
+            cornersInfo.topRight,
+            cornersInfo.bottomLeft,
+            cornersInfo.bottomRight):
+        if (cornerInfo.length_mcf > 0
+                and cornerInfo.shape in (
+                    CornerShape.Convex, CornerShape.Bevelled)):
+            return True
+    return False
+
+
+def applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit):
+    """
+    Apply convex and bevelled corner masks to an image.
+
+    Corner lengths are supplied in MCF units (0.1 mm).
+    """
+    from PIL import Image, ImageChops, ImageDraw
+
+    def getCornerRadius_px(cornerInfo):
+        if cornerInfo.shape == CornerShape.Default:
+            return 0
+
+        radius_px = int(round(
+            cornerInfo.length_mcf * im.width / imgCropWidth_mcfunit
+        ))
+        return max(0, min(radius_px, im.width // 2, im.height // 2))
+
+    topLeftRadius_px = getCornerRadius_px(cornersInfo.topLeft)
+    topRightRadius_px = getCornerRadius_px(cornersInfo.topRight)
+    bottomLeftRadius_px = getCornerRadius_px(cornersInfo.bottomLeft)
+    bottomRightRadius_px = getCornerRadius_px(cornersInfo.bottomRight)
+
+    if max(topLeftRadius_px, topRightRadius_px,
+           bottomLeftRadius_px, bottomRightRadius_px) == 0:
+        return im
+
+    if im.mode != "RGBA":
+        im = im.convert("RGBA")
+
+    width, height = im.size
+    mask = Image.new("L", (width, height), 255)
+    draw = ImageDraw.Draw(mask)
+
+    if topLeftRadius_px > 0:
+        radius = topLeftRadius_px
+        cornerInfo = cornersInfo.topLeft
+
+        if cornerInfo.shape == CornerShape.Convex:
+            draw.rectangle((0, 0, radius, radius), fill=0)
+            draw.pieslice((0, 0, 2 * radius, 2 * radius),
+                          start=180, end=270, fill=255)
+
+        elif cornerInfo.shape == CornerShape.Bevelled:
+            draw.polygon([(0, 0), (radius, 0), (0, radius)], fill=0)
+
+        else:
+            logging.warning(
+                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
+                "ignoring top-left corner decoration."
+            )
+
+    if topRightRadius_px > 0:
+        radius = topRightRadius_px
+        cornerInfo = cornersInfo.topRight
+
+        if cornerInfo.shape == CornerShape.Convex:
+            draw.rectangle((width - radius, 0, width, radius), fill=0)
+            draw.pieslice((width - 2 * radius, 0, width, 2 * radius),
+                          start=270, end=360, fill=255)
+
+        elif cornerInfo.shape == CornerShape.Bevelled:
+            draw.polygon(
+                [(width - radius, 0), (width, 0), (width, radius)],
+                fill=0
+            )
+
+        else:
+            logging.warning(
+                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
+                "ignoring top-right corner decoration."
+            )
+
+    if bottomLeftRadius_px > 0:
+        radius = bottomLeftRadius_px
+        cornerInfo = cornersInfo.bottomLeft
+
+        if cornerInfo.shape == CornerShape.Convex:
+            draw.rectangle((0, height - radius, radius, height), fill=0)
+            draw.pieslice((0, height - 2 * radius, 2 * radius, height),
+                          start=90, end=180, fill=255)
+
+        elif cornerInfo.shape == CornerShape.Bevelled:
+            draw.polygon(
+                [(0, height - radius), (0, height), (radius, height)],
+                fill=0
+            )
+
+        else:
+            logging.warning(
+                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
+                "ignoring bottom-left corner decoration."
+            )
+
+    if bottomRightRadius_px > 0:
+        radius = bottomRightRadius_px
+        cornerInfo = cornersInfo.bottomRight
+
+        if cornerInfo.shape == CornerShape.Convex:
+            draw.rectangle((width - radius, height - radius, width, height),
+                           fill=0)
+            draw.pieslice((width - 2 * radius, height - 2 * radius,
+                           width, height),
+                          start=0, end=90, fill=255)
+
+        elif cornerInfo.shape == CornerShape.Bevelled:
+            draw.polygon(
+                [(width - radius, height), (width, height),
+                 (width, height - radius)],
+                fill=0
+            )
+
+        else:
+            logging.warning(
+                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
+                "ignoring bottom-right corner decoration."
+            )
+
+    # Retain alpha already present, for example from a passepartout mask.
+    im.putalpha(ImageChops.multiply(im.getchannel("A"), mask))
+    return im
+
+
+def processDecorationBorders(decoration, areaHeight, areaWidth, pdf, cornersInfo=None):
     # Draw a single cell table to represent border decoration (a box around the object)
     # We assume that this is called from inside the rotation and translation operation
     for border in decoration.findall('border'):
@@ -483,21 +782,37 @@ def processDecorationBorders(decoration, areaHeight, areaWidth, pdf):
         frameBottomLeft_y = -0.5 * (mcf2rl * areaHeight) - adjustment
         frameWidth = mcf2rl * areaWidth + 2 * adjustment
         frameHeight = mcf2rl * areaHeight + 2 * adjustment
-        frm_table = Table(
-            data=[[None]],
-            colWidths=frameWidth,
-            rowHeights=frameHeight,
-            style=[
-                # The two (0, 0) in each attribute represent the range of table cells that the style applies to.
-                # Since there's only one cell at (0, 0), it's used for both start and end of the range
-                ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-                ('BOX', (0, 0), (0, 0), bwidth, bcolor), # The fourth argument to this style attribute is the border width
-                ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
-            ]
-        )
-        frm_table.wrapOn(pdf, frameWidth, frameHeight)
-        frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
 
+        if hasImplementedCorners(cornersInfo):
+            path = buildCornerPath(
+                pdf,
+                frameBottomLeft_x,
+                frameBottomLeft_y,
+                frameWidth,
+                frameHeight,
+                cornersInfo,
+                adjustment
+            )
+            pdf.saveState()
+            pdf.setLineWidth(bwidth)
+            pdf.setStrokeColor(bcolor)
+            pdf.drawPath(path, stroke=1, fill=0)
+            pdf.restoreState()
+        else:
+            # actually the path code will also work for the default corners, but it we retain the original table
+            # code so that there are no changes in the default case and the regression tests will not fail.
+            frm_table = Table(
+                data=[[None]],
+                colWidths=frameWidth,
+                rowHeights=frameHeight,
+                style=[
+                    ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+                    ('BOX', (0, 0), (0, 0), bwidth, bcolor),
+                    ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
+                ]
+            )
+            frm_table.wrapOn(pdf, frameWidth, frameHeight)
+            frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
 
 def findShadowBottomLeft(frameBottomLeft, angle, distance, swidth):
     x, y = frameBottomLeft
@@ -515,7 +830,7 @@ def intensityToGrey(value):
     colorComponentValue = 1 - (max(1, min(255, value)) / 255)
     return reportlab.lib.colors.Color(colorComponentValue, colorComponentValue, colorComponentValue)
 
-def processDecorationShadow(decoration, areaHeight, areaWidth, pdf):
+def processDecorationShadow(decoration, areaHeight, areaWidth, pdf, cornersInfo=None):
     if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
         # shadows were implemented in May 2025. Prior to that, you could have specified
         # shadows on your photos for printing by CEWE but you would not have got them
