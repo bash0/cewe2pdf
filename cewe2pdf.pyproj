@@ -293,6 +293,7 @@
     <Compile Include="configUtils.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="corners.py" />
     <Compile Include="fontHandling.py">
       <SubType>Code</SubType>
     </Compile>
@@ -320,6 +321,7 @@
     <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
     <Compile Include="runAllTests.py" />
+    <Compile Include="shadows.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
     <Compile Include="tests\compare-pdf\setup.py" />

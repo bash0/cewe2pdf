@@ -3,7 +3,8 @@ fonttools>=4.25.1
 lxml>=4.4.1
 packaging>=24.0,<25
 pillow>=5.4.1
-pikepdf>=6.2.9
+# Page.get_images(), used by the clipart test, was added in pikepdf 10.9.
+pikepdf>=10.9
 pyyaml>=5.3.1
 reportlab>=3.5.23
 pylint>=3.3.0
