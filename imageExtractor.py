@@ -46,8 +46,8 @@ def collectArgsAndExtract():
 
     unpackedFolder, mcfxmlname = unpackMcfx(inputFilePath, imageDirPath)
 
+
 if __name__ == '__main__':
     # only executed when this file is run directly.
     # we need trick to have both: default and fixed formats.
     collectArgsAndExtract()
-

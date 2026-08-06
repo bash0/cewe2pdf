@@ -76,7 +76,7 @@ from io import BytesIO
 from math import sqrt, floor
 
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import Any
 
 import reportlab.lib.colors
 import reportlab.lib.pagesizes
@@ -88,7 +88,6 @@ from reportlab.platypus import Paragraph, Table
 from reportlab.lib.styles import ParagraphStyle
 # from reportlab.lib.styles import getSampleStyleSheet
 
-import numpy as np
 import PIL
 
 from packaging.version import parse as parse_version
@@ -98,6 +97,7 @@ from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
 from clipArt import getClipConfig, loadClipart, readClipArtConfigXML
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
+from corners import applyCornerMask, buildCornerPath, getCornersInfo, hasImplementedCorners
 from configUtils import getConfigurationBool, getConfigurationInt
 from extraLoggers import mustsee, configlogger, VerifyMessageCounts, printMessageCountSummaries
 from fontHandling import getAvailableFont, findAndRegisterFonts
@@ -111,6 +111,7 @@ from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendTe
 from text import CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle, Dequote
 from index import Index
 from textart import handleTextArt
+from shadows import drawBlurredImageShadow, findShadowBottomLeft, intensityToGrey
 
 
 # PageType is a concept for processing in this code, not something used by CEWE
@@ -125,22 +126,6 @@ class PageType(Enum):
     def __str__(self):
         return self.name # to print the enum name without the class
 
-class CornerShape(Enum):
-    Default = "default"
-    Convex = "convex"
-    Notched = "notched"
-    Bevelled = "bevelled"
-    Unknown = "unknown"
-
-class CornerInfo(NamedTuple):
-    shape: CornerShape = CornerShape.Default
-    length_mcf: float = 0
-
-class CornersInfo(NamedTuple):
-    topLeft: CornerInfo = CornerInfo()
-    topRight: CornerInfo = CornerInfo()
-    bottomLeft: CornerInfo = CornerInfo()
-    bottomRight: CornerInfo = CornerInfo()
 
 # work around a breaking change in pil 10.0.0, see
 #   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
@@ -432,7 +417,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     # masks one consistent model, and keeps the shadow aligned with the image.
     for decorationTag in area.findall('decoration'):
         processDecorationShadow(
-            decorationTag, areaHeight, areaWidth, pdf, cornersInfo,
+            decorationTag, areaHeight, areaWidth, pdf,
             im, imgCropWidth_mcfunit, imgCropHeight_mcfunit
         )
 
@@ -462,283 +447,6 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
 
     # we now have temporary file, that we need to delete after pdf creation
     tempFileList.append(jpeg.name)
-
-
-def getCornerInfo(corners, where):
-    """Return shape and length, in MCF units, for one named corner."""
-    corner = corners.find(f"corner[@where='{where}']")
-    if corner is None:
-        return CornerInfo()
-
-    cornerLength = corner.get('length')
-    cornerShapeText = corner.get('shape', 'default')
-
-    try:
-        cornerShape = CornerShape(cornerShapeText)
-    except ValueError:
-        cornerShape = CornerShape.Unknown
-
-    if cornerLength is None:
-        return CornerInfo(cornerShape, 0)
-
-    return CornerInfo(cornerShape, float(cornerLength))
-
-
-def getCornersInfo(area):
-    """Return shape and length information for all enabled image corners."""
-    for decoration in area.findall('decoration'):
-        for corners in decoration.findall('corners'):
-            if corners.get('enabled') != 'yes':
-                continue
-
-            return CornersInfo(
-                topLeft=getCornerInfo(corners, 'top-left'),
-                topRight=getCornerInfo(corners, 'top-right'),
-                bottomLeft=getCornerInfo(corners, 'bottom-left'),
-                bottomRight=getCornerInfo(corners, 'bottom-right')
-            )
-
-    return CornersInfo()
-
-
-def buildCornerPath(pdf, left, bottom, width, height, cornersInfo=None,
-                    radiusAdjustment=0):
-    """
-    Build a PDF path for a rectangle with optional convex or bevelled corners.
-
-    radiusAdjustment expands or contracts the outline, for example when a
-    border is inside or outside the image area.
-    """
-    kappa = 0.5522847498
-
-    if cornersInfo is None:
-        path = pdf.beginPath()
-        path.moveTo(left, bottom)
-        path.lineTo(left + width, bottom)
-        path.lineTo(left + width, bottom + height)
-        path.lineTo(left, bottom + height)
-        path.close()
-        return path
-
-    def getRadius(cornerInfo):
-        if cornerInfo.shape not in (
-                CornerShape.Convex, CornerShape.Bevelled):
-            return 0
-
-        radius = mcf2rl * cornerInfo.length_mcf + radiusAdjustment
-        return max(0, min(radius, width / 2, height / 2))
-
-    topLeftRadius = getRadius(cornersInfo.topLeft)
-    topRightRadius = getRadius(cornersInfo.topRight)
-    bottomLeftRadius = getRadius(cornersInfo.bottomLeft)
-    bottomRightRadius = getRadius(cornersInfo.bottomRight)
-
-    topLeftShape = cornersInfo.topLeft.shape if topLeftRadius > 0 else CornerShape.Default
-    topRightShape = cornersInfo.topRight.shape if topRightRadius > 0 else CornerShape.Default
-    bottomLeftShape = cornersInfo.bottomLeft.shape if bottomLeftRadius > 0 else CornerShape.Default
-    bottomRightShape = cornersInfo.bottomRight.shape if bottomRightRadius > 0 else CornerShape.Default
-
-    right = left + width
-    top = bottom + height
-
-    path = pdf.beginPath()
-    path.moveTo(left + bottomLeftRadius, bottom)
-
-    # Bottom-right corner
-    path.lineTo(right - bottomRightRadius, bottom)
-    if bottomRightShape == CornerShape.Convex:
-        radius = bottomRightRadius
-        path.curveTo(
-            right - radius + kappa * radius, bottom,
-            right, bottom + radius - kappa * radius,
-            right, bottom + radius
-        )
-    elif bottomRightShape == CornerShape.Bevelled:
-        path.lineTo(right, bottom + bottomRightRadius)
-    else:
-        path.lineTo(right, bottom)
-
-    # Top-right corner
-    path.lineTo(right, top - topRightRadius)
-    if topRightShape == CornerShape.Convex:
-        radius = topRightRadius
-        path.curveTo(
-            right, top - radius + kappa * radius,
-            right - radius + kappa * radius, top,
-            right - radius, top
-        )
-    elif topRightShape == CornerShape.Bevelled:
-        path.lineTo(right - topRightRadius, top)
-    else:
-        path.lineTo(right, top)
-
-    # Top-left corner
-    path.lineTo(left + topLeftRadius, top)
-    if topLeftShape == CornerShape.Convex:
-        radius = topLeftRadius
-        path.curveTo(
-            left + radius - kappa * radius, top,
-            left, top - radius + kappa * radius,
-            left, top - radius
-        )
-    elif topLeftShape == CornerShape.Bevelled:
-        path.lineTo(left, top - topLeftRadius)
-    else:
-        path.lineTo(left, top)
-
-    # Bottom-left corner
-    path.lineTo(left, bottom + bottomLeftRadius)
-    if bottomLeftShape == CornerShape.Convex:
-        radius = bottomLeftRadius
-        path.curveTo(
-            left, bottom + radius - kappa * radius,
-            left + radius - kappa * radius, bottom,
-            left + radius, bottom
-        )
-    elif bottomLeftShape == CornerShape.Bevelled:
-        path.lineTo(left + bottomLeftRadius, bottom)
-    else:
-        path.lineTo(left, bottom)
-
-    path.close()
-    return path
-
-
-def hasImplementedCorners(cornersInfo):
-    if cornersInfo is None:
-        return False
-    for cornerInfo in (
-            cornersInfo.topLeft,
-            cornersInfo.topRight,
-            cornersInfo.bottomLeft,
-            cornersInfo.bottomRight):
-        if (cornerInfo.length_mcf > 0
-                and cornerInfo.shape in (
-                    CornerShape.Convex, CornerShape.Bevelled)):
-            return True
-    return False
-
-
-def applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit):
-    """
-    Apply convex and bevelled corner masks to an image.
-
-    Corner lengths are supplied in MCF units (0.1 mm).
-    """
-    from PIL import Image, ImageChops, ImageDraw
-
-    def getCornerRadius_px(cornerInfo):
-        if cornerInfo.shape == CornerShape.Default:
-            return 0
-
-        radius_px = int(round(
-            cornerInfo.length_mcf * im.width / imgCropWidth_mcfunit
-        ))
-        return max(0, min(radius_px, im.width // 2, im.height // 2))
-
-    topLeftRadius_px = getCornerRadius_px(cornersInfo.topLeft)
-    topRightRadius_px = getCornerRadius_px(cornersInfo.topRight)
-    bottomLeftRadius_px = getCornerRadius_px(cornersInfo.bottomLeft)
-    bottomRightRadius_px = getCornerRadius_px(cornersInfo.bottomRight)
-
-    if max(topLeftRadius_px, topRightRadius_px,
-           bottomLeftRadius_px, bottomRightRadius_px) == 0:
-        return im
-
-    if im.mode != "RGBA":
-        im = im.convert("RGBA")
-
-    width, height = im.size
-    mask = Image.new("L", (width, height), 255)
-    draw = ImageDraw.Draw(mask)
-
-    if topLeftRadius_px > 0:
-        radius = topLeftRadius_px
-        cornerInfo = cornersInfo.topLeft
-
-        if cornerInfo.shape == CornerShape.Convex:
-            draw.rectangle((0, 0, radius, radius), fill=0)
-            draw.pieslice((0, 0, 2 * radius, 2 * radius),
-                          start=180, end=270, fill=255)
-
-        elif cornerInfo.shape == CornerShape.Bevelled:
-            draw.polygon([(0, 0), (radius, 0), (0, radius)], fill=0)
-
-        else:
-            logging.warning(
-                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
-                "ignoring top-left corner decoration."
-            )
-
-    if topRightRadius_px > 0:
-        radius = topRightRadius_px
-        cornerInfo = cornersInfo.topRight
-
-        if cornerInfo.shape == CornerShape.Convex:
-            draw.rectangle((width - radius, 0, width, radius), fill=0)
-            draw.pieslice((width - 2 * radius, 0, width, 2 * radius),
-                          start=270, end=360, fill=255)
-
-        elif cornerInfo.shape == CornerShape.Bevelled:
-            draw.polygon(
-                [(width - radius, 0), (width, 0), (width, radius)],
-                fill=0
-            )
-
-        else:
-            logging.warning(
-                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
-                "ignoring top-right corner decoration."
-            )
-
-    if bottomLeftRadius_px > 0:
-        radius = bottomLeftRadius_px
-        cornerInfo = cornersInfo.bottomLeft
-
-        if cornerInfo.shape == CornerShape.Convex:
-            draw.rectangle((0, height - radius, radius, height), fill=0)
-            draw.pieslice((0, height - 2 * radius, 2 * radius, height),
-                          start=90, end=180, fill=255)
-
-        elif cornerInfo.shape == CornerShape.Bevelled:
-            draw.polygon(
-                [(0, height - radius), (0, height), (radius, height)],
-                fill=0
-            )
-
-        else:
-            logging.warning(
-                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
-                "ignoring bottom-left corner decoration."
-            )
-
-    if bottomRightRadius_px > 0:
-        radius = bottomRightRadius_px
-        cornerInfo = cornersInfo.bottomRight
-
-        if cornerInfo.shape == CornerShape.Convex:
-            draw.rectangle((width - radius, height - radius, width, height),
-                           fill=0)
-            draw.pieslice((width - 2 * radius, height - 2 * radius,
-                           width, height),
-                          start=0, end=90, fill=255)
-
-        elif cornerInfo.shape == CornerShape.Bevelled:
-            draw.polygon(
-                [(width - radius, height), (width, height),
-                 (width, height - radius)],
-                fill=0
-            )
-
-        else:
-            logging.warning(
-                f"Corner shape '{cornerInfo.shape.value}' is not implemented; "
-                "ignoring bottom-right corner decoration."
-            )
-
-    # Retain alpha already present, for example from a passepartout mask.
-    im.putalpha(ImageChops.multiply(im.getchannel("A"), mask))
-    return im
 
 
 def processDecorationBorders(decoration, areaHeight, areaWidth, pdf, cornersInfo=None):
@@ -797,6 +505,7 @@ def processDecorationBorders(decoration, areaHeight, areaWidth, pdf, cornersInfo
                 frameBottomLeft_y,
                 frameWidth,
                 frameHeight,
+                mcf2rl,
                 cornersInfo,
                 adjustment
             )
@@ -821,112 +530,8 @@ def processDecorationBorders(decoration, areaHeight, areaWidth, pdf, cornersInfo
             frm_table.wrapOn(pdf, frameWidth, frameHeight)
             frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
 
-def findShadowBottomLeft(frameBottomLeft, angle, distance, swidth):
-    x, y = frameBottomLeft
-    if distance < 0.001:
-        # why on earth do I need this special case??
-        return x - swidth / 2, y - swidth / 2
-    # Compute shadow shift vector
-    angle_rad = np.radians(angle - 90)
-    shadow_dx = distance * np.cos(angle_rad)
-    shadow_dy = -distance * np.sin(angle_rad)  # Flip the Y-axis direction
-    # Return shadow rectangle bottom left coordinates
-    return x + shadow_dx - swidth / 2, y + shadow_dy - swidth / 2
-
-def intensityToGrey(value):
-    colorComponentValue = 1 - (max(1, min(255, value)) / 255)
-    return reportlab.lib.colors.Color(colorComponentValue, colorComponentValue, colorComponentValue)
-
-def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
-                           imgCropHeight_mcfunit, shadowDistance_mcfunit,
-                           shadowAngle, intensity, shadowBlur_mcfunit,
-                           shadowWidth_mcfunit):
-    """
-    Draw a blurred, transparent shadow using the image's existing alpha mask.
-
-    The alpha mask already includes the convex/bevelled corners (and any
-    passepartout mask), so the shadow follows the visible image silhouette.
-    """
-    from PIL import Image, ImageFilter
-
-    if im.mode != 'RGBA':
-        im = im.convert('RGBA')
-
-    # MCF geometry is in 0.1 mm while Pillow needs pixels.  Use the final,
-    # cropped image dimensions: they remain correct whether or not the image
-    # was downsampled earlier in processAreaImageTag.
-    pixelsPerMcfunit = im.width / imgCropWidth_mcfunit
-
-    # CEWE's displayed shadow expands by about three quarters of the nominal
-    # half-width on each side. This was measured from the width-only test page
-    # (0 .. 10 mm); the old ReportLab Table is noticeably larger at high values.
-    spreadRadius_px = int(round(
-        shadowWidth_mcfunit * pixelsPerMcfunit * 0.375
-    ))
-
-    # shadowBlurNew is stored in MCF units. Pillow's GaussianBlur has a wider
-    # visible tail than CEWE's editor, so use half the nominal radius. A
-    # three-radius transparent margin prevents that tail being clipped.
-    # Keep the fractional radius: rounding it would make several of CEWE's
-    # small blur settings render identically at the configured image DPI.
-    blurRadius_px = shadowBlur_mcfunit * pixelsPerMcfunit * 0.5
-    padding_px = spreadRadius_px + int(np.ceil(3 * blurRadius_px))
-
-    alpha = im.getchannel('A')
-    shadowAlpha = Image.new(
-        'L', (im.width + 2 * padding_px, im.height + 2 * padding_px), 0
-    )
-    shadowAlpha.paste(alpha, (padding_px, padding_px))
-
-    if spreadRadius_px > 0:
-        shadowAlpha = shadowAlpha.filter(
-            ImageFilter.MaxFilter(2 * spreadRadius_px + 1)
-        )
-
-    if blurRadius_px > 0:
-        shadowAlpha = shadowAlpha.filter(ImageFilter.GaussianBlur(blurRadius_px))
-
-    # CEWE's intensity maps directly to black alpha: an intensity of 128
-    # produces the mid-grey core seen in the editor, while zero disables it.
-    shadowOpacity = max(0, min(255, intensity)) / 255
-    shadowAlpha = shadowAlpha.point(
-        lambda value: int(round(value * shadowOpacity))
-    )
-    shadowImage = Image.new('RGBA', shadowAlpha.size, (0, 0, 0, 0))
-    shadowImage.putalpha(shadowAlpha)
-
-    # ReportLab handles the PNG alpha channel when mask='auto' is used below.
-    # Keep the temporary file until PDF generation has completed.
-    shadowFile = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
-    shadowFile.close()
-    shadowImage.save(shadowFile.name, 'PNG')
-    tempFileList.append(shadowFile.name)
-
-    # CEWE stores the direction in the same convention used by the older
-    # vector shadow code: the angle identifies where the shadow is cast, not
-    # the light source. The Y calculation is in PDF coordinates (Y upwards).
-    angleRadians = np.radians(shadowAngle - 90)
-    # The editor casts a shadow about three quarters of the stored distance.
-    # This is independently visible in the angle and distance test pages.
-    shadowDistanceScale = 0.75
-    shadowOffsetX_mcfunit = shadowDistanceScale * shadowDistance_mcfunit * np.cos(angleRadians)
-    shadowOffsetY_mcfunit = -shadowDistanceScale * shadowDistance_mcfunit * np.sin(angleRadians)
-    padding_mcfunit = padding_px / pixelsPerMcfunit
-
-    pdf.drawImage(
-        ImageReader(shadowFile.name),
-        mcf2rl * (-0.5 * imgCropWidth_mcfunit - padding_mcfunit
-                  + shadowOffsetX_mcfunit),
-        mcf2rl * (-0.5 * imgCropHeight_mcfunit - padding_mcfunit
-                  + shadowOffsetY_mcfunit),
-        width=mcf2rl * (imgCropWidth_mcfunit + 2 * padding_mcfunit),
-        height=mcf2rl * (imgCropHeight_mcfunit + 2 * padding_mcfunit),
-        mask='auto'
-    )
-
-
 def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
-                            cornersInfo=None, im=None,
+                            im=None,
                             imgCropWidth_mcfunit=None,
                             imgCropHeight_mcfunit=None):
     # The legacy implementation draws an opaque Table rectangle. Cornered
@@ -1010,7 +615,7 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
             drawBlurredImageShadow(
                 pdf, im, imgCropWidth_mcfunit, imgCropHeight_mcfunit,
                 shadowDistance_mcfunit, sangle, intensity, shadowBlur_mcfunit,
-                shadowWidth_mcfunit
+                shadowWidth_mcfunit, mcf2rl, tempFileList
             )
         else:
             # This fallback is for callers without the processed image alpha
