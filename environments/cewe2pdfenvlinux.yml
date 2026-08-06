@@ -42,7 +42,7 @@ dependencies:
       - numpy==2.2.4
       - opencv-python==4.11.0.86
       - packaging==25.0
-      - pikepdf==9.7.0
+      - pikepdf==10.11.0
       - pillow==11.2.1
       - platformdirs==4.3.7
       - pluggy==1.5.0

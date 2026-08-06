@@ -35,7 +35,7 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     assumedBackgroundImageKey = None
     for p in range(0, numPages):
         page = readPdf.pages[p]
-        imagekeys = list(page.images.keys())
+        imagekeys = list(page.get_images().keys())
         imagecount = len(imagekeys)
         if p == 0:
             # the test album has just one actual photo image, on the front cover
@@ -54,16 +54,16 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     assert coverBackgroundImageKey is not None, f"Could not locate cover background image"
     for p in expectedEqualBackgroundPageLists[0]: # covers
         page = readPdf.pages[p]
-        imagekeys = list(page.images.keys())
+        imagekeys = list(page.get_images().keys())
         assert coverBackgroundImageKey in imagekeys
     assert innerBackgroundImageKey is not None, f"Could not locate inner background image"
     for p in expectedEqualBackgroundPageLists[1]: # inner pages
         page = readPdf.pages[p]
-        imagekeys = list(page.images.keys())
+        imagekeys = list(page.get_images().keys())
         assert innerBackgroundImageKey in imagekeys, f"Inner background image differs on page {p}"
 
     # check we've used the right background images
-    coverimage = readPdf.pages[0].images[coverBackgroundImageKey]
+    coverimage = readPdf.pages[0].get_images()[coverBackgroundImageKey]
     coverpdfimage = PdfImage(coverimage)
     assert coverpdfimage.width == 10 and coverpdfimage.height == 10, \
         f"Expected cover bg WxH 10x10, but is {coverpdfimage.width},{coverpdfimage.height}"
@@ -71,7 +71,7 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     covertestpixel = coverpilimage.getpixel((1,1))
     assert covertestpixel == (236,220,195), f"Expected cover colour (236, 220, 95), got {covertestpixel}"
 
-    innerimage = readPdf.pages[4].images[innerBackgroundImageKey]
+    innerimage = readPdf.pages[4].get_images()[innerBackgroundImageKey]
     innerpdfimage = PdfImage(innerimage)
     assert innerpdfimage.width == 10 and innerpdfimage.height == 10, \
         f"Expected inner bg WxH 10x10, but is {innerpdfimage.width},{innerpdfimage.height}"

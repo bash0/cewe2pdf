@@ -40,7 +40,10 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages):
 
     page = readPdf.pages[0]
     imagesizes = [(412,385),(412,288),(412,423),(219,225),(10,10)]
-    imagekeys = list(page.images.keys())
+    # get_images() replaces the deprecated Page.images and also discovers
+    # images nested in form XObjects.
+    images = page.get_images()
+    imagekeys = list(images.keys())
     imagecount = len(imagekeys)
     # the test album front cover has 5 images. My interpretation (aided by pdfexplorer) is
     # 1 clipart for the background, a 10x10 image
@@ -49,7 +52,7 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages):
     # 1 clipart used three times (the same blue square as above, but smaller and used in 3 different rotations)
     assert imagecount == 5, f"Expected 5 images on front cover, found {imagecount}"
     for imk in imagekeys:
-        coverimage = page.images[imk]
+        coverimage = images[imk]
         coverpdfimage = PdfImage(coverimage)
         size = (coverpdfimage.width,coverpdfimage.height)
         assert size in imagesizes, f"Image sized {size} not expected"
