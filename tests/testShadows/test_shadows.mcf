@@ -1,0 +1,1080 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="19fd8464-c1c0-46c4-9209-bf5391905698" imagedir="test_shadows_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
+    <project createdWithHPSVersion="8.1.3" createdWithHPSVersionBuild="20260410" multiPurposeText="" projectID="84362b57-b1f0-467e-853c-5cd62a8067e9" projectIDCreatedEpoch="1785985538"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="8.1.3" programversionBuild="20260410" savetime="2026-08-06 08:37"/>
+    <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-04-23 07:21"/>
+    <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
+    <addOns/>
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Liberation Sans" fontitalics="1" fontsize="12" format="0" margin="52" position="0" textcolor="#ffd41e51" textstring="%" verticalMargin="60">
+        <outline width="1"/>
+    </pagenumbering>
+    <ruler/>
+    <extra>
+        <lastTextFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="4" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <imageQuality version="1.3.56"/>
+    </extra>
+    <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4275"/>
+        <designElementIDs background="201" layout="384109"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
+        <area areatype="spinetextarea">
+            <position height="91" left="812.5" rotation="270" top="1329.5" width="2650" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked::marker { content: "\2612"; }
+</style></head><body style=" font-family:'CEWE Head'; font-size:12pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="275" left="2892.38" rotation="0" top="542.5" width="671.73" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Poppins'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Front cover</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="2" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,18,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="275" left="711.25" rotation="0" top="542.5" width="671" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Poppins'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Back cover</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="2" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,18,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="spine">
+        <bundlesize height="2750" width="4275"/>
+        <designElementIDs background="201"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4275"/>
+        <designElementIDs background="201" layout="422099"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="422099" layout="1" templatename="fullcoverpage_with_title"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="0" pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="221" width="505" zposition="100"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="0" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="635.2" width="505" zposition="101"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="2" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="1049.4" width="505" zposition="102"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="4" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="1463.6" width="505" zposition="103"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="6" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="1877.8" width="505" zposition="104"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="7.9999999999999991" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="2292" width="505" zposition="105"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="9.9999999999999982" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1266.75" rotation="0" top="207.675" width="505" zposition="106"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="0" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1266.75" rotation="0" top="621.675" width="505" zposition="107"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="2" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1266.75" rotation="0" top="1035.68" width="505" zposition="108"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="4" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1266.75" rotation="0" top="1450.68" width="505" zposition="109"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="6" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1266.75" rotation="0" top="1864.68" width="505" zposition="110"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="7.9999999999999991" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1266.75" rotation="0" top="2278.68" width="505" zposition="111"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="9.9999999999999982" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="textarea">
+            <position height="63" left="89.9385" rotation="0" top="64.4966" width="307.218" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Varying blur</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="106.418" left="458.849" rotation="0" top="63.7217" width="1480.21" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">&lt;shadow shadowAngle=&quot;30&quot; shadowDistance=&quot;40&quot; shadowEnabled=&quot;1&quot; shadowIntensity=&quot;128&quot; shadowWidthInMM=&quot;0&quot;/&gt;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="750.06" rotation="0" top="353.285" width="460.51" zposition="7002"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowBlurNew=&quot;0&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="750.06" rotation="0" top="1611.03" width="460.51" zposition="7003"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowBlurNew=&quot;6&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="750.06" rotation="0" top="2030.27" width="460.51" zposition="7004"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowBlurNew=&quot;8&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="750.06" rotation="0" top="772.532" width="460.51" zposition="7005"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowBlurNew=&quot;2&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="750.06" rotation="0" top="1191.78" width="460.51" zposition="7006"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowBlurNew=&quot;4&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="750.06" rotation="0" top="2449.52" width="460.51" zposition="7007"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowBlurNew=&quot;10&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="imagearea">
+            <position height="339" left="138.086" rotation="0" top="217" width="505" zposition="100"/>
+            <decoration>
+                <shadow shadowAngle="1" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="138.086" rotation="0" top="631" width="505" zposition="101"/>
+            <decoration>
+                <shadow shadowAngle="60" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="138.086" rotation="0" top="1045" width="505" zposition="102"/>
+            <decoration>
+                <shadow shadowAngle="120" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="138.086" rotation="0" top="1460" width="505" zposition="103"/>
+            <decoration>
+                <shadow shadowAngle="180" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="138.086" rotation="0" top="1874" width="505" zposition="104"/>
+            <decoration>
+                <shadow shadowAngle="240" shadowBlurNew="5.0000000000000009" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="138.086" rotation="0" top="2288" width="505" zposition="105"/>
+            <decoration>
+                <shadow shadowAngle="300" shadowBlurNew="5.0000000000000009" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1258.09" rotation="0" top="204" width="505" zposition="106"/>
+            <decoration>
+                <shadow shadowAngle="1" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1258.09" rotation="0" top="618" width="505" zposition="107"/>
+            <decoration>
+                <shadow shadowAngle="60" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1258.09" rotation="0" top="1032" width="505" zposition="108"/>
+            <decoration>
+                <shadow shadowAngle="120" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1258.09" rotation="0" top="1447" width="505" zposition="109"/>
+            <decoration>
+                <shadow shadowAngle="180" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1258.09" rotation="0" top="1861" width="505" zposition="110"/>
+            <decoration>
+                <shadow shadowAngle="240" shadowBlurNew="5.0000000000000009" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1258.09" rotation="0" top="2275" width="505" zposition="111"/>
+            <decoration>
+                <shadow shadowAngle="300" shadowBlurNew="5.0000000000000009" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="textarea">
+            <position height="63" left="81.0859" rotation="0" top="60" width="336.464" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Varying angle</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="108.418" left="450.086" rotation="0" top="60" width="1475.63" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Cascadia Mono'; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">&lt;shadow shadowBlurNew=&quot;5&quot; shadowDistance=&quot;40&quot; shadowEnabled=&quot;1&quot; shadowIntensity=&quot;128&quot; shadowWidthInMM=&quot;0&quot;/&gt;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="54" left="749.086" rotation="0" top="349" width="431.046" zposition="7002"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Cascadia Mono'; font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowAngle=&quot;1&quot; </span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="54" left="749.086" rotation="0" top="1607" width="431.046" zposition="7003"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Cascadia Mono'; font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowAngle=&quot;180&quot; </span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="54" left="749.086" rotation="0" top="2026" width="431.046" zposition="7004"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Cascadia Mono'; font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowAngle=&quot;240&quot; </span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="54" left="749.086" rotation="0" top="769" width="431.046" zposition="7005"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Cascadia Mono'; font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowAngle=&quot;60&quot; </span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="54" left="749.086" rotation="0" top="1188" width="431.046" zposition="7006"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Cascadia Mono'; font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowAngle=&quot;120&quot; </span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="54" left="749.086" rotation="0" top="2446" width="431.046" zposition="7007"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Cascadia Mono'; font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowAngle=&quot;300&quot; </span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="5" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="6" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="221" width="505" zposition="100"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="635" width="505" zposition="101"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="9.9999999999999982" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="1049" width="505" zposition="102"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="20.000000000000007" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="1464" width="505" zposition="103"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="29.999999999999993" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="1878" width="505" zposition="104"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="40.000000000000007" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="2292" width="505" zposition="105"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5.0000000000000009" shadowDistance="49.999999999999964" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="208" width="505" zposition="106"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="622" width="505" zposition="107"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="9.9999999999999982" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="1036" width="505" zposition="108"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="20.000000000000007" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="1451" width="505" zposition="109"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="29.999999999999993" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="1865" width="505" zposition="110"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="40.000000000000007" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="2279" width="505" zposition="111"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5.0000000000000009" shadowDistance="49.999999999999964" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="textarea">
+            <position height="63" left="62.4691" rotation="0" top="64" width="384.245" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Varying distance</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="112.628" left="459" rotation="0" top="64" width="1463" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">&lt;shadow shadowAngle=&quot;30&quot; shadowBlurNew=&quot;5&quot; shadowEnabled=&quot;1&quot; shadowIntensity=&quot;128&quot; shadowWidthInMM=&quot;0&quot;/&gt;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="758" rotation="0" top="353" width="452.225" zposition="7002"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowDistance=&quot;0&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="749.342" rotation="0" top="1609.5" width="469.54" zposition="7003"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowDistance=&quot;30&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="749.342" rotation="0" top="2028.5" width="469.54" zposition="7004"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowDistance=&quot;40&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="758" rotation="0" top="771.5" width="469.54" zposition="7005"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowDistance=&quot;10&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="98" left="749.342" rotation="0" top="1190.5" width="469.54" zposition="7006"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowDistance=&quot;20&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="749.342" rotation="0" top="2448.5" width="469.54" zposition="7007"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:10pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowDistance=&quot;50&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,10,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="7" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="8" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="221" width="505" zposition="100"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="635" width="505" zposition="101"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="2"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="1049" width="505" zposition="102"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="4"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="1464" width="505" zposition="103"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="6"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="1878" width="505" zposition="104"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="8"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="147" rotation="0" top="2292" width="505" zposition="105"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="10"/>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="208" width="505" zposition="106"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="622" width="505" zposition="107"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="2"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="1036" width="505" zposition="108"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="4"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="1451" width="505" zposition="109"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="6"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="1865" width="505" zposition="110"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="8"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="339" left="1267" rotation="0" top="2279" width="505" zposition="111"/>
+            <decoration>
+                <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="10"/>
+                <corners enabled="yes">
+                    <corner length="100" shape="convex" where="bottom-right"/>
+                    <corner length="100" shape="convex" where="top-right"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="bottom-left"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
+                <cutout left="0" scale="1.7664" top="0"/>
+                <quality jpeg="0" noise="0" resolution="0.6723" sharpness="0" summarized="0.6723" texture="0"/>
+            </image>
+        </area>
+        <area areatype="textarea">
+            <position height="63" left="90" rotation="0" top="64" width="307" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:14pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Varying width</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,14,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="106.418" left="459" rotation="0" top="64" width="1463" zposition="7001"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">&lt;shadow shadowAngle=&quot;30&quot; shadowBlurNew=&quot;5&quot; shadowDistance=&quot;0&quot; shadowEnabled=&quot;1&quot; shadowIntensity=&quot;128&quot; /&gt;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="728.26" rotation="0" top="353" width="503.247" zposition="7002"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowWidthInMM=&quot;0&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="728.26" rotation="0" top="1611" width="503.247" zposition="7003"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowWidthInMM=&quot;6&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="728.26" rotation="0" top="2030" width="503.247" zposition="7004"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowWidthInMM=&quot;8&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="728.26" rotation="0" top="773" width="503.247" zposition="7005"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowWidthInMM=&quot;2&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="728.26" rotation="0" top="1192" width="503.247" zposition="7006"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowWidthInMM=&quot;4&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="53" left="728.26" rotation="0" top="2450" width="503.247" zposition="7007"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Courier New'; font-size:11pt; font-weight:700; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">shadowWidthInMM=&quot;10&quot;</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNTOP" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Courier New,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="9" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="10" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="11" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="12" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="13" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="14" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="15" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="16" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="17" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="18" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="19" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="20" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="21" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="22" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="23" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="24" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="25" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="26" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships>
+        <foto id="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg"/>
+    </fotoRelationships>
+    <statistics assistantUsed="0" countPauses="50" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="271658" fotosAdded="228" fotosRemoved="35" pauseTime="238008" sessionsUsed="19"/>
+</fotobook>
