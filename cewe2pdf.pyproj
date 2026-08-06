@@ -172,6 +172,11 @@
     <Content Include="tests\testPageNumbers\test_pagenumbers.mcf" />
     <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\testShadows\additional_fonts.txt" />
+    <Content Include="tests\testShadows\cewe2pdf.ini" />
+    <Content Include="tests\testShadows\test_shadows.mcf" />
+    <Content Include="tests\testShadows\test_shadows_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testShadows\test_shadows_mcf-Dateien\z31qhpgx_1_greysquareblueborder.jpg" />
     <Content Include="tests\testTextArt\additional_fonts.txt" />
     <Content Include="tests\testTextArt\cewe2pdf.ini" />
     <Content Include="tests\testTextArt\previous_result_pdfs\test_textart.mcf.20250511S.pdf" />
@@ -331,6 +336,7 @@
     <Compile Include="tests\testLists\test_lists.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
+    <Compile Include="tests\testShadows\test_shadows.py" />
     <Compile Include="tests\testTextArt\test_textart.py" />
     <Compile Include="tests\testTextBox\test_textBox.py" />
     <Compile Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder.py" />
@@ -399,6 +405,8 @@
     <Folder Include="tests\testlists\testlists_mcf-Dateien\" />
     <Folder Include="tests\testPageNumbers\" />
     <Folder Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\" />
+    <Folder Include="tests\testShadows\" />
+    <Folder Include="tests\testShadows\test_shadows_mcf-Dateien\" />
     <Folder Include="tests\testTextArt\" />
     <Folder Include="tests\testTextArt\previous_result_pdfs\" />
     <Folder Include="tests\testTextArt\test_textart_mcf-Dateien\" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="8819a5ba-6665-466e-b2b4-857ceb74d9b3" imagedir="testCorners_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="1" version="4.0">
+<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="02db32e7-3045-4f5b-8a95-08cc3571bb92" imagedir="testCorners_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="1" version="4.0">
     <project createdWithHPSVersion="8.1.3" createdWithHPSVersionBuild="20260410" multiPurposeText="" projectID="4ba85ede-96a2-46e5-8d7d-fadcc9f4fa63" projectIDCreatedEpoch="1785855806"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="8.1.3" programversionBuild="20260410" savetime="2026-08-05 08:28"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="8.1.3" programversionBuild="20260410" savetime="2026-08-05 15:07"/>
     <creationHistory clientId="38" clientVersion="8.0.5-20251014-default" creationDate="2026-07-08 19:34"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -10,7 +10,7 @@
     </pagenumbering>
     <ruler/>
     <extra>
-        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.3.56"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
@@ -46,7 +46,7 @@ li.unchecked::marker { content: "\2610"; }
 li.checked::marker { content: "\2612"; }
 </style></head><body style=" font-family:'CEWE Head'; font-size:12pt; font-weight:400; font-style:normal;">
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEFT,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -88,14 +88,29 @@ li.checked::marker { content: "\2612"; }
             <position height="508.965" left="110.874" rotation="0" top="106.33" width="1048.02" zposition="100"/>
             <decoration>
                 <corners enabled="yes">
-                    <corner length="300" shape="convex" where="top-right"/>
+                    <corner length="300" shape="convex" where="bottom-right"/>
                     <corner length="300" shape="convex" where="bottom-left"/>
                     <corner length="300" shape="convex" where="top-left"/>
-                    <corner length="300" shape="convex" where="bottom-right"/>
+                    <corner length="300" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
-                <cutout left="0" scale="0.259931" top="0"/>
+                <cutout left="0.02" scale="0.259931" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="508.965" left="110.874" rotation="0" top="1268.41" width="763.391" zposition="101"/>
+            <decoration>
+                <corners enabled="yes">
+                    <corner length="250" shape="default" where="bottom-right"/>
+                    <corner length="200" shape="convex" where="bottom-left"/>
+                    <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="200" shape="bevelled" where="top-right"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-142.313" scale="0.259925" top="0"/>
                 <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
             </image>
         </area>
@@ -107,32 +122,32 @@ li.checked::marker { content: "\2612"; }
             </smartlayout>
         </area>
         <area areatype="imagearea">
-            <position height="508.965" left="110.874" rotation="0" top="1268.41" width="763.391" zposition="101"/>
-            <decoration>
-                <corners enabled="yes">
-                    <corner length="200" shape="bevelled" where="top-right"/>
-                    <corner length="200" shape="convex" where="bottom-left"/>
-                    <corner length="100" shape="convex" where="top-left"/>
-                    <corner length="250" shape="default" where="bottom-right"/>
-                </corners>
-            </decoration>
-            <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
-                <cutout left="-142.313" scale="0.259925" top="5.91e-14"/>
-                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
-            </image>
-        </area>
-        <area areatype="imagearea">
             <position height="610" left="119.124" rotation="0" top="1879.13" width="610" zposition="102"/>
             <decoration>
                 <corners enabled="yes">
-                    <corner length="10000" shape="convex" where="top-right"/>
+                    <corner length="10000" shape="convex" where="bottom-right"/>
                     <corner length="10000" shape="convex" where="bottom-left"/>
                     <corner length="10000" shape="convex" where="top-left"/>
-                    <corner length="10000" shape="convex" where="bottom-right"/>
+                    <corner length="10000" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
                 <cutout left="-328.569" scale="0.316637" top="-5"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="610" left="1070.64" rotation="329" top="1908.33" width="750.03" zposition="103"/>
+            <decoration>
+                <corners enabled="yes">
+                    <corner length="10000" shape="convex" where="bottom-right"/>
+                    <corner length="10000" shape="convex" where="bottom-left"/>
+                    <corner length="10000" shape="convex" where="top-left"/>
+                    <corner length="10000" shape="convex" where="top-right"/>
+                </corners>
+            </decoration>
+            <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-258.985" scale="0.316637" top="-5"/>
                 <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
             </image>
         </area>
@@ -144,29 +159,14 @@ li.checked::marker { content: "\2612"; }
             </smartlayout>
         </area>
         <area areatype="imagearea">
-            <position height="610" left="1070.64" rotation="329" top="1908.33" width="750.03" zposition="103"/>
-            <decoration>
-                <corners enabled="yes">
-                    <corner length="10000" shape="convex" where="top-right"/>
-                    <corner length="10000" shape="convex" where="bottom-left"/>
-                    <corner length="10000" shape="convex" where="top-left"/>
-                    <corner length="10000" shape="convex" where="bottom-right"/>
-                </corners>
-            </decoration>
-            <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
-                <cutout left="-258.985" scale="0.316637" top="-5"/>
-                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
-            </image>
-        </area>
-        <area areatype="imagearea">
             <position height="509" left="2295" rotation="0" top="183.25" width="677.75" zposition="104"/>
             <decoration>
                 <border applySpotColor="0" color="#fff47723" enabled="1" gap="10" position="outside" width="9"/>
                 <corners enabled="yes">
-                    <corner length="300" shape="convex" where="top-right"/>
+                    <corner length="300" shape="convex" where="bottom-right"/>
                     <corner length="300" shape="convex" where="bottom-left"/>
                     <corner length="300" shape="convex" where="top-left"/>
-                    <corner length="300" shape="convex" where="bottom-right"/>
+                    <corner length="300" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
@@ -179,10 +179,10 @@ li.checked::marker { content: "\2612"; }
             <decoration>
                 <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="13.000000000000011" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="4"/>
                 <corners enabled="yes">
-                    <corner length="300" shape="convex" where="top-right"/>
+                    <corner length="300" shape="convex" where="bottom-right"/>
                     <corner length="300" shape="convex" where="bottom-left"/>
                     <corner length="300" shape="convex" where="top-left"/>
-                    <corner length="300" shape="convex" where="bottom-right"/>
+                    <corner length="300" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
@@ -194,14 +194,24 @@ li.checked::marker { content: "\2612"; }
             <position height="509" left="110.874" rotation="0" top="687.353" width="764" zposition="106"/>
             <decoration>
                 <corners enabled="yes">
-                    <corner length="100" shape="bevelled" where="top-right"/>
+                    <corner length="100" shape="bevelled" where="bottom-right"/>
                     <corner length="100" shape="bevelled" where="bottom-left"/>
                     <corner length="100" shape="bevelled" where="top-left"/>
-                    <corner length="100" shape="bevelled" where="bottom-right"/>
+                    <corner length="100" shape="bevelled" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
-                <cutout left="-142" scale="0.259925" top="5.68434e-14"/>
+                <cutout left="-142" scale="0.259925" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="510" left="3172" rotation="0" top="756.553" width="678" zposition="107"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="13.000000000000011" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="4"/>
+            </decoration>
+            <image filename="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-186.071" scale="0.260204" top="-1.16018e-14"/>
                 <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
             </image>
         </area>
@@ -522,5 +532,5 @@ li.checked::marker { content: "\2612"; }
             <foto id="safecontainer:/pyzjpjd6_1_20200306_111748.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
         </foto>
     </fotoRelationships>
-    <statistics assistantUsed="0" countPauses="6" elapsedTimeGross="2026-07-08T19:34:10" elapsedTimeNet="13736" fotosAdded="15" fotosRemoved="0" pauseTime="10478" sessionsUsed="5"/>
+    <statistics assistantUsed="0" countPauses="7" elapsedTimeGross="2026-07-08T19:34:10" elapsedTimeNet="15148" fotosAdded="17" fotosRemoved="0" pauseTime="11515" sessionsUsed="6"/>
 </fotobook>

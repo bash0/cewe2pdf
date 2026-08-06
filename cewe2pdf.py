@@ -422,13 +422,20 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
     pdf.translate(img_transx, transy)   # we need to go to the center for correct rotation
     pdf.rotate(-areaRot)   # rotation around center of area
 
-    for decorationTag in area.findall('decoration'):
-        processDecorationShadow(decorationTag, areaHeight, areaWidth, pdf, cornersInfo)
-
     # calculate the non-symmetric shift of the center, given the left pos and the width.
     frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
     frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
     pdf.translate(-frameShiftX_mcf * mcf2rl, -frameShiftY_mcf * mcf2rl) # for adjustments from passepartout
+
+    # A shadow is made from the alpha mask of the final, cropped image.  This
+    # gives ordinary rectangular images, decorated corners and passepartout
+    # masks one consistent model, and keeps the shadow aligned with the image.
+    for decorationTag in area.findall('decoration'):
+        processDecorationShadow(
+            decorationTag, areaHeight, areaWidth, pdf, cornersInfo,
+            im, imgCropWidth_mcfunit, imgCropHeight_mcfunit
+        )
+
     pdf.drawImage(ImageReader(jpeg.name),
         mcf2rl * -0.5 * imgCropWidth_mcfunit,
         mcf2rl * -0.5 * imgCropHeight_mcfunit,
@@ -830,7 +837,101 @@ def intensityToGrey(value):
     colorComponentValue = 1 - (max(1, min(255, value)) / 255)
     return reportlab.lib.colors.Color(colorComponentValue, colorComponentValue, colorComponentValue)
 
-def processDecorationShadow(decoration, areaHeight, areaWidth, pdf, cornersInfo=None):
+def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
+                           imgCropHeight_mcfunit, shadowDistance_mcfunit,
+                           shadowAngle, intensity, shadowBlur_mcfunit,
+                           shadowWidth_mcfunit):
+    """
+    Draw a blurred, transparent shadow using the image's existing alpha mask.
+
+    The alpha mask already includes the convex/bevelled corners (and any
+    passepartout mask), so the shadow follows the visible image silhouette.
+    """
+    from PIL import Image, ImageFilter
+
+    if im.mode != 'RGBA':
+        im = im.convert('RGBA')
+
+    # MCF geometry is in 0.1 mm while Pillow needs pixels.  Use the final,
+    # cropped image dimensions: they remain correct whether or not the image
+    # was downsampled earlier in processAreaImageTag.
+    pixelsPerMcfunit = im.width / imgCropWidth_mcfunit
+
+    # CEWE's displayed shadow expands by about three quarters of the nominal
+    # half-width on each side. This was measured from the width-only test page
+    # (0 .. 10 mm); the old ReportLab Table is noticeably larger at high values.
+    spreadRadius_px = int(round(
+        shadowWidth_mcfunit * pixelsPerMcfunit * 0.375
+    ))
+
+    # shadowBlurNew is stored in MCF units. Pillow's GaussianBlur has a wider
+    # visible tail than CEWE's editor, so use half the nominal radius. A
+    # three-radius transparent margin prevents that tail being clipped.
+    # Keep the fractional radius: rounding it would make several of CEWE's
+    # small blur settings render identically at the configured image DPI.
+    blurRadius_px = shadowBlur_mcfunit * pixelsPerMcfunit * 0.5
+    padding_px = spreadRadius_px + int(np.ceil(3 * blurRadius_px))
+
+    alpha = im.getchannel('A')
+    shadowAlpha = Image.new(
+        'L', (im.width + 2 * padding_px, im.height + 2 * padding_px), 0
+    )
+    shadowAlpha.paste(alpha, (padding_px, padding_px))
+
+    if spreadRadius_px > 0:
+        shadowAlpha = shadowAlpha.filter(
+            ImageFilter.MaxFilter(2 * spreadRadius_px + 1)
+        )
+
+    if blurRadius_px > 0:
+        shadowAlpha = shadowAlpha.filter(ImageFilter.GaussianBlur(blurRadius_px))
+
+    # CEWE's intensity maps directly to black alpha: an intensity of 128
+    # produces the mid-grey core seen in the editor, while zero disables it.
+    shadowOpacity = max(0, min(255, intensity)) / 255
+    shadowAlpha = shadowAlpha.point(
+        lambda value: int(round(value * shadowOpacity))
+    )
+    shadowImage = Image.new('RGBA', shadowAlpha.size, (0, 0, 0, 0))
+    shadowImage.putalpha(shadowAlpha)
+
+    # ReportLab handles the PNG alpha channel when mask='auto' is used below.
+    # Keep the temporary file until PDF generation has completed.
+    shadowFile = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
+    shadowFile.close()
+    shadowImage.save(shadowFile.name, 'PNG')
+    tempFileList.append(shadowFile.name)
+
+    # CEWE stores the direction in the same convention used by the older
+    # vector shadow code: the angle identifies where the shadow is cast, not
+    # the light source. The Y calculation is in PDF coordinates (Y upwards).
+    angleRadians = np.radians(shadowAngle - 90)
+    # The editor casts a shadow about three quarters of the stored distance.
+    # This is independently visible in the angle and distance test pages.
+    shadowDistanceScale = 0.75
+    shadowOffsetX_mcfunit = shadowDistanceScale * shadowDistance_mcfunit * np.cos(angleRadians)
+    shadowOffsetY_mcfunit = -shadowDistanceScale * shadowDistance_mcfunit * np.sin(angleRadians)
+    padding_mcfunit = padding_px / pixelsPerMcfunit
+
+    pdf.drawImage(
+        ImageReader(shadowFile.name),
+        mcf2rl * (-0.5 * imgCropWidth_mcfunit - padding_mcfunit
+                  + shadowOffsetX_mcfunit),
+        mcf2rl * (-0.5 * imgCropHeight_mcfunit - padding_mcfunit
+                  + shadowOffsetY_mcfunit),
+        width=mcf2rl * (imgCropWidth_mcfunit + 2 * padding_mcfunit),
+        height=mcf2rl * (imgCropHeight_mcfunit + 2 * padding_mcfunit),
+        mask='auto'
+    )
+
+
+def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
+                            cornersInfo=None, im=None,
+                            imgCropWidth_mcfunit=None,
+                            imgCropHeight_mcfunit=None):
+    # The legacy implementation draws an opaque Table rectangle. Cornered
+    # images instead pass their processed Pillow image and use the blurred PNG
+    # path below; ordinary images deliberately retain the legacy output.
     if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
         # shadows were implemented in May 2025. Prior to that, you could have specified
         # shadows on your photos for printing by CEWE but you would not have got them
@@ -857,25 +958,36 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf, cornersInfo=
         # then the light rays are parallel and the shadow is the same size as the object.
         # So the width value is really about how much bigger the shadow is than the object.
         swidth = 1
+        shadowWidth_mcfunit = swidth / mcf2rl
         if "shadowWidthInMM" in shadow.attrib:
             widthAttrib = shadow.get('shadowWidthInMM')
             if widthAttrib is not None:
-                swidth = mcf2rl * floor(float(widthAttrib) * 10) # units are 1 mm not 0.1 mm!
+                shadowWidth_mcfunit = floor(float(widthAttrib) * 10) # units are 1 mm not 0.1 mm!
+                swidth = mcf2rl * shadowWidth_mcfunit
 
         # sdistance effectively moves the light source to the side of the centre, in the
         # direction of sangle. When sdistance is zero then sangle is irrelevant. When sdistance
         # is non-zero it offsets the shadow from the object, as determined by the sangle.
         sdistance = 10
+        shadowDistance_mcfunit = sdistance / mcf2rl
         if "shadowDistance" in shadow.attrib:
             distanceAttrib = shadow.get('shadowDistance')
             if distanceAttrib is not None:
-                sdistance = mcf2rl * floor(float(distanceAttrib))
+                shadowDistance_mcfunit = floor(float(distanceAttrib))
+                sdistance = mcf2rl * shadowDistance_mcfunit
 
         intensity = 128
         if "shadowIntensity" in shadow.attrib:
             intensityAttrib = shadow.get('shadowIntensity')
             if intensityAttrib is not None:
                 intensity = int(intensityAttrib) # range 1 .. 255, I think
+
+        # shadowBlurNew is the editor's "Blur" value in MCF units (0.1 mm).
+        # For example, the UI value 0.5 mm is stored as shadowBlurNew="5".
+        shadowBlur_mcfunit = 0
+        if "shadowBlurNew" in shadow.attrib:
+            blurAttrib = shadow.get('shadowBlurNew')
+            shadowBlur_mcfunit = float(blurAttrib)
 
         # you might think that sangle is the angle of the light source, but it is actually
         # the angle where the shadow should appear (exactly 180 degrees opposite). Not
@@ -889,27 +1001,36 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf, cornersInfo=
         if sangle < 0.0: # mcf range -179 .. +180
             sangle = sangle + 360 # range 0 .. 359
 
-        shadowBottomLeft_x, shadowBottomLeft_y = \
-            findShadowBottomLeft((frameBottomLeft_x, frameBottomLeft_y), sangle, sdistance, swidth)
-        shadowWidth = frameWidth + swidth
-        shadowHeight = frameHeight + swidth
         shadowColor = intensityToGrey(intensity) # reportlab.lib.colors.grey
 
-        frm_table = Table(
-            data=[[None]],
-            colWidths=shadowWidth,
-            rowHeights=shadowHeight,
-            style=[
-                # The two (0, 0) in each attribute represent the range of table cells that the style applies to.
-                # Since there's only one cell at (0, 0), it's used for both start and end of the range
-                ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-                ('BACKGROUND', (0, 0), (0, 0), shadowColor),
-                ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
-            ]
-        )
-        frm_table.wrapOn(pdf, shadowWidth, shadowHeight)
-        frm_table.drawOn(pdf, shadowBottomLeft_x, shadowBottomLeft_y)
-
+        if im is not None:
+            # Every image uses its post-crop alpha silhouette. This covers
+            # rectangles, independent corner decorations, and passepartout
+            # masks with the same width, blur, distance and intensity model.
+            drawBlurredImageShadow(
+                pdf, im, imgCropWidth_mcfunit, imgCropHeight_mcfunit,
+                shadowDistance_mcfunit, sangle, intensity, shadowBlur_mcfunit,
+                shadowWidth_mcfunit
+            )
+        else:
+            # This fallback is for callers without the processed image alpha
+            # mask (for example, legacy non-image callers).
+            shadowBottomLeft_x, shadowBottomLeft_y = \
+                findShadowBottomLeft((frameBottomLeft_x, frameBottomLeft_y), sangle, sdistance, swidth)
+            shadowWidth = frameWidth + swidth
+            shadowHeight = frameHeight + swidth
+            frm_table = Table(
+                data=[[None]],
+                colWidths=shadowWidth,
+                rowHeights=shadowHeight,
+                style=[
+                    ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+                    ('BACKGROUND', (0, 0), (0, 0), shadowColor),
+                    ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
+                ]
+            )
+            frm_table.wrapOn(pdf, shadowWidth, shadowHeight)
+            frm_table.drawOn(pdf, shadowBottomLeft_x, shadowBottomLeft_y)
 
 def warnAndIgnoreEnabledDecorationShadow(decoration):
     if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
