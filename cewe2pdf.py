@@ -659,12 +659,16 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         chunks = [t.strip() for t in tree.itertext() if t.strip()]
         return sep.join(chunks)
 
-    def WarnHeightProblem(recentParagraphText, frameHeight, finalTotalHeight):
+    def WarnHeightProblem(recentParagraphText, originalFrameHeight, expandedFrameHeight, finalTotalHeight):
+        originalFrameHeightMm = originalFrameHeight / reportlab.lib.pagesizes.mm
+        expandedFrameHeightMm = expandedFrameHeight / reportlab.lib.pagesizes.mm
+        finalTotalHeightMm = finalTotalHeight / reportlab.lib.pagesizes.mm
+        heightIncreasePercent = 100 * (expandedFrameHeight - originalFrameHeight) / originalFrameHeight
         logging.warning(
-            f"""Text would not fit inside its frame after {maxShrinkCount} shrinks (frameHeight={frameHeight:.2f},finalTotalHeight={finalTotalHeight:.2f})
-                Try widening the text box to avoid an unexpected word wrap, or increase the height
+            f"""Text would not fit inside its {originalFrameHeightMm:.2f} mm frame after shrinking the font to {scaleFactor:.1%}.
                 Most recent paragraph text: {extract_text_sections(recentParagraphText)}
-                The frame height has been programmatically increased for this run.""")
+                The frame height has been increased to {expandedFrameHeightMm:.2f} mm ({heightIncreasePercent:.1f}%) for this run.
+                Text in the unshrunk font needs {finalTotalHeightMm:.2f} mm.""")
 
     # Process each opening tag, merging duplicate style attributes
     def merge_duplicate_styles(match):
@@ -907,6 +911,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     scaleFactor = 1.0
     indexEntryText = None
     firstFinalTotalHeight = 0.0
+    originalFrameHeight = mcf2rl * areaHeight
 
     # The code used to use a global variable to store the flowables. This leads to problems where a
     # flowable in one text area can, in extreme circumstances, appear in another. So, we use a local variable.
@@ -925,10 +930,10 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         if not textWrapProblem or iterationsToShrinkFontWhenNecessary == 0:
             if not textWrapProblem:
                 if scaleFactor < 1.0:
-                    logging.info(f'Shrunk text by {scaleFactor} to fit frame: {extract_text_sections(recentText)}')
+                    logging.info(f'Shrunk text to {scaleFactor:.0%} to fit frame: {extract_text_sections(recentText)}')
             else:
                 # We exhausted all attempts to shrink font to fit
-                WarnHeightProblem(recentText, frameHeight, firstFinalTotalHeight)
+                WarnHeightProblem(recentText, originalFrameHeight, frameHeight, firstFinalTotalHeight)
             break
         if iterationsToShrinkFontWhenNecessary == maxShrinkCount:
             # first time, keep the ideal final total height
@@ -1261,7 +1266,17 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
             logging.error('A set of paragraphs too wide for its frame. INTERNAL ERROR!')
             finalTotalWidth = neededTextWidth + leftPad + rightPad
 
-    textWrapProblem = finalTotalHeight > frameHeight
+    # ReportLab and CEWE can differ by a fraction of a point in their font
+    # metrics. Do not reduce the font merely to correct such an invisible
+    # vertical discrepancy; the frame is enlarged by that small amount below.
+    fitTolerance = 0.5  # points, approximately 0.18 mm
+    heightOverflow = finalTotalHeight - frameHeight
+    textWrapProblem = heightOverflow > fitTolerance
+    if heightOverflow > 0 and not textWrapProblem:
+        logging.debug(
+            f"Text frame exceeds its height by {heightOverflow:.2f} points "
+            f"(within {fitTolerance:.2f}-point tolerance); not shrinking"
+        )
     if textWrapProblem:
         # One of the possible causes here is that wrap function has used an extra line (because
         #  of some slight mismatch in character widths and a frame that matches too precisely?)
