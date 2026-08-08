@@ -66,11 +66,9 @@ import os
 import gc
 
 import argparse  # to parse arguments
-import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
-
+from functools import partial
 from math import floor
 
-from pathlib import Path
 import reportlab.lib.pagesizes
 from reportlab.pdfgen import canvas
 # from reportlab.pdfbase.pdfmetrics import stringWidth as _stringWidth
@@ -79,22 +77,16 @@ from reportlab.pdfgen import canvas
 import PIL
 
 from packaging.version import parse as parse_version
-from lxml import etree
-
 from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
 from borders import processDecorationBorders
-from clipArt import readClipArtConfigXML
 from clipartareas import processAreaClipartTag
-from configUtils import getConfigurationBool, getConfigurationInt
+from configUtils import getConfigurationBool
+from conversionSetup import prepareConversion
 from extraLoggers import mustsee, VerifyMessageCounts, printMessageCountSummaries
-from fontHandling import findAndRegisterFonts
 from imageareas import processAreaImageTag
-from lineScales import LineScales
-from mcfx import unpackMcfx
 from pageNumbering import PageNumberingInfo
 from pageTypes import PageProcessingType
 from pages import getPageElementForPageNumber, processPages
-from pathutils import findFileInDirs
 from renderContext import RenderContext
 from textareas import processAreaTextTag
 from index import Index
@@ -140,27 +132,14 @@ image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # ##########
 
 # .mcf units are 0.1 mm
-# Tabs seem to be in 8mm pitch
-tab_pitch = 80
-
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
 tempFileList = []  # we need to remove all the temporary files at the end
 
-# reportlab defaults
-# pdf_styles = getSampleStyleSheet()
-# pdf_styleN = pdf_styles['Normal']
-
-albumIndex = None # set after we have got the configuration information
-clipartDict = dict[int, str]()    # a dictionary for clipart element IDs to file name
-clipartPathList = tuple[str]()
-defaultConfigSection = None
-
-
 # Note that transCx, transCy are the center of the area
 def processElements(additional_fonts, fotobook, imagedir,
                     productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW,
-                    lastpage, context: RenderContext):
+                    lastpage, context: RenderContext, albumIndex):
     if AlbumInfo.isAlbumDoubleSide(productstyle) and pagetype == PageProcessingType.RegularPage and not oddpage and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
@@ -196,8 +175,8 @@ def processElements(additional_fonts, fotobook, imagedir,
         cx = areaLeft + 0.5 * areaWidth
         cy = pageH - (areaTop + 0.5 * areaHeight)
 
-        transCx = mcf2rl * cx
-        transCy = mcf2rl * cy
+        transCx = context.mcf_to_reportlab * cx
+        transCy = context.mcf_to_reportlab * cy
 
         # process images
         for imageTag in area.findall('imagebackground') + area.findall('image'):
@@ -224,51 +203,7 @@ def processElements(additional_fonts, fotobook, imagedir,
     return
 
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None, outputFileName=None): # noqa: C901 (too complex)
-    global clipartDict  # pylint: disable=global-statement
-    global clipartPathList  # pylint: disable=global-statement
-    global image_res  # pylint: disable=global-statement
-    global bg_res  # pylint: disable=global-statement
-    global defaultConfigSection  # pylint: disable=global-statement
-    global albumIndex  # pylint: disable=global-statement
-
-    clipartDict = {}    # a dictionary for clipart element IDs to file name
-    clipartPathList = tuple()
-    passepartoutFolders = tuple[str]()
     pageNumberingInfo = None
-
-    albumTitle, dummy = os.path.splitext(os.path.basename(albumname))
-
-    # check for new format (version 7.3.?, ca 2023, issue https://github.com/bash0/cewe2pdf/issues/119)
-    mcfxFormat = albumname.endswith(".mcfx")
-    if mcfxFormat:
-        albumPathObj = Path(albumname).resolve()
-        unpackedFolder, mcfxmlname = unpackMcfx(albumPathObj, mcfxTmpDir)
-    else:
-        unpackedFolder = None
-        mcfxmlname = albumname
-
-    # we'll need the album folder to find config files
-    albumBaseFolder = str(Path(albumname).resolve().parent)
-
-    # we'll need the mcf folder to find mcf relative image file names
-    mcfPathObj = Path(mcfxmlname).resolve()
-    mcfBaseFolder = str(mcfPathObj.parent)
-
-    # parse the input mcf xml file
-    # read file as binary, so UTF-8 encoding is preserved for xml-parser
-    try:
-        with open(mcfxmlname, 'rb') as mcffile:
-            mcf = etree.parse(mcffile)
-    except Exception as e:
-        invalidmsg = f"Cannot open mcf file {mcfxmlname}"
-        if mcfxFormat:
-            invalidmsg = invalidmsg + f" (unpacked from {albumname})"
-        invalidmsg = invalidmsg + f": {repr(e)}"
-        logging.error(invalidmsg)
-        sys.exit(1)
-
-    fotobook = mcf.getroot()
-    CeweInfo.ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat)
 
     # check output file is acceptable before we do any processing, which is
     # preferable to processing for a long time and *then* discovering that
@@ -277,104 +212,19 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         outputFileName = CeweInfo.getOutputFileName(albumname)
     CeweInfo.ensureAcceptableOutputFile(outputFileName)
 
-    # a null default configuration section means that some capabilities will be missing!
-    defaultConfigSection = None
-    # find cewe folder using the original cewe_folder.txt file
-    try:
-        configFolderFileName = findFileInDirs('cewe_folder.txt', (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
-        with open(configFolderFileName, 'r') as cewe_file:  # this works on all relevant platforms so pylint: disable=unspecified-encoding
-            cewe_folder = cewe_file.read().strip()
-            CeweInfo.checkCeweFolder(cewe_folder)
-            keyAccountNumber = CeweInfo.getKeyAccountNumber(cewe_folder)
-            keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber)
-            backgroundLocations = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
-
-    except: # noqa: E722
-        # arrives here if the original cewe_folder.txt file is missing, which we really expect it to be these days.
-        logging.info('Trying cewe2pdf.ini from current directory and from the album directory.')
-        configuration = configparser.ConfigParser()
-        # Try to read the .ini first from the current directory, and second from the directory where the .mcf file is.
-        # Order of the files is important, because config entires are
-        #  overwritten when they appear in the later config files.
-        # We want the config file in the .mcf directory to be the most important file.
-        filesread = configuration.read(['cewe2pdf.ini', os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
-        if len(filesread) < 1:
-            logging.error('You must create cewe_folder.txt or cewe2pdf.ini to specify the cewe_folder')
-            sys.exit(1)
-        else:
-            # Give the user feedback which config-file is used, in case there is a problem.
-            mustsee.info(f'Using configuration files, in order: {str(filesread)}')
-            defaultConfigSection = configuration['DEFAULT']
-            # find cewe folder from ini file
-            if 'cewe_folder' not in defaultConfigSection:
-                logging.error('You must create cewe_folder.txt or modify cewe2pdf.ini to define cewe_folder')
-                sys.exit(1)
-
-            cewe_folder = defaultConfigSection['cewe_folder'].strip()
-            CeweInfo.checkCeweFolder(cewe_folder)
-
-            keyAccountNumber = CeweInfo.getKeyAccountNumber(cewe_folder, defaultConfigSection)
-
-            # set the cewe folder and key account number into the environment for later use in the config files
-            CeweInfo.SetEnvironmentVariables(cewe_folder, keyAccountNumber)
-
-            keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber, defaultConfigSection)
-
-            baseBackgroundLocations = CeweInfo.getBaseBackgroundLocations(cewe_folder, keyAccountFolder)
-
-            # add any extra background folders, substituting environment variables
-            xbg = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()  # newline separated list of folders
-            fxbg = list(filter(lambda bg: (len(bg) != 0), xbg)) # filter out empty entries
-            f2xbg = tuple(map(lambda bg: os.path.expandvars(bg), fxbg)) # expand environment vars pylint: disable=unnecessary-lambda
-            backgroundLocations = baseBackgroundLocations + f2xbg
-
-            # adds extra clipart ids, with absolute file references
-            xca = defaultConfigSection.get('extraClipArts', '').splitlines()  # newline separated list of id, filename pairs
-            fxca = list(filter(lambda ca: (len(ca) != 0), xca)) # filter out empty entries
-            f2xca = tuple(map(lambda ca: os.path.expandvars(ca), fxca)) # expand environment vars pylint: disable=unnecessary-lambda
-            for ca in f2xca:
-                definition = ca.split(',')
-                if len(definition) == 2:
-                    clipartId = int(definition[0])
-                    file = definition[1].strip()
-                    clipartDict[clipartId] = file
-
-            # read passepartout folders and substitute environment variables
-            pptout_rawFolder = defaultConfigSection.get('passepartoutFolders', '').splitlines()  # newline separated list of folders
-            pptout_rawFolder.append(cewe_folder)    # add the base folder
-            pptout_filtered1 = list(filter(lambda bg: (len(bg) != 0), pptout_rawFolder)) # filter out empty entries
-            pptout_filtered2 = tuple(map(lambda bg: os.path.expandvars(bg), pptout_filtered1)) # expand environment vars pylint: disable=unnecessary-lambda
-            passepartoutFolders = pptout_filtered2
-
-            # read resolution options
-            image_res = getConfigurationInt(defaultConfigSection, 'pdfImageResolution', '150', 100)
-            bg_res = getConfigurationInt(defaultConfigSection, 'pdfBackgroundResolution', '150', 100)
-
-    mustsee.info(f'Using image resolution {image_res}, background resolution {bg_res}')
-
-    # See if there is a configured default line scale overriding the coded default.
-    # This global default line scale may be reconfigured per font, after font registration
-    # is complete, into the fontLineScales mapping
-    LineScales.setupDefaultLineScale(defaultConfigSection)
-
-    if keyAccountFolder is not None:
-        passepartoutFolders = passepartoutFolders + CeweInfo.getCewePassepartoutFolders(cewe_folder, keyAccountFolder)
-
+    setup = prepareConversion(albumname, mcfxTmpDir, appDataDir)
     bg_notFoundDirList = set([]) # keep a list of background folders that are not found, to prevent multiple errors for the same cause.
 
-    try:
-        albumIndex = Index(configuration['INDEX'])
-    except KeyError:
+    if setup.configuration is None:
         albumIndex = Index(None)
-
-    # Load fonts
-    availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, cewe_folder)
-
-    # Read any configured non-standard line scales for specified fonts, creating a map of font name to line scale
-    LineScales.setupFontLineScales(defaultConfigSection)
+    else:
+        try:
+            albumIndex = Index(setup.configuration['INDEX'])
+        except KeyError:
+            albumIndex = Index(None)
 
     # extract basic album properties
-    articleConfigElement = fotobook.find('articleConfig')
+    articleConfigElement = setup.fotobook.find('articleConfig')
     if articleConfigElement is None:
         logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
@@ -386,18 +236,15 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     #  actually be producing 2 more (the inside covers) but halving the number of final output pdf pages, making 15 double pages.
     # There is also a totalpages attribute in the mcf, but in my files it is 5 more than the normalpages value. Why not 4 more? I
     #  guess that may be because it is a count of the <page> elements and not actually related to the number of printed pages.
-    imageFolder = fotobook.get('imagedir')
-
-    # generate a list of available clip-arts
-    clipartPathList = readClipArtConfigXML(cewe_folder, keyAccountFolder, clipartDict)
-    renderContext = RenderContext(mcf2rl, image_res, image_quality, bg_res, pil_antialias,
-                                  defaultConfigSection, clipartDict, clipartPathList,
-                                  None, passepartoutFolders, tempFileList)
+    imageFolder = setup.fotobook.get('imagedir')
+    renderContext = RenderContext(mcf2rl, setup.image_resolution, image_quality, setup.background_resolution,
+                                  pil_antialias, setup.default_config_section, setup.clipart_files,
+                                  setup.clipart_paths, None, setup.passepartout_folders, tempFileList)
 
     # find the correct size for the album format (if we know!) and set the product style
     pagesize = reportlab.lib.pagesizes.A4
     productstyle = ProductStyle.AlbumSingleSide
-    productname = fotobook.get('productname')
+    productname = setup.fotobook.get('productname')
     if productname in AlbumInfo.formats: # IMO this is clearest so pylint: disable=consider-using-get
         pagesize = AlbumInfo.formats[productname]
     if productname in AlbumInfo.styles: # IMO this is clearest so pylint: disable=consider-using-get
@@ -410,19 +257,27 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     # initialize a pdf canvas
     pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
-    pdf.setTitle(albumTitle)
+    pdf.setTitle(setup.album_title)
 
-    pageNumberElement = fotobook.find('pagenumbering')
+    pageNumberElement = setup.fotobook.find('pagenumbering')
     if pageNumberElement is not None:
         pnpos = int(pageNumberElement.get('position'))
         if pnpos != 0: # 0 implies no numbering
             # make a page number description object to use later
-            pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, availableFonts)
+            pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts)
     renderContext.page_numbering_info = pageNumberingInfo
+
+    # processPages calls its element-rendering callback with the normal page
+    # arguments plus renderContext.  partial() creates an equivalent callback
+    # which also supplies this album's index each time it is called.  The index
+    # is mutable output state, so keep it explicit rather than adding it to
+    # RenderContext with the shared rendering resources.
+    processElementsForAlbum = partial(processElements, albumIndex=albumIndex)
+
     # generate all the requested pages
-    processPages(fotobook, mcfBaseFolder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
-        cewe_folder, availableFonts, backgroundLocations, bg_notFoundDirList, renderContext,
-        processElements)
+    processPages(setup.fotobook, setup.mcf_base_folder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
+        setup.cewe_folder, setup.available_fonts, setup.background_locations, bg_notFoundDirList, renderContext,
+        processElementsForAlbum)
 
     # save final output pdf
     try:
@@ -435,7 +290,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     if albumIndex.indexing:
         # At this point we have an index of items (selected on the basis of their font characteristics)
         #   albumIndex.ShowIndex()
-        indexPdfFileName = albumIndex.SaveIndexPdf(outputFileName, albumTitle, pagesize)
+        indexPdfFileName = albumIndex.SaveIndexPdf(outputFileName, setup.album_title, pagesize)
         indexPngFileName = albumIndex.SaveIndexPng(indexPdfFileName)
         albumIndex.MergeAlbumAndIndexPng(outputFileName, indexPngFileName)
         # most usual is to delete the index pdf, but leave the index png which could be added
@@ -457,9 +312,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         print("Use Adobe Acrobat to print the memory cards. Set custom pages per sheet, 4 wide x 6 down")
         print(" and print two copies!")
 
-    VerifyMessageCounts(defaultConfigSection)
+    VerifyMessageCounts(setup.default_config_section)
 
-    cleanUpTempFiles(tempFileList, unpackedFolder)
+    cleanUpTempFiles(tempFileList, setup.unpacked_folder)
 
     return True
 
