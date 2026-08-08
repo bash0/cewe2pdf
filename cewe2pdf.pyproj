@@ -31,6 +31,8 @@
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
     <Content Include="cewe2pdf.spec" />
+    <Content Include="documents\mcf_feature_classification.md" />
+    <Content Include="documents\readme.txt" />
     <Content Include="environments\cewe2pdfenvlinux.yml" />
     <Content Include="environments\cewe2pdfenvwindows.yml" />
     <Content Include="environments\environments.md" />
@@ -163,6 +165,11 @@
     <Content Include="tests\testIndex\cewe2pdf.ini" />
     <Content Include="tests\testIndex\test_index.mcf" />
     <Content Include="tests\testIndex\test_index_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testLineHeight\additional_fonts.txt" />
+    <Content Include="tests\testLineHeight\cewe2pdf.ini" />
+    <Content Include="tests\testLineHeight\testLineHeight.mcf" />
+    <Content Include="tests\testLineHeight\testLineHeight_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testLineHeight\testLineHeight_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\testLists\additional_fonts.txt" />
     <Content Include="tests\testLists\cewe2pdf.ini" />
     <Content Include="tests\testLists\testlists.mcf" />
@@ -335,6 +342,7 @@
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
     <Compile Include="tests\testIndexLarge\test_indexLarge.py" />
     <Compile Include="tests\testIndex\test_index.py" />
+    <Compile Include="tests\testLineHeight\test_lineHeight.py" />
     <Compile Include="tests\testLists\test_lists.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
@@ -355,6 +363,7 @@
   <ItemGroup>
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
+    <Folder Include="documents\" />
     <Folder Include="environments\" />
     <Folder Include="tests" />
     <Folder Include="tests\compare-pdf\" />
@@ -402,6 +411,8 @@
     <Folder Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\" />
     <Folder Include="tests\testIndex\" />
     <Folder Include="tests\testIndex\test_index_mcf-Dateien\" />
+    <Folder Include="tests\testLineHeight\" />
+    <Folder Include="tests\testLineHeight\testLineHeight_mcf-Dateien\" />
     <Folder Include="tests\testLists\" />
     <Folder Include="tests\testLists\previous_result_pdfs\" />
     <Folder Include="tests\testlists\testlists_mcf-Dateien\" />

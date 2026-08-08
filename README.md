@@ -221,6 +221,10 @@ If your CEWE software uses `.mcfx` files for your projects, you can specify the 
 ### .xmcf
 If your CEWE software uses `.xmcf` files for your projects, you can simply still use this. The `.xmcf` file format is just an archive of the `*.mcf` file, the `<album>_mcf-Dateien` folder and a few other files. Right click the `.xmcf` file and your os should give you an open to open the archive. Copy the relevant files out of it, and you should be all set for the next steps.
 
+### Corner decorations
+
+cewe2pdf renders the `default`, `convex`, and `bevelled` corner decorations used by the CEWE Album Editor. The `notched` and `concave` corner variants are intentionally not implemented: the affected corner remains square and the run logs a warning. These shapes resemble paper-photo-holder cut-outs and are not considered useful enough to justify the additional rendering complexity.
+
 ## Acceptable products
 The program was developed to handle CEWE photo books - photograph albums - and is absolutely **not** guaranteed to handle other products from the same editor such as calendars, cards, invitations, etc. Feeding *cewe2pdf* with one of these is at best unlikely to create the right result, and indeed is more likely to cause it to crash unpredictably.
 

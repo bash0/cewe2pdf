@@ -1,4 +1,9 @@
-"""Corner-decoration parsing and geometry helpers."""
+"""Corner-decoration parsing and geometry helpers.
+
+CEWE's convex and bevelled corner decorations are rendered. Its notched and
+concave variants are intentionally not implemented: cewe2pdf logs a warning
+and leaves those corners square.
+"""
 
 import logging
 from enum import Enum
@@ -171,7 +176,7 @@ def hasImplementedCorners(cornersInfo):
 
 
 def applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit):
-    """Apply convex and bevelled corner masks to an image."""
+    """Apply convex and bevelled corner masks; warn for unimplemented shapes."""
     def getCornerRadius_px(cornerInfo):
         if cornerInfo.shape == CornerShape.Default:
             return 0
