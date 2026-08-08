@@ -374,7 +374,10 @@
     <Compile Include="text.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="textareas.py" />
     <Compile Include="textart.py" />
+    <Compile Include="textoutlines.py" />
+    <Compile Include="textspacing.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />

@@ -30,9 +30,8 @@ from textspacing import getLetterSpacing
 
 
 def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
-                       pgno, context: RenderContext): # noqa: C901 (too complex)
+                       pgno, context: RenderContext, albumIndex): # noqa: C901 (too complex)
     mcf2rl = context.mcf_to_reportlab
-    albumIndex = context.album_index
     # note: it would be better to use proper html processing here
 
     def extract_text_sections(fragment, sep=" / "):
@@ -315,7 +314,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         pdf_styleN.letterSpacing = letterSpacing
         textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
             processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth,
-                body, bodyfont, bodyfs, bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor, context)
+                body, bodyfont, bodyfs, bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor,
+                context, albumIndex)
         if not textWrapProblem or iterationsToShrinkFontWhenNecessary == 0:
             if not textWrapProblem:
                 if scaleFactor < 1.0:
@@ -372,7 +372,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # So we still need to do some padding adjustment below.
             textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
                 processTextCore(pdf_flowableList, pdf_styleN, 1.0, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
-                bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor, context)
+                bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor, context, albumIndex)
 
             # Recalculate for the new height.
             emptySpace = originalFrameHeight - finalTotalHeight
@@ -604,7 +604,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
 def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts, areaHeight, areaWidth, body, bodyfont: str | Any, bodyfs: int,
                     bottomPad: float | int | Any, bstyle: dict[Any, Any], bweight: int, family,
                     leftPad: float | int | Any, pdf, rightPad: float | int | Any, topPad: float | int | Any,
-                    fontScaleFactor: float, context: RenderContext) -> \
+                    fontScaleFactor: float, context: RenderContext, albumIndex) -> \
         tuple[bool, str | Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any, str | Any]:
 
     mcf2rl = context.mcf_to_reportlab
@@ -627,7 +627,7 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
 
     indexEntryText, recentParagraphText = processTextParas(pdf_flowableList, forceLeading, recentParagraphText,
         additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText, pdf, pdf_styleN,
-        fontScaleFactor, unprocessed_children, context.album_index)
+        fontScaleFactor, unprocessed_children, albumIndex)
 
     recentParagraphText = processTextUL(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts,
         body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN, fontScaleFactor, unprocessed_children)

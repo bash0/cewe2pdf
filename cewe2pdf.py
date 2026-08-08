@@ -208,7 +208,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         # process text
         for textTag in area.findall('text'):
             processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
-                               pageNumber, context)
+                               pageNumber, context, albumIndex)
 
         # Clip-Art
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
@@ -419,8 +419,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             # make a page number description object to use later
             pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, availableFonts)
     renderContext.page_numbering_info = pageNumberingInfo
-    renderContext.album_index = albumIndex
-
     # generate all the requested pages
     processPages(fotobook, mcfBaseFolder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
         cewe_folder, availableFonts, backgroundLocations, bg_notFoundDirList, renderContext,
