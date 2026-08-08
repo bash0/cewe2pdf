@@ -265,8 +265,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         if pnpos != 0: # 0 implies no numbering
             # make a page number description object to use later
             pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts)
-    renderContext.page_numbering_info = pageNumberingInfo
-
     # processPages calls its element-rendering callback with the normal page
     # arguments plus renderContext.  partial() creates an equivalent callback
     # which also supplies this album's index each time it is called.  The index
@@ -277,7 +275,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # generate all the requested pages
     processPages(setup.fotobook, setup.mcf_base_folder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
         setup.cewe_folder, setup.available_fonts, setup.background_locations, bg_notFoundDirList, renderContext,
-        processElementsForAlbum)
+        pageNumberingInfo, processElementsForAlbum)
 
     # save final output pdf
     try:

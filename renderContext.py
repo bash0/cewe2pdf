@@ -24,4 +24,3 @@ class RenderContext:
     passepartout_files: dict[int, str] | None = None
     passepartout_folders: tuple[str, ...] = ()
     temporary_files: list[str] | None = None
-    page_numbering_info: Any = None

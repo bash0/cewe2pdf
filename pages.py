@@ -58,7 +58,7 @@ def parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations, ima
 def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pageCount,
                  pageNumbers, ceweFolder, availableFonts, backgroundLocations,
                  backgroundNotFoundDirectories, context: RenderContext,
-                 processElements: Callable):  # noqa: C901
+                 pageNumberingInfo, processElements: Callable):  # noqa: C901
     """Render the requested album pages, including covers and inside covers."""
 
     def isBackCover(number):
@@ -131,7 +131,7 @@ def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pag
                                    imageDirectory, pdf, page, pageNumber, pageCount, pageType,
                                    productStyle, oddPage, backgroundNotFoundDirectories,
                                    availableFonts, lastPage, context, processElements)
-                    addPageNumber(context.page_numbering_info, pdf, pageNumber,
+                    addPageNumber(pageNumberingInfo, pdf, pageNumber,
                                   productStyle, oddPage, context)
 
                 # A page 0 without areas defines the back inside-cover background.
@@ -170,7 +170,7 @@ def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pag
                 if AlbumInfo.isAlbumProduct(productStyle) and pageType in [
                         PageProcessingType.FrontInsideCover,
                         PageProcessingType.RegularPage]:
-                    addPageNumber(context.page_numbering_info, pdf, pageNumber,
+                    addPageNumber(pageNumberingInfo, pdf, pageNumber,
                                   productStyle, oddPage, context)
 
                 if not AlbumInfo.isAlbumProduct(productStyle):
