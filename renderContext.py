@@ -25,3 +25,4 @@ class RenderContext:
     passepartout_folders: tuple[str, ...] = ()
     temporary_files: list[str] | None = None
     page_numbering_info: Any = None
+    album_index: Any = None
