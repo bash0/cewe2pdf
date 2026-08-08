@@ -109,7 +109,8 @@ from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText
 from text import CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle, Dequote, LeadingForExplicitLineHeight
-from textoutlines import TextOutlineParagraph, getTextOutline
+from textoutlines import TextEffectsParagraph, getTextOutline
+from textspacing import getLetterSpacing
 from index import Index
 from textart import handleTextArt
 from shadows import drawBlurredImageShadow, findShadowBottomLeft, intensityToGrey
@@ -820,6 +821,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # from about CEWE 8.0, approx late 2025, the textFormat element has become important
     textFormatElement = textTag.find('textFormat')
     textOutline = getTextOutline(textTag, mcf2rl)
+    letterSpacing = getLetterSpacing(textFormatElement, mcf2rl)
     indentMargin = -1.0
 
     # issue https://github.com/bash0/cewe2pdf/issues/58 - margins are not being used
@@ -927,6 +929,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         # set default para style in case there are no spans to set it.
         pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
         pdf_styleN.textOutline = textOutline
+        pdf_styleN.letterSpacing = letterSpacing
         textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
             processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth,
                 body, bodyfont, bodyfs, bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor)
@@ -980,6 +983,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # set default para style in case there are no spans to set it.
             pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
             pdf_styleN.textOutline = textOutline
+            pdf_styleN.letterSpacing = letterSpacing
             # use forceLeading=1.0 to force minimal leading.  Even with 1.0 there is generally a bit of spare points of space
             # above the text. This is because fonts are laid out using "Em squares", which are larger than the actual glyphs.
             # So we still need to do some padding adjustment below.
@@ -1129,7 +1133,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
             pdf_styleN.leading = paragraphLeading(usefs) # line spacing (text + leading)
-            pdf_flowableList.append(TextOutlineParagraph(paragraphText, pdf_styleN))
+            pdf_flowableList.append(TextEffectsParagraph(paragraphText, pdf_styleN))
             originalFont = CollectItemFontFamily(p, family)
             if albumIndex.CheckForIndexEntry(originalFont, bodyfs):
                 indexEntryText = Index.AppendIndexText(indexEntryText, p.text)
@@ -1155,7 +1159,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                     paragraphText += '&nbsp;</para>'
                     usefs = maxfs if maxfs > 0 else bodyfs
                     pdf_styleN.leading = paragraphLeading(usefs)  # line spacing (text + leading)
-                    pdf_flowableList.append(TextOutlineParagraph(paragraphText, pdf_styleN))
+                    pdf_flowableList.append(TextEffectsParagraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = f'<para autoLeading="{autoLeading}">'
                     paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf,
@@ -1186,7 +1190,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                             paragraphText += '</para>'
                             usefs = maxfs if maxfs > 0 else bodyfs
                             pdf_styleN.leading = paragraphLeading(usefs)  # line spacing (text + leading)
-                            pdf_flowableList.append(TextOutlineParagraph(paragraphText, pdf_styleN))
+                            pdf_flowableList.append(TextEffectsParagraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
                             paragraphText = f'<para autoLeading="{autoLeading}">'
                             # now add the tail text of each br in the span style
@@ -1208,7 +1212,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
                 pdf_styleN.leading = paragraphLeading(usefs)  # line spacing (text + leading)
-                pdf_flowableList.append(TextOutlineParagraph(paragraphText, pdf_styleN))
+                pdf_flowableList.append(TextEffectsParagraph(paragraphText, pdf_styleN))
             except Exception:
                 logging.exception('Exception')
     return indexEntryText, paragraphText
@@ -1377,7 +1381,7 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
                 list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
-                pdf_flowableList.append(TextOutlineParagraph(paragraphText, list_styleN))
+                pdf_flowableList.append(TextEffectsParagraph(paragraphText, list_styleN))
             else:
                 # List item with spans and other formatting
                 bullet_plus_text = bullet_txt + (li.text if li.text is not None else "")
@@ -1437,7 +1441,7 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
                     paragraphText += '</para>'
                     usefs = maxfs if maxfs > 0 else bodyfs
                     list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
-                    pdf_flowableList.append(TextOutlineParagraph(paragraphText, list_styleN))
+                    pdf_flowableList.append(TextEffectsParagraph(paragraphText, list_styleN))
                 except Exception:
                     logging.exception('Exception')
     return paragraphText
@@ -1842,7 +1846,7 @@ def addPageNumber(pni, pdf, pageNumber, productStyle, oddpage):
         return
 
     paragraphText = pni.getParagraphText(pageNumber)
-    paragraph = TextOutlineParagraph(paragraphText, pni.paragraphStyle)
+    paragraph = TextEffectsParagraph(paragraphText, pni.paragraphStyle)
     paraWidth = paragraph.minWidth()
     _, paraHeight = paragraph.wrap(1000, 1000)
     frameWidthFiddleFactor = 3 + pni.fontsize * 1.5
