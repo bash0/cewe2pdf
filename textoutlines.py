@@ -47,11 +47,15 @@ def getTextOutline(text_tag, mcf_to_reportlab):
     return TextOutline(color, width_mcf * mcf_to_reportlab)
 
 
-class TextOutlineParagraph(Paragraph):
-    """A normal ReportLab paragraph which optionally strokes its text glyphs."""
+class TextEffectsParagraph(Paragraph):
+    """A ReportLab paragraph which applies CEWE text effects when requested."""
 
     def beginText(self, x, y):
         text_object = super().beginText(x, y)
+        letter_spacing = getattr(self.style, 'letterSpacing', 0.0)
+        if letter_spacing != 0.0:
+            text_object.setCharSpace(letter_spacing)
+
         outline = getattr(self.style, 'textOutline', None)
         if outline is not None:
             # PDF text mode 2 paints each glyph with its fill and its stroke.
