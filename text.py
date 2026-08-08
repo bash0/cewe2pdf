@@ -2,6 +2,7 @@ import html
 import reportlab.lib.enums
 
 from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfbase import pdfmetrics
 
 from fontHandling import getAvailableFont
 from lineScales import LineScales
@@ -23,6 +24,25 @@ def CreateParagraphStyle(textcolor, font, fontsize, font_size_adjust):
         # backColor=backgroundColor, # text bg not used since ColorFrame colours the whole bg
         textColor=textcolor)
     return parastyle
+
+
+def LeadingForExplicitLineHeight(font, fontsize, line_height):
+    """
+    Return ReportLab leading for a CSS line-height percentage.
+
+    ReportLab's ``autoLeading=\"max\"`` normally grows a line to fit the font's
+    ascent and descent.  That is useful for ordinary CEWE text, but it makes an
+    explicit 100% line height use the font metrics while larger percentages use
+    our configured leading.  Use the same natural line box as the baseline,
+    then apply the requested percentage consistently.
+    """
+    configured_leading = fontsize * LineScales.lineScaleForFont(font)
+    try:
+        ascent, descent = pdfmetrics.getAscentDescent(font, fontsize)
+        natural_leading = ascent - descent
+    except KeyError:
+        natural_leading = configured_leading
+    return max(configured_leading, natural_leading) * line_height
 
 
 def IsBold(weight):

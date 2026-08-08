@@ -108,7 +108,7 @@ from pageNumbering import getPageNumberXy, PageNumberingInfo, PageNumberPosition
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText
-from text import CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle, Dequote
+from text import CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle, Dequote, LeadingForExplicitLineHeight
 from index import Index
 from textart import handleTextArt
 from shadows import drawBlurredImageShadow, findShadowBottomLeft, intensityToGrey
@@ -1091,6 +1091,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
         # there will be a paragraph style with various attributes, most of which we do not handle.
         # But this is where the line spacing is defined, with the line-height attribute
         pLineHeight = 1.0 # normal line spacing by default
+        hasExplicitLineHeight = False
         pStyleAttribute = p.get('style')
         if pStyleAttribute is not None:
             pStyle = dict([kv.split(':') for kv in
@@ -1098,25 +1099,39 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
             if 'line-height' in pStyle.keys():
                 try:
                     pLineHeight = floor(float(pStyle['line-height'].strip("%")))/100.0
+                    hasExplicitLineHeight = True
                 except: # noqa: E722
                     logging.warning(f"Ignoring invalid paragraph line-height setting {pStyleAttribute}")
         finalLeadingFactor = LineScales.lineScaleForFont(bodyfont) * pLineHeight
+        # 100% is CEWE's normal layout and retains the established ReportLab
+        # auto-leading behaviour.  For a user-selected percentage, however,
+        # auto-leading would partly replace the requested leading with font
+        # metrics, so use the calculated value unchanged.
+        useExplicitLineHeight = hasExplicitLineHeight and pLineHeight != 1.0
+        autoLeading = "off" if useExplicitLineHeight else "max"
+
+        def paragraphLeading(usefs):
+            if forceLeading is not None:
+                return usefs * forceLeading
+            if useExplicitLineHeight:
+                return LeadingForExplicitLineHeight(bodyfont, usefs, pLineHeight)
+            return usefs * finalLeadingFactor
 
         htmlspans = p.findall(".*")
         if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
-            paragraphText = '<para autoLeading="max">'
+            paragraphText = f'<para autoLeading="{autoLeading}">'
             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
                 additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
-            pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor # line spacing (text + leading)
+            pdf_styleN.leading = paragraphLeading(usefs) # line spacing (text + leading)
             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             originalFont = CollectItemFontFamily(p, family)
             if albumIndex.CheckForIndexEntry(originalFont, bodyfs):
                 indexEntryText = Index.AppendIndexText(indexEntryText, p.text)
 
         else:
-            paragraphText = '<para autoLeading="max">'
+            paragraphText = f'<para autoLeading="{autoLeading}">'
 
             # there might be untagged text preceding a span. We have to add that to paragraphText
             # first - but we must not terminate the paragraph and add it to the flowable because
@@ -1125,7 +1140,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
                     additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
                 usefs = maxfs if maxfs > 0 else bodyfs
-                pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
+                pdf_styleN.leading = paragraphLeading(usefs)  # line spacing (text + leading)
 
             # now run round the htmlspans
             for item in htmlspans:
@@ -1135,10 +1150,10 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                     # but if it is not there then an empty paragraph goes missing :-(
                     paragraphText += '&nbsp;</para>'
                     usefs = maxfs if maxfs > 0 else bodyfs
-                    pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
+                    pdf_styleN.leading = paragraphLeading(usefs)  # line spacing (text + leading)
                     pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                     # start a new pdf para in the style of the para and add the tail text of this br item
-                    paragraphText = '<para autoLeading="max">'
+                    paragraphText = f'<para autoLeading="{autoLeading}">'
                     paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf,
                         additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
 
@@ -1166,11 +1181,10 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                             # terminate the current pdf para and add it to the flow
                             paragraphText += '</para>'
                             usefs = maxfs if maxfs > 0 else bodyfs
-                            pdf_styleN.leading = \
-                                usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
+                            pdf_styleN.leading = paragraphLeading(usefs)  # line spacing (text + leading)
                             pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
                             # start a new pdf para in the style of the current span
-                            paragraphText = '<para autoLeading="max">'
+                            paragraphText = f'<para autoLeading="{autoLeading}">'
                             # now add the tail text of each br in the span style
                             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf,
                                 additional_fonts, bodyfont, bodyfs, bweight,
@@ -1189,7 +1203,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
             try:
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
-                pdf_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor  # line spacing (text + leading)
+                pdf_styleN.leading = paragraphLeading(usefs)  # line spacing (text + leading)
                 pdf_flowableList.append(Paragraph(paragraphText, pdf_styleN))
             except Exception:
                 logging.exception('Exception')
