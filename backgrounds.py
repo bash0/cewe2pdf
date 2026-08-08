@@ -9,33 +9,34 @@ from reportlab.lib.utils import ImageReader
 from ceweInfo import AlbumInfo
 from configUtils import getConfigurationBool
 from pathutils import findFileInDirs
-from pageTypes import PageType
+from pageTypes import PageProcessingType
+from renderContext import RenderContext
 
 
 def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
-                      productstyle, pagetype, pdf, ph, pw, defaultConfigSection, mcf2rl):  # noqa: C901
+                      productstyle, pagetype, pdf, ph, pw, context: RenderContext):  # noqa: C901
     """Draw the page background, including special handling for inside covers."""
     areaHeight = ph
     areaWidth = pw
     areaXOffset = 0
 
-    if pagetype == PageType.EmptyPage:
-        # EmptyPage is used when processing the inside-cover / first-page pair
-        # for the second time after it was already processed as SingleSide.
+    if pagetype == PageProcessingType.FrontInsideCover:
+        # This pass processes the inside-cover / first-page pair after its
+        # background was handled by FrontInsideCoverBackground.
         if AlbumInfo.isAlbumSingleSide(productstyle):
             return
         if AlbumInfo.isAlbumDoubleSide(productstyle):
             areaWidth = areaWidth / 2
 
-    if pagetype == PageType.BackInsideCover:
+    if pagetype == PageProcessingType.BackInsideCover:
         if AlbumInfo.isAlbumSingleSide(productstyle):
             return
         if AlbumInfo.isAlbumDoubleSide(productstyle):
             areaWidth = areaWidth / 2
             areaXOffset = areaXOffset + areaWidth
 
-    if pagetype in [PageType.EmptyPage, PageType.BackInsideCover] and \
-            not getConfigurationBool(defaultConfigSection, 'insideCoverWhite', 'False'):
+    if pagetype in [PageProcessingType.FrontInsideCover, PageProcessingType.BackInsideCover] and \
+            not getConfigurationBool(context.default_config_section, 'insideCoverWhite', 'False'):
         # Returning accepts the background already underneath.  An explicit
         # configuration setting instead draws CEWE's default white background.
         return
@@ -50,7 +51,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
         if backgroundTag is None:
             return
 
-        if pagetype == PageType.Normal and AlbumInfo.isAlbumDoubleSide(productstyle) and \
+        if pagetype == PageProcessingType.RegularPage and AlbumInfo.isAlbumDoubleSide(productstyle) and \
                 backgroundTag.get('alignment') == '3':
             areaWidth = areaWidth / 2
             areaXOffset = areaXOffset + areaWidth
@@ -71,8 +72,9 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                 memFileHandle = BytesIO()
                 image.save(memFileHandle, 'jpeg')
                 memFileHandle.seek(0)
-                pdf.drawImage(ImageReader(memFileHandle), mcf2rl * areaXOffset, 0,
-                              width=mcf2rl * areaWidth, height=mcf2rl * areaHeight)
+                pdf.drawImage(ImageReader(memFileHandle), context.mcf_to_reportlab * areaXOffset, 0,
+                              width=context.mcf_to_reportlab * areaWidth,
+                              height=context.mcf_to_reportlab * areaHeight)
             except Exception:
                 if bgPath not in bg_notFoundDirList:
                     logging.error('Could not find background or error when adding to pdf')

@@ -340,6 +340,7 @@
     <Compile Include="passepartout.py" />
     <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
+    <Compile Include="renderContext.py" />
     <Compile Include="runAllTests.py" />
     <Compile Include="shadows.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />

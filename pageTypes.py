@@ -3,14 +3,14 @@
 from enum import Enum
 
 
-class PageType(Enum):
-    """A conversion concept; CEWE does not use these names in its MCF files."""
+class PageProcessingType(Enum):
+    """An internal processing role; CEWE does not use these names in MCF files."""
 
-    Unknown = 0
-    Normal = 1
-    SingleSide = 2
+    Undetermined = 0
+    RegularPage = 1
+    FrontInsideCoverBackground = 2
     Cover = 3
-    EmptyPage = 4
+    FrontInsideCover = 4
     BackInsideCover = 5
 
     def __str__(self):
