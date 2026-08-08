@@ -323,6 +323,7 @@
     <Compile Include="extraLoggers.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="imageareas.py" />
     <Compile Include="imageExtractor.py">
       <SubType>Code</SubType>
     </Compile>
