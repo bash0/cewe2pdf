@@ -62,7 +62,6 @@ import logging.config
 
 import os.path
 import os
-import tempfile
 import html
 import re # to merge duplicate style tags
 
@@ -72,14 +71,13 @@ import argparse  # to parse arguments
 import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
 
 from io import BytesIO
-from math import sqrt, floor
+from math import floor
 
 from pathlib import Path
 from typing import Any
 
 import reportlab.lib.colors
 import reportlab.lib.pagesizes
-from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 # from reportlab.pdfbase.pdfmetrics import stringWidth as _stringWidth
@@ -93,21 +91,21 @@ from packaging.version import parse as parse_version
 from lxml import etree
 
 from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
-from clipArt import getClipConfig, loadClipart, readClipArtConfigXML
-from clipartareas import insertClipartFile, processAreaClipartTag
+from borders import processDecorationBorders
+from clipArt import readClipArtConfigXML
+from clipartareas import processAreaClipartTag
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from corners import applyCornerMask, buildCornerPath, getCornersInfo, hasImplementedCorners
 from configUtils import getConfigurationBool, getConfigurationInt
-from extraLoggers import mustsee, configlogger, VerifyMessageCounts, printMessageCountSummaries
+from extraLoggers import mustsee, VerifyMessageCounts, printMessageCountSummaries
 from fontHandling import getAvailableFont, findAndRegisterFonts
-from imageUtils import autorot
+from imageareas import processAreaImageTag
 from lineScales import LineScales
 from mcfx import unpackMcfx
 from pageNumbering import PageNumberingInfo
 from pageTypes import PageProcessingType
 from pages import getPageElementForPageNumber, processPages
-from passepartout import Passepartout
 from pathutils import findFileInDirs
 from renderContext import RenderContext
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText
@@ -116,7 +114,7 @@ from textoutlines import TextEffectsParagraph, getTextOutline
 from textspacing import getLetterSpacing
 from index import Index
 from textart import handleTextArt
-from shadows import drawBlurredImageShadow, findShadowBottomLeft, intensityToGrey
+from shadows import processDecorationShadow, warnAndIgnoreEnabledDecorationShadow
 
 
 # work around a breaking change in pil 10.0.0, see
@@ -172,382 +170,13 @@ tempFileList = []  # we need to remove all the temporary files at the end
 albumIndex = None # set after we have got the configuration information
 clipartDict = dict[int, str]()    # a dictionary for clipart element IDs to file name
 clipartPathList = tuple[str]()
-passepartoutDict = None    # will be dict[int, str] for passepartout designElementIDs to file name
-passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
 defaultConfigSection = None
 
 
 # This is only used for the <background .../> tags. The stock backgrounds use this element.
-def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir,
-                        productstyle, mcfBaseFolder, pagetype, pdf, pw, transx, transy,
-                        context: RenderContext):
-    # open raw image file
-    if imageTag.get('filename') is None:
-        return
-    imagePath = os.path.join(
-        mcfBaseFolder, imagedir, imageTag.get('filename'))
-    # the layout software copies the images to another collection folder
-    imagePath = imagePath.replace('safecontainer:/', '')
-    im = PIL.Image.open(imagePath)
-
-    if imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
-        # display on the right page
-        if AlbumInfo.isAlbumDoubleSide(productstyle):
-            img_transx = transx + mcf2rl * pw/2
-        else:
-            img_transx = transx + mcf2rl * pw
-    else:
-        img_transx = transx
-
-    # correct for exif rotation
-    im = autorot(im)
-    # get the cutout position and scale
-    imleft = float(imageTag.find('cutout').get('left').replace(',', '.'))
-    imtop = float(imageTag.find('cutout').get('top').replace(',', '.'))
-    # imageWidth_px, imageHeight_px = im.size
-    imScale = float(imageTag.find('cutout').get('scale'))
-
-    # we need to take care of changes introduced by passepartout elements, before further image processing
-    passepartoutid = imageTag.get('passepartoutDesignElementId')
-    frameClipartFileName = None
-    maskClipartFileName = None
-    frameDeltaX_mcfunit = 0
-    frameDeltaY_mcfunit = 0
-    frameAlpha = 255
-    imgCropWidth_mcfunit = areaWidth
-    imgCropHeight_mcfunit = areaHeight
-    if passepartoutid is not None:
-        # re-generate the index of designElementId to .xml files, if it does not exist
-        passepartoutid = int(passepartoutid)    # we need to work with a number below
-        global passepartoutDict # pylint: disable=global-statement
-        if passepartoutDict is None:
-            configlogger.info("Regenerating passepartout index from .XML files.")
-            # the folder list may in fact be modified by buildElementIdIndex so disable pylint complaints
-            passepartoutDict = Passepartout.buildElementIdIndex(passepartoutFolders)
-        # read information from .xml file
-        try:
-            pptXmlFileName = passepartoutDict[passepartoutid]
-        except: # noqa: E722
-            pptXmlFileName = None
-        if pptXmlFileName is None:
-            logging.error(f"Can't find passepartout for {passepartoutid}")
-        else:
-            pptXmlFileName = passepartoutDict[passepartoutid]
-            pptXmlInfo = Passepartout.extractInfoFromXml(pptXmlFileName, passepartoutid)
-            frameClipartFileName = Passepartout.getClipartFullName(pptXmlInfo)
-            maskClipartFileName = Passepartout.getMaskFullName(pptXmlInfo)
-            logging.debug(f"Using mask file: {maskClipartFileName}")
-            # draw the passepartout clipart file.
-            # Adjust the position of the real image depending on the frame
-            if pptXmlInfo.fotoarea_x is not None:
-                frameDeltaX_mcfunit = pptXmlInfo.fotoarea_x * areaWidth
-                frameDeltaY_mcfunit = pptXmlInfo.fotoarea_y * areaHeight
-                imgCropWidth_mcfunit = pptXmlInfo.fotoarea_width * areaWidth
-                imgCropHeight_mcfunit = pptXmlInfo.fotoarea_height * areaHeight
-
-    # without cropping: to get from a image pixel width to the areaWidth in .mcf-units, the image pixel width is multiplied by the scale factor.
-    # to get from .mcf units are divided by the scale factor to get to image pixel units.
-
-    # crop image
-    # currently the values can result in pixel coordinates outside the original image size
-    # Pillow will fill these areas with black pixels. That's ok, but not documented anywhere.
-    # For normal image display without passepartout there should be no black pixels visible,
-    # because the CEWE software doesn't allow the creation of such parameters that would result in them.
-    # For frames, the situation might arrise, but then the mask is applied.
-
-    # first calcualte cropping coordinate for normal case
-    cropLeft = int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale)
-    cropUpper = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale)
-    cropRight = int(0.5 - imleft/imScale + 0*frameDeltaX_mcfunit/imScale + imgCropWidth_mcfunit / imScale)
-    cropLower = int(0.5 - imtop/imScale + 0*frameDeltaY_mcfunit/imScale + imgCropHeight_mcfunit / imScale)
-
-    im = im.crop((cropLeft, cropUpper, cropRight, cropLower))
-
-    # scale image
-    # re-scale the image if it is much bigger than final resolution in PDF
-    # set desired DPI based on where the image is used. The background gets a lower DPI.
-    if imageTag.tag == 'imagebackground' and pagetype != 'cover':
-        res = bg_res
-    else:
-        res = image_res
-    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
-    new_w = int(0.5 + imgCropWidth_mcfunit * res / 254.)
-    new_h = int(0.5 + imgCropHeight_mcfunit * res / 254.)
-    factor = sqrt(new_w * new_h / float(im.size[0] * im.size[1]))
-    if factor <= 0.8:
-        im = im.resize(
-            (new_w, new_h), pil_antialias)
-    im.load()
-
-    # apply the frame mask from the passepartout to the image
-    if maskClipartFileName is not None:
-        maskClp = loadClipart(maskClipartFileName, clipartPathList)
-        im = maskClp.applyAsAlphaMaskToFoto(im)
-
-    # issue https://github.com/bash0/cewe2pdf/issues/251 asks for corner decorations. This
-    # implementation deals with convex (rounded) corners, taken from the top-left corner.
-    # The other corner shapes are not implemented, nor are differing corners.
-    cornersInfo = getCornersInfo(area)
-    im = applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit)
-
-    # re-compress image
-    jpeg = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
-    # we need to close the temporary file, because otherwise the call to im.save will fail on Windows.
-    jpeg.close()
-    if im.mode in ('RGBA', 'P'):
-        im.save(jpeg.name, "PNG")
-    else:
-        im.save(jpeg.name, "JPEG",
-                quality=image_quality)
-
-    # place image
-    logging.debug(f"image: {imageTag.get('filename')}")
-    pdf.translate(img_transx, transy)   # we need to go to the center for correct rotation
-    pdf.rotate(-areaRot)   # rotation around center of area
-
-    # calculate the non-symmetric shift of the center, given the left pos and the width.
-    frameShiftX_mcf = -(frameDeltaX_mcfunit-((areaWidth - imgCropWidth_mcfunit) - frameDeltaX_mcfunit))/2
-    frameShiftY_mcf = (frameDeltaY_mcfunit-((areaHeight - imgCropHeight_mcfunit) - frameDeltaY_mcfunit))/2
-    pdf.translate(-frameShiftX_mcf * mcf2rl, -frameShiftY_mcf * mcf2rl) # for adjustments from passepartout
-
-    # A shadow is made from the alpha mask of the final, cropped image.  This
-    # gives ordinary rectangular images, decorated corners and passepartout
-    # masks one consistent model, and keeps the shadow aligned with the image.
-    for decorationTag in area.findall('decoration'):
-        processDecorationShadow(
-            decorationTag, areaHeight, areaWidth, pdf,
-            im, imgCropWidth_mcfunit, imgCropHeight_mcfunit
-        )
-
-    pdf.drawImage(ImageReader(jpeg.name),
-        mcf2rl * -0.5 * imgCropWidth_mcfunit,
-        mcf2rl * -0.5 * imgCropHeight_mcfunit,
-        width=mcf2rl * imgCropWidth_mcfunit,
-        height=mcf2rl * imgCropHeight_mcfunit,
-        mask='auto')
-    pdf.translate(frameShiftX_mcf * mcf2rl, frameShiftY_mcf * mcf2rl) # for adjustments from passepartout
-
-    # we need to draw our passepartout after the real image, so it overlays it.
-    if frameClipartFileName is not None:
-        # we set the transx, transy, and areaRot for the clipart to zero, because our current pdf object
-        # already has these transformations applied. So don't do it twice.
-        # flipX and flipY are also set to false because it cause an exception in PIL
-        # therefore, even if the CEWE software offers the possibility to flip the clipart frame, cewe2pdf
-        # remains unable to render it
-        colorreplacements, flipX, flipY = getClipConfig(imageTag) # pylint: disable=unused-variable
-        insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha,
-                          pdf, 0, 0, False, False, None, context)
-
-    for decorationTag in area.findall('decoration'):
-        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, cornersInfo)
-
-    pdf.rotate(areaRot)
-    pdf.translate(-img_transx, -transy)
-
-    # we now have temporary file, that we need to delete after pdf creation
-    tempFileList.append(jpeg.name)
-
-
-def processDecorationBorders(decoration, areaHeight, areaWidth, pdf, cornersInfo=None):
-    # Draw a single cell table to represent border decoration (a box around the object)
-    # We assume that this is called from inside the rotation and translation operation
-    for border in decoration.findall('border'):
-        if "enabled" in border.attrib:
-            enabledAttrib = border.get('enabled')
-            if enabledAttrib != '1':
-                return
-
-        bwidth = 1
-        if "width" in border.attrib:
-            widthAttrib = border.get('width')
-            if widthAttrib is not None:
-                bwidth = mcf2rl * floor(float(widthAttrib)) # units are 1/10 mm
-
-        bcolor = reportlab.lib.colors.blue
-        if "color" in border.attrib:
-            colorAttrib = border.get('color')
-            # The border colour is weirdly handled by CEWE. The transparency seems to
-            # be ignored. And, non-borders are sometimes stored as borders with no colour.
-            if colorAttrib == '#00000000':
-                # Not a border - don't draw it
-                return
-            bcolor = reportlab.lib.colors.HexColor(colorAttrib)
-
-        adjustment = 0
-        gap = 0
-        if "gap" in border.attrib:
-            gapAttrib = border.get('gap')
-            gap = mcf2rl * floor(float(gapAttrib))
-        # position possibilities are: outsideWithGap outside inside centered insideWithGap
-        if "position" in border.attrib:
-            positionAttrib = border.get('position')
-            if positionAttrib == "insideWithGap":
-                adjustment = -bwidth * 0.5 - gap
-            if positionAttrib == "inside":
-                adjustment = -bwidth * 0.5
-            if positionAttrib == "centered":
-                adjustment = 0
-            if positionAttrib == "outside":
-                adjustment = bwidth * 0.5
-            if positionAttrib == "outsideWithGap":
-                adjustment = bwidth * 0.5 + gap
-
-        frameBottomLeft_x = -0.5 * (mcf2rl * areaWidth) - adjustment
-        frameBottomLeft_y = -0.5 * (mcf2rl * areaHeight) - adjustment
-        frameWidth = mcf2rl * areaWidth + 2 * adjustment
-        frameHeight = mcf2rl * areaHeight + 2 * adjustment
-
-        if hasImplementedCorners(cornersInfo):
-            path = buildCornerPath(
-                pdf,
-                frameBottomLeft_x,
-                frameBottomLeft_y,
-                frameWidth,
-                frameHeight,
-                mcf2rl,
-                cornersInfo,
-                adjustment
-            )
-            pdf.saveState()
-            pdf.setLineWidth(bwidth)
-            pdf.setStrokeColor(bcolor)
-            pdf.drawPath(path, stroke=1, fill=0)
-            pdf.restoreState()
-        else:
-            # actually the path code will also work for the default corners, but it we retain the original table
-            # code so that there are no changes in the default case and the regression tests will not fail.
-            frm_table = Table(
-                data=[[None]],
-                colWidths=frameWidth,
-                rowHeights=frameHeight,
-                style=[
-                    ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-                    ('BOX', (0, 0), (0, 0), bwidth, bcolor),
-                    ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
-                ]
-            )
-            frm_table.wrapOn(pdf, frameWidth, frameHeight)
-            frm_table.drawOn(pdf, frameBottomLeft_x, frameBottomLeft_y)
-
-def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
-                            im=None,
-                            imgCropWidth_mcfunit=None,
-                            imgCropHeight_mcfunit=None):
-    # The legacy implementation draws an opaque Table rectangle. Cornered
-    # images instead pass their processed Pillow image and use the blurred PNG
-    # path below; ordinary images deliberately retain the legacy output.
-    if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
-        # shadows were implemented in May 2025. Prior to that, you could have specified
-        # shadows on your photos for printing by CEWE but you would not have got them
-        # in the pdf version. And this might be what you want, so there is an option
-        # to stop shadow processing altogether
-        return
-
-    # We assume that this is called from inside the rotation and translation operation
-    # Ref https://cs.phx.photoprintit.com/hps-hilfe-online/no_no_5026/7.4/faq-fotos.html#q010
-    # can't find an english version.
-
-    frameBottomLeft_x = -0.5 * (mcf2rl * areaWidth)
-    frameBottomLeft_y = -0.5 * (mcf2rl * areaHeight)
-    frameWidth = mcf2rl * areaWidth
-    frameHeight = mcf2rl * areaHeight
-
-    for shadow in decoration.findall('shadow'):
-        if "shadowEnabled" in shadow.attrib:
-            enabledAttrib = shadow.get('shadowEnabled')
-            if enabledAttrib != '1':
-                continue
-
-        # shadow width simulates "distance away of the light source". If the width is zero,
-        # then the light rays are parallel and the shadow is the same size as the object.
-        # So the width value is really about how much bigger the shadow is than the object.
-        swidth = 1
-        shadowWidth_mcfunit = swidth / mcf2rl
-        if "shadowWidthInMM" in shadow.attrib:
-            widthAttrib = shadow.get('shadowWidthInMM')
-            if widthAttrib is not None:
-                shadowWidth_mcfunit = floor(float(widthAttrib) * 10) # units are 1 mm not 0.1 mm!
-                swidth = mcf2rl * shadowWidth_mcfunit
-
-        # sdistance effectively moves the light source to the side of the centre, in the
-        # direction of sangle. When sdistance is zero then sangle is irrelevant. When sdistance
-        # is non-zero it offsets the shadow from the object, as determined by the sangle.
-        sdistance = 10
-        shadowDistance_mcfunit = sdistance / mcf2rl
-        if "shadowDistance" in shadow.attrib:
-            distanceAttrib = shadow.get('shadowDistance')
-            if distanceAttrib is not None:
-                shadowDistance_mcfunit = floor(float(distanceAttrib))
-                sdistance = mcf2rl * shadowDistance_mcfunit
-
-        intensity = 128
-        if "shadowIntensity" in shadow.attrib:
-            intensityAttrib = shadow.get('shadowIntensity')
-            if intensityAttrib is not None:
-                intensity = int(intensityAttrib) # range 1 .. 255, I think
-
-        # shadowBlurNew is the editor's "Blur" value in MCF units (0.1 mm).
-        # For example, the UI value 0.5 mm is stored as shadowBlurNew="5".
-        shadowBlur_mcfunit = 0
-        if "shadowBlurNew" in shadow.attrib:
-            blurAttrib = shadow.get('shadowBlurNew')
-            shadowBlur_mcfunit = float(blurAttrib)
-
-        # you might think that sangle is the angle of the light source, but it is actually
-        # the angle where the shadow should appear (exactly 180 degrees opposite). Not
-        # unreasonable, when swidth sets the width of the shadow rather than how far away
-        # the light source is. I guess the theory is that the users are not physicists!
-        sangle = 135
-        if "shadowAngle" in shadow.attrib:
-            angleAttrib = shadow.get('shadowAngle')
-            if angleAttrib is not None:
-                sangle = floor(float(angleAttrib))
-        if sangle < 0.0: # mcf range -179 .. +180
-            sangle = sangle + 360 # range 0 .. 359
-
-        shadowColor = intensityToGrey(intensity) # reportlab.lib.colors.grey
-
-        if im is not None:
-            # Every image uses its post-crop alpha silhouette. This covers
-            # rectangles, independent corner decorations, and passepartout
-            # masks with the same width, blur, distance and intensity model.
-            drawBlurredImageShadow(
-                pdf, im, imgCropWidth_mcfunit, imgCropHeight_mcfunit,
-                shadowDistance_mcfunit, sangle, intensity, shadowBlur_mcfunit,
-                shadowWidth_mcfunit, mcf2rl, tempFileList
-            )
-        else:
-            # This fallback is for callers without the processed image alpha
-            # mask (for example, legacy non-image callers).
-            shadowBottomLeft_x, shadowBottomLeft_y = \
-                findShadowBottomLeft((frameBottomLeft_x, frameBottomLeft_y), sangle, sdistance, swidth)
-            shadowWidth = frameWidth + swidth
-            shadowHeight = frameHeight + swidth
-            frm_table = Table(
-                data=[[None]],
-                colWidths=shadowWidth,
-                rowHeights=shadowHeight,
-                style=[
-                    ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-                    ('BACKGROUND', (0, 0), (0, 0), shadowColor),
-                    ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
-                ]
-            )
-            frm_table.wrapOn(pdf, shadowWidth, shadowHeight)
-            frm_table.drawOn(pdf, shadowBottomLeft_x, shadowBottomLeft_y)
-
-def warnAndIgnoreEnabledDecorationShadow(decoration):
-    if getConfigurationBool(defaultConfigSection, "noShadows", "False"):
-        return
-    for shadow in decoration.findall('shadow'):
-        if "shadowEnabled" in shadow.attrib:
-            enabledAttrib = shadow.get('shadowEnabled')
-            if enabledAttrib == '1':
-                logging.warning("Ignoring shadow specified on text, that is not implemented!")
-                continue
-
 # Note that transCx, transCy are the center of the area
-def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, pgno): # noqa: C901 (too complex)
+def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
+                       pgno, context: RenderContext): # noqa: C901 (too complex)
     # note: it would be better to use proper html processing here
 
     def extract_text_sections(fragment, sep=" / "):
@@ -776,7 +405,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     # if this is text art, then we do the whole thing differently.
     cwtextart = area.findall('decoration/cwtextart')
     if len(cwtextart) > 0:
-        processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad, cwtextart)
+        processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad,
+                       cwtextart, context)
         return
 
     pdf.translate(transCx, transCy)
@@ -793,7 +423,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
     # we don't do shadowing on texts, but we could at least warn about that...
     for decorationTag in area.findall('decoration'):
-        warnAndIgnoreEnabledDecorationShadow(decorationTag)
+        warnAndIgnoreEnabledDecorationShadow(decorationTag, context)
 
     # Get the background color. It is stored in an extra element.
     backgroundColor = None
@@ -956,17 +586,18 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     newFrame.addFromList(pdf_flowableList, pdf)
 
     for decorationTag in area.findall('decoration'):
-        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
+        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, context)
 
     pdf.rotate(areaRot)
     pdf.translate(-transCx, -transCy)
 
 
-def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad, cwtextart):
+def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad,
+                   cwtextart, context: RenderContext):
     pdf.translate(transCx, transCy)
     pdf.rotate(-areaRot)
     for decorationTag in area.findall('decoration'):
-        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf)
+        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, context)
     bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
     radius = topPad - leftPad # is this really what they use for the radius?
     handleTextArt(pdf, radius, bodyhtml, cwtextart)
@@ -1388,12 +1019,13 @@ def processElements(additional_fonts, fotobook, imagedir,
         # process images
         for imageTag in area.findall('imagebackground') + area.findall('image'):
             processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, productstyle,
-                                mcfBaseFolder, pagetype, pdf, pageW, transCx, transCy, context)
+                                mcfBaseFolder, pagetype, pdf, pageW, transCx, transCy, context,
+                                processDecorationShadow, processDecorationBorders)
 
         # process text
         for textTag in area.findall('text'):
             processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
-                               pageNumber)
+                               pageNumber, context)
 
         # Clip-Art
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
@@ -1404,14 +1036,13 @@ def processElements(additional_fonts, fotobook, imagedir,
             for clipartElement in area.findall('clipart'):
                 processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transCx, transCy,
                                       decoration, context,
-                                      processDecorationBorders)
+                                      lambda decoration, height, width, canvas:
+                                      processDecorationBorders(decoration, height, width, canvas, context))
     return
 
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None, outputFileName=None): # noqa: C901 (too complex)
     global clipartDict  # pylint: disable=global-statement
     global clipartPathList  # pylint: disable=global-statement
-    global passepartoutDict  # pylint: disable=global-statement
-    global passepartoutFolders  # pylint: disable=global-statement
     global image_res  # pylint: disable=global-statement
     global bg_res  # pylint: disable=global-statement
     global defaultConfigSection  # pylint: disable=global-statement
@@ -1419,8 +1050,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     clipartDict = {}    # a dictionary for clipart element IDs to file name
     clipartPathList = tuple()
-    passepartoutDict = None    # a dictionary for passepartout  desginElementIDs to file name
-    passepartoutFolders = tuple[str]() # global variable with the folders for passepartout frames
+    passepartoutFolders = tuple[str]()
     pageNumberingInfo = None
 
     albumTitle, dummy = os.path.splitext(os.path.basename(albumname))
@@ -1577,7 +1207,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     # generate a list of available clip-arts
     clipartPathList = readClipArtConfigXML(cewe_folder, keyAccountFolder, clipartDict)
-    renderContext = RenderContext(mcf2rl, image_res, defaultConfigSection, clipartDict, clipartPathList)
+    renderContext = RenderContext(mcf2rl, image_res, image_quality, bg_res, pil_antialias,
+                                  defaultConfigSection, clipartDict, clipartPathList,
+                                  None, passepartoutFolders, tempFileList)
 
     # find the correct size for the album format (if we know!) and set the product style
     pagesize = reportlab.lib.pagesizes.A4

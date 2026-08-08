@@ -1,12 +1,17 @@
 """Shadow geometry and alpha-silhouette rendering helpers."""
 
 import tempfile
+import logging
+from math import floor
 
 import numpy as np
 from PIL import Image, ImageFilter
 import reportlab.lib.colors
 from reportlab.lib.utils import ImageReader
+from reportlab.platypus import Table
 
+from configUtils import getConfigurationBool
+from renderContext import RenderContext
 
 def findShadowBottomLeft(frameBottomLeft, angle, distance, swidth):
     """Return the lower-left corner of a legacy rectangular shadow."""
@@ -112,3 +117,85 @@ def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
         height=mcf2rl * (imgCropHeight_mcfunit + 2 * padding_mcfunit),
         mask='auto'
     )
+
+
+def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
+                            context: RenderContext, im=None,
+                            imgCropWidth_mcfunit=None,
+                            imgCropHeight_mcfunit=None):
+    """Draw an enabled CEWE shadow decoration for an already-positioned area."""
+    if getConfigurationBool(context.default_config_section, "noShadows", "False"):
+        return
+
+    mcf2rl = context.mcf_to_reportlab
+    frameBottomLeftX = -0.5 * (mcf2rl * areaWidth)
+    frameBottomLeftY = -0.5 * (mcf2rl * areaHeight)
+    frameWidth = mcf2rl * areaWidth
+    frameHeight = mcf2rl * areaHeight
+
+    for shadow in decoration.findall('shadow'):
+        if shadow.get('shadowEnabled') is not None and shadow.get('shadowEnabled') != '1':
+            continue
+
+        shadowWidth = 1
+        shadowWidth_mcfunit = shadowWidth / mcf2rl
+        widthText = shadow.get('shadowWidthInMM')
+        if widthText is not None:
+            shadowWidth_mcfunit = floor(float(widthText) * 10)
+            shadowWidth = mcf2rl * shadowWidth_mcfunit
+
+        shadowDistance = 10
+        shadowDistance_mcfunit = shadowDistance / mcf2rl
+        distanceText = shadow.get('shadowDistance')
+        if distanceText is not None:
+            shadowDistance_mcfunit = floor(float(distanceText))
+            shadowDistance = mcf2rl * shadowDistance_mcfunit
+
+        intensity = 128
+        intensityText = shadow.get('shadowIntensity')
+        if intensityText is not None:
+            intensity = int(intensityText)
+
+        shadowBlur_mcfunit = 0
+        blurText = shadow.get('shadowBlurNew')
+        if blurText is not None:
+            shadowBlur_mcfunit = float(blurText)
+
+        shadowAngle = 135
+        angleText = shadow.get('shadowAngle')
+        if angleText is not None:
+            shadowAngle = floor(float(angleText))
+        if shadowAngle < 0.0:
+            shadowAngle = shadowAngle + 360
+
+        if im is not None:
+            drawBlurredImageShadow(
+                pdf, im, imgCropWidth_mcfunit, imgCropHeight_mcfunit,
+                shadowDistance_mcfunit, shadowAngle, intensity,
+                shadowBlur_mcfunit, shadowWidth_mcfunit, mcf2rl,
+                context.temporary_files
+            )
+        else:
+            shadowBottomLeftX, shadowBottomLeftY = findShadowBottomLeft(
+                (frameBottomLeftX, frameBottomLeftY), shadowAngle,
+                shadowDistance, shadowWidth)
+            shadowTable = Table(
+                data=[[None]],
+                colWidths=frameWidth + shadowWidth,
+                rowHeights=frameHeight + shadowWidth,
+                style=[
+                    ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+                    ('BACKGROUND', (0, 0), (0, 0), intensityToGrey(intensity)),
+                    ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
+                ])
+            shadowTable.wrapOn(pdf, frameWidth + shadowWidth, frameHeight + shadowWidth)
+            shadowTable.drawOn(pdf, shadowBottomLeftX, shadowBottomLeftY)
+
+
+def warnAndIgnoreEnabledDecorationShadow(decoration, context: RenderContext):
+    """Explain the known limitation for shadow decorations on text areas."""
+    if getConfigurationBool(context.default_config_section, "noShadows", "False"):
+        return
+    for shadow in decoration.findall('shadow'):
+        if shadow.get('shadowEnabled') == '1':
+            logging.warning("Ignoring shadow specified on text, that is not implemented!")

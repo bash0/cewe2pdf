@@ -15,7 +15,13 @@ class RenderContext:
 
     mcf_to_reportlab: float
     image_resolution: int
+    image_quality: int
+    background_resolution: int
+    image_resampling_filter: Any
     default_config_section: Any
     clipart_files: dict[int, str]
     clipart_paths: tuple[str, ...]
+    passepartout_files: dict[int, str] | None = None
+    passepartout_folders: tuple[str, ...] = ()
+    temporary_files: list[str] | None = None
     page_numbering_info: Any = None
