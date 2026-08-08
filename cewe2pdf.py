@@ -71,7 +71,6 @@ import gc
 import argparse  # to parse arguments
 import configparser  # to read config file, see https://docs.python.org/3/library/configparser.html
 
-from enum import Enum
 from io import BytesIO
 from math import sqrt, floor
 
@@ -95,6 +94,8 @@ from lxml import etree
 
 from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
 from clipArt import getClipConfig, loadClipart, readClipArtConfigXML
+from clipartareas import insertClipartFile, processAreaClipartTag
+from backgrounds import processBackground
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from corners import applyCornerMask, buildCornerPath, getCornersInfo, hasImplementedCorners
@@ -105,6 +106,7 @@ from imageUtils import autorot
 from lineScales import LineScales
 from mcfx import unpackMcfx
 from pageNumbering import getPageNumberXy, PageNumberingInfo, PageNumberPosition
+from pageTypes import PageType
 from passepartout import Passepartout
 from pathutils import findFileInDirs
 from text import AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText
@@ -114,19 +116,6 @@ from textspacing import getLetterSpacing
 from index import Index
 from textart import handleTextArt
 from shadows import drawBlurredImageShadow, findShadowBottomLeft, intensityToGrey
-
-
-# PageType is a concept for processing in this code, not something used by CEWE
-class PageType(Enum):
-    Unknown = 0 # this must be an error
-    Normal = 1
-    SingleSide = 2 # don't quite know what this is yet
-    Cover = 3 # front / back cover
-    EmptyPage = 4 # the intentional blanks inside the front and back covers (both have pagenr 0)
-    BackInsideCover = 5 # the obligatory empty page to the right of the last page in keep double pages
-
-    def __str__(self):
-        return self.name # to print the enum name without the class
 
 
 # work around a breaking change in pil 10.0.0, see
@@ -190,97 +179,6 @@ pageNumberingInfo = None # if the album requests page numbering then we keep the
 
 def getPageElementForPageNumber(fotobook, pageNumber):
     return fotobook.find(f"./page[@pagenr='{floor(2 * (pageNumber / 2))}']")
-
-
-# This is only used for the <background .../> tags. The stock backgrounds use this element.
-def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,  # noqa: C901
-                      productstyle, pagetype, pdf, ph, pw):
-    areaHeight = ph
-    areaWidth = pw
-    areaXOffset = 0
-
-    if pagetype == PageType.EmptyPage:
-        # EmptyPage is used when we're processing the inside cover / first page pair
-        # for the second time after already processing it once as SingleSide
-        if AlbumInfo.isAlbumSingleSide(productstyle):
-            # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
-            return
-        if AlbumInfo.isAlbumDoubleSide(productstyle):
-            # if we just return here, then everything looks "nice" because this inside
-            # front cover page comes out with the background of the first inner side.
-            # But "nice" is not the same as the cewe album. If you want white inside cover pages, set the ini file
-            # option to True and continue to output the page with the background that the empty page defines
-            areaWidth = areaWidth / 2
-
-    if pagetype == PageType.BackInsideCover:
-        if AlbumInfo.isAlbumSingleSide(productstyle):
-            # don't draw the inside cover pages at all (both with pagenr="0" but at page numbers 1 and pagecount-1)
-            return
-        if AlbumInfo.isAlbumDoubleSide(productstyle):
-            areaWidth = areaWidth / 2
-            areaXOffset = areaXOffset + areaWidth
-
-    if pagetype in [PageType.EmptyPage,PageType.BackInsideCover] and not getConfigurationBool(defaultConfigSection, "insideCoverWhite", "False"):
-        # return without drawing the background, thus accepting whatever was underneath. If the config option
-        # is set to true then the inside cover pages will be set to the cewe specified default, white
-        return
-
-    if backgroundTags is not None and len(backgroundTags) > 0:
-        # look for a tag that has an alignment attribute
-        for curTag in backgroundTags:
-            if curTag.get('alignment') is not None:
-                backgroundTag = curTag
-                break
-
-        if pagetype == PageType.Normal and AlbumInfo.isAlbumDoubleSide(productstyle) and backgroundTag.get('alignment') == "3":
-            areaWidth = areaWidth / 2
-            areaXOffset = areaXOffset + areaWidth
-
-        if (cewe_folder and backgroundTag is not None
-                and backgroundTag.get('designElementId') is not None):
-            bg = backgroundTag.get('designElementId')
-            # example: fading="0" hue="270" rotation="0" type="1"
-            backgroundFading = 0 # backgroundFading not used yet pylint: disable=unused-variable # noqa: F841
-            if "fading" in backgroundTag.attrib:
-                if float(backgroundTag.get('fading')) != 0:
-                    logging.warning(f"value of background attribute not supported: fading = {backgroundTag.get('fading')}")
-            backgroundHue = 0 # backgroundHue not used yet pylint: disable=unused-variable # noqa: F841
-            if "hue" in backgroundTag.attrib:
-                if float(backgroundTag.get('hue')) != 0:
-                    logging.warning(f"value of background attribute not supported: hue =  {backgroundTag.get('hue')}")
-            backgroundRotation = 0 # backgroundRotation not used yet pylint: disable=unused-variable # noqa: F841
-            if "rotation" in backgroundTag.attrib:
-                if float(backgroundTag.get('rotation')) != 0:
-                    logging.warning(f"value of background attribute not supported: rotation =  {backgroundTag.get('rotation')}")
-            backgroundType = 1 # backgroundType not used yet pylint: disable=unused-variable # noqa: F841
-            if "type" in backgroundTag.attrib:
-                if int(backgroundTag.get('type')) != 1:
-                    logging.warning(
-                        f"value of background attribute not supported: type =  {backgroundTag.get('type')}")
-            try:
-                bgPath = ""
-                bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'], backgroundLocations)
-                logging.debug(f"Reading background file: {bgPath}")
-
-                # webp doesn't work with PIL.Image.open in Anaconda 5.3.0 on Win10
-                imObj = PIL.Image.open(bgPath)
-                # create a in-memory byte array of the image file
-                im = bytes()
-                memFileHandle = BytesIO(im)
-                imObj = imObj.convert("RGB")
-                imObj.save(memFileHandle, 'jpeg')
-                memFileHandle.seek(0)
-
-                # pdf.drawImage(ImageReader(bgpath), f * ax, 0, width=f * aw, height=f * ah)
-                #   but im = ImageReader(bgpath) does not work with 1-bit images,so ...
-                pdf.drawImage(ImageReader(memFileHandle), mcf2rl * areaXOffset, 0, width=mcf2rl * areaWidth, height=mcf2rl * areaHeight)
-
-            except Exception:
-                if bgPath not in bg_notFoundDirList:
-                    logging.error("Could not find background or error when adding to pdf")
-                    logging.exception('Exception')
-                bg_notFoundDirList.add(bgPath)
-    return
 
 
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir,
@@ -439,7 +337,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir
         # therefore, even if the CEWE software offers the possibility to flip the clipart frame, cewe2pdf
         # remains unable to render it
         colorreplacements, flipX, flipY = getClipConfig(imageTag) # pylint: disable=unused-variable
-        insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha, pdf, 0, 0, False, False, None)
+        insertClipartFile(frameClipartFileName, colorreplacements, 0, areaWidth, areaHeight, frameAlpha,
+                          pdf, 0, 0, False, False, None, clipartPathList, image_res, mcf2rl)
 
     for decorationTag in area.findall('decoration'):
         processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, cornersInfo)
@@ -1447,65 +1346,6 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
     return paragraphText
 
 
-def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transx, transy, clipArtDecoration):
-    clipartID = int(clipartElement.get('designElementId'))
-
-    # designElementId 0 seems to be a special empty placeholder
-    if clipartID == 0:
-        return
-
-    # Load the clipart
-    fileName = None
-    if clipartID in clipartDict:
-        fileName = clipartDict[clipartID]
-    # verify preconditions to avoid exception loading the clip art file, which would break the page count
-    if not fileName:
-        logging.error(f"Problem getting file name for clipart ID: {clipartID}")
-        return
-
-    alpha = 255
-    if clipArtDecoration is not None:
-        alphatext = clipArtDecoration.get('alpha') # alpha attribute
-        if alphatext is not None:
-            alpha = int((float(alphatext)) * 255)
-
-    colorreplacements, flipX, flipY = getClipConfig(clipartElement)
-    insertClipartFile(fileName, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY, clipArtDecoration)
-
-
-def insertClipartFile(fileName:str, colorreplacements, transx, areaWidth, areaHeight, alpha, pdf, transy, areaRot, flipX, flipY, decoration):
-    img_transx = transx
-
-    res = image_res # use the foreground resolution setting for clipart
-
-    # 254 -> convert from mcf unit (0.1mm) to inch (1 inch = 25.4 mm)
-    new_w = int(0.5 + areaWidth * res / 254.)
-    new_h = int(0.5 + areaHeight * res / 254.)
-
-    clipart = loadClipart(fileName, clipartPathList)
-    if len(clipart.svgData) <= 0:
-        logging.error(f"Clipart file could not be loaded: {fileName}")
-        # avoiding exception in the processing below here
-        return
-
-    if len(colorreplacements) > 0:
-        clipart.replaceColors(colorreplacements)
-
-    clipart.convertToPngInBuffer(new_w, new_h, alpha, flipX, flipY)  # so we can access the pngMemFile later
-
-    # place image
-    logging.debug(f"Clipart file: {fileName}")
-    pdf.translate(img_transx, transy)
-    pdf.rotate(-areaRot)
-    pdf.drawImage(ImageReader(clipart.pngMemFile),
-        mcf2rl * -0.5 * areaWidth, mcf2rl * -0.5 * areaHeight,
-        width=mcf2rl * areaWidth, height=mcf2rl * areaHeight, mask='auto')
-    if decoration is not None:
-        processDecorationBorders(decoration, areaHeight, areaWidth, pdf)
-    pdf.rotate(areaRot)
-    pdf.translate(-img_transx, -transy)
-
-
 def processElements(additional_fonts, fotobook, imagedir,
                     productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW, lastpage):
     if AlbumInfo.isAlbumDoubleSide(productstyle) and pagetype == PageType.Normal and not oddpage and not lastpage:
@@ -1562,7 +1402,9 @@ def processElements(additional_fonts, fotobook, imagedir,
             # within clipartarea tags we need the decoration for alpha and border information
             decoration = area.find('decoration')
             for clipartElement in area.findall('clipart'):
-                processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transCx, transCy, decoration)
+                processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transCx, transCy,
+                                      decoration, clipartDict, clipartPathList, image_res, mcf2rl,
+                                      processDecorationBorders)
     return
 
 
@@ -1589,7 +1431,8 @@ def parseInputPage(fotobook, cewe_folder, mcfBaseFolder, backgroundLocations, im
     #  number for the background attribute if it is a original
     #  stock image, without filters.
     backgroundTags = page.findall('background')
-    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, productstyle, pagetype, pdf, ph, pw)
+    processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations, productstyle,
+                      pagetype, pdf, ph, pw, defaultConfigSection, mcf2rl)
 
     if AlbumInfo.isAlbumSingleSide(productstyle) and pagetype == PageType.SingleSide:
         # This must be page 1, the inside front cover, so we only do the background. Page 1

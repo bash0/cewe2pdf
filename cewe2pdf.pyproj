@@ -300,12 +300,14 @@
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img6.png" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="backgrounds.py" />
     <Compile Include="ceweInfo.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clipArt.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clipartareas.py" />
     <Compile Include="colorFrame.py" />
     <Compile Include="configUtils.py">
       <SubType>Code</SubType>
@@ -334,6 +336,7 @@
     <Compile Include="messageCounterHandler.py" />
     <Compile Include="otf.py" />
     <Compile Include="pageNumbering.py" />
+    <Compile Include="pageTypes.py" />
     <Compile Include="passepartout.py" />
     <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
