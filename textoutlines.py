@@ -30,18 +30,33 @@ def getTextOutline(text_tag, mcf_to_reportlab):
 
     width_text = outline_tag.get('width')
     color_text = outline_tag.get('color')
-    if width_text is None or color_text is None:
-        logging.warning('Ignoring incomplete text outline setting')
+    if width_text is None:
+        logging.warning('Ignoring text outline setting without a width')
         return None
 
     try:
         width_mcf = float(width_text)
-        color = ReorderColorBytesMcf2Rl(color_text)
-    except (TypeError, ValueError):
-        logging.warning(f"Ignoring invalid text outline setting color={color_text!r}, width={width_text!r}")
+    except ValueError:
+        logging.warning(f"Ignoring invalid text outline width {width_text!r}")
         return None
 
-    if width_mcf <= 0 or color.alpha == 0:
+    # CEWE writes <outline width="0"/> for normal, unoutlined text.  In that
+    # common disabled case no colour is stored, and no warning is appropriate.
+    if width_mcf <= 0:
+        return None
+
+    if color_text is None:
+        # CEWE also writes a positive width without a colour for text whose
+        # outline control is present but not assigned a visible colour.
+        return None
+
+    try:
+        color = ReorderColorBytesMcf2Rl(color_text)
+    except (TypeError, ValueError):
+        logging.warning(f"Ignoring invalid text outline colour {color_text!r}")
+        return None
+
+    if color.alpha == 0:
         return None
 
     return TextOutline(color, width_mcf * mcf_to_reportlab)

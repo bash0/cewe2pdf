@@ -5,8 +5,11 @@ import reportlab.lib.enums
 import reportlab.lib.styles
 from reportlab.lib.styles import ParagraphStyle
 from ceweInfo import ProductStyle
+from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from fontHandling import getAvailableFont
+from renderContext import RenderContext
+from textoutlines import TextEffectsParagraph
 
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
@@ -225,3 +228,35 @@ def getPageNumberXy(pnp, pageNumberingInfo, pdf, frameWidth, frameHeight, produc
         # can't actually happen because pageNumberingInfo checks the position
         return 0,0
     return cx,cy
+
+
+def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage,
+                  context: RenderContext):
+    """Render one configured page number on the current PDF page."""
+    if pageNumberingInfo is None or pageNumberingInfo.position == 0:
+        return
+
+    paragraphText = pageNumberingInfo.getParagraphText(pageNumber)
+    paragraph = TextEffectsParagraph(paragraphText, pageNumberingInfo.paragraphStyle)
+    paraWidth = paragraph.minWidth()
+    _, paraHeight = paragraph.wrap(1000, 1000)
+    frameWidthFiddleFactor = 3 + pageNumberingInfo.fontsize * 1.5
+    # ReportLab's paragraph width is slightly optimistic for some fonts.
+    # This long-established allowance avoids a clipped page number.
+    frameWidth = paraWidth + frameWidthFiddleFactor
+    frameHeight = paraHeight + 3
+
+    configSection = context.default_config_section
+    if configSection is not None and 'singlePageNumberPosition' in configSection:
+        position = PageNumberPosition.ToEnum(configSection['singlePageNumberPosition'].strip())
+    else:
+        position = PageNumberPosition.ORIGINAL
+
+    transx, transy = getPageNumberXy(position, pageNumberingInfo, pdf, frameWidth, frameHeight,
+                                      productStyle, oddpage)
+    pdf.translate(transx, transy)
+    frame = ColorFrame(0, 0, frameWidth, frameHeight,
+                       leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
+    frame.background = pageNumberingInfo.bgcolor
+    frame.addFromList([paragraph], pdf)
+    pdf.translate(-transx, -transy)

@@ -18,3 +18,4 @@ class RenderContext:
     default_config_section: Any
     clipart_files: dict[int, str]
     clipart_paths: tuple[str, ...]
+    page_numbering_info: Any = None
