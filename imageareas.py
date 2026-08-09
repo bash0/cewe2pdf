@@ -38,6 +38,10 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     else:
         imageTransx = transx
 
+    # The source image is first cropped in MCF coordinates, then resized for
+    # the output PDF. Decorations are applied to that final crop so masks,
+    # corners, shadows and borders all describe the visible image rather than
+    # the original photograph.
     image = autorot(image)
     imageLeft = float(imageTag.find('cutout').get('left').replace(',', '.'))
     imageTop = float(imageTag.find('cutout').get('top').replace(',', '.'))

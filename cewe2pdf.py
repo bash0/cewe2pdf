@@ -130,12 +130,17 @@ bg_res = 150  # dpi The resolution of background images will be reduced to this 
 image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # ##########
 
-# .mcf units are 0.1 mm
+# MCF coordinates are measured in 0.1 mm, while ReportLab uses points.
+# Keep this conversion at the boundary: area-rendering modules receive it in
+# RenderContext rather than each maintaining its own approximation.
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
 tempFileList = []  # we need to remove all the temporary files at the end
 
-# Note that transCx, transCy are the center of the area
+# `pages.processPages` identifies the correct MCF page element, including the
+# slightly unusual cover and paired-page rules. This callback dispatches each
+# area to its specialist renderer after translating the PDF origin to the
+# area's centre; rotation therefore behaves like it does in the Album Editor.
 def processElements(additional_fonts, fotobook, imagedir,
                     productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW,
                     lastpage, context: RenderContext, albumIndex):
@@ -271,7 +276,8 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     # RenderContext with the shared rendering resources.
     processElementsForAlbum = partial(processElements, albumIndex=albumIndex)
 
-    # generate all the requested pages
+    # `pages` owns CEWE's page/cover selection. It calls our callback for the
+    # actual areas once the canvas has been sized and the background drawn.
     processPages(setup.fotobook, setup.mcf_base_folder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
         setup.cewe_folder, setup.available_fonts, setup.background_locations, bg_notFoundDirList, renderContext,
         pageNumberingInfo, processElementsForAlbum)

@@ -206,11 +206,10 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     letterSpacing = getLetterSpacing(textFormatElement, mcf2rl)
     indentMargin = -1.0
 
-    # issue https://github.com/bash0/cewe2pdf/issues/58 - margins are not being used
-    # assume (based on empirical evidence!) that there is just one table, and collect
-    # the margin values. This "table" code will no longer be used in an mcf created with the
-    # CEWE 8.0 software, because the margin values have been moved to the textFormat element, but
-    # it is still needed for MCFs created with CEWE 7.0 and earlier, so we keep it in place.
+    # Issue https://github.com/bash0/cewe2pdf/issues/58: older MCFs store all
+    # four text margins in one wrapper table.  We assume there is only one
+    # such table. CEWE 8.0 moved these values into textFormat, but this
+    # compatibility code is still required for CEWE 7.0 and earlier albums.
     tabletmarg = tablebmarg = tablelmarg = tablermarg = 0
     table = htmlxml.find('.//body/table')
     if table is not None:

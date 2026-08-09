@@ -274,6 +274,42 @@ Example:
 ```
 
 ## Development
+
+### Overall program structure
+
+The conversion is deliberately split into a small orchestration layer and
+specialist rendering modules:
+
+1. `conversionSetup.py` opens the `.mcf` or `.mcfx` album, reads its
+   configuration, and resolves the fonts, clip art, backgrounds and
+   passepartouts needed for the run.
+2. `cewe2pdf.py` creates the ReportLab canvas and the `RenderContext`, which
+   contains shared rendering settings and resources. It then asks
+   `pages.py` to render the requested pages.
+3. `pages.py` understands CEWE's cover, inside-cover and paired-page layout.
+   For each output page it draws the background and calls back to
+   `processElements` for the page areas.
+4. The area handlers render the individual objects: `imageareas.py`,
+   `textareas.py` and `clipartareas.py`. Supporting modules handle details
+   such as borders, shadows, corners, page numbers and indexes.
+
+MCF positions and sizes are measured in tenths of a millimetre. ReportLab
+uses points, so the conversion factor is carried in `RenderContext` as
+`mcf_to_reportlab`. A page area's origin is translated to its centre before
+it is rotated, allowing the individual handlers to draw their contents around
+`(0, 0)`.
+
+The text stored in an MCF is HTML-like rather than a direct ReportLab format.
+`textareas.py` translates the useful CEWE formatting into ReportLab
+paragraphs. Small text-size adjustments may be made when ReportLab's font
+metrics would otherwise make the text overflow its CEWE frame.
+
+The project deliberately uses pixel-level regression tests. When a rendering
+change is intentional, visually verify the new PDF before replacing an
+approved PDF in a test's `previous_result_pdfs` directory.
+
+### Standalone executable
+
 To create a stand-alone compiled package, you can use
 ```
 pip install pyinstaller
