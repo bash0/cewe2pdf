@@ -80,9 +80,8 @@ from packaging.version import parse as parse_version
 from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
 from borders import processDecorationBorders
 from clipartareas import processAreaClipartTag
-from configUtils import getConfigurationBool
 from conversionSetup import prepareConversion
-from extraLoggers import mustsee, VerifyMessageCounts, printMessageCountSummaries
+from extraLoggers import VerifyMessageCounts, printMessageCountSummaries
 from imageareas import processAreaImageTag
 from pageNumbering import PageNumberingInfo
 from pageTypes import PageProcessingType

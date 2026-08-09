@@ -1,5 +1,12 @@
 """Prepare the input, configuration, and rendering resources for one conversion."""
 
+# This module deliberately gathers the many resources required for one
+# conversion into one named result.  Splitting the preparation function or its
+# dataclass purely to satisfy Pylint's default size limits would obscure that
+# relationship.  Broad catches are also intentional: the legacy configuration
+# file is optional, and malformed album input needs a user-facing error.
+# pylint: disable=bare-except,broad-exception-caught,too-many-instance-attributes,too-many-locals,too-many-statements
+
 import configparser
 import logging
 import os

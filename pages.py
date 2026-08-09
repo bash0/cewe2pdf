@@ -4,6 +4,9 @@ import logging
 from math import floor
 from typing import Callable
 
+# A failed page must be logged and the remainder of the album rendered.
+# pylint: disable=broad-exception-caught
+
 from backgrounds import processBackground
 from ceweInfo import AlbumInfo
 from pageNumbering import addPageNumber
@@ -55,10 +58,10 @@ def parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations, ima
                     pageHeight, pageWidth, lastPage, context)
 
 
-def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pageCount,
+def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pageCount,  # noqa: C901
                  pageNumbers, ceweFolder, availableFonts, backgroundLocations,
                  backgroundNotFoundDirectories, context: RenderContext,
-                 pageNumberingInfo, processElements: Callable):  # noqa: C901
+                 pageNumberingInfo, processElements: Callable):
     """Render the requested album pages, including covers and inside covers."""
 
     def isBackCover(number):

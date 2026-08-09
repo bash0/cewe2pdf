@@ -67,8 +67,8 @@ class Index(): # pylint: disable=too-many-instance-attributes
             self.indexEntries[pageNumber] = [text]
 
     def ShowIndex(self):
-        for page in self.indexEntries:
-            for text in self.indexEntries[page]:
+        for page, entries in self.indexEntries.items():
+            for text in entries:
                 print(f"{text} ... {page}")
 
     def GenerateIndexPage(self, pdf):

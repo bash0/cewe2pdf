@@ -1,5 +1,10 @@
 """Text-area rendering for CEWE books."""
 
+# CEWE text is variable HTML/XML-like input.  Individual formatting fragments
+# may be malformed, so this renderer logs and ignores the affected fragment
+# where possible instead of abandoning the complete album conversion.
+# pylint: disable=bare-except,broad-exception-caught
+
 import html
 import logging
 import re
@@ -29,8 +34,8 @@ from textoutlines import TextEffectsParagraph, getTextOutline
 from textspacing import getLetterSpacing
 
 
-def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
-                       pgno, context: RenderContext, albumIndex): # noqa: C901 (too complex)
+def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,  # noqa: C901
+                       pgno, context: RenderContext, albumIndex):
     mcf2rl = context.mcf_to_reportlab
     # note: it would be better to use proper html processing here
 
@@ -143,12 +148,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
     try:
         htmlxml = etree.XML(text_content)
-        # Log what we successfully parsed
         body = htmlxml.find('.//body')
-        if body is not None:
-            # Log all direct children of body to see structure
-            body_children = list(body)
-        else:
+        if body is None:
             logging.warning("No <body> tag found in parsed HTML!")
     except etree.XMLSyntaxError as e:
         # Log detailed error information for debugging XML parsing issues
@@ -461,7 +462,7 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
     pdf.translate(-transCx, -transCy)
 
 
-def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,
+def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901
         bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
         family, indexEntryText: Any | None, pdf, pdf_styleN, fontScaleFactor: float,
         unprocessed_children: set[Any], albumIndex) -> tuple[Any, str]:
@@ -704,7 +705,7 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
     return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentParagraphText
 
 
-def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,
+def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901
         bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
         pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> str:
     # Process <ul> (unordered list) elements - bulleted lists

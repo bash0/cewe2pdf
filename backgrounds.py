@@ -3,6 +3,10 @@
 from io import BytesIO
 import logging
 
+# Background discovery tries several optional file locations; failure in one
+# location is expected and is reported before processing continues.
+# pylint: disable=broad-exception-caught
+
 import PIL
 from reportlab.lib.utils import ImageReader
 
