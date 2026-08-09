@@ -253,7 +253,7 @@ def addPageNumber(pageNumberingInfo, pdf, pageNumber, productStyle, oddpage,
         position = PageNumberPosition.ORIGINAL
 
     transx, transy = getPageNumberXy(position, pageNumberingInfo, pdf, frameWidth, frameHeight,
-                                      productStyle, oddpage)
+        productStyle, oddpage)
     pdf.translate(transx, transy)
     frame = ColorFrame(0, 0, frameWidth, frameHeight,
                        leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)

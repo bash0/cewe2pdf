@@ -116,9 +116,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     pdf.rotate(-areaRot)
 
     frameShiftX_mcf = -(frameDeltaX_mcfunit -
-                         ((areaWidth - imageCropWidth_mcfunit) - frameDeltaX_mcfunit)) / 2
+        ((areaWidth - imageCropWidth_mcfunit) - frameDeltaX_mcfunit)) / 2
     frameShiftY_mcf = (frameDeltaY_mcfunit -
-                         ((areaHeight - imageCropHeight_mcfunit) - frameDeltaY_mcfunit)) / 2
+        ((areaHeight - imageCropHeight_mcfunit) - frameDeltaY_mcfunit)) / 2
     pdf.translate(-frameShiftX_mcf * mcf2rl, -frameShiftY_mcf * mcf2rl)
 
     for decorationTag in area.findall('decoration'):
