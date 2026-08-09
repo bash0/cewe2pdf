@@ -53,6 +53,12 @@ def localfont_dir():
 # and the optional ability to walk the structure below the provided directory
 # eg: findFilesInDir(fontdir, '*.ttf')
 def findFilesInDir(dirpath: str, glob_pat: str, ignore_case: bool = True, walk_structure: bool = False):
+    """Return matching files from readable directories below *dirpath*.
+
+    This is a best-effort discovery helper: inaccessible directories are
+    logged and skipped.  A caller which requires a particular directory must
+    validate that requirement separately.
+    """
     if not os.path.exists(dirpath):
         return []
 
@@ -67,7 +73,12 @@ def findFilesInDir(dirpath: str, glob_pat: str, ignore_case: bool = True, walk_s
 
     filelist = []
     for directory in dirnames:
-        filelist.extend(os.path.join(directory, n) for n in os.listdir(directory) if rule.match(n))
+        try:
+            filenames = os.listdir(directory)
+        except OSError as error:
+            logging.warning(f"Could not scan directory '{directory}'; skipping it: {error}")
+            continue
+        filelist.extend(os.path.join(directory, n) for n in filenames if rule.match(n))
 
     return filelist
 
