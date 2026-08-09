@@ -277,9 +277,21 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         bottomPad = 0.0
         indentMargin = 0.0
 
-    # we don't do shadowing on texts, but we could at least warn about that...
+    # We do not render shadows on text, but we can at least warn about them.
+    # The same decoration stores the opacity used when drawing its background.
+    textAreaAlpha = 1.0
     for decorationTag in area.findall('decoration'):
         warnAndIgnoreEnabledDecorationShadow(decorationTag, context)
+        alphaText = decorationTag.get('alpha')
+        if alphaText is not None:
+            try:
+                textAreaAlpha = float(alphaText)
+            except ValueError:
+                logging.warning(f"Ignoring invalid text-area alpha setting {alphaText!r}")
+            else:
+                if not 0.0 <= textAreaAlpha <= 1.0:
+                    logging.warning(f"Clamping text-area alpha setting {alphaText!r} to 0..1")
+                    textAreaAlpha = max(0.0, min(1.0, textAreaAlpha))
 
     # Get the background color. It is stored in an extra element.
     backgroundColor = None
@@ -433,7 +445,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         leftPadding=leftPad, bottomPadding=bottomPad,
         rightPadding=rightPad, topPadding=topPad,
         showBoundary=0,  # for debugging useful to set 1
-        background=backgroundColor
+        background=backgroundColor,
+        alpha=textAreaAlpha
         )
 
     # This call should produce an exception, if any of the flowables do not fit inside the frame.
