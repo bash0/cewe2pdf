@@ -22,12 +22,16 @@ class ColorFrame(Frame):
 
     def drawBackground(self, canv):
         color = toColor(self.background)
+        background_alpha = getattr(color, 'alpha', 1.0)
+        combined_alpha = background_alpha * self.alpha
 
         canv.saveState()
-        # ``setFillColor`` otherwise takes alpha from the colour object,
-        # which is normally 1.0 and would override a surrounding graphics
-        # state's transparency.  Supply CEWE's decoration alpha explicitly.
-        canv.setFillColor(color, alpha=self.alpha)
+        # CEWE can store opacity either in the #AARRGGBB background colour or
+        # separately in a decoration's alpha attribute.  ReportLab accepts
+        # only one alpha value here, so apply both sources.  In particular,
+        # passing the decoration's default 1.0 alone would discard a colour's
+        # own transparency.
+        canv.setFillColor(color, alpha=combined_alpha)
         canv.rect(
             self._x1, self._y1, self._x2 - self._x1, self._y2 - self._y1,
             stroke=0, fill=1
