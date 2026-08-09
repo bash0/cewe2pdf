@@ -300,16 +300,19 @@
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img6.png" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="backgrounds.py" />
     <Compile Include="ceweInfo.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clipArt.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clipartareas.py" />
     <Compile Include="colorFrame.py" />
     <Compile Include="configUtils.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="conversionSetup.py" />
     <Compile Include="corners.py" />
     <Compile Include="fontHandling.py">
       <SubType>Code</SubType>
@@ -320,6 +323,7 @@
     <Compile Include="extraLoggers.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="imageareas.py" />
     <Compile Include="imageExtractor.py">
       <SubType>Code</SubType>
     </Compile>
@@ -334,9 +338,11 @@
     <Compile Include="messageCounterHandler.py" />
     <Compile Include="otf.py" />
     <Compile Include="pageNumbering.py" />
+    <Compile Include="pageTypes.py" />
     <Compile Include="passepartout.py" />
     <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
+    <Compile Include="renderContext.py" />
     <Compile Include="runAllTests.py" />
     <Compile Include="shadows.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
@@ -370,7 +376,10 @@
     <Compile Include="text.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="textareas.py" />
     <Compile Include="textart.py" />
+    <Compile Include="textoutlines.py" />
+    <Compile Include="textspacing.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />
