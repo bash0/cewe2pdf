@@ -31,6 +31,7 @@ from text import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendT
                   Dequote, LeadingForExplicitLineHeight)
 from textart import handleTextArt
 from textoutlines import TextEffectsParagraph, getTextOutline
+from texttabs import getTabbedTextLine
 from textspacing import getLetterSpacing
 
 
@@ -276,9 +277,21 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         bottomPad = 0.0
         indentMargin = 0.0
 
-    # we don't do shadowing on texts, but we could at least warn about that...
+    # We do not render shadows on text, but we can at least warn about them.
+    # The same decoration stores the opacity used when drawing its background.
+    textAreaAlpha = 1.0
     for decorationTag in area.findall('decoration'):
         warnAndIgnoreEnabledDecorationShadow(decorationTag, context)
+        alphaText = decorationTag.get('alpha')
+        if alphaText is not None:
+            try:
+                textAreaAlpha = float(alphaText)
+            except ValueError:
+                logging.warning(f"Ignoring invalid text-area alpha setting {alphaText!r}")
+            else:
+                if not 0.0 <= textAreaAlpha <= 1.0:
+                    logging.warning(f"Clamping text-area alpha setting {alphaText!r} to 0..1")
+                    textAreaAlpha = max(0.0, min(1.0, textAreaAlpha))
 
     # Get the background color. It is stored in an extra element.
     backgroundColor = None
@@ -432,7 +445,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         leftPadding=leftPad, bottomPadding=bottomPad,
         rightPadding=rightPad, topPadding=topPad,
         showBoundary=0,  # for debugging useful to set 1
-        background=backgroundColor
+        background=backgroundColor,
+        alpha=textAreaAlpha
         )
 
     # This call should produce an exception, if any of the flowables do not fit inside the frame.
@@ -464,7 +478,8 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
 def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901
         bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
         family, indexEntryText: Any | None, pdf, pdf_styleN, fontScaleFactor: float,
-        unprocessed_children: set[Any], albumIndex) -> tuple[Any, str]:
+        unprocessed_children: set[Any], albumIndex,
+        available_text_width: float) -> tuple[Any, str]:
     htmlparas = body.findall(".//p")
 
     for p in htmlparas:
@@ -510,6 +525,18 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
             return usefs * finalLeadingFactor
 
         htmlspans = p.findall(".*")
+        tabbed_text_line = getTabbedTextLine(
+            p, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle,
+            fontScaleFactor, paragraphLeading(bodyfs * fontScaleFactor),
+            pdf_styleN.textOutline, pdf_styleN.letterSpacing)
+        if (tabbed_text_line is not None and
+                tabbed_text_line.wrap(available_text_width, 0)[0] <= available_text_width):
+            # ReportLab's Paragraph has no real tab stops.  TabbedTextLine is
+            # intentionally limited to simple, unwrapped paragraphs, but
+            # positions their styled runs exactly at CEWE's 8 mm tab stops.
+            pdf_flowableList.append(tabbed_text_line)
+            continue
+
         if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
             paragraphText = f'<para autoLeading="{autoLeading}">'
             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
@@ -621,13 +648,17 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
     # Keep track of recent text so we can provide informative errors.
     recentParagraphText = ''
 
+    # A direct-drawing tab line cannot wrap.  Only use it when all of its
+    # 8 mm tab stops stay inside the same usable text width as a Paragraph.
+    availableTextWidth = mcf2rl * areaWidth - leftPad - rightPad
+
     # Track all direct children of body to validate we process everything
     all_body_children = list(body)
     unprocessed_children = set(all_body_children)  # Will remove elements as we process them
 
     indexEntryText, recentParagraphText = processTextParas(pdf_flowableList, forceLeading, recentParagraphText,
         additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText, pdf, pdf_styleN,
-        fontScaleFactor, unprocessed_children, albumIndex)
+        fontScaleFactor, unprocessed_children, albumIndex, availableTextWidth)
 
     recentParagraphText = processTextUL(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts,
         body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN, fontScaleFactor, unprocessed_children)

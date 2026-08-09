@@ -7,23 +7,31 @@ from reportlab.platypus import Frame
 # pylint: disable=too-many-arguments,redefined-builtin,too-many-function-args
 
 class ColorFrame(Frame):
-    """ Extends the reportlab Frame with the ability to draw a background color. """
+    """A Frame which draws CEWE's text-area background with its opacity."""
 
     def __init__(self, x1, y1, width,height, leftPadding=6, bottomPadding=6,
             rightPadding=6, topPadding=6, id=None, showBoundary=0,
-            overlapAttachedSpace=None,_debug=None,background=None):
+            overlapAttachedSpace=None,_debug=None,background=None, alpha=1.0):
 
         Frame.__init__(self, x1, y1, width, height, leftPadding,
             bottomPadding, rightPadding, topPadding, id, showBoundary,
             overlapAttachedSpace, _debug)
 
         self.background = background
+        self.alpha = alpha
 
     def drawBackground(self, canv):
         color = toColor(self.background)
+        background_alpha = getattr(color, 'alpha', 1.0)
+        combined_alpha = background_alpha * self.alpha
 
         canv.saveState()
-        canv.setFillColor(color)
+        # CEWE can store opacity either in the #AARRGGBB background colour or
+        # separately in a decoration's alpha attribute.  ReportLab accepts
+        # only one alpha value here, so apply both sources.  In particular,
+        # passing the decoration's default 1.0 alone would discard a colour's
+        # own transparency.
+        canv.setFillColor(color, alpha=combined_alpha)
         canv.rect(
             self._x1, self._y1, self._x2 - self._x1, self._y2 - self._y1,
             stroke=0, fill=1
