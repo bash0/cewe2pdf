@@ -1,16 +1,23 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+# NumPy 2 imports this module dynamically during initialisation through OpenCV.
+# PyInstaller's normal analysis does not see that import.
+hiddenimports = ['numpy._core._exceptions']
+
 
 a = Analysis(
     ['cewe2pdf.py'],
     pathex=[],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    # cffi imports setuptools only to support legacy build-time machinery.
+    # The converter does not need it at run time, and excluding it avoids
+    # bundling setuptools' deprecated pkg_resources API.
+    excludes=['setuptools', 'pkg_resources'],
     noarchive=False,
     optimize=0,
 )
