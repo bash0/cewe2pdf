@@ -410,13 +410,16 @@ nearest canonical build available locally.
 The log can therefore look like either:
 
 ```
-cewe2pdf version 1.0; Git identification: cewe2pdf-v1.0-build-184-3-g1234567-dirty
-cewe2pdf version 1.0; Git identification: a046aed-dirty
+>>> cewe2pdf version 1.0; Git identification: cewe2pdf-v1.0-build-178-0-g844e6d0
+>>> cewe2pdf version 1.0; Git identification: cewe2pdf-v1.0-build-178-3-g844e6d0-dirty
+>>> cewe2pdf version 1.0; Git identification: a046aed-dirty
 ```
 
-The first form means that the working tree is three commits after canonical
-build 184. The second means that no matching build tag is available locally;
-`a046aed` is an abbreviated commit ID. `dirty` is a diagnostic indication that
+The first form means that the working tree is exactly at the specified build. 
+The second form means that the working tree is 3 builds later than the specified build. 
+The third means that no matching build tag is available locally;
+`a046aed` and `g844e6d0` is abbreviated commit IDs. 
+`dirty` is a diagnostic indication that
 the working tree has uncommitted changes, so it is not an approved reproducible
 build. A source archive or standalone executable normally has no `.git`
 metadata, so it logs that Git identification is unavailable.
@@ -437,11 +440,15 @@ Developers working in a fork can instead fetch the same tags from their
 
 ### Standalone executable
 
-To create a stand-alone compiled package, you can use
+To create the Windows stand-alone executable, install PyInstaller in the
+project's Python environment and build the checked-in specification file:
 ```
 pip install pyinstaller
-pyinstaller cewe2pdf.py --onefile
+python -m PyInstaller cewe2pdf.spec --clean
 ```
+The executable is written to `dist/cewe2pdf.exe`. The specification explicitly
+includes the dynamically imported OpenCV and NumPy components needed by the
+indexing code; do not replace it with a direct `--onefile` invocation.
 To run the unit-test you also need to install
 ```
 pip install pytest pikepdf
