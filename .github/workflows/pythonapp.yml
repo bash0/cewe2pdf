@@ -7,8 +7,15 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # The final step tags successful canonical-master builds.  Forks and
+    # branches still run all checks, but never create canonical build tags.
+    permissions:
+      contents: write
+
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Set up Python 3.12
       uses: actions/setup-python@v6
       with:
@@ -29,3 +36,23 @@ jobs:
         pip install pytest
         # find and run tests, capturing stdout and stderr for the log
         pytest --capture=tee-sys
+    - name: Tag successful canonical-master build
+      if: github.repository == 'bash0/cewe2pdf' && github.ref == 'refs/heads/master'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        version=$(python -c "from versionInfo import PROGRAM_VERSION; print(PROGRAM_VERSION)")
+        tag="cewe2pdf-v${version}-build-${GITHUB_RUN_NUMBER}"
+        if git rev-parse -q --verify "refs/tags/${tag}"; then
+          existing_commit=$(git rev-list -n 1 "${tag}")
+          if [ "${existing_commit}" != "${GITHUB_SHA}" ]; then
+            echo "Existing tag ${tag} identifies ${existing_commit}, not ${GITHUB_SHA}" >&2
+            exit 1
+          fi
+          echo "Tag ${tag} already identifies this build."
+          exit 0
+        fi
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git tag -a "${tag}" -m "Successful cewe2pdf build ${tag}"
+        git push origin "${tag}"

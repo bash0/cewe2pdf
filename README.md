@@ -142,7 +142,129 @@ noShadows = False
 #	root:            ERROR[2], WARNING[4], INFO[38]
 ```
 
-#### Indexing an album
+### additional_fonts.txt
+The code knows where to find the fonts delivered with the Cewe software, but if you use non-Cewe fonts then you must specify the location of those fonts. For historical reasons configuration of fonts is done with a separate (optional) configuration file, ``additional_fonts.txt``. The file should contain one line per font file or font directory to be added. Both `.ttf` or `.otf` files are read.
+
+To find a potential ``additional_fonts.txt`` the code searches, in order, the album directory, the current directory and the location of the program itself; it uses only the **first** such file found.
+
+For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place an ``additional_fonts.txt`` file with the album file, out of the way of future updates to the program repository. You can prevent the program from using fonts defined in the code repository versions of the file by providing an empty ``additional_fonts.txt`` next to your album file.
+
+Example for Windows font file and directory paths:
+```
+C:\Windows\Fonts\BOD_R.TTF
+C:\Windows\Fonts\
+```
+Example for linux font file and directory paths:
+```
+/usr/share/fonts/truetype/lato/Lato-Heavy.ttf
+/home/myusername/.local/share/fonts/
+```
+### cewe_folder.txt (deprecated)
+Go to the directory where cewe2pdf is installed and create a text file there with filename ``cewe_folder.txt``
+and use a text editor to write the installation directory of the CEWE software into the text file.
+For example, if you have the software branded for the company DM, called "dm-Fotowelt", then the file ``cewe_folder.txt`` might contain:
+```
+C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
+```
+Save the file and close it. Alternatively - indeed, preferably, if you want full functionality! - use more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``, as described below
+
+## Album files
+### .mcf
+`.mcf` is the format that Cewe has used for many years for albums, until the introduction of the newer `.mcfx` format around 2023. This is the format around which `cewe2pdf` has been developed; the file content is XML. There is always a folder `<album>_mcf-Dateien` associated with a `.mcf` file, containing the images used in the album.
+
+### .mcfx
+If your CEWE software uses `.mcfx` files for your projects, you can specify the file name directly on the command line. The `.mcfx` file format is actually an sql database containing a single `.mcf` file and the related image files. `cewe2pdf` will create a temporary directory, unpack the the `.mcfx` there, process the result, and then delete the temporary directory again 
+
+### .xmcf
+If your CEWE software uses `.xmcf` files for your projects, you can simply still use this. The `.xmcf` file format is just an archive of the `*.mcf` file, the `<album>_mcf-Dateien` folder and a few other files. Right click the `.xmcf` file and your os should give you an open to open the archive. Copy the relevant files out of it, and you should be all set for the next steps.
+
+## Feature implementations
+
+### Border decorations
+
+Borders are supported for image, text and clip-art areas. The colour, width,
+gap and the four CEWE positions (`centered`, `insideWithGap`, `outside` and
+`outsideWithGap`) are supported.
+
+For ordinary rectangular areas the historic ReportLab `Table` rendering is
+retained, partly to preserve the established regression-test output. Borders
+on objects with supported convex and bevelled image corners instead use the same shaped
+path as the image, so that the border follows the corner rather than the
+original rectangle.
+
+### Shadow decorations
+
+The CEWE angle, distance, intensity, expansion (`shadowWidthInMM`) and blur
+settings are interpreted from the MCF. Their visual effect is based on
+measurements from the album editor, rather than an official CEWE specification,
+so our shadows are a best-effort approximation.
+Image shadows use a transparent alpha silhouette of the rendered image. They
+therefore follow supported corner decorations and transparent image content.
+
+The legacy rectangular shadow renderer remains for non-image callers. Shadows
+on text areas are not implemented and produce a warning. Set `noShadows = True`
+in `cewe2pdf.ini` to suppress all shadows.
+
+### Corner decorations
+
+cewe2pdf renders the `default`, `convex`, and `bevelled` corner decorations used by the
+CEWE album editor. The `notched` and `concave` corner variants are not implemented: the
+affected corner remains square and the run logs a warning. These shapes resemble
+paper-photo-holder cut-outs and are not considered useful enough to justify the
+additional rendering complexity.
+
+### Text effects
+
+Most text settings are supported, including font family, size, bold, italic, colour.
+
+#### Line height
+
+Line height is supported. 
+
+CEWE's explicit CSS `line-height` percentage in the HTML stored in the text
+area is supported. The renderer bases the percentage on ReportLab's natural
+line box for the selected font so that 100% and larger values behave
+consistently. The editor's `textFormat` element is used for several area-wide
+settings, but is not the source of this line-height implementation.
+
+#### Outlines
+
+Text areas with a visible `<outline>` element are rendered with a fill and
+stroke. Colour and width are supported, including rotated and italic text. Outline
+is generally only useful on large text, for example banner headings. 
+
+`textFormat.hasOutline` is only an editor flag; an outline is visible only when
+the MCF also supplies a positive width and a non-transparent colour.
+
+#### Letter spacing
+
+The area-wide `textFormat.letterSpacing` setting is supported. Per-span letter
+spacing and wrapping-aware measurement are not implemented, so heavily spaced
+text near the edge of a narrow frame deserves visual checking.
+
+#### Tabs
+
+Literal tabs in a simple single line left-aligned paragraph imitate CEWE's 8 mm
+tab stops. The direct tab renderer preserves per-span font family, bold,
+italic, size, colour and underline, as well as area-wide outlines and letter
+spacing.
+
+It is not a general replacement for ReportLab paragraph layout. Paragraphs
+with line breaks, nested markup, tables, lists, non-left alignment, or text
+which would run beyond the frame fall back to the older non-breaking-space
+approximation. Tabbed text does not wrap across tab stops.
+
+The text-area background is drawn separately from the text itself. CEWE can
+store its opacity in the `#AARRGGBB` background colour and/or in a decoration
+`alpha` attribute; cewe2pdf combines both values. This preserves translucent
+text panels over a page background while leaving the text opaque.
+
+#### Text Art
+
+Text art objects are supported, but combination with backgrounds and outlines has not been tested.
+
+### Indexing an album (not available in the CEWE editor)
+
 It is possible to ask cewe2pdf to generate an index for the album, where index terms are selected using a combination of of font and font size used in a text area. The index is initially generated as a separate pdf file with black text on white background. The index pdf is used to create an index image file, a png in which the background is transparent. That png image is then merged into the album pdf, being placed on any page containing an index marker identifier.
 
 This feature may be useful in, for example, an album which represents a day-by-day record of some period of time. The headings for each day in the album can be specified in a font/fontsize combination which is not used for any other purpose in the album, and the index will then present a short day-by-day summary with page number references.
@@ -185,45 +307,6 @@ There are also margin settings for the creation of the index pdf, __pdfTopMargin
 #### Large index limitations
 The current code only handles a single index page. If there are more index terms than fit on a single page, the index pdf will be correct, but the index image will only take the first page.
 
-### additional_fonts.txt
-The code knows where to find the fonts delivered with the Cewe software, but if you use non-Cewe fonts then you must specify the location of those fonts. For historical reasons configuration of fonts is done with a separate (optional) configuration file, ``additional_fonts.txt``. The file should contain one line per font file or font directory to be added. Both `.ttf` or `.otf` files are read.
-
-To find a potential ``additional_fonts.txt`` the code searches, in order, the album directory, the current directory and the location of the program itself; it uses only the **first** such file found.
-
-For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place an ``additional_fonts.txt`` file with the album file, out of the way of future updates to the program repository. You can prevent the program from using fonts defined in the code repository versions of the file by providing an empty ``additional_fonts.txt`` next to your album file.
-
-Example for Windows font file and directory paths:
-```
-C:\Windows\Fonts\BOD_R.TTF
-C:\Windows\Fonts\
-```
-Example for linux font file and directory paths:
-```
-/usr/share/fonts/truetype/lato/Lato-Heavy.ttf
-/home/myusername/.local/share/fonts/
-```
-### cewe_folder.txt (deprecated)
-Go to the directory where cewe2pdf is installed and create a text file there with filename ``cewe_folder.txt``
-and use a text editor to write the installation directory of the CEWE software into the text file.
-For example, if you have the software branded for the company DM, called "dm-Fotowelt", then the file ``cewe_folder.txt`` might contain:
-```
-C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
-```
-Save the file and close it. Alternatively - indeed, preferably, if you want full functionality! - use more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``, as described below
-
-## Album files
-### .mcf
-`.mcf` is the format that Cewe has used for many years for albums, until the introduction of the newer `.mcfx` format around 2023. This is the format around which `cewe2pdf` has been developed; the file content is XML. There is always a folder `<album>_mcf-Dateien` associated with a `.mcf` file, containing the images used in the album.
-
-### .mcfx
-If your CEWE software uses `.mcfx` files for your projects, you can specify the file name directly on the command line. The `.mcfx` file format is actually an sql database containing a single `.mcf` file and the related image files. `cewe2pdf` will create a temporary directory, unpack the the `.mcfx` there, process the result, and then delete the temporary directory again 
-
-### .xmcf
-If your CEWE software uses `.xmcf` files for your projects, you can simply still use this. The `.xmcf` file format is just an archive of the `*.mcf` file, the `<album>_mcf-Dateien` folder and a few other files. Right click the `.xmcf` file and your os should give you an open to open the archive. Copy the relevant files out of it, and you should be all set for the next steps.
-
-### Corner decorations
-
-cewe2pdf renders the `default`, `convex`, and `bevelled` corner decorations used by the CEWE Album Editor. The `notched` and `concave` corner variants are intentionally not implemented: the affected corner remains square and the run logs a warning. These shapes resemble paper-photo-holder cut-outs and are not considered useful enough to justify the additional rendering complexity.
 
 ## Acceptable products
 The program was developed to handle CEWE photo books - photograph albums - and is absolutely **not** guaranteed to handle other products from the same editor such as calendars, cards, invitations, etc. Feeding *cewe2pdf* with one of these is at best unlikely to create the right result, and indeed is more likely to cause it to crash unpredictably.
@@ -307,6 +390,50 @@ metrics would otherwise make the text overflow its CEWE frame.
 The project deliberately uses pixel-level regression tests. When a rendering
 change is intentional, visually verify the new PDF before replacing an
 approved PDF in a test's `previous_result_pdfs` directory.
+
+### Version numbering
+
+Each conversion logs a user-facing program version and, when the source is a
+Git checkout, a Git build identification. The user-facing version is the
+manually maintained `PROGRAM_VERSION` constant in `versionInfo.py`, currently
+in `m.n` form. Incrementing `m` or `n` is intentionally a maintainer judgement,
+based on the significance of the changes being merged into `bash0/cewe2pdf`
+master.
+
+After the tests succeed for a commit pushed to canonical `bash0/cewe2pdf`
+master, the GitHub workflow creates a tag of the form
+`cewe2pdf-v<m.n>-build-<GitHub-run-number>`. Tags identify the exact tested
+commit without making an automatic commit to master. Forks and branches run the
+same checks but do not create canonical tags; fetch upstream tags to make their
+nearest canonical build available locally.
+
+The log can therefore look like either:
+
+```
+cewe2pdf version 1.0; Git identification: cewe2pdf-v1.0-build-184-3-g1234567-dirty
+cewe2pdf version 1.0; Git identification: a046aed-dirty
+```
+
+The first form means that the working tree is three commits after canonical
+build 184. The second means that no matching build tag is available locally;
+`a046aed` is an abbreviated commit ID. `dirty` is a diagnostic indication that
+the working tree has uncommitted changes, so it is not an approved reproducible
+build. A source archive or standalone executable normally has no `.git`
+metadata, so it logs that Git identification is unavailable.
+
+To reproduce an approved canonical build, clone the canonical repository,
+fetch its tags, and check out the reported build tag:
+
+```
+git clone https://github.com/bash0/cewe2pdf.git
+cd cewe2pdf
+git fetch --tags
+git checkout cewe2pdf-v1.0-build-184
+```
+
+This gives the exact source commit which passed the canonical test workflow.
+Developers working in a fork can instead fetch the same tags from their
+`upstream` remote.
 
 ### Standalone executable
 

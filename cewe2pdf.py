@@ -90,6 +90,7 @@ from renderContext import RenderContext
 from textareas import processAreaTextTag
 from index import Index
 from shadows import processDecorationShadow
+from versionInfo import logVersionInformation
 
 
 # work around a breaking change in pil 10.0.0, see
@@ -207,6 +208,7 @@ def processElements(additional_fonts, fotobook, imagedir,
     return
 
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None, outputFileName=None): # noqa: C901 (too complex)
+    logVersionInformation()
     pageNumberingInfo = None
 
     # check output file is acceptable before we do any processing, which is
