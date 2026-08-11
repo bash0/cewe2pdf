@@ -23,17 +23,17 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        python -m pip install -r requirements-all.txt
     - name: Lint with flake8
       run: |
-        pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings.
         flake8 . --count --exit-zero --max-complexity=20 --max-line-length=160 --statistics
+    - name: Build standalone executable
+      run: python -m PyInstaller cewe2pdf.spec --noconfirm --clean
     - name: Test with pytest
       run: |
-        pip install pytest
         # find and run tests, capturing stdout and stderr for the log
         pytest --capture=tee-sys
     - name: Tag successful canonical-master build

@@ -57,6 +57,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # only needed when the program is frozen (i.e. compiled).
 import sys
 
+from versionInfo import getVersionInformationText, logVersionInformation
+
+# Let a user identify an executable without loading image libraries or reading
+# any album files.  argparse also knows about --version below for its help.
+if __name__ == '__main__' and len(sys.argv) == 2 and sys.argv[1] == '--version':
+    print(getVersionInformationText())
+    sys.exit(0)
+
 import logging
 import logging.config
 
@@ -90,7 +98,6 @@ from renderContext import RenderContext
 from textareas import processAreaTextTag
 from index import Index
 from shadows import processDecorationShadow
-from versionInfo import logVersionInformation
 
 
 # work around a breaking change in pil 10.0.0, see
@@ -346,6 +353,9 @@ def collectArgsAndConvert():
     parser.add_argument('--appdata-dir', dest='appData',
                         default=None,
                         help='Directory for persistent app data, eg ttf fonts converted from otf fonts')
+    parser.add_argument('--version', action='version',
+                        version=getVersionInformationText(),
+                        help='Show version and build identification, then exit')
     parser.add_argument('--outFile', dest='outFile',
                         default=None,
                         help="The name of the output file, rather than the default <inputFile>.pdf")

@@ -8,7 +8,7 @@ There are many capabilities in the Cewe album editor which are not supported by 
 
 The current tests run with albums created with the 8.0 version of the editor. We don't explicitly test that files from older versions of the editor still work (though code to handle them may still be there) so the safest bet to recreate a pdf from an old album file is surely to load it into the latest album editor and save it again.
 
-Python 3.12 is the supported development and test version. Newer Python versions may work, but are not part of the automated test baseline. We may have used features in 3.12 which mean you cannot use earlier versions.
+Python 3.12 is the supported development and test version. Newer Python versions may work, but are not part of the automated test baseline. Older versions will probably fail because of missing Python features. The code is expected to work on Windows, MacOS and Linux.
 
 You will need underlying Cairographics (<https://www.cairographics.org/>) support installed on your machine for the handling of clip art. How you get this will depend on your platform, but if you have the GTK+ toolkit installed (<https://www.gtk.org/docs/installations/>) that should do it.
 
@@ -337,8 +337,9 @@ python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
 ### Command line options
 `cewe2pdf` supports the following options, shown if you run ```python cewe2pdf.py --help```
 ```
-usage: cewe2pdf.py [-h] [--keepDoublePages] [--pages PAGES] [--tmp-dir MCFXTMPDIR] [--appdata-dir APPDATADIR]
-                   [inputFile]
+usage: cewe2pdf.py [-h] [--keepDoublePages] [--pages PAGES]
+                   [--tmp-dir MCFXTMP] [--appdata-dir APPDATA] [--version]
+                   [--outFile OUTFILE] [inputFile]
 
 Convert a photo-book from .mcf/.mcfx file format to .pdf
 
@@ -349,16 +350,50 @@ options:
   -h, --help            show this help message and exit
   --keepDoublePages     Each page in the .pdf will be a double-sided page, instead of a normal single page. (default: False)
   --pages PAGES         Page numbers to render, e.g. 1,2,4-9 (default: None, which of course processes all the pages). These refer to the inside page numbers as you see them in the album editor - the first user editable inside page is number 1. If you want the front cover, then ask for page 0. Asking for the back cover explicitly will not work!
-  --outFile OUTFILE     The name for the output file (rather than the name of the input file with the suffix .pdf added)
-  --tmp-dir MCFXTMPDIR  Directory for .mcfx file extraction (default: None)
-  --appdata-dir APPDATADIR
-                        Directory for persistent app data, eg ttf fonts converted from otf fonts (default: None)
+  --tmp-dir MCFXTMP     Directory for .mcfx file extraction (default: None)
+  --appdata-dir APPDATA
+                         Directory for persistent app data, eg ttf fonts converted from otf fonts (default: None)
+  --version             Show version and build identification, then exit
+  --outFile OUTFILE     The name of the output file, rather than the default
+                        <inputFile>.pdf (default: None)
 
 Example:
    python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
 ```
 
 ## Development
+
+### Python dependencies
+
+The project has two dependency files with distinct jobs:
+
+- `requirements.txt` is maintained by hand. It lists the direct runtime,
+  test, lint and standalone-build dependencies, with the ranges the project
+  supports.
+- `requirements-all.txt` is the generated lock file. It pins those packages
+  and all their dependencies to the exact versions which have been tested.
+  Do not edit it by hand.
+
+For a new development or test environment, install the lock file:
+
+```
+python -m pip install -r requirements-all.txt
+```
+
+GitHub Actions uses `requirements-all.txt` for linting, tests and its
+PyInstaller smoke build. Therefore, when a direct dependency is added or its
+supported range is changed in `requirements.txt`, regenerate the lock file,
+run the full tests and standalone build, and commit both files together:
+
+```
+pip-compile --allow-unsafe --output-file=requirements-all.txt requirements.txt
+```
+
+`--allow-unsafe` includes the build-time `setuptools` dependency required by
+PyInstaller. `pip-tools` is used only to maintain the lock file, rather than
+to run or build cewe2pdf. The current lock was generated with Python 3.12,
+pip 24.3.1 and pip-tools 7.5.1; use that combination in a separate tool
+environment when regenerating it.
 
 ### Overall program structure
 
@@ -395,12 +430,23 @@ approved PDF in a test's `previous_result_pdfs` directory.
 
 ### Version numbering
 
-Each conversion logs a user-facing program version and, when the source is a
-Git checkout, a Git build identification. The user-facing version is the
-manually maintained `PROGRAM_VERSION` constant in `versionInfo.py`, currently
-in `m.n` form. Incrementing `m` or `n` is intentionally a maintainer judgement,
-based on the significance of the changes being merged into `bash0/cewe2pdf`
-master.
+Each conversion logs a user-facing program version and Git build
+identification. The user-facing version is the manually maintained
+`PROGRAM_VERSION` constant in `versionInfo.py`, currently in `m.n` form.
+Incrementing `m` or `n` is intentionally a maintainer judgement, based on the
+significance of the changes being merged into `bash0/cewe2pdf` master.
+
+To display this information without converting an album, use:
+
+```
+python cewe2pdf.py --version
+```
+
+The same option is available from the standalone executable:
+
+```
+dist\cewe2pdf.exe --version
+```
 
 After the tests succeed for a commit pushed to canonical `bash0/cewe2pdf`
 master, the GitHub workflow creates a tag of the form
@@ -428,8 +474,10 @@ The third means that no matching build tag is available locally;
 `a046aed` and `g844e6d0` is abbreviated commit IDs. 
 `dirty` is a diagnostic indication that
 the working tree has uncommitted changes, so it is not an approved reproducible
-build. A source archive or standalone executable normally has no `.git`
-metadata, so it logs that Git identification is unavailable.
+build. A source archive without `.git` metadata logs that Git identification
+is unavailable. PyInstaller captures the Git description while building a
+standalone executable and bundles it, so a normally built executable retains
+the identification of its source build.
 
 To reproduce an approved canonical build, clone the canonical repository,
 fetch its tags, and check out the reported build tag:
@@ -447,20 +495,16 @@ Developers working in a fork can instead fetch the same tags from their
 
 ### Standalone executable
 
-To create the Windows stand-alone executable, install PyInstaller in the
-project's Python environment and build the checked-in specification file:
+To create the Windows stand-alone executable from a development environment
+prepared with `requirements-all.txt`, build the checked-in specification file:
 ```
-pip install pyinstaller
 python -m PyInstaller cewe2pdf.spec --clean
 ```
 The executable is written to `dist/cewe2pdf.exe`. The specification explicitly
 includes the dynamically imported OpenCV and NumPy components needed by the
-indexing code; do not replace it with a direct `--onefile` invocation.
-To run the unit-test you also need to install
-```
-pip install pytest pikepdf
-```
-You can then call pytest from the working directory or use the runAllTests.py file, or you can run the individual test files.
+indexing code; do not replace it with a direct `--onefile` invocation. You can
+run pytest from the working directory, use `runalltests.py`, or run individual
+test files.
 ### Test verification using pixel level result comparison with compare-pdf
 We have a local copy of the compare-pdf code from https://github.com/Formartha/compare-pdf. This code can be used from our automated unit test code to do pixel-by-pixel comparison of the pdf pages that have been generated with a previous (approved) version. This strategy has been implemented for several of the tests, and it is therefore important that each test has an "approved" result pdf with which any new version is compared (see below)
 

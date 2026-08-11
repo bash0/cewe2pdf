@@ -1,5 +1,25 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import subprocess
+from pathlib import Path
+
+# A frozen executable has no .git directory to inspect at run time.  Capture
+# the Git description now and bundle it as a small Python module instead.
+generatedBuildInfoDirectory = Path(SPECPATH) / 'build' / 'generatedBuildInfo'
+generatedBuildInfoDirectory.mkdir(parents=True, exist_ok=True)
+try:
+    gitDescription = subprocess.run(
+        ['git', 'describe', '--tags', '--long', '--always', '--dirty',
+         '--match', 'cewe2pdf-v*'],
+        cwd=SPECPATH,
+        check=True,
+        capture_output=True,
+        text=True).stdout.strip()
+except (FileNotFoundError, OSError, subprocess.CalledProcessError):
+    gitDescription = None
+(generatedBuildInfoDirectory / 'frozenBuildInfo.py').write_text(
+    f'FROZEN_GIT_BUILD_IDENTIFICATION = {gitDescription!r}\n', encoding='utf-8')
+
 # NumPy 2 imports this module dynamically during initialisation through OpenCV.
 # PyInstaller's normal analysis does not see that import.
 hiddenimports = ['numpy._core._exceptions']
@@ -7,7 +27,7 @@ hiddenimports = ['numpy._core._exceptions']
 
 a = Analysis(
     ['cewe2pdf.py'],
-    pathex=[],
+    pathex=[str(generatedBuildInfoDirectory)],
     binaries=[],
     datas=[],
     hiddenimports=hiddenimports,

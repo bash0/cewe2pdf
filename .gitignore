@@ -59,7 +59,6 @@ nosetests.xml
 /tests/unittest_fotobook_mcf-Dateien/folderid.xml
 /tests/unittest_fotobook_mcf-Dateien/identifier.xml
 /tests/testMcfxExtraction/tmp-dir
-/requirements-all.txt
 /tests/*/*.mcf.pdf
 /tests/*/*.mcfx.pdf
 /tests/*/*.mcf.*.pdf

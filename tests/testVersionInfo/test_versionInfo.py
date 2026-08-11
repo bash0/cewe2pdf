@@ -1,7 +1,8 @@
 from subprocess import CalledProcessError
 from unittest.mock import Mock, patch
 
-from versionInfo import PROGRAM_VERSION, getGitBuildIdentification, logVersionInformation
+from versionInfo import (PROGRAM_VERSION, getGitBuildIdentification,
+    getVersionInformationText, logVersionInformation)
 
 
 def test_get_git_build_identification_returns_description():
@@ -18,6 +19,22 @@ def test_get_git_build_identification_handles_missing_git():
 def test_get_git_build_identification_handles_non_git_directory():
     with patch("versionInfo.subprocess.run", side_effect=CalledProcessError(128, "git")):
         assert getGitBuildIdentification() is None
+
+
+def test_get_git_build_identification_uses_frozen_build_information():
+    gitBuildIdentification = "cewe2pdf-v1.0-build-178-0-g1234567"
+    with patch("versionInfo.FROZEN_GIT_BUILD_IDENTIFICATION", gitBuildIdentification):
+        with patch("versionInfo.subprocess.run") as gitDescribe:
+            assert getGitBuildIdentification() == gitBuildIdentification
+
+    gitDescribe.assert_not_called()
+
+
+def test_get_version_information_text():
+    gitBuildIdentification = "cewe2pdf-v1.0-build-178-0-g1234567"
+    with patch("versionInfo.getGitBuildIdentification", return_value=gitBuildIdentification):
+        assert getVersionInformationText() == (
+            f"cewe2pdf version {PROGRAM_VERSION}; Git identification: {gitBuildIdentification}")
 
 
 def test_log_version_information_with_git_build_identification():
@@ -43,6 +60,8 @@ def testall():
     test_get_git_build_identification_returns_description()
     test_get_git_build_identification_handles_missing_git()
     test_get_git_build_identification_handles_non_git_directory()
+    test_get_git_build_identification_uses_frozen_build_information()
+    test_get_version_information_text()
     test_log_version_information_with_git_build_identification()
     test_log_version_information_without_git_build_identification()
 
