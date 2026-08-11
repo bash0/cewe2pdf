@@ -13,6 +13,8 @@ from pathlib import Path
 import os, os.path
 import filecmp
 import logging
+import sqlite3
+import tempfile
 
 import xml.etree.ElementTree as ET
 
@@ -157,6 +159,45 @@ def test_mcfxExtraction():
     assert errorCount == 0
 
 
-if __name__ == '__main__':
-    #only executed when this file is run directly.
+def test_mcfxExtraction_withNonNumericLastModified():
+    """
+    Issue https://github.com/bash0/cewe2pdf/issues/250 shows that .mcfx files may not
+    store Files.LastModified as numeric though we don't know what else it might be. This test
+    ensures that unpackMcfx() can handle such a case without crashing and still extracts
+    the .mcf file correctly.
+    """
+    with tempfile.TemporaryDirectory() as temporaryDirectory:
+        temporaryPath = Path(temporaryDirectory)
+        mcfxPath = temporaryPath / 'non-numeric-lastmodified.mcfx'
+        outputPath = temporaryPath / 'unpacked'
+        mcfData = b'<?xml version="1.0"?><fotobook></fotobook>'
+
+        connection = sqlite3.connect(mcfxPath)
+        try:
+            connection.execute(
+                'CREATE TABLE Files (Filename TEXT, Data BLOB, LastModified BLOB)')
+            connection.execute(
+                'INSERT INTO Files VALUES (?, ?, ?)',
+                ('data.mcf', mcfData, sqlite3.Binary(b'not-a-timestamp')))
+            connection.commit()
+        finally:
+            # A sqlite3 connection context manager commits or rolls back, but does
+            # not close the database. Closing it explicitly lets TemporaryDirectory
+            # remove the .mcfx file on Windows.
+            connection.close()
+
+        unpackedFolder, extractedMcfPath = unpackMcfx(mcfxPath, outputPath)
+
+        assert unpackedFolder is None
+        assert extractedMcfPath == outputPath / 'data.mcf'
+        assert extractedMcfPath.read_bytes() == mcfData
+
+
+def runall():
+    """Run every test in this file when it is executed directly."""
     test_mcfxExtraction()
+    test_mcfxExtraction_withNonNumericLastModified()
+
+
+if __name__ == '__main__':
+    runall()
