@@ -1,5 +1,5 @@
 # This file contains code to unpack an .mfcx album to the older format
-# of an mcf file and a folder of images. An mfcx file is just a database
+# of an mcf file and a folder of images. An mcfx file is just a database
 # with a single table, Files, where each row is a filename and a blob
 # content for the file. We create a temporary directory and unpack all
 # the files to there. One of these files is the .mcf file in exactly the
@@ -25,6 +25,7 @@ def writeTofile(data, filename):
 def unpackMcfx(mcfxPath: Path, tempdirPath): # pylint: disable=too-many-statements
     mcfname = ""
     curdir = os.getcwd()
+    connection = None
 
     tempdir = None
     if tempdirPath is not None:
@@ -45,13 +46,26 @@ def unpackMcfx(mcfxPath: Path, tempdirPath): # pylint: disable=too-many-statemen
         cursor = connection.cursor()
         logging.info(r"Connected to mcfx database")
 
-        sql_fetch_blob_query = """SELECT * from Files"""
+        sql_fetch_blob_query = """SELECT Filename, Data, LastModified FROM Files"""
         cursor.execute(sql_fetch_blob_query)
         record = cursor.fetchall()
+        warnedAboutNonNumericLastModified = False
         for row in record:
             filename = row[0]
             filecontent = row[1]
-            lastchange = row[2] / 1000
+            try:
+                lastchange = float(row[2]) / 1000
+            except (TypeError, ValueError):
+                # .mcfx files are expected to use a numeric millisecond timestamp, but
+                # CEWE files seem to store something else here instead. The timestamp is
+                # only an extraction cache optimisation, so use the containing .mcfx
+                # file's time when it cannot be interpreted safely.
+                if not warnedAboutNonNumericLastModified:
+                    logging.warning(
+                        "Ignoring non-numeric Files.LastModified values in the .mcfx file; "
+                        "files will be re-extracted when needed")
+                    warnedAboutNonNumericLastModified = True
+                lastchange = mcfxMtime
             if lastchange == 0:
                 lastchange = mcfxMtime
             if filename.endswith(".mcf"):
