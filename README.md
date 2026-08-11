@@ -393,12 +393,23 @@ approved PDF in a test's `previous_result_pdfs` directory.
 
 ### Version numbering
 
-Each conversion logs a user-facing program version and, when the source is a
-Git checkout, a Git build identification. The user-facing version is the
-manually maintained `PROGRAM_VERSION` constant in `versionInfo.py`, currently
-in `m.n` form. Incrementing `m` or `n` is intentionally a maintainer judgement,
-based on the significance of the changes being merged into `bash0/cewe2pdf`
-master.
+Each conversion logs a user-facing program version and Git build
+identification. The user-facing version is the manually maintained
+`PROGRAM_VERSION` constant in `versionInfo.py`, currently in `m.n` form.
+Incrementing `m` or `n` is intentionally a maintainer judgement, based on the
+significance of the changes being merged into `bash0/cewe2pdf` master.
+
+To display this information without converting an album, use:
+
+```
+python cewe2pdf.py --version
+```
+
+The same option is available from the standalone executable:
+
+```
+dist\cewe2pdf.exe --version
+```
 
 After the tests succeed for a commit pushed to canonical `bash0/cewe2pdf`
 master, the GitHub workflow creates a tag of the form
@@ -421,8 +432,10 @@ The third means that no matching build tag is available locally;
 `a046aed` and `g844e6d0` is abbreviated commit IDs. 
 `dirty` is a diagnostic indication that
 the working tree has uncommitted changes, so it is not an approved reproducible
-build. A source archive or standalone executable normally has no `.git`
-metadata, so it logs that Git identification is unavailable.
+build. A source archive without `.git` metadata logs that Git identification
+is unavailable. PyInstaller captures the Git description while building a
+standalone executable and bundles it, so a normally built executable retains
+the identification of its source build.
 
 To reproduce an approved canonical build, clone the canonical repository,
 fetch its tags, and check out the reported build tag:
