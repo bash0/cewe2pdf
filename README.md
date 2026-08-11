@@ -8,9 +8,11 @@ There are many capabilities in the Cewe album editor which are not supported by 
 
 The current tests run with albums created with the 8.0 version of the editor. We don't explicitly test that files from older versions of the editor still work (though code to handle them may still be there) so the safest bet to recreate a pdf from an old album file is surely to load it into the latest album editor and save it again.
 
-Python 3.12 is the supported development and test version. Newer Python versions may work, but are not part of the automated test baseline.
+Python 3.12 is the supported development and test version. Newer Python versions may work, but are not part of the automated test baseline. We may have used features in 3.12 which mean you cannot use earlier versions.
 
-You will need underlying Cairographics (<https://www.cairographics.org/>) support installed on your machine for the handling of clip art. How you get this will depend on your platform, but if you have the GTK+ toolkit installed (<https://www.gtk.org/docs/installations/>) that should do it. 
+You will need underlying Cairographics (<https://www.cairographics.org/>) support installed on your machine for the handling of clip art. How you get this will depend on your platform, but if you have the GTK+ toolkit installed (<https://www.gtk.org/docs/installations/>) that should do it.
+
+In August 2026 the code was significantly rearranged into smaller files, to isolate functionality and make maintenance a little easier. Several improvements were made at the same time. The suite of pixel comparison suites was also extended. The code from cewe2pdf.py is basically still there and should be recognizable once you find the file in which it now lives. The work was done with the aid of OpenAI's Codex AI engine, which turned out to be very effective. Codex downloaded its own copy of the source structure from GitHub to the local machine, complete with tests, so that it could make its suggested changes first and run the test suite before making a final change proposal for whatever modification had been suggested.  
 
 tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf exportieren, cewe Fotobuch pdf, mcf in pdf umwandeln, aus CEW-Fotobuch ein pdf machen, cewe Fotobuch pdf
 
@@ -403,7 +405,12 @@ master.
 After the tests succeed for a commit pushed to canonical `bash0/cewe2pdf`
 master, the GitHub workflow creates a tag of the form
 `cewe2pdf-v<m.n>-build-<GitHub-run-number>`. Tags identify the exact tested
-commit without making an automatic commit to master. Forks and branches run the
+commit without making an automatic commit to master. They can be seen in the GitHub web 
+interface on the code tab:
+
+<img width="382" height="420" alt="image" src="https://github.com/user-attachments/assets/a512c662-dc21-4ad1-99d2-229c25f71894" />
+
+Forks and branches run the
 same checks but do not create canonical tags; fetch upstream tags to make their
 nearest canonical build available locally.
 
