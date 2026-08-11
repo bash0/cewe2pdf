@@ -335,8 +335,9 @@ python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
 ### Command line options
 `cewe2pdf` supports the following options, shown if you run ```python cewe2pdf.py --help```
 ```
-usage: cewe2pdf.py [-h] [--keepDoublePages] [--pages PAGES] [--tmp-dir MCFXTMPDIR] [--appdata-dir APPDATADIR]
-                   [inputFile]
+usage: cewe2pdf.py [-h] [--keepDoublePages] [--pages PAGES]
+                   [--tmp-dir MCFXTMP] [--appdata-dir APPDATA] [--version]
+                   [--outFile OUTFILE] [inputFile]
 
 Convert a photo-book from .mcf/.mcfx file format to .pdf
 
@@ -347,10 +348,12 @@ options:
   -h, --help            show this help message and exit
   --keepDoublePages     Each page in the .pdf will be a double-sided page, instead of a normal single page. (default: False)
   --pages PAGES         Page numbers to render, e.g. 1,2,4-9 (default: None, which of course processes all the pages). These refer to the inside page numbers as you see them in the album editor - the first user editable inside page is number 1. If you want the front cover, then ask for page 0. Asking for the back cover explicitly will not work!
-  --outFile OUTFILE     The name for the output file (rather than the name of the input file with the suffix .pdf added)
-  --tmp-dir MCFXTMPDIR  Directory for .mcfx file extraction (default: None)
-  --appdata-dir APPDATADIR
-                        Directory for persistent app data, eg ttf fonts converted from otf fonts (default: None)
+  --tmp-dir MCFXTMP     Directory for .mcfx file extraction (default: None)
+  --appdata-dir APPDATA
+                         Directory for persistent app data, eg ttf fonts converted from otf fonts (default: None)
+  --version             Show version and build identification, then exit
+  --outFile OUTFILE     The name of the output file, rather than the default
+                        <inputFile>.pdf (default: None)
 
 Example:
    python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
