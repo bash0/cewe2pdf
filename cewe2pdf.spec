@@ -30,6 +30,12 @@ hiddenimports = ['numpy._core._exceptions']
 
 def findCairoDll():
     """Return the Windows Cairo DLL supplied by a GTK runtime, if present."""
+    configuredCairoDll = os.environ.get('CEWE2PDF_CAIRO_DLL')
+    if configuredCairoDll is not None:
+        cairoDllPath = Path(configuredCairoDll)
+        if cairoDllPath.is_file():
+            return cairoDllPath
+
     cairoDllName = 'libcairo-2.dll'
     cairoDllPath = shutil.which(cairoDllName)
     if cairoDllPath is not None:

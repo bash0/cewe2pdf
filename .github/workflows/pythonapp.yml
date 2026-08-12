@@ -45,14 +45,22 @@ jobs:
       with:
         python-version: 3.12
     - name: Install the Cairo runtime used by CairoSVG
+      id: msys2
       uses: msys2/setup-msys2@v2
       with:
         msystem: MINGW64
         update: true
         install: mingw-w64-x86_64-cairo
-    - name: Make Cairo available to the standalone build
+    - name: Locate Cairo for the standalone build
       shell: pwsh
-      run: echo 'C:\msys64\mingw64\bin' >> $env:GITHUB_PATH
+      env:
+        MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+      run: |
+        $cairoDll = Join-Path $env:MSYS2_LOCATION 'mingw64\bin\libcairo-2.dll'
+        if (-not (Test-Path $cairoDll)) {
+          throw "The MSYS2 Cairo DLL was not installed at $cairoDll"
+        }
+        "CEWE2PDF_CAIRO_DLL=$cairoDll" >> $env:GITHUB_ENV
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
