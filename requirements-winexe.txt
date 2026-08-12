@@ -1,0 +1,11 @@
+# Exact packages needed in addition to requirements-pinned.txt when building
+# the Windows standalone executable.  GTK/MSYS2 supplies Cairo separately on
+# the build machine; the specification bundles its required DLLs into the EXE.
+-r requirements-pinned.txt
+
+altgraph==0.17.5
+pefile==2024.8.26
+pyinstaller==6.22.0
+pyinstaller-hooks-contrib==2026.6
+pywin32-ctypes==0.2.3
+setuptools==84.0.0

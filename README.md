@@ -365,33 +365,37 @@ Example:
 
 ### Python dependencies
 
-The project has two dependency files with distinct jobs:
+The project has three dependency files with distinct jobs:
 
 - `requirements.txt` is maintained by hand. It lists the direct runtime,
-  test, lint and standalone-build dependencies, with the ranges the project
-  supports.
-- `requirements-all.txt` is the generated lock file. It pins those packages
-  and all their dependencies to the exact versions which have been tested.
-  Do not edit it by hand.
+  test and lint dependencies, with the ranges the project supports.
+- `requirements-pinned.txt` is the generated lock file for that normal Python
+  environment. It pins those packages and their dependencies to the exact
+  versions which have been tested. Do not edit it by hand.
+- `requirements-winexe.txt` is a small, exact Windows-only overlay on the
+  pinned file. It supplies PyInstaller and its dependencies for developers
+  building `cewe2pdf.exe`.
 
 For a new development or test environment, install the lock file:
 
 ```
-python -m pip install -r requirements-all.txt
+python -m pip install -r requirements-pinned.txt
 ```
 
-GitHub Actions uses `requirements-all.txt` for linting, tests and its
-PyInstaller smoke build. Therefore, when a direct dependency is added or its
-supported range is changed in `requirements.txt`, regenerate the lock file,
-run the full tests and standalone build, and commit both files together:
+GitHub Actions uses `requirements-pinned.txt` for linting and tests, and
+`requirements-winexe.txt` for its separate Windows executable build. Therefore,
+when a direct dependency is added or its supported range is changed in
+`requirements.txt`, regenerate the pinned file, run the full tests and the
+Windows executable build, and commit the related files together:
 
 ```
-pip-compile --allow-unsafe --output-file=requirements-all.txt requirements.txt
+pip-compile --output-file=requirements-pinned.txt requirements.txt
 ```
 
-`--allow-unsafe` includes the build-time `setuptools` dependency required by
-PyInstaller. `pip-tools` is used only to maintain the lock file, rather than
-to run or build cewe2pdf. The current lock was generated with Python 3.12,
+After regenerating `requirements-pinned.txt`, preserve its PyInstaller-free
+purpose: update `requirements-winexe.txt` only when a PyInstaller build
+dependency changes. `pip-tools` is used only to maintain the lock file, rather
+than to run or build cewe2pdf. The current lock was generated with Python 3.12,
 pip 24.3.1 and pip-tools 7.5.1; use that combination in a separate tool
 environment when regenerating it.
 
@@ -495,8 +499,13 @@ Developers working in a fork can instead fetch the same tags from their
 
 ### Standalone executable
 
-To create the Windows stand-alone executable from a development environment
-prepared with `requirements-all.txt`, build the checked-in specification file:
+The project does not publish executable releases. A Windows developer may build
+an executable privately for a friend after preparing an environment with
+`requirements-winexe.txt`. Cairo must be available on the build machine (the
+GTK+ toolkit/runtime is sufficient); the finished EXE bundles the required
+Cairo DLLs, so its recipient does not need GTK, Cairo, MSYS2 or Python.
+
+Build the checked-in specification file:
 ```
 python -m PyInstaller cewe2pdf.spec --clean
 ```
