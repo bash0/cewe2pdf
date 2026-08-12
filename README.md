@@ -16,66 +16,83 @@ In August 2026 the code was significantly rearranged into smaller files, to isol
 
 tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf exportieren, cewe Fotobuch pdf, mcf in pdf umwandeln, aus CEW-Fotobuch ein pdf machen, cewe Fotobuch pdf
 
-## Install - Windows
+## Install
 
-Download or clone this cewe2pdf repository into a folder of your choice.
+### 1. Obtain the repository
 
-The easiest way to start this Python script, is to install the latest python version.
-Then from the start-menu open your python promt and install the dependencies
+Clone or download this repository into a folder of your choice. The supported
+development and test interpreter is Python 3.12. The following instructions
+create an isolated Python environment so that cewe2pdf's dependencies do not
+alter the rest of your Python installation.
 
-```
-pip install packages lxml reportlab pillow pillow_heif cairosvg fonttools pyyaml
-```
+### 2. Create a Python environment
 
-If you have installed the Anaconda Python distribution, there is one catch:
-Currently, there is a problem with the pillow image library in Anaconda, that prevents it from loading .webp images on Windows.
-This will give the error:
-`"image file could not be identified because WEBP support not installed"`.
+The normal, reproducible installation uses `requirements-pinned.txt`. It pins
+the versions which the project tests in GitHub Actions. `requirements.txt` is
+the hand-maintained list of direct dependencies; it is not the file to install
+for an ordinary development or user environment.
 
-To fix this, you can do the following steps.
-
-Press Windows Start button and start the "Anaconda prompt"
-
-Make sure you have all the dependencies installed by executing:
+On Windows, using the standard Python distribution, run PowerShell in the
+repository directory:
 
 ```
-conda install lxml
-conda uninstall reportlab pillow
-pip install reportlab pillow fonttools pyyaml
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements-pinned.txt
 ```
 
-For Windows you can avoid the need to build Cairo graphics yourself by using vcpkg (https://learn.microsoft.com/en-gb/vcpkg/get_started/overview and https://vcpkg.io/en/). 
-For users just seeking a 'cairo.dll' to add to %WINDIR%\System32, you could also take a look at [this project](https://github.com/preshing/cairo-windows) for binary releases.
-
-## Install - MacOS
-
-Download the repository into a folder of your choice.
-
-Install the packages listed in `requirements.txt` into a Python environment.
-
-Install `cairo`, for example using the `brew` package manager. If you dont have `brew`installed, please do so [https://brew.sh/](https://brew.sh/). Then run
+Conda is an equally valid alternative. For example, from an Anaconda Prompt:
 
 ```
-brew install cairo
+conda create --name cewe2pdf312 python=3.12
+conda activate cewe2pdf312
+python -m pip install --upgrade pip
+python -m pip install -r requirements-pinned.txt
 ```
 
-as shown here [https://formulae.brew.sh/formula/cairo](https://formulae.brew.sh/formula/cairo).
+There is no need to mix Conda and Pip packages manually, or to apply the old
+Pillow/WebP workaround previously described here.
 
-Follow the steps outlined for Linux on linking to the software (most likely it will be installed in `/Applications`) and creating the font file. The standard directory for fonts on MacOS is `~/Library/Fonts/`.
+On macOS or Linux, create and activate a virtual environment in the repository
+directory:
 
-## Install - Linux
+```
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements-pinned.txt
+```
 
-Download the repository into a folder of your choice. Ensure the python dependencies are installed.
-On Fedora :
-```
-sudo dnf install python3-lxml python3-reportlab python-cairosvg fonttools python3-pyyaml
-```
-On Debian:
-```
-sudo apt install python3-cairosvg python3-fonttools python3-lxml python3-packaging python3-pillow python3-reportlab python3-yaml python3-opencv python3-fitz
-```
-Locate the directory where your CEWE album software is installed. You can recognize it by the many `.so` files and some subdirs like `Resources`).
-Put this directory name into a configuration file ``cewe2pdf.ini`` (or, I guess, the now deprecated ``cewe_folder.txt``)
+Use the name supplied by your platform if it calls the interpreter `python3`
+rather than `python3.12`.
+
+### 3. Install the Cairo runtime
+
+Cairo is used by CairoSVG to render CEWE clip art. It is not supplied by Pip,
+so source-code installations need a platform Cairo runtime as well as the
+Python packages above. CairoSVG is currently imported while cewe2pdf starts,
+so install the runtime even if the particular album has no clip art.
+
+- **Windows:** installing the [GTK 3 runtime/toolkit](https://www.gtk.org/docs/installations/)
+  is sufficient. Ensure its `bin` directory, containing `libcairo-2.dll`, is
+  on `PATH` when running cewe2pdf from source. Do not copy DLLs into the
+  Windows system directories.
+- **macOS:** with Homebrew, run `brew install cairo`.
+- **Debian/Ubuntu:** run `sudo apt install libcairo2`.
+- **Fedora:** run `sudo dnf install cairo`.
+
+Other distributions provide an equivalent Cairo runtime package. The private
+Windows standalone executable described below bundles the Cairo DLLs; its
+recipient does not need to install Cairo or Python.
+
+### 4. Configure the CEWE installation
+
+Locate the directory where the CEWE album software is installed. On Linux it
+can be recognised by its many `.so` files and directories such as `Resources`.
+Create a `cewe2pdf.ini` file alongside the album file and set `cewe_folder` to
+that directory. The following section describes that configuration file and
+the optional font and resource settings in detail.
 
 ## Configuration files
 
@@ -498,10 +515,17 @@ Developers working in a fork can instead fetch the same tags from their
 ### Standalone executable
 
 The project does not publish executable releases. A Windows developer may build
-an executable privately for a friend after preparing an environment with
-`requirements-winexe.txt`. Cairo must be available on the build machine (the
-GTK+ toolkit/runtime is sufficient); the finished EXE bundles the required
-Cairo DLLs, so its recipient does not need GTK, Cairo, MSYS2 or Python.
+an executable privately for a friend after preparing the normal environment
+and then installing the Windows-only overlay:
+
+```
+python -m pip install -r requirements-pinned.txt
+python -m pip install -r requirements-winexe.txt
+```
+
+Cairo must be available on the build machine (the GTK+ toolkit/runtime is
+sufficient); the finished EXE bundles the required Cairo DLLs, so its recipient
+does not need GTK, Cairo, MSYS2 or Python.
 
 Build the checked-in specification file:
 ```
