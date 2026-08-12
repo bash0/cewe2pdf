@@ -209,11 +209,9 @@ in `cewe2pdf.ini` to suppress all shadows.
 
 ### Corner decorations
 
-cewe2pdf renders the `default`, `convex`, and `bevelled` corner decorations used by the
-CEWE album editor. The `notched` and `concave` corner variants are not implemented: the
-affected corner remains square and the run logs a warning. These shapes resemble
-paper-photo-holder cut-outs and are not considered useful enough to justify the
-additional rendering complexity.
+cewe2pdf renders the `default`, `convex`, `bevelled`, `notched`, and `concave`
+corner decorations used by the CEWE album editor. Unknown corner shapes remain
+square and the run logs a warning.
 
 ### Text effects
 
