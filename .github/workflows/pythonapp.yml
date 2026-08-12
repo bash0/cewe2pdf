@@ -68,13 +68,12 @@ jobs:
     - name: Build Windows standalone executable
       run: python -m PyInstaller cewe2pdf.spec --noconfirm --clean
     - name: Smoke-test Windows executable
-      working-directory: tests/testEmptyPageOne
       run: |
-        & ..\..\dist\cewe2pdf.exe --version
+        & .\dist\cewe2pdf.exe --version
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        & ..\..\dist\cewe2pdf.exe --outFile executable-smoke.pdf test_emptyPageOne.mcf
+        & .\dist\cewe2pdf.exe --outFile tests\testEmptyPageOne\executable-smoke.pdf tests\testEmptyPageOne\test_emptyPageOne.mcf
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        if (-not (Test-Path executable-smoke.pdf)) {
+        if (-not (Test-Path tests\testEmptyPageOne\executable-smoke.pdf)) {
           throw 'The standalone executable did not create executable-smoke.pdf'
         }
 
