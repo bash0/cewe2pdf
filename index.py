@@ -2,7 +2,7 @@ import logging
 import re
 # pylint: disable=no-member
 import cv2 # the no_member warning is a false positive, cv2 is imported correctly and used in the code
-import fitz  # PyMuPDF
+import pymupdf
 import numpy as np
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
@@ -130,7 +130,7 @@ class Index(): # pylint: disable=too-many-instance-attributes
     def SaveIndexPng(self, indexPdfFileName):
         if not self.indexing:
             return None
-        doc = fitz.open(indexPdfFileName)
+        doc = pymupdf.open(indexPdfFileName)
         image = Index._convert_to_opencv(doc.load_page(0), dpi=150)
         transparent_image = Index._make_white_transparent(image)
 
@@ -211,7 +211,7 @@ class Index(): # pylint: disable=too-many-instance-attributes
         idx_height_pt = idx_height_px * (72 / dpi_y)
 
         # Load the album PDF and find the page where the user wants the index
-        albumDoc = fitz.open(albumPdfFileName)
+        albumDoc = pymupdf.open(albumPdfFileName)
         pattern = re.compile(self.indexMarkerRegex)
         page = None
         img_width = 0
@@ -226,7 +226,7 @@ class Index(): # pylint: disable=too-many-instance-attributes
                 for line in lines:
                     if pattern.search(line):  # Check regex against each line separately
                         markerFound = True
-                        # markerRect = fitz.Rect(x0, y0, x1, y1)
+                        # markerRect = pymupdf.Rect(x0, y0, x1, y1)
                         # full block rect, this needs refining if the marker is to be removed
             if not markerFound:
                 continue
@@ -236,7 +236,7 @@ class Index(): # pylint: disable=too-many-instance-attributes
             # example a heading "Contents" or "Index" or similar. Removal of the markers would
             # be something like this
             #    page.add_redact_annot(markerrect)
-            #    page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
+            #    page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
             # Look to see if the (human) album editor has added a previous version of the index
             # image which would be the case if he generates his pdf version and then takes the
             # image into the version which he plans to send for quality printing. We'll want to
@@ -287,7 +287,7 @@ class Index(): # pylint: disable=too-many-instance-attributes
         # Compute position
         x0 = (page_width - scaled_width_pt) / 2 # centered horizontally
         y0 = self.mergeTopMarginPt
-        rect = fitz.Rect(x0, y0, x0 + scaled_width_pt, y0 + scaled_height_pt)
+        rect = pymupdf.Rect(x0, y0, x0 + scaled_width_pt, y0 + scaled_height_pt)
 
         # Insert the scaled and centered image into the PDF
         page.insert_image(rect, filename=indexPngFileName, overlay=True)
@@ -298,13 +298,13 @@ class Index(): # pylint: disable=too-many-instance-attributes
     @staticmethod
     def MergeAlbumAndIndexPdf(albumPdfFileName, pagenr, indexPdfFileName):
         # Load the album PDF
-        albumDoc = fitz.open(albumPdfFileName)
-        indexDoc = fitz.open(indexPdfFileName)
+        albumDoc = pymupdf.open(albumPdfFileName)
+        indexDoc = pymupdf.open(indexPdfFileName)
         # Replace page in album, 0 indexed
         albumDoc.delete_page(pagenr)  # Remove the old page
         albumDoc.insert_pdf(indexDoc, from_page=0, to_page=0, start_at=pagenr)
         # Save the modified album PDF
-        # to original ... doc.save("input.pdf", incremental=False, encryption=fitz.PDF_ENCRYPT_NONE)
+        # to original ... doc.save("input.pdf", incremental=False, encryption=pymupdf.PDF_ENCRYPT_NONE)
         albumDoc.save(albumPdfFileName.replace(".pdf",".final.pdf"))
         albumDoc.close()
 
