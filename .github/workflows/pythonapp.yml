@@ -3,12 +3,12 @@ name: Python application
 on: [push, workflow_dispatch]
 
 jobs:
-  build:
+  python_build:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
     - name: Set up Python 3.12
@@ -35,7 +35,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
     - name: Set up Python 3.12
@@ -77,14 +77,14 @@ jobs:
 
   tag_successful_canonical_master:
 
-    needs: [build, windows_executable]
-    if: ${{ always() && needs.build.result == 'success' && needs.windows_executable.result == 'success' && github.repository == 'bash0/cewe2pdf' && github.ref == 'refs/heads/master' }}
+    needs: [python_build, windows_executable]
+    if: ${{ always() && needs.python_build.result == 'success' && needs.windows_executable.result == 'success' && github.repository == 'bash0/cewe2pdf' && github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
     - name: Set up Python 3.12
@@ -95,7 +95,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        version=$(python -c "from versionInfo import PROGRAM_VERSION; print(PROGRAM_VERSION)")
+        version=$(python -c "from programversion import PROGRAM_VERSION; print(PROGRAM_VERSION)")
         tag="cewe2pdf-v${version}-build-${GITHUB_RUN_NUMBER}"
         if git rev-parse -q --verify "refs/tags/${tag}"; then
           existing_commit=$(git rev-list -n 1 "${tag}")

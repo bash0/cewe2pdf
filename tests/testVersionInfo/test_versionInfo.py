@@ -1,8 +1,13 @@
 from subprocess import CalledProcessError
 from unittest.mock import Mock, patch
 
+from programversion import PROGRAM_VERSION as PROGRAM_VERSION_FROM_SOURCE
 from versionInfo import (PROGRAM_VERSION, getGitBuildIdentification,
     getVersionInformationText, logVersionInformation)
+
+
+def test_version_information_uses_program_version_source():
+    assert PROGRAM_VERSION == PROGRAM_VERSION_FROM_SOURCE
 
 
 def test_get_git_build_identification_returns_description():
@@ -57,6 +62,7 @@ def test_log_version_information_without_git_build_identification():
 
 
 def testall():
+    test_version_information_uses_program_version_source()
     test_get_git_build_identification_returns_description()
     test_get_git_build_identification_handles_missing_git()
     test_get_git_build_identification_handles_non_git_directory()
