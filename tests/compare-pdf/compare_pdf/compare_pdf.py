@@ -5,7 +5,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
 
-import fitz  # PyMuPDF library
+import pymupdf
 import cv2
 import numpy as np
 
@@ -17,7 +17,7 @@ class ShowDiffsStyle(Enum):
 class ComparePDF:
     def __init__(self, pdf_paths, showdiffs):
         self.pdf_paths = pdf_paths
-        self.pdf_documents = [fitz.open(path) for path in pdf_paths]
+        self.pdf_documents = [pymupdf.open(path) for path in pdf_paths]
         self.showdiffs = showdiffs
         self.logger = logging.getLogger('cewe2pdf.test')
 
