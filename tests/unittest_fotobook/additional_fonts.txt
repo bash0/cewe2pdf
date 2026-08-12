@@ -20,3 +20,7 @@
 # Apart from the document embedding rights described previously, you may not redistribute the Windows fonts.
 # You may not copy them to other computers or servers, and you may not convert them to other formats, including
 # bitmap formats, or modify them.
+
+# for testing on WSL Ubuntu on a windows machine with full windows font in place you can use these
+# /mnt/c/windows/fonts/
+# /mnt/c/Users/pete/AppData/Local/Microsoft/Windows/Fonts/
