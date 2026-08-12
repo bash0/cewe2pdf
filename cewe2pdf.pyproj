@@ -350,6 +350,7 @@
     <Compile Include="passepartout.py" />
     <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
+    <Compile Include="programversion.py" />
     <Compile Include="renderContext.py" />
     <Compile Include="runAllTests.py" />
     <Compile Include="setup.py" />

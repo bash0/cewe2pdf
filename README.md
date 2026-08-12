@@ -436,7 +436,7 @@ approved PDF in a test's `previous_result_pdfs` directory.
 
 Each conversion logs a user-facing program version and Git build
 identification. The user-facing version is the manually maintained
-`PROGRAM_VERSION` constant in `versionInfo.py`, currently in `m.n` form.
+`PROGRAM_VERSION` constant in `programversion.py`, currently in `m.n` form.
 Incrementing `m` or `n` is intentionally a maintainer judgement, based on the
 significance of the changes being merged into `bash0/cewe2pdf` master.
 
