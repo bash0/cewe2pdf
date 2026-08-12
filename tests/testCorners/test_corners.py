@@ -12,10 +12,14 @@ sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not b
 
 from datetime import datetime
 from pathlib import Path
+from xml.etree import ElementTree
+from PIL import Image
 from pikepdf import Pdf, PdfImage
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
+from corners import (CornerInfo, CornerShape, CornersInfo, applyCornerMask,
+                     getCornerInfo, hasImplementedCorners) # type: ignore
 
 from testutils import getLatestResultFile
 
@@ -67,6 +71,31 @@ def defineCommonVariables():
     yyyymmdd = datetime.today().strftime("%Y%m%d")
     return albumFolderBasename,albumBasename,inFile,yyyymmdd
 
+
+def test_recognises_unsupported_corner_shapes():
+    corners = ElementTree.fromstring(
+        '<corners><corner where="top-left" shape="concave" length="100"/>'
+        '<corner where="bottom-right" shape="notched" length="200"/></corners>')
+
+    assert getCornerInfo(corners, 'top-left') == (CornerShape.Concave, 100)
+    assert getCornerInfo(corners, 'bottom-right') == (CornerShape.Notched, 200)
+
+
+def test_renders_notched_and_concave_corner_masks():
+    notchedInfo = CornersInfo(
+        topLeft=CornerInfo(CornerShape.Notched, 25))
+    notchedImage = applyCornerMask(Image.new('RGB', (100, 100)), notchedInfo, 100)
+    assert hasImplementedCorners(notchedInfo)
+    assert notchedImage.getchannel('A').getpixel((24, 24)) == 0
+    assert notchedImage.getchannel('A').getpixel((26, 26)) == 255
+
+    concaveInfo = CornersInfo(
+        topLeft=CornerInfo(CornerShape.Concave, 25))
+    concaveImage = applyCornerMask(Image.new('RGB', (100, 100)), concaveInfo, 100)
+    assert hasImplementedCorners(concaveInfo)
+    assert concaveImage.getchannel('A').getpixel((5, 5)) == 0
+    assert concaveImage.getchannel('A').getpixel((22, 22)) == 255
+
 def test_testCorners(main=False):
     albumFolderBasename, albumBasename, inFile, yyyymmdd = defineCommonVariables()
     styleid = "S"
@@ -81,4 +110,6 @@ def test_testCorners(main=False):
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
+    test_recognises_unsupported_corner_shapes()
+    test_renders_notched_and_concave_corner_masks()
     test_testCorners(main=True)

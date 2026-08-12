@@ -1,8 +1,7 @@
 """Corner-decoration parsing and geometry helpers.
 
-CEWE's convex and bevelled corner decorations are rendered. Its notched and
-concave variants are intentionally not implemented: cewe2pdf logs a warning
-and leaves those corners square.
+CEWE's default, convex, bevelled, notched, and concave corner decorations are
+rendered. Unknown shapes are left square and produce a warning.
 """
 
 import logging
@@ -16,6 +15,7 @@ class CornerShape(Enum):
     Default = "default"
     Convex = "convex"
     Notched = "notched"
+    Concave = "concave"
     Bevelled = "bevelled"
     Unknown = "unknown"
 
@@ -72,7 +72,7 @@ def getCornersInfo(area):
 def buildCornerPath(pdf, left, bottom, width, height, mcf2rl,
                     cornersInfo=None, radiusAdjustment=0):
     """
-    Build a PDF path for a rectangle with optional convex or bevelled corners.
+    Build a PDF path for a rectangle with optional decorated corners.
 
     radiusAdjustment expands or contracts the outline, for example when a
     border is inside or outside the image area.
@@ -120,6 +120,14 @@ def buildCornerPath(pdf, left, bottom, width, height, mcf2rl,
                      right, bottom + radius)
     elif bottomRightShape == CornerShape.Bevelled:
         path.lineTo(right, bottom + bottomRightRadius)
+    elif bottomRightShape == CornerShape.Notched:
+        path.lineTo(right - bottomRightRadius, bottom + bottomRightRadius)
+        path.lineTo(right, bottom + bottomRightRadius)
+    elif bottomRightShape == CornerShape.Concave:
+        radius = bottomRightRadius
+        path.curveTo(right - radius, bottom + kappa * radius,
+                     right - kappa * radius, bottom + radius,
+                     right, bottom + radius)
     else:
         path.lineTo(right, bottom)
 
@@ -131,6 +139,14 @@ def buildCornerPath(pdf, left, bottom, width, height, mcf2rl,
                      right - radius, top)
     elif topRightShape == CornerShape.Bevelled:
         path.lineTo(right - topRightRadius, top)
+    elif topRightShape == CornerShape.Notched:
+        path.lineTo(right - topRightRadius, top - topRightRadius)
+        path.lineTo(right - topRightRadius, top)
+    elif topRightShape == CornerShape.Concave:
+        radius = topRightRadius
+        path.curveTo(right - kappa * radius, top - radius,
+                     right - radius, top - kappa * radius,
+                     right - radius, top)
     else:
         path.lineTo(right, top)
 
@@ -142,6 +158,14 @@ def buildCornerPath(pdf, left, bottom, width, height, mcf2rl,
                      left, top - radius)
     elif topLeftShape == CornerShape.Bevelled:
         path.lineTo(left, top - topLeftRadius)
+    elif topLeftShape == CornerShape.Notched:
+        path.lineTo(left + topLeftRadius, top - topLeftRadius)
+        path.lineTo(left, top - topLeftRadius)
+    elif topLeftShape == CornerShape.Concave:
+        radius = topLeftRadius
+        path.curveTo(left + radius, top - kappa * radius,
+                     left + kappa * radius, top - radius,
+                     left, top - radius)
     else:
         path.lineTo(left, top)
 
@@ -153,6 +177,14 @@ def buildCornerPath(pdf, left, bottom, width, height, mcf2rl,
                      left + radius, bottom)
     elif bottomLeftShape == CornerShape.Bevelled:
         path.lineTo(left + bottomLeftRadius, bottom)
+    elif bottomLeftShape == CornerShape.Notched:
+        path.lineTo(left + bottomLeftRadius, bottom + bottomLeftRadius)
+        path.lineTo(left + bottomLeftRadius, bottom)
+    elif bottomLeftShape == CornerShape.Concave:
+        radius = bottomLeftRadius
+        path.curveTo(left + kappa * radius, bottom + radius,
+                     left + radius, bottom + kappa * radius,
+                     left + radius, bottom)
     else:
         path.lineTo(left, bottom)
 
@@ -170,13 +202,14 @@ def hasImplementedCorners(cornersInfo):
             cornersInfo.bottomRight):
         if (cornerInfo.length_mcf > 0
                 and cornerInfo.shape in (
-                    CornerShape.Convex, CornerShape.Bevelled)):
+                    CornerShape.Convex, CornerShape.Bevelled,
+                    CornerShape.Notched, CornerShape.Concave)):
             return True
     return False
 
 
 def applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit):
-    """Apply convex and bevelled corner masks; warn for unimplemented shapes."""
+    """Apply corner masks; warn for shapes not known to the converter."""
     def getCornerRadius_px(cornerInfo):
         if cornerInfo.shape == CornerShape.Default:
             return 0
@@ -217,6 +250,11 @@ def applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit):
                           start=180, end=270, fill=255)
         elif cornerInfo.shape == CornerShape.Bevelled:
             draw.polygon([(0, 0), (radius, 0), (0, radius)], fill=0)
+        elif cornerInfo.shape == CornerShape.Notched:
+            draw.rectangle((0, 0, radius, radius), fill=0)
+        elif cornerInfo.shape == CornerShape.Concave:
+            draw.pieslice((-radius, -radius, radius, radius),
+                          start=0, end=90, fill=0)
         else:
             warnUnimplemented(cornerInfo, 'top-left')
 
@@ -230,6 +268,11 @@ def applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit):
         elif cornerInfo.shape == CornerShape.Bevelled:
             draw.polygon([(width - radius, 0), (width, 0), (width, radius)],
                          fill=0)
+        elif cornerInfo.shape == CornerShape.Notched:
+            draw.rectangle((width - radius, 0, width, radius), fill=0)
+        elif cornerInfo.shape == CornerShape.Concave:
+            draw.pieslice((width - radius, -radius, width + radius, radius),
+                          start=90, end=180, fill=0)
         else:
             warnUnimplemented(cornerInfo, 'top-right')
 
@@ -243,6 +286,11 @@ def applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit):
         elif cornerInfo.shape == CornerShape.Bevelled:
             draw.polygon([(0, height - radius), (0, height),
                           (radius, height)], fill=0)
+        elif cornerInfo.shape == CornerShape.Notched:
+            draw.rectangle((0, height - radius, radius, height), fill=0)
+        elif cornerInfo.shape == CornerShape.Concave:
+            draw.pieslice((-radius, height - radius, radius, height + radius),
+                          start=270, end=360, fill=0)
         else:
             warnUnimplemented(cornerInfo, 'bottom-left')
 
@@ -257,6 +305,13 @@ def applyCornerMask(im, cornersInfo, imgCropWidth_mcfunit):
         elif cornerInfo.shape == CornerShape.Bevelled:
             draw.polygon([(width - radius, height), (width, height),
                           (width, height - radius)], fill=0)
+        elif cornerInfo.shape == CornerShape.Notched:
+            draw.rectangle((width - radius, height - radius, width, height),
+                           fill=0)
+        elif cornerInfo.shape == CornerShape.Concave:
+            draw.pieslice((width - radius, height - radius,
+                           width + radius, height + radius),
+                          start=180, end=270, fill=0)
         else:
             warnUnimplemented(cornerInfo, 'bottom-right')
 
