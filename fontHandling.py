@@ -6,14 +6,13 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 from ceweInfo import CeweInfo
+from conversionState import ConversionState
 from extraLoggers import mustsee, configlogger
 from otf import getTtfsFromOtfs
 from pathutils import localfont_dir, findFileInDirs, findFilesInDir
 
-fontSubstitutions = list[str]() # used to avoid repeated messages
-
-
-def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder): # pylint: disable=too-many-statements
+def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder,
+                         state: ConversionState): # pylint: disable=too-many-statements
     ttfFiles = []
     fontDirs = []
     fontsToRegister = {}
@@ -95,7 +94,7 @@ def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder
     #  but ignoring any family name which was registered explicitly from configuration
     registerFontFamilies(familiesToRegister, explicitlyRegisteredFamilyNames)
 
-    loadMissingFontSubstitutions(configSection, fontsToRegister)
+    loadMissingFontSubstitutions(configSection, fontsToRegister, state)
 
     logging.info("Ended font registration")
 
@@ -293,7 +292,7 @@ def registerFontFamilies(fontFamilies, explicitlyRegisteredFamilyNames):
 
 # if a font is missing when we need it then we'll try to find an
 # alternative from this table
-missingFontSubstitutions = {
+DEFAULT_MISSING_FONT_SUBSTITUTIONS = {
     "Arial": "Liberation Sans Narrow",
     "Arial Narrow": "Liberation Sans Narrow",
     "Arial Rounded MT Bold": "Poppins",
@@ -311,8 +310,14 @@ missingFontSubstitutions = {
     # Segoe UI Symbol
     }
 
-def loadMissingFontSubstitutions(configSection, availableFonts):
-    global missingFontSubstitutions  # pylint: disable=global-statement
+def loadMissingFontSubstitutions(configSection, availableFonts, state: ConversionState):
+    """Build this conversion's missing-font substitution table.
+
+    The defaults remain constants in this module, but the editable mapping and
+    the record of warnings both belong to ConversionState.  That avoids a
+    previous album's INI settings leaking into a later album conversion.
+    """
+    state.missing_font_substitutions = dict(DEFAULT_MISSING_FONT_SUBSTITUTIONS)
     if configSection is None:
         return
     # build the known missing font substitutions table
@@ -325,32 +330,32 @@ def loadMissingFontSubstitutions(configSection, availableFonts):
             originalfont = definition[0].strip()
             newfont = definition[1].strip()
             if originalfont == '' and newfont == '':
-                missingFontSubstitutions = {}
+                state.missing_font_substitutions = {}
             else:
                 if originalfont != '' and newfont != '':
                     if newfont not in availableFonts:
                         configlogger.error(f"Font substitution with '{newfont}' ignored, that font has not been found")
                         continue
-                    missingFontSubstitutions[originalfont] = newfont
+                    state.missing_font_substitutions[originalfont] = newfont
                 else:
                     configlogger.error(f"Invalid font substitution '{originalfont}' : '{newfont}' ignored")
                     continue
 
 
-def getMissingFontSubstitute(family):
-    if family in missingFontSubstitutions: # IMO this is clearest so pylint: disable=consider-using-get
-        bodyfont = missingFontSubstitutions[family]
+def getMissingFontSubstitute(family, state: ConversionState):
+    if family in state.missing_font_substitutions: # IMO this is clearest so pylint: disable=consider-using-get
+        bodyfont = state.missing_font_substitutions[family]
     else:
         bodyfont = 'Helvetica'
         # reportlabs actually offers Helvetica, which is a bit strange since it is a proprietary font.
     return bodyfont
 
 
-def noteFontSubstitution(family, replacement):
+def noteFontSubstitution(family, replacement, state: ConversionState):
     fontSubstitutionPair = family + "/" + replacement
-    fontSubsNotedAlready = fontSubstitutionPair in fontSubstitutions
+    fontSubsNotedAlready = fontSubstitutionPair in state.noted_font_substitutions
     if not fontSubsNotedAlready:
-        fontSubstitutions.append(fontSubstitutionPair)
+        state.noted_font_substitutions.add(fontSubstitutionPair)
     if logging.root.isEnabledFor(logging.DEBUG):
         # At DEBUG level we log all font substitutions, making it easier to find them in the mcf
         logging.debug(f"Using font family = '{replacement}' (wanted {family})")
@@ -360,13 +365,13 @@ def noteFontSubstitution(family, replacement):
         logging.warning(f"Using font family = '{replacement}' (wanted {family})")
 
 
-def getAvailableFont(family, pdf, additional_fonts):
+def getAvailableFont(family, pdf, additional_fonts, state: ConversionState):
     reportlabFonts = pdf.getAvailableFonts()
     if family in reportlabFonts:
         bodyfont = family
     elif family in additional_fonts:
         bodyfont = family
     else:
-        bodyfont = getMissingFontSubstitute(family)
-        noteFontSubstitution(family, bodyfont)
+        bodyfont = getMissingFontSubstitute(family, state)
+        noteFontSubstitution(family, bodyfont, state)
     return bodyfont

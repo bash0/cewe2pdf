@@ -21,6 +21,5 @@ class RenderContext:
     default_config_section: Any
     clipart_files: dict[int, str]
     clipart_paths: tuple[str, ...]
-    passepartout_files: dict[int, str] | None = None
     passepartout_folders: tuple[str, ...] = ()
-    temporary_files: list[str] | None = None
+    line_scales: Any = None

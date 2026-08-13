@@ -8,6 +8,7 @@ from typing import Callable
 # pylint: disable=broad-exception-caught
 
 from backgrounds import processBackground
+from conversionState import ConversionState
 from ceweInfo import AlbumInfo
 from pageNumbering import addPageNumber
 from pageTypes import PageProcessingType
@@ -21,7 +22,7 @@ def getPageElementForPageNumber(fotobook, pageNumber):
 
 def parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations, imageDirectory, pdf,
                    page, pageNumber, pageCount, pageType, productStyle, oddPage,
-                   backgroundNotFoundDirectories, availableFonts, lastPage,
+                   state: ConversionState, availableFonts, lastPage,
                    context: RenderContext, processElements: Callable):
     """Set up one output page, draw its background, then delegate its areas."""
     logging.info(f"Side {pageNumber} ({pageType}): parsing pagenr {page.get('pagenr')} of {pageCount}")
@@ -42,7 +43,7 @@ def parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations, ima
     # The designElementIDs preceding the background element match it only for
     # an original, unfiltered stock background.
     backgroundTags = page.findall('background')
-    processBackground(backgroundTags, backgroundNotFoundDirectories, ceweFolder,
+    processBackground(backgroundTags, state, ceweFolder,
                       backgroundLocations, productStyle, pageType, pdf,
                       pageHeight, pageWidth, context)
 
@@ -60,7 +61,7 @@ def parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations, ima
 
 def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pageCount,  # noqa: C901
                  pageNumbers, ceweFolder, availableFonts, backgroundLocations,
-                 backgroundNotFoundDirectories, context: RenderContext,
+                 state: ConversionState, context: RenderContext,
                  pageNumberingInfo, processElements: Callable):
     """Render the requested album pages, including covers and inside covers."""
 
@@ -120,7 +121,7 @@ def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pag
                     lastPage = False
                     parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations,
                                    imageDirectory, pdf, realFirstPages[0], pageNumber, pageCount,
-                                   pageType, productStyle, oddPage, backgroundNotFoundDirectories,
+                                   pageType, productStyle, oddPage, state,
                                    availableFonts, lastPage, context, processElements)
                 pageType = PageProcessingType.FrontInsideCover
 
@@ -132,7 +133,7 @@ def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pag
                     pageType = PageProcessingType.RegularPage
                     parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations,
                                    imageDirectory, pdf, page, pageNumber, pageCount, pageType,
-                                   productStyle, oddPage, backgroundNotFoundDirectories,
+                                   productStyle, oddPage, state,
                                    availableFonts, lastPage, context, processElements)
                     addPageNumber(pageNumberingInfo, pdf, pageNumber,
                                   productStyle, oddPage, context)
@@ -167,7 +168,7 @@ def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pag
                     continue
                 parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations,
                                imageDirectory, pdf, page, pageNumber, pageCount, pageType,
-                               productStyle, oddPage, backgroundNotFoundDirectories,
+                               productStyle, oddPage, state,
                                availableFonts, lastPage, context, processElements)
 
                 if AlbumInfo.isAlbumProduct(productStyle) and pageType in [

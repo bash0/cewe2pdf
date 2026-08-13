@@ -24,6 +24,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.platypus import Flowable
 
 from text import CollectFontInfo, IsBold, IsItalic, IsUnderline
+from conversionState import ConversionState
 
 
 @dataclass(frozen=True)
@@ -113,7 +114,7 @@ class TabbedTextLine(Flowable):
 
 def getTabbedTextLine(paragraph, pdf, additional_fonts, body_font, body_size,
                       body_weight, body_style, font_scale_factor,
-                      leading, text_outline=None, letter_spacing=0.0):
+                      leading, state: ConversionState, text_outline=None, letter_spacing=0.0):
     """Return a direct-drawing flowable for a supported tabbed paragraph.
 
     ``None`` tells the caller to use the existing Paragraph implementation.
@@ -134,7 +135,7 @@ def getTabbedTextLine(paragraph, pdf, additional_fonts, body_font, body_size,
             return
         font, font_size, weight, item_style = CollectFontInfo(
             item, pdf, additional_fonts, body_font, body_size, body_weight,
-            font_scale_factor)
+            font_scale_factor, state)
         try:
             font_name = tt2ps(font, IsBold(weight),
                               IsItalic(item_style, body_style))

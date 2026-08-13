@@ -326,6 +326,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="conversionSetup.py" />
+    <Compile Include="conversionState.py" />
     <Compile Include="corners.py" />
     <Compile Include="fontHandling.py">
       <SubType>Code</SubType>

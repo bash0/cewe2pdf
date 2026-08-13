@@ -6,16 +6,17 @@ from reportlab.pdfbase import pdfmetrics
 
 from fontHandling import getAvailableFont
 from lineScales import LineScales
+from conversionState import ConversionState
 
 
-def CreateParagraphStyle(textcolor, font, fontsize, font_size_adjust):
+def CreateParagraphStyle(textcolor, font, fontsize, font_size_adjust, line_scales: LineScales):
     # apply a tiny adjustment to the font size used by ReportLab for measuring
     adjusted_fs = fontsize * font_size_adjust
     parastyle = ParagraphStyle(None, None,
         alignment=reportlab.lib.enums.TA_LEFT,  # will often be overridden
         fontSize=adjusted_fs,
         fontName=font,
-        leading=adjusted_fs * LineScales.lineScaleForFont(font),  # line spacing (text + leading)
+        leading=adjusted_fs * line_scales.lineScaleForFont(font),  # line spacing (text + leading)
         borderPadding=0,
         borderWidth=0,
         leftIndent=0,
@@ -26,7 +27,7 @@ def CreateParagraphStyle(textcolor, font, fontsize, font_size_adjust):
     return parastyle
 
 
-def LeadingForExplicitLineHeight(font, fontsize, line_height):
+def LeadingForExplicitLineHeight(font, fontsize, line_height, line_scales: LineScales):
     """
     Return ReportLab leading for a CSS line-height percentage.
 
@@ -36,7 +37,7 @@ def LeadingForExplicitLineHeight(font, fontsize, line_height):
     our configured leading.  Use the same natural line box as the baseline,
     then apply the requested percentage consistently.
     """
-    configured_leading = fontsize * LineScales.lineScaleForFont(font)
+    configured_leading = fontsize * line_scales.lineScaleForFont(font)
     try:
         ascent, descent = pdfmetrics.getAscentDescent(font, fontsize)
         natural_leading = ascent - descent
@@ -78,7 +79,8 @@ def Dequote(s):
     # we can not delete now, because file is opened by pdf library
 
 
-def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight, fontScaleFactor):
+def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight,
+                    fontScaleFactor, state: ConversionState):
     if item is None:
         return dfltfont, dfltfs, bweight, {}
     spanfont = dfltfont
@@ -88,7 +90,7 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight, font
                     item.get('style').lstrip(' ').rstrip(';').split('; ')])
     if 'font-family' in spanstyle:
         spanfamily = spanstyle['font-family'].strip("'")
-        spanfont = getAvailableFont(spanfamily, pdf, additional_fonts)
+        spanfont = getAvailableFont(spanfamily, pdf, additional_fonts, state)
 
     if 'font-weight' in spanstyle:
         try:
@@ -170,8 +172,9 @@ def AppendSpanEnd(paragraphText, weight, style, outerstyle):
 
 
 def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, bodyfont, bodyfs,
-        bweight, bstyle, fontScaleFactor): # pylint: disable= too-many-arguments
-    pfont, pfs, pweight, pstyle = CollectFontInfo(item, pdf, additional_fonts, bodyfont, bodyfs, bweight, fontScaleFactor)
+        bweight, bstyle, fontScaleFactor, state: ConversionState): # pylint: disable= too-many-arguments
+    pfont, pfs, pweight, pstyle = CollectFontInfo(
+        item, pdf, additional_fonts, bodyfont, bodyfs, bweight, fontScaleFactor, state)
     paragraphText = AppendSpanStart(paragraphText, pfont, pfs, pweight, pstyle, bstyle)
     if text is None:
         paragraphText = AppendText(paragraphText, "")

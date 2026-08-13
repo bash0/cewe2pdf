@@ -560,7 +560,7 @@ Tests using compare-pdf originally used the modification time to sort result pdf
 ### Cleaning up temporary files 
 Running tests during development can leave temporary output files lying around. Cleaning these away is a bit tricky, because it's important not to delete the approved result pdfs. On Windows you can locate these files with a powershell command like this:
 ```
-$pattern = '^(test|unittest)[A-Za-z0-9._-]*\.mcf\.\d{8}[DS]\.(pdf|idx\.png)$'
+$pattern = '^(test|unittest|allblack)[A-Za-z0-9._-]*\.mcf\.\d{8}[DS]\.(pdf|idx\.png)$'
 Get-ChildItem -Recurse -File |
 Where-Object {
     $_.FullName -notmatch '\\previous_result_pdfs\\' -and

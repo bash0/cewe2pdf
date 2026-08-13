@@ -65,6 +65,10 @@ if __name__ == '__main__' and len(sys.argv) == 2 and sys.argv[1] == '--version':
     print(getVersionInformationText())
     sys.exit(0)
 
+# These imports deliberately follow the lightweight --version exit above.  Do
+# not move them before it: doing so would load image libraries merely to report
+# a program version from a standalone executable.
+# pylint: disable=wrong-import-position,wrong-import-order
 import logging
 import logging.config
 
@@ -89,14 +93,15 @@ from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
 from borders import processDecorationBorders
 from clipartareas import processAreaClipartTag
 from conversionSetup import prepareConversion
-from extraLoggers import VerifyMessageCounts, printMessageCountSummaries
+from conversionState import ConversionState
+from extraLoggers import ConversionMessageCounters
 from imageareas import processAreaImageTag
 from pageNumbering import PageNumberingInfo
 from pageTypes import PageProcessingType
 from pages import getPageElementForPageNumber, processPages
 from renderContext import RenderContext
 from textareas import processAreaTextTag
-from index import Index
+from albumIndex import AlbumIndex
 from shadows import processDecorationShadow
 
 
@@ -143,15 +148,13 @@ image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # RenderContext rather than each maintaining its own approximation.
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
-tempFileList = []  # we need to remove all the temporary files at the end
-
 # `pages.processPages` identifies the correct MCF page element, including the
 # slightly unusual cover and paired-page rules. This callback dispatches each
 # area to its specialist renderer after translating the PDF origin to the
 # area's centre; rotation therefore behaves like it does in the Album Editor.
 def processElements(additional_fonts, fotobook, imagedir,
                     productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW,
-                    lastpage, context: RenderContext, albumIndex):
+                    lastpage, context: RenderContext, state: ConversionState, albumIndex: AlbumIndex):
     if AlbumInfo.isAlbumDoubleSide(productstyle) and pagetype == PageProcessingType.RegularPage and not oddpage and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
@@ -194,12 +197,13 @@ def processElements(additional_fonts, fotobook, imagedir,
         for imageTag in area.findall('imagebackground') + area.findall('image'):
             processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, productstyle,
                                 mcfBaseFolder, pagetype, pdf, pageW, transCx, transCy, context,
+                                state,
                                 processDecorationShadow, processDecorationBorders)
 
         # process text
         for textTag in area.findall('text'):
             processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
-                               pageNumber, context, albumIndex)
+                               pageNumber, context, state, albumIndex)
 
         # Clip-Art
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
@@ -215,6 +219,8 @@ def processElements(additional_fonts, fotobook, imagedir,
     return
 
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None, outputFileName=None): # noqa: C901 (too complex)
+    conversionState = ConversionState()
+    conversionState.message_counters = ConversionMessageCounters()
     logVersionInformation()
     pageNumberingInfo = None
 
@@ -225,16 +231,15 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         outputFileName = CeweInfo.getOutputFileName(albumname)
     CeweInfo.ensureAcceptableOutputFile(outputFileName)
 
-    setup = prepareConversion(albumname, mcfxTmpDir, appDataDir)
-    bg_notFoundDirList = set([]) # keep a list of background folders that are not found, to prevent multiple errors for the same cause.
+    setup = prepareConversion(albumname, mcfxTmpDir, appDataDir, conversionState)
 
     if setup.configuration is None:
-        albumIndex = Index(None)
+        albumIndex = AlbumIndex(None)
     else:
         try:
-            albumIndex = Index(setup.configuration['INDEX'])
+            albumIndex = AlbumIndex(setup.configuration['INDEX'])
         except KeyError:
-            albumIndex = Index(None)
+            albumIndex = AlbumIndex(None)
 
     # extract basic album properties
     articleConfigElement = setup.fotobook.find('articleConfig')
@@ -252,7 +257,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     imageFolder = setup.fotobook.get('imagedir')
     renderContext = RenderContext(mcf2rl, setup.image_resolution, image_quality, setup.background_resolution,
                                   pil_antialias, setup.default_config_section, setup.clipart_files,
-                                  setup.clipart_paths, None, setup.passepartout_folders, tempFileList)
+                                  setup.clipart_paths, setup.passepartout_folders, setup.line_scales)
 
     # find the correct size for the album format (if we know!) and set the product style
     pagesize = reportlab.lib.pagesizes.A4
@@ -277,18 +282,17 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         pnpos = int(pageNumberElement.get('position'))
         if pnpos != 0: # 0 implies no numbering
             # make a page number description object to use later
-            pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts)
+            pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts, conversionState)
     # processPages calls its element-rendering callback with the normal page
     # arguments plus renderContext.  partial() creates an equivalent callback
-    # which also supplies this album's index each time it is called.  The index
-    # is mutable output state, so keep it explicit rather than adding it to
-    # RenderContext with the shared rendering resources.
-    processElementsForAlbum = partial(processElements, albumIndex=albumIndex)
+    # The index is an optional text-processing feature.  Passing it explicitly
+    # keeps it outside the general rendering state used by every area type.
+    processElementsForAlbum = partial(processElements, state=conversionState, albumIndex=albumIndex)
 
     # `pages` owns CEWE's page/cover selection. It calls our callback for the
     # actual areas once the canvas has been sized and the background drawn.
     processPages(setup.fotobook, setup.mcf_base_folder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
-        setup.cewe_folder, setup.available_fonts, setup.background_locations, bg_notFoundDirList, renderContext,
+        setup.cewe_folder, setup.available_fonts, setup.background_locations, conversionState, renderContext,
         pageNumberingInfo, processElementsForAlbum)
 
     # save final output pdf
@@ -317,16 +321,17 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     objectscollected = gc.collect()
     logging.info(f'GC collected objects : {objectscollected}')
 
-    printMessageCountSummaries()
+    conversionState.message_counters.print_summary()
 
     if productstyle == ProductStyle.MemoryCard:
         print()
         print("Use Adobe Acrobat to print the memory cards. Set custom pages per sheet, 4 wide x 6 down")
         print(" and print two copies!")
 
-    VerifyMessageCounts(setup.default_config_section)
+    conversionState.message_counters.verify(setup.default_config_section)
 
-    cleanUpTempFiles(tempFileList, setup.unpacked_folder)
+    cleanUpTempFiles(conversionState.temporary_files, setup.unpacked_folder)
+    conversionState.message_counters.close()
 
     return True
 

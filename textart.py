@@ -4,6 +4,7 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
 from fontHandling import getMissingFontSubstitute
+from conversionState import ConversionState
 
 def parse_html_text(html):
     """Parses an HTML string, applying default styles from <body> while handling <p>, <span>, <i>, and <b>."""
@@ -71,7 +72,8 @@ def parse_html_text(html):
     return parsed_data, maxfontsize
 
 
-def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwise, maxfontsize):
+def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwise, maxfontsize,
+                      state: ConversionState):
     notifiedFontError = False
     cx, cy = (0,0) # center
     current_angle = start_angle_deg
@@ -95,7 +97,7 @@ def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwi
             letter_width = pdfmetrics.stringWidth(char, full_font, font_size)
         except KeyError:
             fail_font = full_font
-            full_font = getMissingFontSubstitute(font_name) # honouring any configured font substitutions
+            full_font = getMissingFontSubstitute(font_name, state) # honouring any configured font substitutions
             if not notifiedFontError: # just one message per text art
                 logging.error(f"Unregistered font in TextArt: {fail_font}, font substitution: {full_font}")
                 notifiedFontError = True
@@ -140,7 +142,7 @@ def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwi
     return angle_extent
 
 
-def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, clockwise=True):
+def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, state: ConversionState, clockwise=True):
     """
     Draws styled text along a circular arc, applying bold and italic styles dynamically.
     Parameters:
@@ -169,13 +171,13 @@ def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, clockwise=Tr
     # that we can place it symmetrically around the given start angle
     givenStartAngle = 90 - start_angle_deg if clockwise else start_angle_deg - 90
     angularExtent = processParsedText(parsed_text, None, effectiveRadius, start_angle_deg,
-        clockwise, maxfontsize)
+        clockwise, maxfontsize, state)
     centredStartAngle = givenStartAngle - (angularExtent * 0.5)
 
-    processParsedText(parsed_text, pdf, effectiveRadius, centredStartAngle, clockwise, maxfontsize)
+    processParsedText(parsed_text, pdf, effectiveRadius, centredStartAngle, clockwise, maxfontsize, state)
 
 
-def handleTextArt(pdf, radius, bodyhtml, cwtextart):
+def handleTextArt(pdf, radius, bodyhtml, cwtextart, state: ConversionState):
     if "enabled" in cwtextart[0].attrib:
         enabledAttrib = cwtextart[0].get('enabled')
         if enabledAttrib != '1':
@@ -191,4 +193,4 @@ def handleTextArt(pdf, radius, bodyhtml, cwtextart):
         directionAttrib = cwtextart[0].get('direction')
         direction = directionAttrib == '1'
 
-    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, clockwise=direction)
+    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, state, clockwise=direction)

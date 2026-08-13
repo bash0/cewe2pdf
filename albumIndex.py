@@ -10,7 +10,7 @@ from PIL import Image
 
 from configUtils import getConfigurationBool, getConfigurationFloat, getConfigurationInt
 
-class Index(): # pylint: disable=too-many-instance-attributes
+class AlbumIndex(): # pylint: disable=too-many-instance-attributes
 
     def __init__(self, configSection):
         self.indexEntries = {}
@@ -116,7 +116,7 @@ class Index(): # pylint: disable=too-many-instance-attributes
         if not self.indexing:
             return None
         # Initialize a pdf canvas for the index
-        indexFileName = Index.GetIndexName(outputFileName)
+        indexFileName = AlbumIndex.GetIndexName(outputFileName)
         pdf = canvas.Canvas(indexFileName, pagesize=pagesize)
         pdf.setTitle(albumTitle + " index")
         # Create the pdf page containing the index
@@ -131,11 +131,11 @@ class Index(): # pylint: disable=too-many-instance-attributes
         if not self.indexing:
             return None
         doc = pymupdf.open(indexPdfFileName)
-        image = Index._convert_to_opencv(doc.load_page(0), dpi=150)
-        transparent_image = Index._make_white_transparent(image)
+        image = AlbumIndex._convert_to_opencv(doc.load_page(0), dpi=150)
+        transparent_image = AlbumIndex._make_white_transparent(image)
 
         # I used to crop the image to reduce the size of the final png image
-        #   cropped_image = Index._crop_transparent_borders(transparent_image)
+        #   cropped_image = AlbumIndex._crop_transparent_borders(transparent_image)
         # but the effect was that indexes in different albums were scaled differently,
         # making it impossible to have consistent font size and margin sizes in the
         # various .ini files and get the same resulting text sizes on the merged index page.
