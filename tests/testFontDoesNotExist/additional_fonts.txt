@@ -1,2 +1,0 @@
-Arial = C:\WINDOWS\FONTS\TEST_NOT_EXIST1.TTF
-TestDoesNotExist = /usr/testFontDoesNotExist.ttf

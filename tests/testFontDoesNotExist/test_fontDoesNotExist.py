@@ -1,46 +1,47 @@
-#SPDX-License-Identifier: GPL-3.0-only
+"""Test recovery from an unavailable additional-font definition."""
 
-#author(s): BarchSteel
-#Copyright (c) 2020 by BarchSteel
-
-# This test needs to be in its own directory, so it can have it's own cwew2pdf.ini with
-# with an invalid entry to test the error handling.
-
-# test what happens when a font file does not exist.
-# if the font is missing, the page where it was used should still exist.
+import sys
+from tempfile import TemporaryDirectory
+from pathlib import Path
+from unittest.mock import patch
 
 # Bootstrap the project root so this test can also run directly.
-import sys
-from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
-from testutils import configureTestImportPaths
-configureTestImportPaths(__file__)
-import os, os.path
-from pikepdf import Pdf
+
+from fontHandling import addAdditionalFontsFromFile
+from extraLoggers import configlogger
 
 
-from cewe2pdf import convertMcf
+def test_missingAdditionalFontIsLoggedAndIgnored():
+    """A bad definition must not prevent usable definitions being collected."""
+    with TemporaryDirectory() as temporaryDirectory:
+        temporaryPath = Path(temporaryDirectory)
+        existingFontFile = temporaryPath / 'available.ttf'
+        existingFontFile.touch()
+        existingFontDirectory = temporaryPath / 'font-directory'
+        existingFontDirectory.mkdir()
+        missingFontFile = temporaryPath / 'not-there.ttf'
+        fontDefinitions = temporaryPath / 'additional_fonts.txt'
+        fontDefinitions.write_text(
+            f'# A comment is ignored\n'
+            f'Legacy definition = {missingFontFile}\n'
+            f'{existingFontFile}\n'
+            f'{existingFontDirectory}\n',
+            encoding='utf-8')
 
-def tryToBuildBook(keepDoublePages):
-    inFile = str(Path(Path.cwd(), 'tests', 'testFontDoesNotExist', 'testFontDoesNotExist.mcf'))
-    outFile = str(Path(Path.cwd(), 'tests', 'testFontDoesNotExist', 'testFontDoesNotExist.mcf.pdf'))
-    if os.path.exists(outFile) == True:
-        os.remove(outFile)
-    assert os.path.exists(outFile) == False
-    convertMcf(inFile, keepDoublePages)
-    assert Path(outFile).exists() == True
+        ttfFiles = []
+        fontDirs = []
 
-    #check the pdf contents
-    readPdf = Pdf.open(outFile)
-    numPages =  len(readPdf.pages)
-    assert numPages == 6, f"Expected 6 pages (4 normal plus 2 covers), found {numPages}"
+        with patch.object(configlogger, 'error') as logError:
+            addAdditionalFontsFromFile(fontDefinitions, ttfFiles, fontDirs)
 
-    #os.remove(outFile)
+        assert ttfFiles == [str(existingFontFile)]
+        assert fontDirs == [str(existingFontDirectory)]
+        logError.assert_called_once_with(
+            f'Custom additional font file does not exist: {missingFontFile}')
 
-def test_testFontDoesNotExist():
-    tryToBuildBook(False)
 
 if __name__ == '__main__':
-    #only executed when this file is run directly.
-    test_testFontDoesNotExist()
+    test_missingAdditionalFontIsLoggedAndIgnored()
+    print('Missing additional-font test passed.')

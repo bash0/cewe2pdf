@@ -274,9 +274,6 @@
     <Content Include="tests\testEmptyPageOne\cewe2pdf.ini" />
     <Content Include="tests\testEmptyPageOne\test_emptyPageOne.mcf" />
     <Content Include="tests\testEmptyPageOne\test_emptyPageOne_mcf-Dateien\folderid.xml" />
-    <Content Include="tests\testFontDoesNotExist\additional_fonts.txt" />
-    <Content Include="tests\testFontDoesNotExist\cewe2pdf.ini" />
-    <Content Include="tests\testFontDoesNotExist\testFontDoesNotExist.mcf" />
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction.mcf" />
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\20200306_111748.jpg" />
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\folderid.xml" />
