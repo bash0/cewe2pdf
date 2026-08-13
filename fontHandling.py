@@ -11,6 +11,33 @@ from extraLoggers import mustsee, configlogger
 from otf import getTtfsFromOtfs
 from pathutils import localfont_dir, findFileInDirs, findFilesInDir
 
+
+def addAdditionalFontsFromFile(configFontFileName, ttfFiles, fontDirs):
+    """Add usable font files and directories listed in ``additional_fonts.txt``.
+
+    A bad user-supplied entry is not fatal: report it and continue processing
+    the remaining definitions.  Keeping this small operation separate makes
+    that important behaviour directly testable without converting an album.
+    """
+    with open(configFontFileName, 'r') as fp: # pylint: disable=unspecified-encoding
+        for line in fp:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            if ' = ' in line:
+                # Old "font name = /path/to/file" format.
+                path = os.path.expandvars(line.split(' = ', 1)[1])
+            else:
+                path = os.path.expandvars(line)
+
+            if not os.path.exists(path):
+                configlogger.error(f'Custom additional font file does not exist: {path}')
+            elif os.path.isdir(path):
+                fontDirs.append(path)
+            else:
+                ttfFiles.append(path)
+
+
 def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder,
                          state: ConversionState): # pylint: disable=too-many-statements
     ttfFiles = []
@@ -34,28 +61,7 @@ def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder
         searchlocations = (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__)))
         configFontFileName = findFileInDirs('additional_fonts.txt', searchlocations)
         mustsee.info(f'Using additional font definitions from: {configFontFileName}')
-        with open(configFontFileName, 'r') as fp: # this works on all relevant platforms so pylint: disable=unspecified-encoding
-            for line in fp:
-                line = line.strip()
-                if not line:
-                    continue # ignore empty lines
-                if line.startswith("#"):
-                    continue # ignore comments
-                if line.find(" = ") != -1:
-                    # Old "font name = /path/to/file" format
-                    p = line.split(" = ", 1)
-                    path = os.path.expandvars(p[1])
-                else:
-                    path = os.path.expandvars(line)
-
-                if not os.path.exists(path):
-                    configlogger.error(f'Custom additional font file does not exist: {path}')
-                    continue
-                if os.path.isdir(path):
-                    fontDirs.append(path)
-                else:
-                    ttfFiles.append(path)
-            fp.close()
+        addAdditionalFontsFromFile(configFontFileName, ttfFiles, fontDirs)
     except ValueError: # noqa: E722. This is a locally thrown exception
         mustsee.info(f'No additional_fonts.txt found in {searchlocations}')
     except: # noqa: E722 # pylint: disable=bare-except
