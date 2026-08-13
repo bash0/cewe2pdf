@@ -90,7 +90,7 @@ from borders import processDecorationBorders
 from clipartareas import processAreaClipartTag
 from conversionSetup import prepareConversion
 from conversionState import ConversionState
-from extraLoggers import VerifyMessageCounts, printMessageCountSummaries
+from extraLoggers import ConversionMessageCounters
 from imageareas import processAreaImageTag
 from pageNumbering import PageNumberingInfo
 from pageTypes import PageProcessingType
@@ -199,7 +199,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         # process text
         for textTag in area.findall('text'):
             processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
-                               pageNumber, context, albumIndex)
+                               pageNumber, context, state, albumIndex)
 
         # Clip-Art
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
@@ -215,6 +215,8 @@ def processElements(additional_fonts, fotobook, imagedir,
     return
 
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None, outputFileName=None): # noqa: C901 (too complex)
+    conversionState = ConversionState()
+    conversionState.message_counters = ConversionMessageCounters()
     logVersionInformation()
     pageNumberingInfo = None
 
@@ -225,8 +227,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         outputFileName = CeweInfo.getOutputFileName(albumname)
     CeweInfo.ensureAcceptableOutputFile(outputFileName)
 
-    setup = prepareConversion(albumname, mcfxTmpDir, appDataDir)
-    conversionState = ConversionState()
+    setup = prepareConversion(albumname, mcfxTmpDir, appDataDir, conversionState)
 
     if setup.configuration is None:
         albumIndex = Index(None)
@@ -252,7 +253,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     imageFolder = setup.fotobook.get('imagedir')
     renderContext = RenderContext(mcf2rl, setup.image_resolution, image_quality, setup.background_resolution,
                                   pil_antialias, setup.default_config_section, setup.clipart_files,
-                                  setup.clipart_paths, setup.passepartout_folders)
+                                  setup.clipart_paths, setup.passepartout_folders, setup.line_scales)
 
     # find the correct size for the album format (if we know!) and set the product style
     pagesize = reportlab.lib.pagesizes.A4
@@ -277,7 +278,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         pnpos = int(pageNumberElement.get('position'))
         if pnpos != 0: # 0 implies no numbering
             # make a page number description object to use later
-            pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts)
+            pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts, conversionState)
     # processPages calls its element-rendering callback with the normal page
     # arguments plus renderContext.  partial() creates an equivalent callback
     # which also supplies this conversion's mutable state and its album index.
@@ -318,16 +319,17 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     objectscollected = gc.collect()
     logging.info(f'GC collected objects : {objectscollected}')
 
-    printMessageCountSummaries()
+    conversionState.message_counters.print_summary()
 
     if productstyle == ProductStyle.MemoryCard:
         print()
         print("Use Adobe Acrobat to print the memory cards. Set custom pages per sheet, 4 wide x 6 down")
         print(" and print two copies!")
 
-    VerifyMessageCounts(setup.default_config_section)
+    conversionState.message_counters.verify(setup.default_config_section)
 
     cleanUpTempFiles(conversionState.temporary_files, setup.unpacked_folder)
+    conversionState.message_counters.close()
 
     return True
 

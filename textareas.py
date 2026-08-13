@@ -21,9 +21,9 @@ from lxml import etree
 from borders import processDecorationBorders
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
+from conversionState import ConversionState
 from fontHandling import getAvailableFont
 from index import Index
-from lineScales import LineScales
 from renderContext import RenderContext
 from shadows import warnAndIgnoreEnabledDecorationShadow
 from text import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText,
@@ -36,7 +36,7 @@ from textspacing import getLetterSpacing
 
 
 def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,  # noqa: C901
-                       pgno, context: RenderContext, albumIndex):
+                       pgno, context: RenderContext, state: ConversionState, albumIndex):
     mcf2rl = context.mcf_to_reportlab
     # note: it would be better to use proper html processing here
 
@@ -194,7 +194,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     except: # noqa: E722
         bodyfs = 12
     family = bstyle['font-family'].strip("'")
-    bodyfont = getAvailableFont(family, pdf, additional_fonts)
+    bodyfont = getAvailableFont(family, pdf, additional_fonts, state)
 
     try:
         bweight = int(Dequote(bstyle['font-weight']))
@@ -262,7 +262,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     cwtextart = area.findall('decoration/cwtextart')
     if len(cwtextart) > 0:
         processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad,
-                       cwtextart, context)
+                       cwtextart, context, state)
         return
 
     pdf.translate(transCx, transCy)
@@ -322,13 +322,14 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         # But, if we encounter the text wrapping issue, we will try again.
         pdf_flowableList = []
         # set default para style in case there are no spans to set it.
-        pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
+        pdf_styleN = CreateParagraphStyle(
+            reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor, context.line_scales)
         pdf_styleN.textOutline = textOutline
         pdf_styleN.letterSpacing = letterSpacing
         textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
             processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth,
                 body, bodyfont, bodyfs, bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor,
-                context, albumIndex)
+                context, state, albumIndex)
         if not textWrapProblem or iterationsToShrinkFontWhenNecessary == 0:
             if not textWrapProblem:
                 if scaleFactor < 1.0:
@@ -377,7 +378,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
             pdf_flowableList = [] # Throw away previous layout
             # set default para style in case there are no spans to set it.
-            pdf_styleN = CreateParagraphStyle(reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor)
+            pdf_styleN = CreateParagraphStyle(
+                reportlab.lib.colors.black, bodyfont, bodyfs, scaleFactor, context.line_scales)
             pdf_styleN.textOutline = textOutline
             pdf_styleN.letterSpacing = letterSpacing
             # use forceLeading=1.0 to force minimal leading.  Even with 1.0 there is generally a bit of spare points of space
@@ -385,7 +387,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # So we still need to do some padding adjustment below.
             textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
                 processTextCore(pdf_flowableList, pdf_styleN, 1.0, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
-                bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor, context, albumIndex)
+                bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor, context, state, albumIndex)
 
             # Recalculate for the new height.
             emptySpace = originalFrameHeight - finalTotalHeight
@@ -463,14 +465,14 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
 
 def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad,
-                   cwtextart, context: RenderContext):
+                   cwtextart, context: RenderContext, state: ConversionState):
     pdf.translate(transCx, transCy)
     pdf.rotate(-areaRot)
     for decorationTag in area.findall('decoration'):
         processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, context)
     bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
     radius = topPad - leftPad # is this really what they use for the radius?
-    handleTextArt(pdf, radius, bodyhtml, cwtextart)
+    handleTextArt(pdf, radius, bodyhtml, cwtextart, state)
     pdf.rotate(areaRot)
     pdf.translate(-transCx, -transCy)
 
@@ -478,7 +480,7 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
 def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901
         bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
         family, indexEntryText: Any | None, pdf, pdf_styleN, fontScaleFactor: float,
-        unprocessed_children: set[Any], albumIndex,
+        unprocessed_children: set[Any], albumIndex, line_scales, state: ConversionState,
         available_text_width: float) -> tuple[Any, str]:
     htmlparas = body.findall(".//p")
 
@@ -509,7 +511,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                     hasExplicitLineHeight = True
                 except: # noqa: E722
                     logging.warning(f"Ignoring invalid paragraph line-height setting {pStyleAttribute}")
-        finalLeadingFactor = LineScales.lineScaleForFont(bodyfont) * pLineHeight
+        finalLeadingFactor = line_scales.lineScaleForFont(bodyfont) * pLineHeight
         # 100% is CEWE's normal layout and retains the established ReportLab
         # auto-leading behaviour.  For a user-selected percentage, however,
         # auto-leading would partly replace the requested leading with font
@@ -521,14 +523,14 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
             if forceLeading is not None:
                 return usefs * forceLeading
             if useExplicitLineHeight:
-                return LeadingForExplicitLineHeight(bodyfont, usefs, pLineHeight)
+                return LeadingForExplicitLineHeight(bodyfont, usefs, pLineHeight, line_scales)
             return usefs * finalLeadingFactor
 
         htmlspans = p.findall(".*")
         tabbed_text_line = getTabbedTextLine(
             p, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle,
             fontScaleFactor, paragraphLeading(bodyfs * fontScaleFactor),
-            pdf_styleN.textOutline, pdf_styleN.letterSpacing)
+            state, pdf_styleN.textOutline, pdf_styleN.letterSpacing)
         if (tabbed_text_line is not None and
                 tabbed_text_line.wrap(available_text_width, 0)[0] <= available_text_width):
             # ReportLab's Paragraph has no real tab stops.  TabbedTextLine is
@@ -540,7 +542,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
         if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
             paragraphText = f'<para autoLeading="{autoLeading}">'
             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
-                additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
+                additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
             paragraphText += '</para>'
             usefs = maxfs if maxfs > 0 else bodyfs
             pdf_styleN.leading = paragraphLeading(usefs) # line spacing (text + leading)
@@ -557,7 +559,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
             # the first span just continues that leading text
             if p.text is not None:
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
-                    additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
+                    additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
                 usefs = maxfs if maxfs > 0 else bodyfs
                 pdf_styleN.leading = paragraphLeading(usefs)  # line spacing (text + leading)
 
@@ -574,12 +576,12 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                     # start a new pdf para in the style of the para and add the tail text of this br item
                     paragraphText = f'<para autoLeading="{autoLeading}">'
                     paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, p, pdf,
-                        additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
+                        additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
 
                 elif item.tag == 'span':
                     span = item
                     spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additional_fonts, bodyfont,
-                        bodyfs, bweight, fontScaleFactor)
+                        bodyfs, bweight, fontScaleFactor, state)
 
                     maxfs = max(maxfs, spanfs)
 
@@ -607,7 +609,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                             # now add the tail text of each br in the span style
                             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf,
                                 additional_fonts, bodyfont, bodyfs, bweight,
-                                bstyle, fontScaleFactor)
+                                bstyle, fontScaleFactor, state)
                     else:
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
@@ -631,7 +633,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
 def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts, areaHeight, areaWidth, body, bodyfont: str | Any, bodyfs: int,
                     bottomPad: float | int | Any, bstyle: dict[Any, Any], bweight: int, family,
                     leftPad: float | int | Any, pdf, rightPad: float | int | Any, topPad: float | int | Any,
-                    fontScaleFactor: float, context: RenderContext, albumIndex) -> \
+                    fontScaleFactor: float, context: RenderContext, state: ConversionState, albumIndex) -> \
         tuple[bool, str | Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any, str | Any]:
 
     mcf2rl = context.mcf_to_reportlab
@@ -658,10 +660,11 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
 
     indexEntryText, recentParagraphText = processTextParas(pdf_flowableList, forceLeading, recentParagraphText,
         additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText, pdf, pdf_styleN,
-        fontScaleFactor, unprocessed_children, albumIndex, availableTextWidth)
+        fontScaleFactor, unprocessed_children, albumIndex, context.line_scales, state, availableTextWidth)
 
     recentParagraphText = processTextUL(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts,
-        body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN, fontScaleFactor, unprocessed_children)
+        body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN, fontScaleFactor, unprocessed_children,
+        context.line_scales, state)
 
     # The <table> tag contains margin info, not actual content - mark it as processed
     table = body.find('table')
@@ -737,7 +740,8 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
 
 def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901
         bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
-        pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any]) -> str:
+        pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any], line_scales,
+        state: ConversionState) -> str:
     # Process <ul> (unordered list) elements - bulleted lists
     htmllists = body.findall("ul")
 
@@ -781,7 +785,7 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
                         pLineHeight = floor(float(liStyle['line-height'].strip("%"))) / 100.0
                     except:  # noqa: E722
                         logging.warning(f"Ignoring invalid list item line-height setting {liStyleAttribute}")
-            finalLeadingFactor = LineScales.lineScaleForFont(bodyfont) * pLineHeight
+            finalLeadingFactor = line_scales.lineScaleForFont(bodyfont) * pLineHeight
 
             # Start paragraph - we'll add bullet inside the styled text
             paragraphText = '<para autoLeading="max">'
@@ -794,7 +798,7 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
                 # Prepend bullet to the text so it gets styled
                 bullet_plus_text = bullet_txt + (li.text if li.text is not None else "")
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
-                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
+                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
                 list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
@@ -803,9 +807,9 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
                 # List item with spans and other formatting
                 bullet_plus_text = bullet_txt + (li.text if li.text is not None else "")
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
-                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
+                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
                 paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
-                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor)
+                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
                 usefs = maxfs if maxfs > 0 else bodyfs
                 list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
 
@@ -819,12 +823,12 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
                         if br.tail:
                             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, li, pdf,
                                                                          additional_fonts, bodyfont, bodyfs, bweight,
-                                                                         bstyle, fontScaleFactor)
+                                                                         bstyle, fontScaleFactor, state)
 
                     elif item.tag == 'span':
                         span = item
                         spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additional_fonts, bodyfont,
-                                                                                  bodyfs, bweight, fontScaleFactor)
+                                                                                  bodyfs, bweight, fontScaleFactor, state)
 
                         maxfs = max(maxfs, spanfs)
 
@@ -842,7 +846,7 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
                                 if br.tail:
                                     paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf,
                                                                                  additional_fonts, bodyfont, bodyfs,
-                                                                                 bweight, bstyle, fontScaleFactor)
+                                                                                 bweight, bstyle, fontScaleFactor, state)
                         else:
                             paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 

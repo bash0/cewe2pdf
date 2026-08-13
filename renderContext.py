@@ -22,3 +22,4 @@ class RenderContext:
     clipart_files: dict[int, str]
     clipart_paths: tuple[str, ...]
     passepartout_folders: tuple[str, ...] = ()
+    line_scales: Any = None

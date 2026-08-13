@@ -21,6 +21,7 @@ from lxml import etree
 from ceweInfo import CeweInfo
 from clipArt import readClipArtConfigXML
 from configUtils import getConfigurationInt
+from conversionState import ConversionState
 from extraLoggers import mustsee
 from fontHandling import findAndRegisterFonts
 from lineScales import LineScales
@@ -30,28 +31,40 @@ from pathutils import findFileInDirs
 
 @dataclass
 class ConversionSetup:
-    """Input and resources resolved before the PDF canvas is created."""
+    """Input and read-only resources resolved before the PDF canvas is created.
 
-    album_title: str
-    mcf_xml_name: str
-    unpacked_folder: str | None
-    album_base_folder: str
-    mcf_base_folder: str
-    fotobook: Any
-    configuration: configparser.ConfigParser | None
-    default_config_section: Any
-    cewe_folder: str
-    key_account_folder: str | None
-    background_locations: tuple[str, ...]
-    passepartout_folders: tuple[str, ...]
-    clipart_files: dict[int, str]
-    clipart_paths: tuple[str, ...]
-    image_resolution: int
-    background_resolution: int
-    available_fonts: Any
+    Values here describe the album and its configured rendering environment.
+    Data discovered while rendering belongs in :class:`ConversionState`
+    instead, so it is clear which values are safe to share with all pages.
+    """
+
+    cewe_folder: str                # CEWE installation/data root, from cewe_folder.txt or cewe2pdf.ini.
+    key_account_folder: str | None  # Account-specific CEWE data directory when one can be determined.
+
+    configuration: configparser.ConfigParser | None    # Merged INI configuration, or None when the legacy cewe_folder.txt path was used.
+    default_config_section: Any             # The DEFAULT INI section, passed to renderers needing an individual setting.
+
+    background_locations: tuple[str, ...]   # Ordered directories searched for CEWE page-background images.
+    clipart_files: dict[int, str]           # Extra clipart ID-to-file mappings configured in the INI file.
+    clipart_paths: tuple[str, ...]          # Clipart XML/resource search paths resolved from the CEWE installation.
+    passepartout_folders: tuple[str, ...]   # Ordered directories searched when building the passepartout index.
+
+    mcf_xml_name: str           # Actual XML file to parse: the source MCF, or data.mcf unpacked from MCFX.
+    mcf_base_folder: str        # Folder containing mcf_xml_name, used to resolve album image references.
+    unpacked_folder: str | None # TemporaryDirectory returned when an MCFX archive was unpacked; otherwise None.
+    album_base_folder: str      # Original album location, used to find its optional configuration file.
+
+    fotobook: Any       # Root <fotobook> XML element used by the page-processing stage.
+    album_title: str    # Human-readable album name, used as the PDF document title.
+
+    available_fonts: Any        # Font faces successfully registered with ReportLab for this conversion.
+    line_scales: LineScales     # Default and per-font line-spacing rules read from the INI configuration.
+
+    image_resolution: int       # Target DPI for ordinary images.
+    background_resolution: int  # Target DPI for page-background images.
 
 
-def prepareConversion(albumname, mcfxTmpDir, appDataDir) -> ConversionSetup: # noqa: C901
+def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState) -> ConversionSetup: # noqa: C901
     """Read an album and resolve the configuration and resources it requires."""
     albumTitle, dummy = os.path.splitext(os.path.basename(albumname))
 
@@ -147,16 +160,32 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir) -> ConversionSetup: # n
 
     mustsee.info(f'Using image resolution {imageResolution}, background resolution {backgroundResolution}')
 
-    LineScales.setupDefaultLineScale(defaultConfigSection)
+    lineScales = LineScales(defaultConfigSection)
     if keyAccountFolder is not None:
         passepartoutFolders += CeweInfo.getCewePassepartoutFolders(ceweFolder, keyAccountFolder)
 
-    availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, ceweFolder)
-    LineScales.setupFontLineScales(defaultConfigSection)
+    availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, ceweFolder, state)
     clipartPaths = readClipArtConfigXML(ceweFolder, keyAccountFolder, clipartFiles)
 
+    # Use names here rather than relying on ConversionSetup's declaration
+    # order.  The dataclass is intentionally grouped for readability above,
+    # and its fields should be freely rearrangeable without changing values.
     return ConversionSetup(
-        albumTitle, mcfxmlname, unpackedFolder, albumBaseFolder, mcfBaseFolder,
-        fotobook, configuration, defaultConfigSection, ceweFolder, keyAccountFolder,
-        backgroundLocations, passepartoutFolders, clipartFiles, clipartPaths,
-        imageResolution, backgroundResolution, availableFonts)
+        cewe_folder=ceweFolder,
+        key_account_folder=keyAccountFolder,
+        configuration=configuration,
+        default_config_section=defaultConfigSection,
+        background_locations=backgroundLocations,
+        clipart_files=clipartFiles,
+        clipart_paths=clipartPaths,
+        passepartout_folders=passepartoutFolders,
+        mcf_xml_name=mcfxmlname,
+        mcf_base_folder=mcfBaseFolder,
+        unpacked_folder=unpackedFolder,
+        album_base_folder=albumBaseFolder,
+        fotobook=fotobook,
+        album_title=albumTitle,
+        available_fonts=availableFonts,
+        line_scales=lineScales,
+        image_resolution=imageResolution,
+        background_resolution=backgroundResolution)
