@@ -150,7 +150,7 @@ mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1m
 # area's centre; rotation therefore behaves like it does in the Album Editor.
 def processElements(additional_fonts, fotobook, imagedir,
                     productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW,
-                    lastpage, context: RenderContext, state: ConversionState, albumIndex):
+                    lastpage, context: RenderContext, state: ConversionState):
     if AlbumInfo.isAlbumDoubleSide(productstyle) and pagetype == PageProcessingType.RegularPage and not oddpage and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
@@ -199,7 +199,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         # process text
         for textTag in area.findall('text'):
             processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
-                               pageNumber, context, state, albumIndex)
+                               pageNumber, context, state)
 
         # Clip-Art
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
@@ -230,12 +230,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     setup = prepareConversion(albumname, mcfxTmpDir, appDataDir, conversionState)
 
     if setup.configuration is None:
-        albumIndex = Index(None)
+        conversionState.album_index = Index(None)
     else:
         try:
-            albumIndex = Index(setup.configuration['INDEX'])
+            conversionState.album_index = Index(setup.configuration['INDEX'])
         except KeyError:
-            albumIndex = Index(None)
+            conversionState.album_index = Index(None)
 
     # extract basic album properties
     articleConfigElement = setup.fotobook.find('articleConfig')
@@ -281,11 +281,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts, conversionState)
     # processPages calls its element-rendering callback with the normal page
     # arguments plus renderContext.  partial() creates an equivalent callback
-    # which also supplies this conversion's mutable state and its album index.
-    # The index remains explicit for now: it is specialised output state,
-    # whereas ConversionState owns general rendering caches and temporary files.
-    processElementsForAlbum = partial(processElements, state=conversionState,
-                                      albumIndex=albumIndex)
+    # which also supplies this conversion's mutable state, including any index
+    # entries found while text areas are rendered.
+    processElementsForAlbum = partial(processElements, state=conversionState)
 
     # `pages` owns CEWE's page/cover selection. It calls our callback for the
     # actual areas once the canvas has been sized and the background drawn.
@@ -301,6 +299,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     pdf = []
 
+    albumIndex = conversionState.album_index
     if albumIndex.indexing:
         # At this point we have an index of items (selected on the basis of their font characteristics)
         #   albumIndex.ShowIndex()
