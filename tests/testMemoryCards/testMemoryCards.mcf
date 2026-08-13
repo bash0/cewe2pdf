@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="6623" article_name="vendespil" externalProjectId="" folderID="7cae1dce-27b3-42b5-88a3-b7b754e95f69" imagedir="testMemoryCards_mcf-Dateien" isDataMcf="0" productname="MEM3" startdatecalendarium="" version="4.0">
+    <project createdWithHPSVersion="8.1.3" createdWithHPSVersionBuild="20260410" multiPurposeText="" projectID="66c0a61d-34c3-4c4c-8c3e-2c02ec56a87e" projectIDCreatedEpoch="1786608473"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="8.1.3" programversionBuild="20260410" savetime="2026-08-13 10:07"/>
+    <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2024-11-25 15:53"/>
+    <articleConfig normalpages="25" pagenaming="16" totalpages="25"/>
+    <addOns/>
+    <ruler/>
+    <extra>
+        <lastTextFormat Alignment="ALIGNLEFT" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <imageQuality version="1.3.56"/>
+    </extra>
+    <page pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="101"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="101"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="101"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="5" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="6" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="7" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="8" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="9" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="10" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="11" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="12" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="13" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="14" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="15" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="16" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="85.6218" rotation="0" top="50" width="428.756" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-253.622" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="17" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="80.3433" rotation="0" top="50" width="439.313" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-248.344" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="18" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="19" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="20" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="21" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="22" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="101"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="23" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="101"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="24" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="101"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page pagenr="25" rotation="0" type="normalpage">
+        <bundlesize height="600" width="600"/>
+        <designElementIDs background="201" layout="810347"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="810347" layout="1" templatename="MEM3_1_Bild_mit_Rand"/>
+        <area areatype="imagearea">
+            <position height="500" left="50" rotation="0" top="50" width="500" zposition="101"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-218" scale="0.255102" top="-1.04406e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships>
+        <foto id="file:///C:/Users/pete/source/repos/cewe2pdf/tests/testMemoryCards/20200306_111748.jpg">
+            <foto id="safecontainer:/cbxmu7d2_1_20200306_111748.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
+    </fotoRelationships>
+    <statistics assistantUsed="0" countPauses="0" elapsedTimeGross="2024-11-25T15:53:04" elapsedTimeNet="6210" fotosAdded="91" fotosRemoved="58" pauseTime="0" sessionsUsed="4"/>
+</fotobook>

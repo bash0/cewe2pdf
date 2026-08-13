@@ -182,6 +182,11 @@
     <Content Include="tests\testLists\cewe2pdf.ini" />
     <Content Include="tests\testLists\testlists.mcf" />
     <Content Include="tests\testlists\testlists_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testMemoryCards\additional_fonts.txt" />
+    <Content Include="tests\testMemoryCards\cewe2pdf.ini" />
+    <Content Include="tests\testMemoryCards\testMemoryCards.mcf" />
+    <Content Include="tests\testMemoryCards\testMemoryCards_mcf-Dateien\cbxmu7d2_1_20200306_111748.jpg" />
+    <Content Include="tests\testMemoryCards\testMemoryCards_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testPageNumbers\additional_fonts.txt" />
     <Content Include="tests\testPageNumbers\cewe2pdf.ini" />
     <Content Include="tests\testPageNumbers\test_pagenumbers.mcf" />
@@ -365,6 +370,7 @@
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
     <Compile Include="tests\compare-pdf\setup.py" />
+    <Compile Include="tests\testCewePageResolver\test_cewePageResolver.py" />
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
     <Compile Include="tests\testbackgrounds\test_backgrounds.py" />
     <Compile Include="tests\testClipart\test_drawClipart.py" />
@@ -379,6 +385,7 @@
     <Compile Include="tests\testLineHeight\test_lineHeight.py" />
     <Compile Include="tests\testLists\test_lists.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
+    <Compile Include="tests\testMemoryCards\test_memoryCards.py" />
     <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
     <Compile Include="tests\testShadows\test_shadows.py" />
     <Compile Include="tests\testTabs\test_tabs.py" />
@@ -438,6 +445,7 @@
     <Folder Include="tests\Resources\photofun\decorations\63457\line_single_black\" />
     <Folder Include="tests\Resources\photofun\fonts\" />
     <Folder Include="tests\testbackgrounds\previous_result_pdfs\" />
+    <Folder Include="tests\testCewePageResolver\" />
     <Folder Include="tests\testClipartColorReplacement\previous_result_pdfs\" />
     <Folder Include="tests\testClipart\previous_result_pdfs\" />
     <Folder Include="tests\testCorners\" />
@@ -462,6 +470,9 @@
     <Folder Include="tests\testLists\" />
     <Folder Include="tests\testLists\previous_result_pdfs\" />
     <Folder Include="tests\testlists\testlists_mcf-Dateien\" />
+    <Folder Include="tests\testMemoryCards\" />
+    <Folder Include="tests\testMemoryCards\previous_result_pdfs\" />
+    <Folder Include="tests\testMemoryCards\testMemoryCards_mcf-Dateien\" />
     <Folder Include="tests\testPageNumbers\" />
     <Folder Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\" />
     <Folder Include="tests\testShadows\" />
