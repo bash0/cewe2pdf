@@ -3,15 +3,15 @@
 
 # Test the corner masking
 
-#if you run this file directly, it won't have access to parent folder, so add it to python path
+# Bootstrap the project root so this test can also run directly.
 import os, os.path
 import sys
-sys.path.append('..')
-sys.path.append('.')
-sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
-
-from datetime import datetime
 from pathlib import Path
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+from testutils import configureTestImportPaths
+configureTestImportPaths(__file__)
+from datetime import datetime
 from xml.etree import ElementTree
 from PIL import Image
 from pikepdf import Pdf, PdfImage

@@ -5,11 +5,13 @@
 
 # Test the unpacking of a .mcfx file to a .mcf file and the associated image files
 
-#if you run this file directly, it won't have access to parent folder, so add it to python path
+# Bootstrap the project root so this test can also run directly.
 import sys
-sys.path.append('..')
-sys.path.append('.')
 from pathlib import Path
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+from testutils import configureTestImportPaths
+configureTestImportPaths(__file__)
 import os, os.path
 import filecmp
 import logging

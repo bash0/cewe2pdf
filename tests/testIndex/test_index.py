@@ -3,21 +3,21 @@
 
 # Test rendering when page one is empty
 
-#if you run this file directly, it won't have access to parent folder, so add it to python path
+# Bootstrap the project root so this test can also run directly.
 import os, os.path
 import sys
+from pathlib import Path
 
 from numpy import test
-sys.path.append('..')
-sys.path.append('.')
-sys.path.append('tests/compare-pdf/compare_pdf') # used if compare_pdf has not been pip installed
-
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+from testutils import configureTestImportPaths
+configureTestImportPaths(__file__)
 # Parse the mcf file to create variations using xml.dom.minidom rather than xml.etree.ElementTree
 # Copilot suggested this choice because etree is bad at parsing CDATA
 from xml.dom.minidom import parse, Document
 
 from datetime import datetime
-from pathlib import Path
 from pikepdf import Pdf
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore

@@ -2,13 +2,13 @@
 
 import os
 import sys
-from datetime import datetime
 from pathlib import Path
+from datetime import datetime
 
-sys.path.append('..')
-sys.path.append('.')
-sys.path.append('tests/compare-pdf/compare_pdf')
-
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+from testutils import configureTestImportPaths
+configureTestImportPaths(__file__)
 from pikepdf import Pdf
 
 from compare_pdf import ComparePDF, ShowDiffsStyle  # type: ignore
