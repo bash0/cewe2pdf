@@ -319,6 +319,7 @@
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img6.png" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="albumConversionSession.py" />
     <Compile Include="backgrounds.py" />
     <Compile Include="borders.py" />
     <Compile Include="ceweInfo.py">

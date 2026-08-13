@@ -57,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # only needed when the program is frozen (i.e. compiled).
 import sys
 
-from versionInfo import getVersionInformationText, logVersionInformation
+from versionInfo import getVersionInformationText
 
 # Let a user identify an executable without loading image libraries or reading
 # any album files.  argparse also knows about --version below for its help.
@@ -75,34 +75,27 @@ import logging.config
 import os.path
 import os
 
-import gc
-
 import argparse  # to parse arguments
-from functools import partial
 from math import floor
 
 import reportlab.lib.pagesizes
-from reportlab.pdfgen import canvas
 # from reportlab.pdfbase.pdfmetrics import stringWidth as _stringWidth
 # from reportlab.lib.styles import getSampleStyleSheet
 
 import PIL
 
 from packaging.version import parse as parse_version
-from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
+from ceweInfo import AlbumInfo
+from albumIndex import AlbumIndex
 from borders import processDecorationBorders
 from clipartareas import processAreaClipartTag
-from conversionSetup import prepareConversion
 from conversionState import ConversionState
-from extraLoggers import ConversionMessageCounters
 from imageareas import processAreaImageTag
-from pageNumbering import PageNumberingInfo
 from pageTypes import PageProcessingType
 from cewePageResolver import getPageElementForPageNumber
-from pages import processPages
 from renderContext import RenderContext
 from textareas import processAreaTextTag
-from albumIndex import AlbumIndex
+from albumConversionSession import AlbumConversionSession
 from shadows import processDecorationShadow
 
 
@@ -148,6 +141,7 @@ image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # Keep this conversion at the boundary: area-rendering modules receive it in
 # RenderContext rather than each maintaining its own approximation.
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
+
 
 # `pages.processPages` identifies the correct MCF page element, including the
 # slightly unusual cover and paired-page rules. This callback dispatches each
@@ -219,124 +213,15 @@ def processElements(additional_fonts, fotobook, imagedir,
                                       processDecorationBorders(decoration, height, width, canvas, context))
     return
 
-def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None, appDataDir=None, outputFileName=None): # noqa: C901 (too complex)
-    conversionState = ConversionState()
-    conversionState.message_counters = ConversionMessageCounters()
-    logVersionInformation()
-    pageNumberingInfo = None
 
-    # check output file is acceptable before we do any processing, which is
-    # preferable to processing for a long time and *then* discovering that
-    # the file is not writable
-    if outputFileName is None:
-        outputFileName = CeweInfo.getOutputFileName(albumname)
-    CeweInfo.ensureAcceptableOutputFile(outputFileName)
+def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None,
+               appDataDir=None, outputFileName=None):
+    """Convert one MCF or MCFX album while preserving the established API."""
+    with AlbumConversionSession(
+            albumname, keepDoublePages, pageNumbers, mcfxTmpDir, appDataDir,
+            outputFileName, mcf2rl, image_quality, pil_antialias) as session:
+        return session.render(processElements)
 
-    setup = prepareConversion(albumname, mcfxTmpDir, appDataDir, conversionState)
-
-    if setup.configuration is None:
-        albumIndex = AlbumIndex(None)
-    else:
-        try:
-            albumIndex = AlbumIndex(setup.configuration['INDEX'])
-        except KeyError:
-            albumIndex = AlbumIndex(None)
-
-    # extract basic album properties
-    articleConfigElement = setup.fotobook.find('articleConfig')
-    if articleConfigElement is None:
-        logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
-        sys.exit(1)
-
-    # find the correct size for the album format (if we know!) and set the product style
-    pagesize = reportlab.lib.pagesizes.A4
-    productstyle = ProductStyle.AlbumSingleSide
-    productname = setup.fotobook.get('productname')
-    if productname in AlbumInfo.formats: # IMO this is clearest so pylint: disable=consider-using-get
-        pagesize = AlbumInfo.formats[productname]
-    if productname in AlbumInfo.styles: # IMO this is clearest so pylint: disable=consider-using-get
-        productstyle = AlbumInfo.styles[productname]
-    if keepDoublePages:
-        if productstyle == ProductStyle.AlbumSingleSide:
-            productstyle = ProductStyle.AlbumDoubleSide
-        elif productstyle == ProductStyle.MemoryCard:
-            logging.warning('keepdoublepages option is irrelevant and ignored for a memory card product')
-
-    if AlbumInfo.isAlbumProduct(productstyle):
-        pageCount = int(articleConfigElement.get('normalpages')) + 2
-        # Albums record only usable inside pages in normalpages. The two outer
-        # covers make the corresponding single-sided PDF page count.
-    else:
-        # Photo Pairs records each card as a real MCF page; it has neither
-        # covers nor two-page bundles, so do not apply the album +2 rule.
-        pageCount = int(articleConfigElement.get('totalpages'))
-
-    imageFolder = setup.fotobook.get('imagedir')
-    renderContext = RenderContext(mcf2rl, setup.image_resolution, image_quality, setup.background_resolution,
-                                  pil_antialias, setup.default_config_section, setup.clipart_files,
-                                  setup.clipart_paths, setup.passepartout_folders, setup.line_scales)
-
-    # initialize a pdf canvas
-    pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
-    pdf.setTitle(setup.album_title)
-
-    pageNumberElement = setup.fotobook.find('pagenumbering')
-    if pageNumberElement is not None:
-        pnpos = int(pageNumberElement.get('position'))
-        if pnpos != 0: # 0 implies no numbering
-            # make a page number description object to use later
-            pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts, conversionState)
-    # processPages calls its element-rendering callback with the normal page
-    # arguments plus renderContext.  partial() creates an equivalent callback
-    # The index is an optional text-processing feature.  Passing it explicitly
-    # keeps it outside the general rendering state used by every area type.
-    processElementsForAlbum = partial(processElements, state=conversionState, albumIndex=albumIndex)
-
-    # `pages` owns CEWE's page/cover selection. It calls our callback for the
-    # actual areas once the canvas has been sized and the background drawn.
-    processPages(setup.fotobook, setup.mcf_base_folder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
-        setup.cewe_folder, setup.available_fonts, setup.background_locations, conversionState, renderContext,
-        pageNumberingInfo, processElementsForAlbum)
-
-    # save final output pdf
-    try:
-        pdf.save()
-    except Exception as ex:
-        logging.error(f'Could not save the output file: {str(ex)}')
-
-    pdf = []
-
-    if albumIndex.indexing:
-        # At this point we have an index of items (selected on the basis of their font characteristics)
-        #   albumIndex.ShowIndex()
-        indexPdfFileName = albumIndex.SaveIndexPdf(outputFileName, setup.album_title, pagesize)
-        indexPngFileName = albumIndex.SaveIndexPng(indexPdfFileName)
-        albumIndex.MergeAlbumAndIndexPng(outputFileName, indexPngFileName)
-        # most usual is to delete the index pdf, but leave the index png which could be added
-        # to the original with the cewe editor, and then you get it in the printed edition as well
-        if albumIndex.deleteIndexPdf and os.path.exists(indexPdfFileName):
-            os.remove(indexPdfFileName)
-        if albumIndex.deleteIndexPng and os.path.exists(indexPngFileName):
-            os.remove(indexPngFileName)
-
-    # force the release of objects which might be holding on to picture file references
-    # so that they will not prevent the removal of the files as we clean up and exit
-    objectscollected = gc.collect()
-    logging.info(f'GC collected objects : {objectscollected}')
-
-    conversionState.message_counters.print_summary()
-
-    if productstyle == ProductStyle.MemoryCard:
-        print()
-        print("Use Adobe Acrobat to print the memory cards. Set custom pages per sheet, 4 wide x 6 down")
-        print(" and print two copies!")
-
-    conversionState.message_counters.verify(setup.default_config_section)
-
-    cleanUpTempFiles(conversionState.temporary_files, setup.unpacked_folder)
-    conversionState.message_counters.close()
-
-    return True
 
 def collectArgsAndConvert():
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
@@ -422,14 +307,6 @@ def collectArgsAndConvert():
 
     # convert the file
     return convertMcf(args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData, outputFileName=outFile)
-
-
-def cleanUpTempFiles(fileList, unpackedFolder):
-    for tmpFileName in fileList:
-        if os.path.exists(tmpFileName):
-            os.remove(tmpFileName)
-    if unpackedFolder is not None:
-        unpackedFolder.cleanup()
 
 
 if __name__ == '__main__':
