@@ -407,6 +407,7 @@
     </Compile>
     <Compile Include="textareas.py" />
     <Compile Include="textart.py" />
+    <Compile Include="textlists.py" />
     <Compile Include="textoutlines.py" />
     <Compile Include="textspacing.py" />
     <Compile Include="texttabs.py" />

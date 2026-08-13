@@ -15,7 +15,6 @@ import reportlab.lib.colors
 import reportlab.lib.enums
 import reportlab.lib.pagesizes
 from reportlab.pdfbase import pdfmetrics
-from reportlab.lib.styles import ParagraphStyle
 from lxml import etree
 
 from borders import processDecorationBorders
@@ -32,6 +31,7 @@ from text import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendT
 from textart import handleTextArt
 from textoutlines import TextEffectsParagraph, getTextOutline
 from texttabs import getTabbedTextLine
+from textlists import processTextLists
 from textspacing import getLetterSpacing
 
 
@@ -738,142 +738,3 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
     return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentParagraphText
 
 
-def processTextLists(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901
-        bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
-        pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any], line_scales,
-        state: ConversionState) -> str:
-    """Convert CEWE's imported HTML ``ul`` and ``ol`` elements to paragraphs.
-
-    The Album Editor emits lists when text has been pasted from another
-    application. ReportLab's Paragraph supports the required wrapping, so we
-    supply each marker as part of a paragraph and use a hanging indent for any
-    continuation lines.
-    """
-    htmllists = body.findall("ul") + body.findall("ol")
-
-    for htmlList in htmllists:
-        # Mark this list as processed
-        unprocessed_children.discard(htmlList)
-
-        listitems = htmlList.findall("li")
-        try:
-            listNumber = int(htmlList.get('start', '1'))
-        except ValueError:
-            logging.warning(f"Ignoring invalid ordered-list start value {htmlList.get('start')}")
-            listNumber = 1
-
-        for li in listitems:
-            maxfs = 0
-
-            # Create a copy of the style for this list item with hanging indent
-            list_styleN = ParagraphStyle('list_item', parent=pdf_styleN)
-            # Hanging indent: first line at 0, subsequent lines indented
-            # Calculate indent based on font size - approximately 2x the font size
-            # accounts for bullet width + space
-            bullet_indent = bodyfs * 1.65  # Adjust multiplier if needed (1.5 - 2.5 range)
-            list_styleN.leftIndent = bullet_indent  # Where wrapped lines start
-            list_styleN.firstLineIndent = -bullet_indent / 2  # Pull first line (with bullet) back halfway position 0
-            bullet_txt = '• '
-            markerText = f'{listNumber}. ' if htmlList.tag == 'ol' else bullet_txt
-            listNumber += 1
-
-            # Check alignment (though lists are typically left-aligned)
-            if li.get('align') == 'center':
-                list_styleN.alignment = reportlab.lib.enums.TA_CENTER
-            elif li.get('align') == 'right':
-                list_styleN.alignment = reportlab.lib.enums.TA_RIGHT
-            elif li.get('align') == 'justify':
-                list_styleN.alignment = reportlab.lib.enums.TA_JUSTIFY
-            else:
-                list_styleN.alignment = reportlab.lib.enums.TA_LEFT
-
-            # Get line height from <li> style if present
-            pLineHeight = 1.0
-            liStyleAttribute = li.get('style')
-            if liStyleAttribute is not None:
-                liStyle = dict([kv.split(':') for kv in
-                                li.get('style').lstrip(' ').rstrip(';').split('; ')])
-                if 'line-height' in liStyle.keys():
-                    try:
-                        pLineHeight = floor(float(liStyle['line-height'].strip("%"))) / 100.0
-                    except:  # noqa: E722
-                        logging.warning(f"Ignoring invalid list item line-height setting {liStyleAttribute}")
-            finalLeadingFactor = line_scales.lineScaleForFont(bodyfont) * pLineHeight
-
-            # Start paragraph - we'll add bullet inside the styled text
-            paragraphText = '<para autoLeading="max">'
-
-            # Check if there are child elements (spans, br, etc.)
-            lispans = li.findall(".*")
-
-            if len(lispans) < 1:
-                # Simple list item with just text, no spans
-                # Prepend bullet to the text so it gets styled
-                marker_plus_text = markerText + (li.text if li.text is not None else "")
-                paragraphText, maxfs = AppendItemTextInStyle(paragraphText, marker_plus_text, li, pdf,
-                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
-                paragraphText += '</para>'
-                usefs = maxfs if maxfs > 0 else bodyfs
-                list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
-                pdf_flowableList.append(TextEffectsParagraph(paragraphText, list_styleN))
-            else:
-                # List item with spans and other formatting
-                marker_plus_text = markerText + (li.text if li.text is not None else "")
-                paragraphText, maxfs = AppendItemTextInStyle(paragraphText, marker_plus_text, li, pdf,
-                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
-                usefs = maxfs if maxfs > 0 else bodyfs
-                list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
-
-                # Process child elements (spans, br, etc.)
-                for item in lispans:
-                    if item.tag == 'br':
-                        br = item
-                        # For lists, we don't typically break into multiple paragraphs on <br>
-                        # Instead, insert a line break within the same paragraph
-                        paragraphText += '<br/>'
-                        if br.tail:
-                            paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, li, pdf,
-                                                                         additional_fonts, bodyfont, bodyfs, bweight,
-                                                                         bstyle, fontScaleFactor, state)
-
-                    elif item.tag == 'span':
-                        span = item
-                        spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additional_fonts, bodyfont,
-                                                                                  bodyfs, bweight, fontScaleFactor, state)
-
-                        maxfs = max(maxfs, spanfs)
-
-                        paragraphText = AppendSpanStart(paragraphText, spanfont, spanfs, spanweight, spanstyle, bstyle)
-
-                        if span.text is not None:
-                            paragraphText = AppendText(paragraphText, html.escape(span.text))
-
-                        # Handle line breaks within spans
-                        brs = span.findall(".//br")
-                        if len(brs) > 0:
-                            paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
-                            for br in brs:
-                                paragraphText += '<br/>'
-                                if br.tail:
-                                    paragraphText, maxfs = AppendItemTextInStyle(paragraphText, br.tail, span, pdf,
-                                                                                 additional_fonts, bodyfont, bodyfs,
-                                                                                 bweight, bstyle, fontScaleFactor, state)
-                        else:
-                            paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
-
-                        if span.tail is not None:
-                            paragraphText = AppendText(paragraphText, html.escape(span.tail))
-
-                    else:
-                        logging.warning(
-                            f"Ignoring unhandled tag {item.tag} in list item (tag content: {etree.tostring(item, encoding='unicode')[:100]}...)")
-
-                # Finalize the list item paragraph
-                try:
-                    paragraphText += '</para>'
-                    usefs = maxfs if maxfs > 0 else bodyfs
-                    list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
-                    pdf_flowableList.append(TextEffectsParagraph(paragraphText, list_styleN))
-                except Exception:
-                    logging.exception('Exception')
-    return paragraphText
