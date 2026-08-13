@@ -10,6 +10,8 @@ from lxml import etree
 # including GitHub Actions' test-collection environment.
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
+from testutils import configureTestImportPaths
+configureTestImportPaths(__file__)
 
 from ceweInfo import ProductStyle
 from cewePageResolver import resolvePages

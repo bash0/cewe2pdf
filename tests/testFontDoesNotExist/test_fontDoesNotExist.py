@@ -9,11 +9,13 @@
 # test what happens when a font file does not exist.
 # if the font is missing, the page where it was used should still exist.
 
-#if you run this file directly, it won't have access to parent folder, so add it to python path
+# Bootstrap the project root so this test can also run directly.
 import sys
-sys.path.append('..')
-sys.path.append('.')
 from pathlib import Path
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+from testutils import configureTestImportPaths
+configureTestImportPaths(__file__)
 import os, os.path
 from pikepdf import Pdf
 

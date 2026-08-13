@@ -1,9 +1,34 @@
 import glob
 import os
 import os.path
+import sys
 
 from pathlib import Path
 from extraLoggers import mustsee
+
+
+def configureTestImportPaths(testFile):
+    """Make project modules and the local compare_pdf helper importable.
+
+    Tests are useful both through pytest and when a developer executes one
+    test file directly.  The latter has the test's directory, rather than the
+    repository root, on ``sys.path``.  Deriving paths from ``testFile`` avoids
+    depending on the current working directory used by Visual Studio, pytest,
+    or a command prompt.
+
+    The local compare_pdf directory is retained as a fallback for developers
+    who have not installed that helper package.  Both paths are inserted ahead
+    of installed packages so the test always exercises this working tree.
+    """
+    projectRoot = Path(testFile).resolve().parents[2]
+    comparePdfPath = projectRoot / 'tests' / 'compare-pdf' / 'compare_pdf'
+
+    for importPath in reversed((projectRoot, comparePdfPath)):
+        importPathText = str(importPath)
+        if importPathText in sys.path:
+            sys.path.remove(importPathText)
+        sys.path.insert(0, importPathText)
+
 
 def getLatestResultFile(albumFolderBasename, pattern: str) -> str:
     resultpdfpattern = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", 'previous_result_pdfs', pattern))
