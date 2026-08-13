@@ -180,10 +180,12 @@
     <Content Include="tests\testLineHeight\testLineHeight_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\testLists\additional_fonts.txt" />
     <Content Include="tests\testLists\cewe2pdf.ini" />
+    <Content Include="tests\testLists\previous_result_pdfs\testlists.mcf.20260813S.pdf" />
     <Content Include="tests\testLists\testlists.mcf" />
     <Content Include="tests\testlists\testlists_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testMemoryCards\additional_fonts.txt" />
     <Content Include="tests\testMemoryCards\cewe2pdf.ini" />
+    <Content Include="tests\testMemoryCards\previous_result_pdfs\testMemoryCards.mcf.20260813S.pdf" />
     <Content Include="tests\testMemoryCards\testMemoryCards.mcf" />
     <Content Include="tests\testMemoryCards\testMemoryCards_mcf-Dateien\cbxmu7d2_1_20200306_111748.jpg" />
     <Content Include="tests\testMemoryCards\testMemoryCards_mcf-Dateien\folderid.xml" />
