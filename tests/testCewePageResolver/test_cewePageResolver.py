@@ -1,8 +1,15 @@
 """Test CEWE page selection without invoking any PDF rendering."""
 
 from pathlib import Path
+import sys
 
 from lxml import etree
+
+# This test imports the resolver directly rather than through cewe2pdf.py.
+# Derive the project root from this file so that pytest works from any cwd,
+# including GitHub Actions' test-collection environment.
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from ceweInfo import ProductStyle
 from cewePageResolver import resolvePages
@@ -11,6 +18,12 @@ from pageTypes import PageProcessingType
 
 def _testFotobook():
     testMcf = Path(__file__).parents[1] / 'testEmptyPageOne' / 'test_emptyPageOne.mcf'
+    root = etree.parse(str(testMcf)).getroot()
+    return root.find('fotobook') or root
+
+
+def _memoryCardsFotobook():
+    testMcf = Path(__file__).parents[1] / 'testMemoryCards' / 'testMemoryCards.mcf'
     root = etree.parse(str(testMcf)).getroot()
     return root.find('fotobook') or root
 
@@ -40,3 +53,12 @@ def test_resolveSelectedAlbumPages():
         (1, PageProcessingType.FrontInsideCoverBackground),
         (26, PageProcessingType.RegularPage),
     ]
+
+
+def test_resolveMemoryCards():
+    pages = list(resolvePages(_memoryCardsFotobook(), ProductStyle.MemoryCard, 25))
+
+    assert len(pages) == 25
+    assert [page.page_number for page in pages] == list(range(1, 26))
+    assert all(page.page_type == PageProcessingType.RegularPage for page in pages)
+    assert [int(page.element.get('pagenr')) for page in pages] == list(range(1, 26))
