@@ -23,7 +23,7 @@ from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
 from fontHandling import getAvailableFont
-from index import Index
+from albumIndex import AlbumIndex
 from renderContext import RenderContext
 from shadows import warnAndIgnoreEnabledDecorationShadow
 from text import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText,
@@ -36,7 +36,7 @@ from textspacing import getLetterSpacing
 
 
 def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,  # noqa: C901
-                       pgno, context: RenderContext, state: ConversionState):
+                       pgno, context: RenderContext, state: ConversionState, albumIndex: AlbumIndex):
     mcf2rl = context.mcf_to_reportlab
     # note: it would be better to use proper html processing here
 
@@ -329,7 +329,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
             processTextCore(pdf_flowableList, pdf_styleN, None, additional_fonts, areaHeight, areaWidth,
                 body, bodyfont, bodyfs, bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor,
-                context, state)
+                context, state, albumIndex)
         if not textWrapProblem or iterationsToShrinkFontWhenNecessary == 0:
             if not textWrapProblem:
                 if scaleFactor < 1.0:
@@ -348,7 +348,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
     # Just add one index entry
     if indexEntryText:
-        state.album_index.AddIndexEntry(pgno, indexEntryText)
+        albumIndex.AddIndexEntry(pgno, indexEntryText)
 
     # Apply vertical centering if ALIGNVCENTER is specified. We previously set topPad and bottomPad
     # to zero. Now we have the actual text height, we can calculate the required padding to center
@@ -387,7 +387,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
             # So we still need to do some padding adjustment below.
             textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentText = \
                 processTextCore(pdf_flowableList, pdf_styleN, 1.0, additional_fonts, areaHeight, areaWidth, body, bodyfont, bodyfs,
-                bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor, context, state)
+                bottomPad, bstyle, bweight, family, leftPad, pdf, rightPad, topPad, scaleFactor, context, state, albumIndex)
 
             # Recalculate for the new height.
             emptySpace = originalFrameHeight - finalTotalHeight
@@ -480,7 +480,7 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
 def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901
         bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int,
         family, indexEntryText: Any | None, pdf, pdf_styleN, fontScaleFactor: float,
-        unprocessed_children: set[Any], line_scales, state: ConversionState,
+        unprocessed_children: set[Any], line_scales, state: ConversionState, albumIndex: AlbumIndex,
         available_text_width: float) -> tuple[Any, str]:
     htmlparas = body.findall(".//p")
 
@@ -548,8 +548,8 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
             pdf_styleN.leading = paragraphLeading(usefs) # line spacing (text + leading)
             pdf_flowableList.append(TextEffectsParagraph(paragraphText, pdf_styleN))
             originalFont = CollectItemFontFamily(p, family)
-            if state.album_index.CheckForIndexEntry(originalFont, bodyfs):
-                indexEntryText = Index.AppendIndexText(indexEntryText, p.text)
+            if albumIndex.CheckForIndexEntry(originalFont, bodyfs):
+                indexEntryText = AlbumIndex.AppendIndexText(indexEntryText, p.text)
 
         else:
             paragraphText = f'<para autoLeading="{autoLeading}">'
@@ -590,8 +590,8 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                     if span.text is not None:
                         paragraphText = AppendText(paragraphText, html.escape(span.text))
                         originalFont = CollectItemFontFamily(span, family)
-                        if state.album_index.CheckForIndexEntry(originalFont, spanfs):
-                            indexEntryText = Index.AppendIndexText(indexEntryText, span.text)
+                        if albumIndex.CheckForIndexEntry(originalFont, spanfs):
+                            indexEntryText = AlbumIndex.AppendIndexText(indexEntryText, span.text)
 
                     # there might be (one or more, or only one?) line break within the span.
                     brs = span.findall(".//br")
@@ -633,7 +633,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
 def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts, areaHeight, areaWidth, body, bodyfont: str | Any, bodyfs: int,
                     bottomPad: float | int | Any, bstyle: dict[Any, Any], bweight: int, family,
                     leftPad: float | int | Any, pdf, rightPad: float | int | Any, topPad: float | int | Any,
-                    fontScaleFactor: float, context: RenderContext, state: ConversionState) -> \
+                    fontScaleFactor: float, context: RenderContext, state: ConversionState, albumIndex: AlbumIndex) -> \
         tuple[bool, str | Any, float | int | Any, float | Any, float | Any, float | Any, float | int | Any, str | Any]:
 
     mcf2rl = context.mcf_to_reportlab
@@ -660,7 +660,7 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
 
     indexEntryText, recentParagraphText = processTextParas(pdf_flowableList, forceLeading, recentParagraphText,
         additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText, pdf, pdf_styleN,
-        fontScaleFactor, unprocessed_children, context.line_scales, state, availableTextWidth)
+        fontScaleFactor, unprocessed_children, context.line_scales, state, albumIndex, availableTextWidth)
 
     recentParagraphText = processTextUL(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts,
         body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN, fontScaleFactor, unprocessed_children,

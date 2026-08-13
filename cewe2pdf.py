@@ -65,6 +65,10 @@ if __name__ == '__main__' and len(sys.argv) == 2 and sys.argv[1] == '--version':
     print(getVersionInformationText())
     sys.exit(0)
 
+# These imports deliberately follow the lightweight --version exit above.  Do
+# not move them before it: doing so would load image libraries merely to report
+# a program version from a standalone executable.
+# pylint: disable=wrong-import-position,wrong-import-order
 import logging
 import logging.config
 
@@ -97,7 +101,7 @@ from pageTypes import PageProcessingType
 from pages import getPageElementForPageNumber, processPages
 from renderContext import RenderContext
 from textareas import processAreaTextTag
-from index import Index
+from albumIndex import AlbumIndex
 from shadows import processDecorationShadow
 
 
@@ -150,7 +154,7 @@ mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1m
 # area's centre; rotation therefore behaves like it does in the Album Editor.
 def processElements(additional_fonts, fotobook, imagedir,
                     productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW,
-                    lastpage, context: RenderContext, state: ConversionState):
+                    lastpage, context: RenderContext, state: ConversionState, albumIndex: AlbumIndex):
     if AlbumInfo.isAlbumDoubleSide(productstyle) and pagetype == PageProcessingType.RegularPage and not oddpage and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
@@ -199,7 +203,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         # process text
         for textTag in area.findall('text'):
             processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
-                               pageNumber, context, state)
+                               pageNumber, context, state, albumIndex)
 
         # Clip-Art
         # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
@@ -230,12 +234,12 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     setup = prepareConversion(albumname, mcfxTmpDir, appDataDir, conversionState)
 
     if setup.configuration is None:
-        conversionState.album_index = Index(None)
+        albumIndex = AlbumIndex(None)
     else:
         try:
-            conversionState.album_index = Index(setup.configuration['INDEX'])
+            albumIndex = AlbumIndex(setup.configuration['INDEX'])
         except KeyError:
-            conversionState.album_index = Index(None)
+            albumIndex = AlbumIndex(None)
 
     # extract basic album properties
     articleConfigElement = setup.fotobook.find('articleConfig')
@@ -281,9 +285,9 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts, conversionState)
     # processPages calls its element-rendering callback with the normal page
     # arguments plus renderContext.  partial() creates an equivalent callback
-    # which also supplies this conversion's mutable state, including any index
-    # entries found while text areas are rendered.
-    processElementsForAlbum = partial(processElements, state=conversionState)
+    # The index is an optional text-processing feature.  Passing it explicitly
+    # keeps it outside the general rendering state used by every area type.
+    processElementsForAlbum = partial(processElements, state=conversionState, albumIndex=albumIndex)
 
     # `pages` owns CEWE's page/cover selection. It calls our callback for the
     # actual areas once the canvas has been sized and the background drawn.
@@ -299,7 +303,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     pdf = []
 
-    albumIndex = conversionState.album_index
     if albumIndex.indexing:
         # At this point we have an index of items (selected on the basis of their font characteristics)
         #   albumIndex.ShowIndex()

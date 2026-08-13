@@ -24,7 +24,4 @@ class ConversionState:
     passepartout_files: dict[int, str] | None = None
     missing_font_substitutions: dict[str, str] = field(default_factory=dict)
     noted_font_substitutions: set[str] = field(default_factory=set)
-    # Index is configured before rendering, but its entries are discovered by
-    # text areas and it is rendered only after the album PDF has been saved.
-    album_index: Any | None = None
     message_counters: Any | None = None
