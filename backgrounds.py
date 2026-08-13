@@ -12,12 +12,13 @@ from reportlab.lib.utils import ImageReader
 
 from ceweInfo import AlbumInfo
 from configUtils import getConfigurationBool
+from conversionState import ConversionState
 from pathutils import findFileInDirs
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
 
 
-def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroundLocations,
+def processBackground(backgroundTags, state: ConversionState, cewe_folder, backgroundLocations,
                       productstyle, pagetype, pdf, ph, pw, context: RenderContext):  # noqa: C901
     """Draw the page background, including special handling for inside covers."""
     areaHeight = ph
@@ -80,7 +81,7 @@ def processBackground(backgroundTags, bg_notFoundDirList, cewe_folder, backgroun
                               width=context.mcf_to_reportlab * areaWidth,
                               height=context.mcf_to_reportlab * areaHeight)
             except Exception:
-                if bgPath not in bg_notFoundDirList:
+                if bgPath not in state.background_not_found_paths:
                     logging.error('Could not find background or error when adding to pdf')
                     logging.exception('Exception')
-                bg_notFoundDirList.add(bgPath)
+                state.background_not_found_paths.add(bgPath)

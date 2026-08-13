@@ -11,6 +11,7 @@ from reportlab.lib.utils import ImageReader
 from ceweInfo import AlbumInfo
 from clipArt import getClipConfig, loadClipart
 from clipartareas import insertClipartFile
+from conversionState import ConversionState
 from corners import applyCornerMask, getCornersInfo
 from imageUtils import autorot
 from passepartout import Passepartout
@@ -19,7 +20,8 @@ from renderContext import RenderContext
 
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDirectory,
                         productStyle, mcfBaseFolder, pageType, pdf, pageWidth,
-                        transx, transy, context: RenderContext, drawShadow, drawBorders):
+                        transx, transy, context: RenderContext, state: ConversionState,
+                        drawShadow, drawBorders):
     """Crop, decorate and draw one CEWE image area."""
     if imageTag.get('filename') is None:
         return
@@ -57,11 +59,11 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     imageCropHeight_mcfunit = areaHeight
     if passepartoutId is not None:
         passepartoutId = int(passepartoutId)
-        if context.passepartout_files is None:
+        if state.passepartout_files is None:
             logging.info("Regenerating passepartout index from .XML files.")
-            context.passepartout_files = Passepartout.buildElementIdIndex(context.passepartout_folders)
+            state.passepartout_files = Passepartout.buildElementIdIndex(context.passepartout_folders)
         try:
-            passepartoutXmlFileName = context.passepartout_files[passepartoutId]
+            passepartoutXmlFileName = state.passepartout_files[passepartoutId]
         except KeyError:
             passepartoutXmlFileName = None
         if passepartoutXmlFileName is None:
@@ -126,7 +128,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     pdf.translate(-frameShiftX_mcf * mcf2rl, -frameShiftY_mcf * mcf2rl)
 
     for decorationTag in area.findall('decoration'):
-        drawShadow(decorationTag, areaHeight, areaWidth, pdf, context,
+        drawShadow(decorationTag, areaHeight, areaWidth, pdf, context, state,
                    image, imageCropWidth_mcfunit, imageCropHeight_mcfunit)
 
     pdf.drawImage(ImageReader(temporaryImage.name),
@@ -148,5 +150,4 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     pdf.rotate(areaRot)
     pdf.translate(-imageTransx, -transy)
 
-    if context.temporary_files is not None:
-        context.temporary_files.append(temporaryImage.name)
+    state.temporary_files.append(temporaryImage.name)

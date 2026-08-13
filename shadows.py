@@ -11,6 +11,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.platypus import Table
 
 from configUtils import getConfigurationBool
+from conversionState import ConversionState
 from renderContext import RenderContext
 
 def findShadowBottomLeft(frameBottomLeft, angle, distance, swidth):
@@ -37,11 +38,11 @@ def intensityToGrey(value):
 def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
                            imgCropHeight_mcfunit, shadowDistance_mcfunit,
                            shadowAngle, intensity, shadowBlur_mcfunit,
-                           shadowWidth_mcfunit, mcf2rl, tempFileList):
+                           shadowWidth_mcfunit, mcf2rl, temporary_files):
     """
     Draw a blurred, transparent shadow using the image's existing alpha mask.
 
-    ``tempFileList`` belongs to the caller's PDF-generation lifecycle. The
+    ``temporary_files`` belongs to the caller's PDF-generation lifecycle. The
     generated PNG is therefore retained until the PDF has been completed.
     """
     if im.mode != 'RGBA':
@@ -94,7 +95,7 @@ def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
     shadowFile = tempfile.NamedTemporaryFile() # pylint:disable=consider-using-with
     shadowFile.close()
     shadowImage.save(shadowFile.name, 'PNG')
-    tempFileList.append(shadowFile.name)
+    temporary_files.append(shadowFile.name)
 
     # CEWE stores the direction in the same convention used by the older
     # vector shadow code: the angle identifies where the shadow is cast, not
@@ -120,7 +121,7 @@ def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
 
 
 def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
-                            context: RenderContext, im=None,
+                            context: RenderContext, state: ConversionState, im=None,
                             imgCropWidth_mcfunit=None,
                             imgCropHeight_mcfunit=None):
     """Draw an enabled CEWE shadow decoration for an already-positioned area."""
@@ -173,7 +174,7 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
                 pdf, im, imgCropWidth_mcfunit, imgCropHeight_mcfunit,
                 shadowDistance_mcfunit, shadowAngle, intensity,
                 shadowBlur_mcfunit, shadowWidth_mcfunit, mcf2rl,
-                context.temporary_files
+                state.temporary_files
             )
         else:
             shadowBottomLeftX, shadowBottomLeftY = findShadowBottomLeft(

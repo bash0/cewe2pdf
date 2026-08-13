@@ -89,6 +89,7 @@ from ceweInfo import CeweInfo, AlbumInfo, ProductStyle
 from borders import processDecorationBorders
 from clipartareas import processAreaClipartTag
 from conversionSetup import prepareConversion
+from conversionState import ConversionState
 from extraLoggers import VerifyMessageCounts, printMessageCountSummaries
 from imageareas import processAreaImageTag
 from pageNumbering import PageNumberingInfo
@@ -143,15 +144,13 @@ image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # RenderContext rather than each maintaining its own approximation.
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 
-tempFileList = []  # we need to remove all the temporary files at the end
-
 # `pages.processPages` identifies the correct MCF page element, including the
 # slightly unusual cover and paired-page rules. This callback dispatches each
 # area to its specialist renderer after translating the PDF origin to the
 # area's centre; rotation therefore behaves like it does in the Album Editor.
 def processElements(additional_fonts, fotobook, imagedir,
                     productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW,
-                    lastpage, context: RenderContext, albumIndex):
+                    lastpage, context: RenderContext, state: ConversionState, albumIndex):
     if AlbumInfo.isAlbumDoubleSide(productstyle) and pagetype == PageProcessingType.RegularPage and not oddpage and not lastpage:
         # if we are in double-page mode, all the images are drawn by the odd pages.
         return
@@ -194,6 +193,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         for imageTag in area.findall('imagebackground') + area.findall('image'):
             processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, productstyle,
                                 mcfBaseFolder, pagetype, pdf, pageW, transCx, transCy, context,
+                                state,
                                 processDecorationShadow, processDecorationBorders)
 
         # process text
@@ -226,7 +226,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     CeweInfo.ensureAcceptableOutputFile(outputFileName)
 
     setup = prepareConversion(albumname, mcfxTmpDir, appDataDir)
-    bg_notFoundDirList = set([]) # keep a list of background folders that are not found, to prevent multiple errors for the same cause.
+    conversionState = ConversionState()
 
     if setup.configuration is None:
         albumIndex = Index(None)
@@ -252,7 +252,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
     imageFolder = setup.fotobook.get('imagedir')
     renderContext = RenderContext(mcf2rl, setup.image_resolution, image_quality, setup.background_resolution,
                                   pil_antialias, setup.default_config_section, setup.clipart_files,
-                                  setup.clipart_paths, None, setup.passepartout_folders, tempFileList)
+                                  setup.clipart_paths, setup.passepartout_folders)
 
     # find the correct size for the album format (if we know!) and set the product style
     pagesize = reportlab.lib.pagesizes.A4
@@ -280,15 +280,16 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             pageNumberingInfo = PageNumberingInfo(pageNumberElement, pdf, setup.available_fonts)
     # processPages calls its element-rendering callback with the normal page
     # arguments plus renderContext.  partial() creates an equivalent callback
-    # which also supplies this album's index each time it is called.  The index
-    # is mutable output state, so keep it explicit rather than adding it to
-    # RenderContext with the shared rendering resources.
-    processElementsForAlbum = partial(processElements, albumIndex=albumIndex)
+    # which also supplies this conversion's mutable state and its album index.
+    # The index remains explicit for now: it is specialised output state,
+    # whereas ConversionState owns general rendering caches and temporary files.
+    processElementsForAlbum = partial(processElements, state=conversionState,
+                                      albumIndex=albumIndex)
 
     # `pages` owns CEWE's page/cover selection. It calls our callback for the
     # actual areas once the canvas has been sized and the background drawn.
     processPages(setup.fotobook, setup.mcf_base_folder, imageFolder, productstyle, pdf, pageCount, pageNumbers,
-        setup.cewe_folder, setup.available_fonts, setup.background_locations, bg_notFoundDirList, renderContext,
+        setup.cewe_folder, setup.available_fonts, setup.background_locations, conversionState, renderContext,
         pageNumberingInfo, processElementsForAlbum)
 
     # save final output pdf
@@ -326,7 +327,7 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
 
     VerifyMessageCounts(setup.default_config_section)
 
-    cleanUpTempFiles(tempFileList, setup.unpacked_folder)
+    cleanUpTempFiles(conversionState.temporary_files, setup.unpacked_folder)
 
     return True
 
