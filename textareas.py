@@ -662,7 +662,7 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
         additional_fonts, body, bodyfont, bodyfs, bstyle, bweight, family, indexEntryText, pdf, pdf_styleN,
         fontScaleFactor, unprocessed_children, context.line_scales, state, albumIndex, availableTextWidth)
 
-    recentParagraphText = processTextUL(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts,
+    recentParagraphText = processTextLists(pdf_flowableList, forceLeading, recentParagraphText, additional_fonts,
         body, bodyfont, bodyfs, bstyle, bweight, pdf, pdf_styleN, fontScaleFactor, unprocessed_children,
         context.line_scales, state)
 
@@ -738,18 +738,29 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
     return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentParagraphText
 
 
-def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901
+def processTextLists(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901
         bodyfont: str | Any, bodyfs: int, bstyle: dict[Any, Any], bweight: int, pdf,
         pdf_styleN, fontScaleFactor: float, unprocessed_children: set[Any], line_scales,
         state: ConversionState) -> str:
-    # Process <ul> (unordered list) elements - bulleted lists
-    htmllists = body.findall("ul")
+    """Convert CEWE's imported HTML ``ul`` and ``ol`` elements to paragraphs.
 
-    for ul in htmllists:
+    The Album Editor emits lists when text has been pasted from another
+    application. ReportLab's Paragraph supports the required wrapping, so we
+    supply each marker as part of a paragraph and use a hanging indent for any
+    continuation lines.
+    """
+    htmllists = body.findall("ul") + body.findall("ol")
+
+    for htmlList in htmllists:
         # Mark this list as processed
-        unprocessed_children.discard(ul)
+        unprocessed_children.discard(htmlList)
 
-        listitems = ul.findall("li")
+        listitems = htmlList.findall("li")
+        try:
+            listNumber = int(htmlList.get('start', '1'))
+        except ValueError:
+            logging.warning(f"Ignoring invalid ordered-list start value {htmlList.get('start')}")
+            listNumber = 1
 
         for li in listitems:
             maxfs = 0
@@ -763,6 +774,8 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
             list_styleN.leftIndent = bullet_indent  # Where wrapped lines start
             list_styleN.firstLineIndent = -bullet_indent / 2  # Pull first line (with bullet) back halfway position 0
             bullet_txt = '• '
+            markerText = f'{listNumber}. ' if htmlList.tag == 'ol' else bullet_txt
+            listNumber += 1
 
             # Check alignment (though lists are typically left-aligned)
             if li.get('align') == 'center':
@@ -796,8 +809,8 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
             if len(lispans) < 1:
                 # Simple list item with just text, no spans
                 # Prepend bullet to the text so it gets styled
-                bullet_plus_text = bullet_txt + (li.text if li.text is not None else "")
-                paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
+                marker_plus_text = markerText + (li.text if li.text is not None else "")
+                paragraphText, maxfs = AppendItemTextInStyle(paragraphText, marker_plus_text, li, pdf,
                                                              additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
                 paragraphText += '</para>'
                 usefs = maxfs if maxfs > 0 else bodyfs
@@ -805,10 +818,8 @@ def processTextUL(pdf_flowableList, forceLeading, paragraphText: str, additional
                 pdf_flowableList.append(TextEffectsParagraph(paragraphText, list_styleN))
             else:
                 # List item with spans and other formatting
-                bullet_plus_text = bullet_txt + (li.text if li.text is not None else "")
-                paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
-                                                             additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
-                paragraphText, maxfs = AppendItemTextInStyle(paragraphText, bullet_plus_text, li, pdf,
+                marker_plus_text = markerText + (li.text if li.text is not None else "")
+                paragraphText, maxfs = AppendItemTextInStyle(paragraphText, marker_plus_text, li, pdf,
                                                              additional_fonts, bodyfont, bodyfs, bweight, bstyle, fontScaleFactor, state)
                 usefs = maxfs if maxfs > 0 else bodyfs
                 list_styleN.leading = usefs * forceLeading if forceLeading is not None else usefs * finalLeadingFactor
