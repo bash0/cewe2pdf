@@ -280,6 +280,10 @@ text panels over a page background while leaving the text opaque.
 
 Text art objects are supported, but combination with backgrounds and outlines has not been tested.
 
+#### Bullet and numbered lists
+
+These are not something you can create in the album editor, but if you make them in, for example, Google Docs, and paste them into the album, then it will actually render them. We also render them, though not in _exactly_ the same way as they are in the album editor
+
 ### Indexing an album (not available in the CEWE editor)
 
 It is possible to ask cewe2pdf to generate an index for the album, where index terms are selected using a combination of of font and font size used in a text area. The index is initially generated as a separate pdf file with black text on white background. The index pdf is used to create an index image file, a png in which the background is transparent. That png image is then merged into the album pdf, being placed on any page containing an index marker identifier.
