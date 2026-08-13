@@ -5,7 +5,7 @@ import os
 import sys
 from enum import Enum
 
-import reportlab.lib
+import reportlab.lib.pagesizes
 
 from lxml import etree
 from extraLoggers import mustsee
@@ -14,7 +14,7 @@ from extraLoggers import mustsee
 class ProductStyle(Enum):
     AlbumSingleSide = 1  # normal for albums, we divide the cewe 2 page bundle to single pages
     AlbumDoubleSide = 2  # any album when --keepdoublepages is set
-    MemoryCard = 3 # memory card game
+    MemoryCard = 3 # CEWE Photo Pairs memory-card game (product code MEM3)
 
 
 class AlbumInfo():
@@ -30,7 +30,10 @@ class AlbumInfo():
         "ALB17": (205 * reportlab.lib.pagesizes.mm, 205 * reportlab.lib.pagesizes.mm), # album kvadratisk, 20.5 x 20.5 cm
         "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm),
         # add other page sizes here
-        "MEM3": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm) # memory game cards 6x6cm
+        # MEM3 is CEWE Photo Pairs: one 6 x 6 cm card per MCF normal-page.
+        # Its bundlesize normally supplies the same dimensions at render time;
+        # this fallback matters only when that element is absent.
+        "MEM3": (60 * reportlab.lib.pagesizes.mm, 60 * reportlab.lib.pagesizes.mm)
         }
 
     # product style. The CEWE album products (which is what we are normally expecting in this
@@ -40,7 +43,7 @@ class AlbumInfo():
     # option will cause AlbumSingleSide to be changed to AlbumDoubleSide.
     # Other "non-album" styles which we handle appear in this table
     styles = {
-        "MEM3": ProductStyle.MemoryCard # memory game cards 6x6cm
+        "MEM3": ProductStyle.MemoryCard # CEWE Photo Pairs: 6 x 6 cm memory cards
         }
 
     @staticmethod

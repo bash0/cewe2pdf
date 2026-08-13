@@ -98,7 +98,8 @@ from extraLoggers import ConversionMessageCounters
 from imageareas import processAreaImageTag
 from pageNumbering import PageNumberingInfo
 from pageTypes import PageProcessingType
-from pages import getPageElementForPageNumber, processPages
+from cewePageResolver import getPageElementForPageNumber
+from pages import processPages
 from renderContext import RenderContext
 from textareas import processAreaTextTag
 from albumIndex import AlbumIndex
@@ -247,18 +248,6 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
         logging.error(f'{albumname} is an old version. Open it in the album editor and save before retrying the pdf conversion. Exiting.')
         sys.exit(1)
 
-    pageCount = int(articleConfigElement.get('normalpages')) + 2
-    # The normalpages attribute in the mcf is the number of "usable" inside pages, excluding the front and back covers and the blank inside
-    #  cover pages. Add 2 so that pagecount represents the actual number of printed pdf pages we expect in the normal single sided
-    #  pdf print (a basic album is 26 inside pages, plus front and back cover, i.e. 28). If we use keepDoublePages, then we'll
-    #  actually be producing 2 more (the inside covers) but halving the number of final output pdf pages, making 15 double pages.
-    # There is also a totalpages attribute in the mcf, but in my files it is 5 more than the normalpages value. Why not 4 more? I
-    #  guess that may be because it is a count of the <page> elements and not actually related to the number of printed pages.
-    imageFolder = setup.fotobook.get('imagedir')
-    renderContext = RenderContext(mcf2rl, setup.image_resolution, image_quality, setup.background_resolution,
-                                  pil_antialias, setup.default_config_section, setup.clipart_files,
-                                  setup.clipart_paths, setup.passepartout_folders, setup.line_scales)
-
     # find the correct size for the album format (if we know!) and set the product style
     pagesize = reportlab.lib.pagesizes.A4
     productstyle = ProductStyle.AlbumSingleSide
@@ -272,6 +261,20 @@ def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=No
             productstyle = ProductStyle.AlbumDoubleSide
         elif productstyle == ProductStyle.MemoryCard:
             logging.warning('keepdoublepages option is irrelevant and ignored for a memory card product')
+
+    if AlbumInfo.isAlbumProduct(productstyle):
+        pageCount = int(articleConfigElement.get('normalpages')) + 2
+        # Albums record only usable inside pages in normalpages. The two outer
+        # covers make the corresponding single-sided PDF page count.
+    else:
+        # Photo Pairs records each card as a real MCF page; it has neither
+        # covers nor two-page bundles, so do not apply the album +2 rule.
+        pageCount = int(articleConfigElement.get('totalpages'))
+
+    imageFolder = setup.fotobook.get('imagedir')
+    renderContext = RenderContext(mcf2rl, setup.image_resolution, image_quality, setup.background_resolution,
+                                  pil_antialias, setup.default_config_section, setup.clipart_files,
+                                  setup.clipart_paths, setup.passepartout_folders, setup.line_scales)
 
     # initialize a pdf canvas
     pdf = canvas.Canvas(outputFileName, pagesize=pagesize)
