@@ -38,7 +38,6 @@ class ConversionSetup:
     instead, so it is clear which values are safe to share with all pages.
     """
 
-    cewe_folder: str                # CEWE installation/data root, from cewe_folder.txt or cewe2pdf.ini.
     key_account_folder: str | None  # Account-specific CEWE data directory when one can be determined.
 
     configuration: configparser.ConfigParser | None    # Merged INI configuration, or None when the legacy cewe_folder.txt path was used.
@@ -100,46 +99,65 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState)
     passepartoutFolders = tuple[str]()
     defaultConfigSection = None
     configuration = None
+    ceweFolder = None
+    keyAccountFolder = None
+    backgroundLocations = tuple[str]()
     imageResolution = 150
     backgroundResolution = 150
 
-    # Prefer the legacy cewe_folder.txt file when it is present.  Otherwise,
+    # Prefer the legacy cewe_folder.txt file when it is present. Otherwise,
     # read the current-directory INI first and the album INI second, so the
-    # album-specific values override the current-directory defaults.
+    # album-specific values override the current-directory defaults.  Neither
+    # configuration source is required: without a CEWE installation we can
+    # still render album-contained photos and ordinary text using local fonts.
     try:
         configFolderFileName = findFileInDirs(
             'cewe_folder.txt',
             (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__))))
         with open(configFolderFileName, 'r') as ceweFile: # pylint: disable=unspecified-encoding
             ceweFolder = ceweFile.read().strip()
-            CeweInfo.checkCeweFolder(ceweFolder)
-            keyAccountNumber = CeweInfo.getKeyAccountNumber(ceweFolder)
-            keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber)
-            backgroundLocations = CeweInfo.getBaseBackgroundLocations(ceweFolder, keyAccountFolder)
+            if os.path.isdir(ceweFolder):
+                CeweInfo.checkCeweFolder(ceweFolder)
+                keyAccountNumber = CeweInfo.getKeyAccountNumber(ceweFolder)
+                keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber)
+                backgroundLocations = CeweInfo.getBaseBackgroundLocations(ceweFolder, keyAccountFolder)
+            else:
+                logging.warning(f"Configured CEWE folder does not exist: {ceweFolder}")
+                ceweFolder = None
 
     except: # noqa: E722
         logging.info('Trying cewe2pdf.ini from current directory and from the album directory.')
         configuration = configparser.ConfigParser()
         filesread = configuration.read(['cewe2pdf.ini', os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
-        if len(filesread) < 1:
-            logging.error('You must create cewe_folder.txt or cewe2pdf.ini to specify the cewe_folder')
-            sys.exit(1)
-
-        mustsee.info(f'Using configuration files, in order: {str(filesread)}')
         defaultConfigSection = configuration['DEFAULT']
-        if 'cewe_folder' not in defaultConfigSection:
-            logging.error('You must create cewe_folder.txt or modify cewe2pdf.ini to define cewe_folder')
-            sys.exit(1)
+        if filesread:
+            mustsee.info(f'Using configuration files, in order: {str(filesread)}')
+        else:
+            mustsee.warning(
+                'No CEWE configuration or installation found: continuing with local fonts and '
+                'album-contained resources only. CEWE backgrounds, delivered clipart and '
+                'passepartouts will be unavailable.')
 
-        ceweFolder = defaultConfigSection['cewe_folder'].strip()
-        CeweInfo.checkCeweFolder(ceweFolder)
-        keyAccountNumber = CeweInfo.getKeyAccountNumber(ceweFolder, defaultConfigSection)
-        CeweInfo.SetEnvironmentVariables(ceweFolder, keyAccountNumber)
-        keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber, defaultConfigSection)
+        configuredCeweFolder = defaultConfigSection.get('cewe_folder', '').strip()
+        if configuredCeweFolder:
+            if os.path.isdir(configuredCeweFolder):
+                ceweFolder = configuredCeweFolder
+                CeweInfo.checkCeweFolder(ceweFolder)
+                keyAccountNumber = CeweInfo.getKeyAccountNumber(ceweFolder, defaultConfigSection)
+                CeweInfo.SetEnvironmentVariables(ceweFolder, keyAccountNumber)
+                keyAccountFolder = CeweInfo.getKeyAccountDataFolder(keyAccountNumber, defaultConfigSection)
+                backgroundLocations = CeweInfo.getBaseBackgroundLocations(ceweFolder, keyAccountFolder)
+            else:
+                logging.warning(
+                    f"Configured CEWE folder does not exist: {configuredCeweFolder}; "
+                    'continuing without CEWE resources.')
+        else:
+            logging.warning(
+                "CEWE folder deliberately left unspecified: "
+                'continuing without CEWE resources.')
 
-        baseBackgroundLocations = CeweInfo.getBaseBackgroundLocations(ceweFolder, keyAccountFolder)
         extraBackgroundFolders = defaultConfigSection.get('extraBackgroundFolders', '').splitlines()
-        backgroundLocations = baseBackgroundLocations + tuple(
+        backgroundLocations += tuple(
             os.path.expandvars(folder) for folder in extraBackgroundFolders if folder)
 
         extraClipArts = defaultConfigSection.get('extraClipArts', '').splitlines()
@@ -151,7 +169,8 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState)
                 clipartFiles[int(definition[0])] = definition[1].strip()
 
         configuredPassepartoutFolders = defaultConfigSection.get('passepartoutFolders', '').splitlines()
-        configuredPassepartoutFolders.append(ceweFolder)
+        if ceweFolder:
+            configuredPassepartoutFolders.append(ceweFolder)
         passepartoutFolders = tuple(
             os.path.expandvars(folder) for folder in configuredPassepartoutFolders if folder)
 
@@ -161,17 +180,19 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState)
     mustsee.info(f'Using image resolution {imageResolution}, background resolution {backgroundResolution}')
 
     lineScales = LineScales(defaultConfigSection)
-    if keyAccountFolder is not None:
+    if ceweFolder and keyAccountFolder is not None:
         passepartoutFolders += CeweInfo.getCewePassepartoutFolders(ceweFolder, keyAccountFolder)
 
     availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, ceweFolder, state)
+    # Extra clipart file mappings work independently of the CEWE installation.
+    # With no CEWE root this returns an empty delivered catalogue; a later
+    # clipart lookup then uses its normal "not found" warning.
     clipartPaths = readClipArtConfigXML(ceweFolder, keyAccountFolder, clipartFiles)
 
     # Use names here rather than relying on ConversionSetup's declaration
     # order.  The dataclass is intentionally grouped for readability above,
     # and its fields should be freely rearrangeable without changing values.
     return ConversionSetup(
-        cewe_folder=ceweFolder,
         key_account_folder=keyAccountFolder,
         configuration=configuration,
         default_config_section=defaultConfigSection,

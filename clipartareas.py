@@ -18,7 +18,7 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
 
     fileName = context.clipart_files.get(clipartID)
     if not fileName:
-        logging.error(f"Problem getting file name for clipart ID: {clipartID}")
+        logging.warning(f"Could not find clipart {clipartID}; leaving it out.")
         return
 
     alpha = 255

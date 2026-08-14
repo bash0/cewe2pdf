@@ -374,6 +374,7 @@
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
     <Compile Include="tests\testbackgrounds\test_backgrounds.py" />
     <Compile Include="tests\testClipart\test_drawClipart.py" />
+    <Compile Include="tests\testConversionSetup\test_conversionSetup.py" />
     <Compile Include="tests\testCorners\test_corners.py" />
     <Compile Include="tests\testDecorations\test_decorations.py" />
     <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
@@ -449,6 +450,7 @@
     <Folder Include="tests\testCewePageResolver\" />
     <Folder Include="tests\testClipartColorReplacement\previous_result_pdfs\" />
     <Folder Include="tests\testClipart\previous_result_pdfs\" />
+    <Folder Include="tests\testConversionSetup\" />
     <Folder Include="tests\testCorners\" />
     <Folder Include="tests\testCorners\previous_result_pdfs\" />
     <Folder Include="tests\testDecorations\" />

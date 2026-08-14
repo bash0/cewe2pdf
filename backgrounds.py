@@ -18,7 +18,7 @@ from pageTypes import PageProcessingType
 from renderContext import RenderContext
 
 
-def processBackground(backgroundTags, state: ConversionState, cewe_folder, backgroundLocations,
+def processBackground(backgroundTags, state: ConversionState, backgroundLocations,
                       productstyle, pagetype, pdf, ph, pw, context: RenderContext):  # noqa: C901
     """Draw the page background, including special handling for inside covers."""
     areaHeight = ph
@@ -61,7 +61,7 @@ def processBackground(backgroundTags, state: ConversionState, cewe_folder, backg
             areaWidth = areaWidth / 2
             areaXOffset = areaXOffset + areaWidth
 
-        if cewe_folder and backgroundTag.get('designElementId') is not None:
+        if backgroundTag.get('designElementId') is not None:
             bg = backgroundTag.get('designElementId')
             for attribute, expected in [('fading', 0.0), ('hue', 0.0), ('rotation', 0.0)]:
                 if attribute in backgroundTag.attrib and float(backgroundTag.get(attribute)) != expected:
@@ -81,7 +81,7 @@ def processBackground(backgroundTags, state: ConversionState, cewe_folder, backg
                               width=context.mcf_to_reportlab * areaWidth,
                               height=context.mcf_to_reportlab * areaHeight)
             except Exception:
-                if bgPath not in state.background_not_found_paths:
-                    logging.error('Could not find background or error when adding to pdf')
-                    logging.exception('Exception')
-                state.background_not_found_paths.add(bgPath)
+                if bg not in state.background_not_found_paths:
+                    logging.warning(
+                        f'Could not find background {bg}; leaving the page background unchanged.')
+                state.background_not_found_paths.add(bg)

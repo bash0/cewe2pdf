@@ -70,6 +70,11 @@ def getClipConfig(Element):
 def readClipArtConfigXML(baseFolder, keyaccountFolder, clipartDict):
     """Parse the configuration XML file and generate a dictionary of designElementId to fileName
     currently only cliparts_default.xml is supported !"""
+    # A conversion without CEWE resources simply has no delivered clipart
+    # catalogue.  Explicitly configured cliparts remain in clipartDict.
+    if baseFolder is None:
+        return tuple()
+
     clipartPathList = CeweInfo.getBaseClipartLocations(baseFolder) # append instead of overwrite global variable
     xmlConfigFileName = 'cliparts_default.xml'
     try:

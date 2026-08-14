@@ -86,13 +86,18 @@ Other distributions provide an equivalent Cairo runtime package. The private
 Windows standalone executable described below bundles the Cairo DLLs; its
 recipient does not need to install Cairo or Python.
 
-### 4. Configure the CEWE installation
+### 4. Configure the CEWE installation (optional, but highly recommended!)
 
 Locate the directory where the CEWE album software is installed. On Linux it
 can be recognised by its many `.so` files and directories such as `Resources`.
 Create a `cewe2pdf.ini` file alongside the album file and set `cewe_folder` to
-that directory. The following section describes that configuration file and
-the optional font and resource settings in detail.
+that directory. This gives the most faithful results, including CEWE-delivered
+backgrounds, clipart, passepartouts and fonts.
+
+If CEWE is not installed, configuration is not required for a best-effort
+conversion. cewe2pdf will use locally installed fonts and the images contained
+with the album. It reports each unavailable CEWE background, clipart or
+passepartout and leaves that decoration out of the PDF.
 
 ## Configuration files
 
@@ -101,7 +106,9 @@ If a ``cewe_folder.txt`` (see below) file is not found, then the program looks f
 
 For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place a ``cewe2pdf.ini`` file with the album file, setting everything you need there, out of the way of future updates to the program repository.
 
-In ``cewe2pdf.ini`` you **must** specify the location of the cewe folder. You can also
+For full CEWE resource support, specify the location of the CEWE folder in
+``cewe2pdf.ini``. The file is optional when a best-effort PDF using local
+fonts and album-contained images is sufficient. It can also
 * provide a list of locations for additional background images, cliparts, passepartouts (frames)
 * define how the additional fonts you have specified (see below) are organised into families so that bold and italic texts are shown correctly
 * define non-standard line spacing (linescale) for any fonts that need it
@@ -162,7 +169,12 @@ noShadows = False
 ```
 
 ### additional_fonts.txt
-The code knows where to find the fonts delivered with the Cewe software, but if you use non-Cewe fonts then you must specify the location of those fonts. For historical reasons configuration of fonts is done with a separate (optional) configuration file, ``additional_fonts.txt``. The file should contain one line per font file or font directory to be added. Both `.ttf` or `.otf` files are read.
+The code knows where to find the fonts delivered with the Cewe software. It
+also looks in the current user's local font folder, unless the
+``IGNORELOCALFONTS`` environment variable is set (as it is for the regression
+test run). If the album uses other fonts, use the separate optional
+configuration file ``additional_fonts.txt``. It contains one line per font file
+or font directory to be added; both `.ttf` and `.otf` files are read.
 
 To find a potential ``additional_fonts.txt`` the code searches, in order, the album directory, the current directory and the location of the program itself; it uses only the **first** such file found.
 
