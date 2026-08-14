@@ -76,7 +76,6 @@ import os.path
 import os
 
 import argparse  # to parse arguments
-from math import floor
 
 import reportlab.lib.pagesizes
 # from reportlab.pdfbase.pdfmetrics import stringWidth as _stringWidth
@@ -85,18 +84,8 @@ import reportlab.lib.pagesizes
 import PIL
 
 from packaging.version import parse as parse_version
-from ceweInfo import AlbumInfo
-from albumIndex import AlbumIndex
-from borders import processDecorationBorders
-from clipartareas import processAreaClipartTag
-from conversionState import ConversionState
-from imageareas import processAreaImageTag
-from pageTypes import PageProcessingType
-from cewePageResolver import getPageElementForPageNumber
-from renderContext import RenderContext
-from textareas import processAreaTextTag
 from albumConversionSession import AlbumConversionSession
-from shadows import processDecorationShadow
+from pageElements import processElements
 
 
 # work around a breaking change in pil 10.0.0, see
@@ -141,77 +130,6 @@ image_quality = 86  # 0=worst, 100=best. This is the JPEG quality option.
 # Keep this conversion at the boundary: area-rendering modules receive it in
 # RenderContext rather than each maintaining its own approximation.
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
-
-
-# `pages.processPages` identifies the correct MCF page element, including the
-# slightly unusual cover and paired-page rules. This callback dispatches each
-# area to its specialist renderer after translating the PDF origin to the
-# area's centre; rotation therefore behaves like it does in the Album Editor.
-def processElements(additional_fonts, fotobook, imagedir,
-                    productstyle, mcfBaseFolder, oddpage, page, pageNumber, pagetype, pdf, pageH, pageW,
-                    lastpage, context: RenderContext, state: ConversionState, albumIndex: AlbumIndex):
-    if AlbumInfo.isAlbumDoubleSide(productstyle) and pagetype == PageProcessingType.RegularPage and not oddpage and not lastpage:
-        # if we are in double-page mode, all the images are drawn by the odd pages.
-        return
-
-    # the mcf file really comes in "bundles" of two pages, so for odd pages we switch back to
-    # the page element for the preceding even page to get the elements
-    if AlbumInfo.isAlbumProduct(productstyle) and pagetype == PageProcessingType.RegularPage and oddpage:
-        page = getPageElementForPageNumber(fotobook, 2*floor(pageNumber/2))
-
-    for area in page.findall('area'):
-        areaPos = area.find('position')
-        areaLeft = float(areaPos.get('left').replace(',', '.'))
-        if pagetype != PageProcessingType.FrontInsideCoverBackground or len(area.findall('imagebackground')) == 0:
-            if oddpage and AlbumInfo.isAlbumSingleSide(productstyle):
-                # shift double-page content from other page
-                areaLeft -= pageW
-        areaTop = float(areaPos.get('top').replace(',', '.'))
-        areaWidth = float(areaPos.get('width').replace(',', '.'))
-        areaHeight = float(areaPos.get('height').replace(',', '.'))
-        areaRot = float(areaPos.get('rotation'))
-
-        # check if the image is on current page at all, and if not then skip processing it
-        if AlbumInfo.isAlbumSingleSide(productstyle) and pagetype in [PageProcessingType.RegularPage, PageProcessingType.Cover]:
-            if oddpage:
-                # the right edge of image is beyond the left page border
-                if (areaLeft+areaWidth) < 0:
-                    continue
-            else:
-                if areaLeft > pageW:  # the left image edge is beyond the right page border.
-                    continue
-
-        # center positions
-        cx = areaLeft + 0.5 * areaWidth
-        cy = pageH - (areaTop + 0.5 * areaHeight)
-
-        transCx = context.mcf_to_reportlab * cx
-        transCy = context.mcf_to_reportlab * cy
-
-        # process images
-        for imageTag in area.findall('imagebackground') + area.findall('image'):
-            processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imagedir, productstyle,
-                                mcfBaseFolder, pagetype, pdf, pageW, transCx, transCy, context,
-                                state,
-                                processDecorationShadow, processDecorationBorders)
-
-        # process text
-        for textTag in area.findall('text'):
-            processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,
-                               pageNumber, context, state, albumIndex)
-
-        # Clip-Art
-        # In the clipartarea there are two similar elements, the <designElementIDs> and the <clipart>.
-        # We are using the <clipart> element here
-        if area.get('areatype') == 'clipartarea':
-            # within clipartarea tags we need the decoration for alpha and border information
-            decoration = area.find('decoration')
-            for clipartElement in area.findall('clipart'):
-                processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, transCx, transCy,
-                                      decoration, context,
-                                      lambda decoration, height, width, canvas:
-                                      processDecorationBorders(decoration, height, width, canvas, context))
-    return
 
 
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None,
