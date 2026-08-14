@@ -1,5 +1,6 @@
 import sys
 import os
+import pytest
 
 def test_webp_loading():
     #if this fails, then there is a problem with the pillow install.
@@ -15,4 +16,4 @@ def test_webp_loading():
 
 if __name__ == '__main__':
     #only executed when this file is run directly.
-    test_webp_loading()
+    sys.exit(pytest.main([__file__]))

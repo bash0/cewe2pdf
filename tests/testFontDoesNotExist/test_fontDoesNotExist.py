@@ -1,6 +1,7 @@
 """Test recovery from an unavailable additional-font definition."""
 
 import sys
+import pytest
 from tempfile import TemporaryDirectory
 from pathlib import Path
 from unittest.mock import patch
@@ -43,5 +44,4 @@ def test_missingAdditionalFontIsLoggedAndIgnored():
 
 
 if __name__ == '__main__':
-    test_missingAdditionalFontIsLoggedAndIgnored()
-    print('Missing additional-font test passed.')
+    sys.exit(pytest.main([__file__]))
