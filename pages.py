@@ -15,7 +15,7 @@ from pageTypes import PageProcessingType
 from renderContext import RenderContext
 
 
-def parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations, imageDirectory, pdf,
+def parseInputPage(fotobook, mcfBaseFolder, backgroundLocations, imageDirectory, pdf,
                    page, pageNumber, pageCount, pageType, productStyle, oddPage,
                    state: ConversionState, availableFonts, lastPage,
                    context: RenderContext, processElements: Callable):
@@ -38,7 +38,7 @@ def parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations, ima
     # The designElementIDs preceding the background element match it only for
     # an original, unfiltered stock background.
     backgroundTags = page.findall('background')
-    processBackground(backgroundTags, state, ceweFolder,
+    processBackground(backgroundTags, state,
                       backgroundLocations, productStyle, pageType, pdf,
                       pageHeight, pageWidth, context)
 
@@ -55,14 +55,14 @@ def parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations, ima
 
 
 def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pageCount,
-                 pageNumbers, ceweFolder, availableFonts, backgroundLocations,
+                 pageNumbers, availableFonts, backgroundLocations,
                  state: ConversionState, context: RenderContext,
                  pageNumberingInfo, processElements: Callable):
     """Render the requested album pages, including covers and inside covers."""
 
     for resolvedPage in resolvePages(fotobook, productStyle, pageCount, pageNumbers):
         try:
-            _renderResolvedPage(resolvedPage, fotobook, ceweFolder, mcfBaseFolder,
+            _renderResolvedPage(resolvedPage, fotobook, mcfBaseFolder,
                                 backgroundLocations, imageDirectory, productStyle, pdf,
                                 pageCount, state, availableFonts, context,
                                 pageNumberingInfo, processElements)
@@ -72,12 +72,12 @@ def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pag
             logging.error(f'error on page {resolvedPage.source_number}: {pageException.args[0]}')
 
 
-def _renderResolvedPage(resolvedPage: ResolvedPage, fotobook, ceweFolder, mcfBaseFolder,
+def _renderResolvedPage(resolvedPage: ResolvedPage, fotobook, mcfBaseFolder,
                         backgroundLocations, imageDirectory, productStyle, pdf, pageCount,
                         state: ConversionState, availableFonts, context: RenderContext,
                         pageNumberingInfo, processElements: Callable):
     """Render one page which has already been classified by CEWE rules."""
-    parseInputPage(fotobook, ceweFolder, mcfBaseFolder, backgroundLocations,
+    parseInputPage(fotobook, mcfBaseFolder, backgroundLocations,
                    imageDirectory, pdf, resolvedPage.element, resolvedPage.page_number,
                    pageCount, resolvedPage.page_type, productStyle,
                    resolvedPage.odd_page, state, availableFonts,

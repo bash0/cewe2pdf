@@ -104,7 +104,7 @@ class AlbumConversionSession:
 
         processPages(
             self.setup.fotobook, self.setup.mcf_base_folder, imageFolder,
-            productStyle, pdf, pageCount, self.page_numbers, self.setup.cewe_folder,
+            productStyle, pdf, pageCount, self.page_numbers,
             self.setup.available_fonts, self.setup.background_locations, self.state,
             renderContext, pageNumberingInfo, processElementsForAlbum)
 

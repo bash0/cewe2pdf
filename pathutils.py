@@ -33,20 +33,19 @@ def appdata_dir():
 
 
 def localfont_dir():
-    # Get OS specific directory for locally installed fonts
+    # Get OS specific directory for locally installed fonts.
     if sys.platform.startswith("win"):
-        # microsoft windows
+        # Microsoft Windows
         os_path = getenv("LOCALAPPDATA") + "/Microsoft/Windows/Fonts/"
     elif sys.platform.startswith("darwin"):
         # Mac and several others
         os_path = "~/Library/Fonts"
     else:
-        # assume linux
+        # Assume Linux
         os_path = getenv("XDG_DATA_HOME", "~/.local/share") + "/fonts"
 
     # join with cewe2pdf dir
-    path = Path(os_path)
-    return path.expanduser()
+    return Path(os_path).expanduser()
 
 
 # locate files in a directory with a pattern, with optional case sensitivity

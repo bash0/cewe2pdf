@@ -67,7 +67,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
         except KeyError:
             passepartoutXmlFileName = None
         if passepartoutXmlFileName is None:
-            logging.error(f"Can't find passepartout for {passepartoutId}")
+            logging.warning(f"Could not find passepartout {passepartoutId}; rendering the unframed image.")
         else:
             passepartoutInfo = Passepartout.extractInfoFromXml(passepartoutXmlFileName, passepartoutId)
             frameClipartFileName = Passepartout.getClipartFullName(passepartoutInfo)

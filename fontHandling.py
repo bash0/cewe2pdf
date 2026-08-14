@@ -48,10 +48,10 @@ def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder
     if cewe_folder:
         fontDirs.append(CeweInfo.getCeweFontsFolder(cewe_folder))
 
-    # If a user has installed fonts locally on his machine, then we look there as well
+    # If a user has installed fonts locally on his machine, then we look there as well.
     # This behaviour can be inhibited with the presence of an environment variable to
-    # make the local run more like what will happen when it is run by the github check-in
-    # workflow
+    # make the local run more like what will happen when it is run by the GitHub check-in
+    # workflow.
     if os.getenv("IGNORELOCALFONTS") is None:
         localFontFolder = localfont_dir()
         if os.path.exists(localFontFolder):
@@ -323,7 +323,16 @@ def loadMissingFontSubstitutions(configSection, availableFonts, state: Conversio
     the record of warnings both belong to ConversionState.  That avoids a
     previous album's INI settings leaking into a later album conversion.
     """
-    state.missing_font_substitutions = dict(DEFAULT_MISSING_FONT_SUBSTITUTIONS)
+    # The historical defaults name fonts supplied by the CEWE installation
+    # and by our test resources.  They are useful only when that replacement
+    # was successfully registered.  In a standalone installation they may be
+    # absent, in which case getMissingFontSubstitute deliberately falls back
+    # to ReportLab's built-in Helvetica instead of returning an unusable name.
+    state.missing_font_substitutions = {
+        originalfont: replacement
+        for originalfont, replacement in DEFAULT_MISSING_FONT_SUBSTITUTIONS.items()
+        if replacement in availableFonts
+    }
     if configSection is None:
         return
     # build the known missing font substitutions table
