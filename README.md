@@ -106,9 +106,9 @@ If a ``cewe_folder.txt`` (see below) file is not found, then the program looks f
 
 For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place a ``cewe2pdf.ini`` file with the album file, setting everything you need there, out of the way of future updates to the program repository.
 
-For full CEWE resource support, specify the location of the CEWE folder in
-``cewe2pdf.ini``. The file is optional when a best-effort PDF using local
-fonts and album-contained images is sufficient. It can also
+For full CEWE resource support, specify the location of the CEWE installation folder in ``cewe2pdf.ini``. If you do not have CEWE installed on your machine you should specify an empty entry, `cewe_folder =`, but then the album itself must not have used resources which are supplied by CEWE - fonts, backgrounds, clip arts, etc.
+
+``cewe2pdf.ini`` can also
 * provide a list of locations for additional background images, cliparts, passepartouts (frames)
 * define how the additional fonts you have specified (see below) are organised into families so that bold and italic texts are shown correctly
 * define non-standard line spacing (linescale) for any fonts that need it
@@ -172,7 +172,10 @@ noShadows = False
 The code knows where to find the fonts delivered with the Cewe software. It
 also looks in the current user's local font folder, unless the
 ``IGNORELOCALFONTS`` environment variable is set (as it is for the regression
-test run). If the album uses other fonts, use the separate optional
+test run).
+
+If the album uses other fonts (including those provided by the host operating system) you
+should use the separate optional
 configuration file ``additional_fonts.txt``. It contains one line per font file
 or font directory to be added; both `.ttf` and `.otf` files are read.
 
