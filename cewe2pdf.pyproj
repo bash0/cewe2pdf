@@ -31,6 +31,7 @@
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.txt" />
     <Content Include="cewe2pdf.spec" />
+    <Content Include="DEVELOPER_GUIDE.md" />
     <Content Include="documents\mcf_feature_classification.md" />
     <Content Include="documents\readme.txt" />
     <Content Include="environments\cewe2pdfenvlinux.yml" />

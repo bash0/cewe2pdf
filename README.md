@@ -411,6 +411,9 @@ Example:
 
 ## Development
 
+For a newcomer-oriented overview of the modules, data ownership and regression
+test structure, see the [Developer guide](DEVELOPER_GUIDE.md).
+
 ### Python dependencies
 
 The project has three dependency files with distinct jobs:
