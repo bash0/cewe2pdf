@@ -339,10 +339,13 @@ def loadMissingFontSubstitutions(configSection, availableFonts, state: Conversio
     # was successfully registered.  In a standalone installation they may be
     # absent, in which case getMissingFontSubstitute deliberately falls back
     # to ReportLab's built-in Helvetica instead of returning an unusable name.
+    # availableFonts contains faces registered from font files.  ReportLab's
+    # PDF base fonts need no registration, but are also valid replacements.
+    usableReplacementFonts = set(availableFonts).union(pdfmetrics.standardFonts)
     state.missing_font_substitutions = {
         originalfont: replacement
         for originalfont, replacement in DEFAULT_MISSING_FONT_SUBSTITUTIONS.items()
-        if replacement in availableFonts
+        if replacement in usableReplacementFonts
     }
     if configSection is None:
         return
@@ -359,7 +362,7 @@ def loadMissingFontSubstitutions(configSection, availableFonts, state: Conversio
                 state.missing_font_substitutions = {}
             else:
                 if originalfont != '' and newfont != '':
-                    if newfont not in availableFonts:
+                    if newfont not in usableReplacementFonts:
                         configlogger.error(f"Font substitution with '{newfont}' ignored, that font has not been found")
                         continue
                     state.missing_font_substitutions[originalfont] = newfont

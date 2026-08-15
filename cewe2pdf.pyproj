@@ -189,6 +189,11 @@
     <Content Include="tests\testMemoryCards\testMemoryCards.mcf" />
     <Content Include="tests\testMemoryCards\testMemoryCards_mcf-Dateien\cbxmu7d2_1_20200306_111748.jpg" />
     <Content Include="tests\testMemoryCards\testMemoryCards_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testNoCewe\cewe2pdf.ini" />
+    <Content Include="tests\testNoCewe\testNoCewe.mcf" />
+    <Content Include="tests\testNoCewe\testNoCewe_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testNoCewe\testNoCewe_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\testNoCewe\__pycache__\test_noCewe.cpython-312-pytest-9.1.1.pyc" />
     <Content Include="tests\testPageNumbers\additional_fonts.txt" />
     <Content Include="tests\testPageNumbers\cewe2pdf.ini" />
     <Content Include="tests\testPageNumbers\test_pagenumbers.mcf" />
@@ -387,6 +392,7 @@
     <Compile Include="tests\testLists\test_lists.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
     <Compile Include="tests\testMemoryCards\test_memoryCards.py" />
+    <Compile Include="tests\testNoCewe\test_noCewe.py" />
     <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
     <Compile Include="tests\testShadows\test_shadows.py" />
     <Compile Include="tests\testTabs\test_tabs.py" />
@@ -476,6 +482,10 @@
     <Folder Include="tests\testMemoryCards\" />
     <Folder Include="tests\testMemoryCards\previous_result_pdfs\" />
     <Folder Include="tests\testMemoryCards\testMemoryCards_mcf-Dateien\" />
+    <Folder Include="tests\testNoCewe\" />
+    <Folder Include="tests\testNoCewe\previous_result_pdfs\" />
+    <Folder Include="tests\testNoCewe\testNoCewe_mcf-Dateien\" />
+    <Folder Include="tests\testNoCewe\__pycache__\" />
     <Folder Include="tests\testPageNumbers\" />
     <Folder Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\" />
     <Folder Include="tests\testShadows\" />
