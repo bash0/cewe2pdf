@@ -171,6 +171,11 @@ noShadows = False
 #	cewe2pdf.config: WARNING[32], INFO[669]
 #	root:            ERROR[2], WARNING[4], INFO[38]
 ```
+#### Advanced CEWE resource lookup
+
+During development when we don't want to use resources from the local CEWE installation, you can set some related values in cewe2pdf.ini
+* ``hpsFolder``: overrides the location of CEWE’s HPS/account-resource hierarchy.
+* ``keyaccount``: selects the account folder within that hierarchy.
 
 ### additional_fonts.txt
 The code knows where to find the fonts delivered with the Cewe software. It
