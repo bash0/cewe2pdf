@@ -129,6 +129,10 @@ fontFamilies =
 pdfImageResolution = 150
 pdfBackgroundResolution = 150
 
+# Search shared operating-system font folders as well as CEWE and local fonts.
+# Disabled by default because system fonts vary between machines.
+#loadSystemFonts = True
+
 # specify default leading (1.1 = 10% of the font size as leading is standard in the code, where we leave
 # it unaltered for backward compatibility, but 1.15 works best when line spacing is used, see issue 182)
 defaultLineScale = 1.15
@@ -179,9 +183,14 @@ should use the separate optional
 configuration file ``additional_fonts.txt``. It contains one line per font file
 or font directory to be added; both `.ttf` and `.otf` files are read.
 
+Alternatively, set ``loadSystemFonts = True`` in ``cewe2pdf.ini`` to search the
+shared operating-system font folders (for example ``C:\\Windows\\Fonts``).
+This is disabled by default because the available fonts differ between
+machines.
+
 To find a potential ``additional_fonts.txt`` the code searches, in order, the album directory, the current directory and the location of the program itself; it uses only the **first** such file found.
 
-For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place an ``additional_fonts.txt`` file with the album file, out of the way of future updates to the program repository. You can prevent the program from using fonts defined in the code repository versions of the file by providing an empty ``additional_fonts.txt`` next to your album file.
+For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place an ``additional_fonts.txt`` file with the album file, out of the way of future updates to the program repository. The repository supplies a commented ``additional_fonts.example.txt`` which you can copy and adapt. It is deliberately not called ``additional_fonts.txt``, so it is never used as implicit configuration.
 
 Example for Windows font file and directory paths:
 ```
@@ -357,7 +366,7 @@ You should now have
   - one or more `*.mcf` or `.mcfx` album files
     * a directory named `<album>_mcf-Datein` for each album, if you are using `*.mcf`
   - a `cewe2pdf.ini` configuration file (or maybe the now deprecated `cewe_folder.txt`)
-  - an `additional_fonts.txt` configuration file
+  - optionally, an `additional_fonts.txt` configuration file
 
 It is not really a good idea to place your album files in the same directory as the program. Keep them separate so there is no confusion in keeping your version of the program up to date with your Github repository version.
 

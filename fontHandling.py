@@ -6,10 +6,11 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 from ceweInfo import CeweInfo
+from configUtils import getConfigurationBool
 from conversionState import ConversionState
 from extraLoggers import mustsee, configlogger
 from otf import getTtfsFromOtfs
-from pathutils import localfont_dir, findFileInDirs, findFilesInDir
+from pathutils import localfont_dir, systemfont_dirs, findFileInDirs, findFilesInDir
 
 
 def addAdditionalFontsFromFile(configFontFileName, ttfFiles, fontDirs):
@@ -42,6 +43,7 @@ def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder
                          state: ConversionState): # pylint: disable=too-many-statements
     ttfFiles = []
     fontDirs = []
+    recursiveFontDirs = []
     fontsToRegister = {}
     familiesToRegister = {}
 
@@ -57,6 +59,16 @@ def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder
         if os.path.exists(localFontFolder):
             fontDirs.append(str(localFontFolder))
 
+    if getConfigurationBool(configSection, 'loadSystemFonts', False):
+        configuredSystemFontDirs = [str(fontDirectory) for fontDirectory in systemfont_dirs()
+                                    if os.path.exists(fontDirectory)]
+        fontDirs.extend(configuredSystemFontDirs)
+        # Linux and macOS commonly arrange fonts in subdirectories. Windows
+        # keeps usable fonts directly in its Fonts folder, and recursion can
+        # encounter stale deleted-font data below it.
+        if os.name != 'nt':
+            recursiveFontDirs.extend(configuredSystemFontDirs)
+
     try:
         searchlocations = (albumBaseFolder, os.path.curdir, os.path.dirname(os.path.realpath(__file__)))
         configFontFileName = findFileInDirs('additional_fonts.txt', searchlocations)
@@ -69,11 +81,11 @@ def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder
         configlogger.error('Content example:')
         configlogger.error('/tmp/vera.ttf')
 
-    addTtfFilesFromFontdirs(ttfFiles, fontDirs, appDataDir)
+    addTtfFilesFromFontdirs(ttfFiles, fontDirs, appDataDir, recursiveFontDirs)
 
     buildFontsToRegisterFromTtfFiles(ttfFiles, fontsToRegister, familiesToRegister)
 
-    logging.info(f"Registering {len(fontsToRegister)} fonts")
+    logging.info(f"Found {len(fontsToRegister)} fonts; registering them")
     # We need to loop over the keys, not the list iterator, so we can delete keys from the list in the loop
     for curFontName in list(fontsToRegister):
         try:
@@ -244,7 +256,7 @@ def getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontList):
     return explicitFamilyNames
 
 
-def addTtfFilesFromFontdirs(ttfFiles, fontDirs, appDataDir):
+def addTtfFilesFromFontdirs(ttfFiles, fontDirs, appDataDir, recursiveFontDirs=()):
     if len(fontDirs) > 0:
         mustsee.info(f'Scanning for ttf/otf files in {str(fontDirs)}')
         for fontDir in fontDirs:
@@ -254,16 +266,15 @@ def addTtfFilesFromFontdirs(ttfFiles, fontDirs, appDataDir):
             # a Linux subsystem on a Windows machine and file system. So we use a case insensitive
             # alternative [until Python 3.12 when glob itself offers case insensitivity] Ref the
             # discussion at https://stackoverflow.com/questions/8151300/ignore-case-in-glob-on-linux
-            ttfextras = findFilesInDir(fontDir, '*.ttf', walk_structure=False)
-            # walk_structure set to True looks like a good idea, so we could keep our own
-            # downloaded fonts, eg from Google Fonts, in separate folders. But it turns out
-            # that Windows really assumes that searches are restricted to a single folder,
-            # so that deleted fonts may be moved to a "Deleted" sub folder.
+            ttfextras = findFilesInDir(fontDir, '*.ttf', walk_structure=fontDir in recursiveFontDirs)
+            # Recursion is reserved for configured shared system folders on
+            # Linux and macOS. Ordinary additional-font folders retain the
+            # historical one-folder scan, which is safer on Windows.
             ttfFiles.extend(sorted(ttfextras))
 
             # CEWE deliver some fonts as otf, which we cannot use witout first converting to ttf
             #   see https://github.com/bash0/cewe2pdf/issues/133
-            otfFiles = findFilesInDir(fontDir, '*.otf')
+            otfFiles = findFilesInDir(fontDir, '*.otf', walk_structure=fontDir in recursiveFontDirs)
             if len(otfFiles) > 0:
                 ttfsFromOtfs = getTtfsFromOtfs(otfFiles,appDataDir)
                 ttfFiles.extend(sorted(ttfsFromOtfs))
