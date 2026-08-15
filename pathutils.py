@@ -48,6 +48,21 @@ def localfont_dir():
     return Path(os_path).expanduser()
 
 
+def systemfont_dirs():
+    """Return the standard shared font directories for this platform.
+
+    These directories are intentionally not searched unless the caller has an
+    explicit configuration option for that purpose: system fonts vary between
+    computers and can change PDF output.
+    """
+    if sys.platform.startswith("win"):
+        windowsDirectory = getenv("WINDIR", r"C:\\Windows")
+        return (Path(windowsDirectory) / "Fonts",)
+    if sys.platform.startswith("darwin"):
+        return (Path("/Library/Fonts"), Path("/System/Library/Fonts"))
+    return (Path("/usr/local/share/fonts"), Path("/usr/share/fonts"))
+
+
 # locate files in a directory with a pattern, with optional case sensitivity
 # and the optional ability to walk the structure below the provided directory
 # eg: findFilesInDir(fontdir, '*.ttf')

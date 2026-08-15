@@ -1,0 +1,24 @@
+# This is an example only. Copy it to additional_fonts.txt and adapt it before
+# use. In an additional_fonts.txt file you can list individual font files or directories containing
+# fonts over and above what the code loads as standard, namely CEWE fonts and
+# the current user's local font folder (unless IGNORELOCALFONTS is set).
+
+# cewe2pdf searches for just one additional_fonts.txt file, the first it can find, starting
+#  with the album folder, then the current directory, then the program directory.
+#  This unlike the way that it reads and combines all the cewe2pdf.ini files that it finds.
+# If you want no non-standard fonts to be used, then simply place an empty additional_fonts.txt
+#  file in the album folder, thereby stopping the code from looking further.
+
+# Listing a system font directory below remains useful when an album uses a
+# font that CEWE does not supply, but a better way (after August 2026) is to
+# use the ini file loadSystemFonts=1 setting, which is a portable way to get
+# the same effect without having to know the system font directory.
+
+# These are examples of what you can put in an additional_fonts.txt file. They used to be
+# present rather than commented out, but were removed in Aug 2026 so that this file does
+# not actually get used as a default when the user does not have an additional_fonts.txt
+# in their album folder.
+#  C:\Windows\Fonts\BOD_R.TTF
+#  ${CEWE_FOLDER}\Resources\photofun\fonts\Function-Light.ttf
+#  /home/cweiske/.local/share/fonts/
+#  C:\Windows\Fonts\

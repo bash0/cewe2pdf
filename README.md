@@ -129,6 +129,10 @@ fontFamilies =
 pdfImageResolution = 150
 pdfBackgroundResolution = 150
 
+# Search shared operating-system font folders as well as CEWE and local fonts.
+# Disabled by default because system fonts vary between machines.
+#loadSystemFonts = True
+
 # specify default leading (1.1 = 10% of the font size as leading is standard in the code, where we leave
 # it unaltered for backward compatibility, but 1.15 works best when line spacing is used, see issue 182)
 defaultLineScale = 1.15
@@ -178,6 +182,11 @@ If the album uses other fonts (including those provided by the host operating sy
 should use the separate optional
 configuration file ``additional_fonts.txt``. It contains one line per font file
 or font directory to be added; both `.ttf` and `.otf` files are read.
+
+Alternatively, set ``loadSystemFonts = True`` in ``cewe2pdf.ini`` to search the
+shared operating-system font folders (for example ``C:\\Windows\\Fonts``).
+This is disabled by default because the available fonts differ between
+machines.
 
 To find a potential ``additional_fonts.txt`` the code searches, in order, the album directory, the current directory and the location of the program itself; it uses only the **first** such file found.
 
