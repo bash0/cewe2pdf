@@ -1,5 +1,6 @@
 """Tests for conversion setup when no CEWE installation is available."""
 
+import configparser
 import os
 import shutil
 import sys
@@ -13,6 +14,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from conversionSetup import prepareConversion
 from conversionState import ConversionState
+from extraLoggers import configlogger
 from fontHandling import getMissingFontSubstitute, loadMissingFontSubstitutions
 
 
@@ -53,3 +55,33 @@ def test_defaultFontSubstitutionsNeedAvailableReplacementFonts():
 
     assert 'CEWE Head' not in state.missing_font_substitutions
     assert getMissingFontSubstitute('CEWE Head', state) == 'Helvetica'
+
+
+def test_configuredFontSubstitutionCanUseReportLabBaseFont():
+    """An INI mapping may target a ReportLab font needing no file registration."""
+    configuration = configparser.ConfigParser()
+    configuration['DEFAULT'] = {
+        'missingFontSubstitutions': 'Courier PS: Courier\nTimes New Roman: Times-Roman'
+    }
+    state = ConversionState()
+
+    loadMissingFontSubstitutions(configuration['DEFAULT'], {}, state)
+
+    assert getMissingFontSubstitute('Courier PS', state) == 'Courier'
+    assert getMissingFontSubstitute('Times New Roman', state) == 'Times-Roman'
+
+
+def test_configuredFontSubstitutionStillRejectsUnavailableReplacement():
+    """A configured replacement must be a registered or ReportLab base font."""
+    configuration = configparser.ConfigParser()
+    configuration['DEFAULT'] = {
+        'missingFontSubstitutions': 'Courier PS: A Font That Does Not Exist'
+    }
+    state = ConversionState()
+
+    with patch.object(configlogger, 'error') as logError:
+        loadMissingFontSubstitutions(configuration['DEFAULT'], {}, state)
+
+    assert 'Courier PS' not in state.missing_font_substitutions
+    logError.assert_called_once_with(
+        "Font substitution with 'A Font That Does Not Exist' ignored, that font has not been found")
