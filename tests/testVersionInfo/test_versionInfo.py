@@ -1,5 +1,11 @@
 from subprocess import CalledProcessError
+import sys
+from pathlib import Path
 from unittest.mock import Mock, patch
+
+# Bootstrap the project root so this test can also run directly.
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from programversion import PROGRAM_VERSION as PROGRAM_VERSION_FROM_SOURCE
 from versionInfo import (PROGRAM_VERSION, getGitBuildIdentification,

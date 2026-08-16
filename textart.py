@@ -1,10 +1,18 @@
 import logging
 import math
+from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
+from lxml import etree
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
-from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
+
+from borders import processDecorationBorders
 from fontHandling import getMissingFontSubstitute
 from conversionState import ConversionState
+from renderContext import RenderContext
+
+# A CEWE 8.1 TextArt box has no stored radius.  A newly-created 490-unit
+# square box has the same arc as the 171-unit legacy wrapper-table margin.
+CEWE8_DEFAULT_TEXTART_RADIUS_RATIO = 171 / 490
 
 def parse_html_text(html):
     """Parses an HTML string, applying default styles from <body> while handling <p>, <span>, <i>, and <b>."""
@@ -73,9 +81,9 @@ def parse_html_text(html):
 
 
 def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwise, maxfontsize,
-                      state: ConversionState):
+                      state: ConversionState, circleCenterY=0, ellipseRadiusY=None):
     notifiedFontError = False
-    cx, cy = (0,0) # center
+    cx, cy = (0, circleCenterY)
     current_angle = start_angle_deg
 
     for char, font_name, font_size, font_color, is_bold, is_italic in parsed_text:
@@ -103,27 +111,41 @@ def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwi
                 notifiedFontError = True
             letter_width = pdfmetrics.stringWidth(char, full_font, font_size)
 
-        # Convert the letter width to an angular span (in degrees) on the circle
-        # using the original radius so that the letters are the same for both
-        # clockwise and anticlockwise
-        letter_angle_deg = (letter_width / originalRadius) * (180 / math.pi)
+        # Convert the letter width to an angular span (in degrees).  Legacy
+        # TextArt follows a circle; CEWE 8 rectangle TextArt follows an
+        # ellipse, whose local arc length varies with the current angle.
+        if ellipseRadiusY is None:
+            arc_radius = originalRadius
+        else:
+            current_angle_radians = math.radians(current_angle)
+            arc_radius = math.hypot(
+                originalRadius * math.sin(current_angle_radians),
+                ellipseRadiusY * math.cos(current_angle_radians))
+        letter_angle_deg = (letter_width / arc_radius) * (180 / math.pi)
         letter_center_angle = current_angle + letter_angle_deg / 2
         letter_center_radians = math.radians(letter_center_angle)
 
         # Compute letter positioning and rotation
         # For clockwise we need to reduce the radius and to move the letter
         # placement inwards, putting the top of the letter up against the arc
-        radius = originalRadius - maxfontsize * 0.7 if clockwise else originalRadius
-        x = cx + radius * math.cos(letter_center_radians)
-        y = cy + radius * math.sin(letter_center_radians)
+        radius_x = originalRadius - maxfontsize * 0.7 if clockwise else originalRadius
+        radius_y = ellipseRadiusY if ellipseRadiusY is not None else originalRadius
+        if clockwise:
+            radius_y -= maxfontsize * 0.7
+        x = cx + radius_x * math.cos(letter_center_radians)
+        y = cy + radius_y * math.sin(letter_center_radians)
 
         if pdf is not None: # actually draw the text, rather than just calculating the size
             pdf.saveState()
             pdf.setFont(full_font, font_size)
             pdf.setFillColor(font_color)
             pdf.translate(x, y)
-            # Rotate appropriately for direction
-            pdf.rotate(letter_center_angle - 90 if clockwise else letter_center_angle + 90)
+            # The ellipse tangent is the baseline. Reversing it produces the
+            # clockwise orientation while retaining the legacy circle result.
+            tangent_angle = math.degrees(math.atan2(
+                radius_y * math.cos(letter_center_radians),
+                -radius_x * math.sin(letter_center_radians)))
+            pdf.rotate(tangent_angle + 180 if clockwise else tangent_angle)
             pdf.drawString(-letter_width / 2, 0, char)
             pdf.restoreState()
 
@@ -142,7 +164,8 @@ def processParsedText(parsed_text, pdf, originalRadius, start_angle_deg, clockwi
     return angle_extent
 
 
-def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, state: ConversionState, clockwise=True):
+def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, state: ConversionState,
+                            clockwise=True, circleCenterY=0, ellipseRadiusY=None):
     """
     Draws styled text along a circular arc, applying bold and italic styles dynamically.
     Parameters:
@@ -162,6 +185,9 @@ def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, state: Conve
     # we'll have to adjust the letters individually in relation to this
     fiddleFactor = maxfontsize * 0.9
     effectiveRadius = radius + fiddleFactor
+    effectiveEllipseRadiusY = None
+    if ellipseRadiusY is not None:
+        effectiveEllipseRadiusY = ellipseRadiusY + fiddleFactor
 
     # Reverse text placement if necessary
     if clockwise:
@@ -171,13 +197,15 @@ def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, state: Conve
     # that we can place it symmetrically around the given start angle
     givenStartAngle = 90 - start_angle_deg if clockwise else start_angle_deg - 90
     angularExtent = processParsedText(parsed_text, None, effectiveRadius, start_angle_deg,
-        clockwise, maxfontsize, state)
+        clockwise, maxfontsize, state, ellipseRadiusY=effectiveEllipseRadiusY)
     centredStartAngle = givenStartAngle - (angularExtent * 0.5)
 
-    processParsedText(parsed_text, pdf, effectiveRadius, centredStartAngle, clockwise, maxfontsize, state)
+    processParsedText(parsed_text, pdf, effectiveRadius, centredStartAngle, clockwise, maxfontsize,
+                      state, circleCenterY, effectiveEllipseRadiusY)
 
 
-def handleTextArt(pdf, radius, bodyhtml, cwtextart, state: ConversionState):
+def handleTextArt(pdf, radius, bodyhtml, cwtextart, state: ConversionState, circleCenterY=0,
+                  ellipseRadiusY=None):
     if "enabled" in cwtextart[0].attrib:
         enabledAttrib = cwtextart[0].get('enabled')
         if enabledAttrib != '1':
@@ -193,4 +221,52 @@ def handleTextArt(pdf, radius, bodyhtml, cwtextart, state: ConversionState):
         directionAttrib = cwtextart[0].get('direction')
         direction = directionAttrib == '1'
 
-    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, state, clockwise=direction)
+    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, state,
+                            clockwise=direction, circleCenterY=circleCenterY,
+                            ellipseRadiusY=ellipseRadiusY)
+
+
+def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad,
+                   cwtextart, context: RenderContext, state: ConversionState):
+    """Render one TextArt area, including its border and arc geometry."""
+    pdf.translate(transCx, transCy)
+    pdf.rotate(-areaRot)
+    for decorationTag in area.findall('decoration'):
+        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, context)
+    bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
+
+    # CEWE 7 and earlier put a TextArt radius in the margin of the wrapper
+    # table in the HTML text. CEWE 8.1 saves the same TextArt as a plain
+    # paragraph, without retaining that margin or introducing a dedicated
+    # radius attribute. Retain the legacy circular value when present.
+    #
+    # The CEWE 8 rectangle behaviour is an ellipse: its horizontal and
+    # vertical radii scale independently with the area's width and height.
+    # The top inset is based on the shorter box side. This leaves a tall
+    # TextArt box in its established position, but moves a wide ellipse up so
+    # that its text stays equally close to the top edge. The radius ratio is
+    # calibrated from CEWE's 490 x 490 MCF-unit default TextArt area, whose
+    # legacy representation held a 171-unit radius.
+    #
+    # CEWE's TextArt "inside margin" is textFormat.IndentMargin. The parser
+    # has already converted it to leftPad/topPad. It reduces the radii while
+    # retaining the same ellipse centre, moving the whole arc inward.
+    radius = topPad - leftPad
+    circleCenterY = 0
+    ellipseRadiusY = None
+    if radius <= 0:
+        baseRadius = (context.mcf_to_reportlab * areaWidth
+                      * CEWE8_DEFAULT_TEXTART_RADIUS_RATIO)
+        radius = max(1.0, baseRadius - leftPad)
+        if areaHeight != areaWidth:
+            baseEllipseRadiusY = (context.mcf_to_reportlab * areaHeight
+                                  * CEWE8_DEFAULT_TEXTART_RADIUS_RATIO)
+            ellipseRadiusY = max(1.0, baseEllipseRadiusY - topPad)
+            shorterSide = min(areaWidth, areaHeight)
+            topOfEllipse = context.mcf_to_reportlab * (
+                areaHeight * 0.5
+                - shorterSide * (0.5 - CEWE8_DEFAULT_TEXTART_RADIUS_RATIO))
+            circleCenterY = topOfEllipse - baseEllipseRadiusY
+    handleTextArt(pdf, radius, bodyhtml, cwtextart, state, circleCenterY, ellipseRadiusY)
+    pdf.rotate(areaRot)
+    pdf.translate(-transCx, -transCy)
