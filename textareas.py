@@ -28,7 +28,7 @@ from shadows import warnAndIgnoreEnabledDecorationShadow
 from text import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText,
                   CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle,
                   Dequote, LeadingForExplicitLineHeight)
-from textart import handleTextArt
+from textart import processTextArt
 from textoutlines import TextEffectsParagraph, getTextOutline
 from texttabs import getTabbedTextLine
 from textlists import processTextLists
@@ -460,19 +460,6 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     for decorationTag in area.findall('decoration'):
         processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, context)
 
-    pdf.rotate(areaRot)
-    pdf.translate(-transCx, -transCy)
-
-
-def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, body, leftPad, topPad,
-                   cwtextart, context: RenderContext, state: ConversionState):
-    pdf.translate(transCx, transCy)
-    pdf.rotate(-areaRot)
-    for decorationTag in area.findall('decoration'):
-        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, context)
-    bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
-    radius = topPad - leftPad # is this really what they use for the radius?
-    handleTextArt(pdf, radius, bodyhtml, cwtextart, state)
     pdf.rotate(areaRot)
     pdf.translate(-transCx, -transCy)
 
