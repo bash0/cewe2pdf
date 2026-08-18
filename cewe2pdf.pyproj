@@ -144,6 +144,7 @@
     <Content Include="tests\TestDecorations\test_decorations_mcf-Dateien\folderid.xml" />
     <Content Include="tests\TestDecorations\test_decorations_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\TestDecorations\test_decorations_mcf-Dateien\z31qhpgx_1_greysquareblueborder.jpg" />
+    <Content Include="tests\testEmptyPageOne\cewe2pdf.ini" />
     <Content Include="tests\testEmptyPageOne\previous_result_pdfs\test_emptyPageOne.mcf.20250321D.pdf" />
     <Content Include="tests\testfontsubstitution\cewe2pdf.ini" />
     <Content Include="tests\testFontSubstitution\previous_result_pdfs\testfontsubstitution.mcf.20250411S.pdf" />
@@ -254,7 +255,7 @@
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testClipart\cewe2pdf.ini" />
     <Content Include="tests\testClipart\testClipart.mcf" />
-    <Content Include="tests\testEmptyPageOne\cewe2pdf.ini" />
+    <Content Include="tests\testImageExtractor\cewe2pdf.ini" />
     <Content Include="tests\testEmptyPageOne\test_emptyPageOne.mcf" />
     <Content Include="tests\testEmptyPageOne\test_emptyPageOne_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction.mcf" />
@@ -364,6 +365,7 @@
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
     <Compile Include="tests\testImageExtractor\test_imageExtractor.py" />
+    <Compile Include="tests\testImageExtractor\test_imageFormats.py" />
     <Compile Include="tests\testIndexLarge\test_indexLarge.py" />
     <Compile Include="tests\testIndex\test_index.py" />
     <Compile Include="tests\testLetterSpacing\test_letterSpacing.py" />
