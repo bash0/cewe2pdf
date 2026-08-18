@@ -7,7 +7,7 @@ they are unavailable.
 
 import ctypes
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import shutil
 import sys
@@ -64,7 +64,7 @@ def _registryInstallationFolders() -> tuple[Path, ...]:
     return tuple(candidates)
 
 
-def _executableFolderFromCommand(command: str | None) -> Path | None:
+def _executableFolderFromCommand(command: str | None) -> str | None:
     """Extract an executable's parent folder from a Windows open command."""
     if not command:
         return None
@@ -74,7 +74,9 @@ def _executableFolderFromCommand(command: str | None) -> Path | None:
     match = re.match(r'^\s*"([^\"]+\.exe)"|^\s*([^\s]+\.exe)', command, re.IGNORECASE)
     if match is None:
         return None
-    return Path(match.group(1) or match.group(2)).parent
+    # The registry command always uses Windows path syntax, including when
+    # this parser is exercised by the Linux CI test run.
+    return str(PureWindowsPath(match.group(1) or match.group(2)).parent)
 
 
 def _readRegistryValue(hive, keyName: str, valueName: str = '') -> str | None:
@@ -89,7 +91,7 @@ def _readRegistryValue(hive, keyName: str, valueName: str = '') -> str | None:
         return None
 
 
-def _associatedCeweFolders() -> tuple[Path, ...]:
+def _associatedCeweFolders() -> tuple[str, ...]:
     """Return folders used by Windows to open MCF and MCFX files.
 
     The default program is the best evidence for a CEWE installation, and
@@ -101,7 +103,7 @@ def _associatedCeweFolders() -> tuple[Path, ...]:
 
     import winreg  # pylint: disable=import-outside-toplevel
 
-    candidates: list[Path] = []
+    candidates: list[str] = []
     for extension in FILE_EXTENSIONS:
         progIds = []
         userChoice = _readRegistryValue(

@@ -54,7 +54,7 @@ def test_executableFolderFromCommand_handlesNormalWindowsAssociation():
 
     executableFolder = _executableFolderFromCommand(command)
 
-    assert executableFolder == Path(r'C:\Program Files\Elkjop fotoservice')
+    assert executableFolder == r'C:\Program Files\Elkjop fotoservice'
 
 
 def test_automaticSessionWritesAllUserVisibleLoggers():
@@ -100,3 +100,8 @@ def test_automaticSessionDoesNotDuplicatePropagatingLoggers():
 
     assert logText.count('propagating configuration diagnostic') == 1
     assert logText.count('propagating must-see diagnostic') == 1
+
+
+if __name__ == '__main__':
+    import pytest
+    raise SystemExit(pytest.main([__file__, '-s']))
