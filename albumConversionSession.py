@@ -88,7 +88,7 @@ class AlbumConversionSession:
         self.automatic_log_file_name = self.album_name + '.log'
         try:
             self.automatic_log_handler = logging.FileHandler(
-                self.automatic_log_file_name, encoding='utf-8')
+                self.automatic_log_file_name, mode='w', encoding='utf-8')
         except OSError as exception:
             logging.warning(
                 f'Could not create automatic conversion log '
