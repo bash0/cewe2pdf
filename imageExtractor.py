@@ -4,6 +4,22 @@ import argparse
 from pathlib import Path
 from mcfx import unpackMcfx
 
+
+def extractMcfx(inputFile, imageDir):
+    """Extract an .mcfx album into *imageDir* and return its data.mcf path.
+
+    The .mcfx container already holds the original image bytes, so extraction
+    does not decode or convert photographs.  In particular, a .heic file is
+    copied unchanged and does not require pillow_heif.
+    """
+    # unpackMcfx() changes to the extraction directory while it works, so
+    # resolve both caller-supplied paths before handing them over.
+    inputFilePath = Path(inputFile).resolve()
+    imageDirPath = Path(imageDir).resolve()
+    _, mcfxmlname = unpackMcfx(inputFilePath, imageDirPath)
+    return mcfxmlname
+
+
 def collectArgsAndExtract():
     class CustomArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
         pass
@@ -40,11 +56,7 @@ def collectArgsAndExtract():
 
     imageDir = os.path.abspath(args.imageDir)
 
-    # convert the file
-    inputFilePath = Path(args.inputFile)
-    imageDirPath = Path(imageDir)
-
-    unpackedFolder, mcfxmlname = unpackMcfx(inputFilePath, imageDirPath)
+    extractMcfx(args.inputFile, imageDir)
 
 
 if __name__ == '__main__':
