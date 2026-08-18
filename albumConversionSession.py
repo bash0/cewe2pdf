@@ -18,7 +18,7 @@ from albumIndex import AlbumIndex
 from ceweInfo import AlbumInfo, CeweInfo, ProductStyle
 from conversionSetup import prepareConversion
 from conversionState import ConversionState
-from extraLoggers import ConversionMessageCounters
+from extraLoggers import ConversionMessageCounters, configlogger, mustsee
 from pageNumbering import PageNumberingInfo
 from pages import processPages
 from renderContext import RenderContext
@@ -35,7 +35,7 @@ class AlbumConversionSession:
 
     def __init__(self, albumName, keepDoublePages, pageNumbers, mcfxTmpDir,
                  appDataDir, outputFileName, mcfToReportlab, imageQuality,
-                 pilAntialias):
+                 pilAntialias, automaticWindows=False):
         self.album_name = albumName
         self.keep_double_pages = keepDoublePages
         self.page_numbers = pageNumbers
@@ -45,12 +45,17 @@ class AlbumConversionSession:
         self.mcf_to_reportlab = mcfToReportlab
         self.image_quality = imageQuality
         self.pil_antialias = pilAntialias
+        self.automatic_windows = automaticWindows
+        self.automatic_log_file_name = None
+        self.automatic_log_handler = None
+        self.automatic_loggers = []
 
         self.state = ConversionState()
         self.state.message_counters = ConversionMessageCounters()
         self.setup = None
 
     def __enter__(self):
+        self._startAutomaticLog()
         logVersionInformation()
         if self.output_file_name is None:
             self.output_file_name = CeweInfo.getOutputFileName(self.album_name)
@@ -70,13 +75,61 @@ class AlbumConversionSession:
             messageCounters.close()
 
         unpackedFolder = self.setup.unpacked_folder if self.setup is not None else None
-        cleanUpTemporaryFiles(self.state.temporary_files, unpackedFolder)
+        try:
+            cleanUpTemporaryFiles(self.state.temporary_files, unpackedFolder)
+        finally:
+            self._closeAutomaticLog()
         return False
+
+    def _startAutomaticLog(self):
+        """Write Explorer-run diagnostics beside the album, if possible."""
+        if not self.automatic_windows:
+            return
+        self.automatic_log_file_name = self.album_name + '.log'
+        try:
+            self.automatic_log_handler = logging.FileHandler(
+                self.automatic_log_file_name, mode='w', encoding='utf-8')
+        except OSError as exception:
+            logging.warning(
+                f'Could not create automatic conversion log '
+                f'{self.automatic_log_file_name}: {exception}')
+            self.automatic_log_file_name = None
+            return
+
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            datefmt='%H:%M:%S')
+        self.automatic_log_handler.setFormatter(formatter)
+
+        # The normal YAML configuration deliberately prevents the specialised
+        # configuration and must-see loggers propagating to root.  Attach the
+        # file handler to those loggers as well.  The frozen EXE normally has
+        # no YAML file, in which case they *do* propagate: root already records
+        # them, and adding the same handler again would duplicate every line.
+        rootLogger = logging.getLogger()
+        self.automatic_loggers = [rootLogger]
+        for logger in (configlogger, mustsee):
+            if not logger.propagate:
+                self.automatic_loggers.append(logger)
+        for logger in self.automatic_loggers:
+            logger.addHandler(self.automatic_log_handler)
+        logging.info(f'Writing automatic conversion log to: {self.automatic_log_file_name}')
+
+    def _closeAutomaticLog(self):
+        """Detach and close the optional Explorer-run log file."""
+        if self.automatic_log_handler is None:
+            return
+        for logger in self.automatic_loggers:
+            logger.removeHandler(self.automatic_log_handler)
+        self.automatic_log_handler.close()
+        self.automatic_log_handler = None
+        self.automatic_loggers = []
 
     def render(self, processElements):  # noqa: C901
         """Prepare the album, render its pages, and save its primary PDF."""
         self.setup = prepareConversion(
-            self.album_name, self.mcfx_tmp_dir, self.app_data_dir, self.state)
+            self.album_name, self.mcfx_tmp_dir, self.app_data_dir, self.state,
+            self.automatic_windows)
         albumIndex = self._createAlbumIndex()
 
         articleConfigElement = self.setup.fotobook.find('articleConfig')

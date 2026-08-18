@@ -63,6 +63,8 @@ nosetests.xml
 /tests/*/*.mcfx.pdf
 /tests/*/*.mcf.*.pdf
 /tests/*/*.mcfx.*.pdf
+/tests/*/*.mcf.log
+/tests/*/*.mcfx.log
 /tests/temp
 /junk*.pdf
 /tests/testIndex/test_index.mcf.*S.idx.png

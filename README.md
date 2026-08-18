@@ -102,7 +102,7 @@ passepartout and leaves that decoration out of the PDF.
 ## Configuration files
 
 ### cewe2pdf.ini
-If a ``cewe_folder.txt`` (see below) file is not found, then the program looks for files called ``cewe2pdf.ini``, first in the current directory and then in the album directory, reading both if it finds both. Later entries override previous entries of the same name. 
+The program looks for files called ``cewe2pdf.ini``, first in the current directory and then in the album directory, reading both if it finds both. Later entries override previous entries of the same name.
 
 For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place a ``cewe2pdf.ini`` file with the album file, setting everything you need there, out of the way of future updates to the program repository.
 
@@ -207,15 +207,6 @@ Example for linux font file and directory paths:
 /usr/share/fonts/truetype/lato/Lato-Heavy.ttf
 /home/myusername/.local/share/fonts/
 ```
-### cewe_folder.txt (deprecated)
-Go to the directory where cewe2pdf is installed and create a text file there with filename ``cewe_folder.txt``
-and use a text editor to write the installation directory of the CEWE software into the text file.
-For example, if you have the software branded for the company DM, called "dm-Fotowelt", then the file ``cewe_folder.txt`` might contain:
-```
-C:\Program Files\dm\dm-Fotowelt\dm-Fotowelt.exe
-```
-Save the file and close it. Alternatively - indeed, preferably, if you want full functionality! - use more extensive configuration by using ``cewe2pdf.ini`` instead of ``cewe_folder.txt``, as described below
-
 ## Album files
 ### .mcf
 `.mcf` is the format that Cewe has used for many years for albums, until the introduction of the newer `.mcfx` format around 2023. This is the format around which `cewe2pdf` has been developed; the file content is XML. There is always a folder `<album>_mcf-Dateien` associated with a `.mcf` file, containing the images used in the album.
@@ -370,7 +361,7 @@ You should now have
 * one or more album directories each containing
   - one or more `*.mcf` or `.mcfx` album files
     * a directory named `<album>_mcf-Datein` for each album, if you are using `*.mcf`
-  - a `cewe2pdf.ini` configuration file (or maybe the now deprecated `cewe_folder.txt`)
+  - optionally, a `cewe2pdf.ini` configuration file
   - optionally, an `additional_fonts.txt` configuration file
 
 It is not really a good idea to place your album files in the same directory as the program. Keep them separate so there is no confusion in keeping your version of the program up to date with your Github repository version.
@@ -572,6 +563,30 @@ includes the dynamically imported OpenCV and NumPy components needed by the
 indexing code; do not replace it with a direct `--onefile` invocation. You can
 run pytest from the working directory, use `runalltests.py`, or run individual
 test files.
+
+#### Giving the Windows executable to a non-programmer
+
+The executable is intended to be shared privately by the developer who builds
+it; the project does not publish executable releases. Its recipient can simply
+double-click `cewe2pdf.exe`. It offers to install itself for that Windows user:
+the EXE is copied from (for example) the USB stick to
+`%LOCALAPPDATA%\cewe2pdf`, and an Explorer menu item, **Create PDF with
+cewe2pdf**, is added for `.mcf` and `.mcfx` files. No administrator rights are
+required.
+
+The user can then right-click an album file and choose that menu item. This
+Windows-only automatic mode asks Windows which installed application normally
+opens `.mcf` or `.mcfx` files, and uses that application's folder as the CEWE
+installation when it contains the expected CEWE resources. It also enables
+shared Windows fonts. The recipient does not need to find the CEWE directory
+or create a `cewe2pdf.ini` file. The PDF is created beside the album and a
+confirmation message shows its name. The same folder receives a diagnostic
+log named `<album>.mcf.log` (or `<album>.mcfx.log`), retaining the conversion
+messages which would otherwise disappear when Explorer closes the console.
+
+Running the EXE with `--install` performs the same installation explicitly.
+`--uninstall` removes the Explorer menu entries but deliberately leaves the
+copied EXE in place, so that no running program has to delete itself.
 ### Test verification using pixel level result comparison with compare-pdf
 We have a local copy of the compare-pdf code from https://github.com/Formartha/compare-pdf. This code can be used from our automated unit test code to do pixel-by-pixel comparison of the pdf pages that have been generated with a previous (approved) version. This strategy has been implemented for several of the tests, and it is therefore important that each test has an "approved" result pdf with which any new version is compared (see below)
 
