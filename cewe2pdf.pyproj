@@ -149,6 +149,7 @@
     <Content Include="tests\testFontSubstitution\previous_result_pdfs\testfontsubstitution.mcf.20250411S.pdf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testImageExtractor\test_imageExtractor.mcfx" />
     <Content Include="tests\testIndexLarge\cewe2pdf.ini" />
     <Content Include="tests\testIndexLarge\test_indexLarge.mcf" />
     <Content Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\6ds3xtbb_1_20200306_111748.jpg" />
@@ -362,6 +363,7 @@
     <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
+    <Compile Include="tests\testImageExtractor\test_imageExtractor.py" />
     <Compile Include="tests\testIndexLarge\test_indexLarge.py" />
     <Compile Include="tests\testIndex\test_index.py" />
     <Compile Include="tests\testLetterSpacing\test_letterSpacing.py" />
@@ -444,6 +446,8 @@
     <Folder Include="tests\testfontsubstitution\" />
     <Folder Include="tests\testFontSubstitution\previous_result_pdfs\" />
     <Folder Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\" />
+    <Folder Include="tests\testImageExtractor\" />
+    <Folder Include="tests\testImageExtractor\previous_result_pdfs\" />
     <Folder Include="tests\testIndexLarge\" />
     <Folder Include="tests\testIndexLarge\previous_result_pdfs\" />
     <Folder Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\" />
