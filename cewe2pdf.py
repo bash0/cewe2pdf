@@ -86,6 +86,9 @@ import PIL
 from packaging.version import parse as parse_version
 from albumConversionSession import AlbumConversionSession
 from pageElements import processElements
+from windowsIntegration import (confirmInstallation, installWindowsIntegration,
+                                isWindowsFrozenExecutable, showMessage,
+                                uninstallWindowsIntegration)
 
 
 # work around a breaking change in pil 10.0.0, see
@@ -133,11 +136,12 @@ mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1m
 
 
 def convertMcf(albumname, keepDoublePages: bool, pageNumbers=None, mcfxTmpDir=None,
-               appDataDir=None, outputFileName=None):
+               appDataDir=None, outputFileName=None, automaticWindows=False):
     """Convert one MCF or MCFX album while preserving the established API."""
     with AlbumConversionSession(
             albumname, keepDoublePages, pageNumbers, mcfxTmpDir, appDataDir,
-            outputFileName, mcf2rl, image_quality, pil_antialias) as session:
+            outputFileName, mcf2rl, image_quality, pil_antialias,
+            automaticWindows) as session:
         return session.render(processElements)
 
 
@@ -170,12 +174,60 @@ def collectArgsAndConvert():
     parser.add_argument('--outFile', dest='outFile',
                         default=None,
                         help="The name of the output file, rather than the default <inputFile>.pdf")
+    parser.add_argument('--install', action='store_true',
+                        help='Windows executable: install an Explorer right-click command for MCF and MCFX files.')
+    parser.add_argument('--uninstall', action='store_true',
+                        help='Windows executable: remove the cewe2pdf Explorer right-click command.')
+    # This is the command used by the Explorer menu.  It is intentionally not
+    # advertised to normal command-line users because it enables Windows-only
+    # defaults such as automatic CEWE discovery and system-font loading.
+    parser.add_argument('--automatic', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('inputFile', type=str, nargs='?',
                         help='Just one mcf(x) input file must be specified')
 
     args = parser.parse_args()
 
+    if args.install:
+        if not isWindowsFrozenExecutable():
+            parser.error('--install is available only from the Windows cewe2pdf executable.')
+        try:
+            installedPath = installWindowsIntegration()
+        except OSError as exception:
+            showMessage(f'Could not install cewe2pdf:\n{exception}', error=True)
+            return False
+        showMessage(
+            f'cewe2pdf is installed at:\n{installedPath}\n\n'
+            'Right-click an MCF or MCFX album and choose “Create PDF with cewe2pdf”.')
+        return True
+
+    if args.uninstall:
+        if os.name != 'nt':
+            parser.error('--uninstall is available only on Windows.')
+        try:
+            installedPath = uninstallWindowsIntegration()
+        except OSError as exception:
+            showMessage(f'Could not remove the cewe2pdf Explorer menu:\n{exception}', error=True)
+            return False
+        retainedText = f'\nThe executable remains at:\n{installedPath}' if installedPath else ''
+        showMessage(f'The cewe2pdf Explorer menu was removed.{retainedText}')
+        return True
+
+    if args.automatic and os.name != 'nt':
+        parser.error('--automatic is reserved for the Windows Explorer command.')
+
     if args.inputFile is None:
+        if isWindowsFrozenExecutable():
+            if confirmInstallation():
+                try:
+                    installedPath = installWindowsIntegration()
+                except OSError as exception:
+                    showMessage(f'Could not install cewe2pdf:\n{exception}', error=True)
+                    return False
+                showMessage(
+                    f'cewe2pdf is installed at:\n{installedPath}\n\n'
+                    'Right-click an MCF or MCFX album and choose “Create PDF with cewe2pdf”.')
+                return True
+            return False
         # from July 2024 you must specify a file name. Check if there are any obvious candidates
         # which we could use in an example text
         fnames = [i for i in os.listdir(os.curdir) if os.path.isfile(i) and (i.endswith('.mcf') or i.endswith('.mcfx'))]
@@ -224,7 +276,15 @@ def collectArgsAndConvert():
         outFile = os.path.abspath(args.outFile)
 
     # convert the file
-    return convertMcf(args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData, outputFileName=outFile)
+    result = convertMcf(
+        args.inputFile, args.keepDoublePages, pages, mcfxTmp, appData,
+        outputFileName=outFile, automaticWindows=args.automatic)
+    if args.automatic and result:
+        outputName = outFile or os.path.abspath(args.inputFile + '.pdf')
+        logName = os.path.abspath(args.inputFile + '.log')
+        logText = f'\n\nConversion log:\n{logName}' if os.path.isfile(logName) else ''
+        showMessage(f'Created PDF:\n{outputName}{logText}')
+    return result
 
 
 if __name__ == '__main__':

@@ -47,6 +47,77 @@ def test_prepareConversionWithoutCeweConfiguration():
     assert setup.passepartout_folders == ()
 
 
+def test_automaticWindowsSetupEnablesSystemFontsWithoutCewe():
+    """Explorer mode must need neither an INI file nor an installed CEWE app."""
+    sourceMcf = PROJECT_ROOT / 'tests' / 'testEmptyPageOne' / 'test_emptyPageOne.mcf'
+
+    with TemporaryDirectory() as temporaryDirectory:
+        temporaryPath = Path(temporaryDirectory)
+        albumMcf = temporaryPath / sourceMcf.name
+        shutil.copy2(sourceMcf, albumMcf)
+        originalCwd = Path.cwd()
+        try:
+            os.chdir(temporaryPath)
+            with patch('conversionSetup.findInstalledCeweFolder', return_value=None), \
+                    patch('conversionSetup.findAndRegisterFonts', return_value={}):
+                setup = prepareConversion(
+                    str(albumMcf), None, None, ConversionState(), automaticWindows=True)
+        finally:
+            os.chdir(originalCwd)
+
+    assert setup.default_config_section.getboolean('loadSystemFonts')
+    assert setup.key_account_folder is None
+
+
+def test_automaticWindowsSetupIgnoresInvalidConfiguredCeweFolder():
+    """Explorer mode falls back to discovery after a stale album INI path."""
+    sourceMcf = PROJECT_ROOT / 'tests' / 'testEmptyPageOne' / 'test_emptyPageOne.mcf'
+
+    with TemporaryDirectory() as temporaryDirectory:
+        temporaryPath = Path(temporaryDirectory)
+        albumMcf = temporaryPath / sourceMcf.name
+        shutil.copy2(sourceMcf, albumMcf)
+        (temporaryPath / 'cewe2pdf.ini').write_text(
+            '[DEFAULT]\ncewe_folder = tests/\n', encoding='utf-8')
+        originalCwd = Path.cwd()
+        try:
+            os.chdir(temporaryPath)
+            with patch('conversionSetup.findInstalledCeweFolder', return_value=None) as discover, \
+                    patch('conversionSetup.findAndRegisterFonts', return_value={}):
+                setup = prepareConversion(
+                    str(albumMcf), None, None, ConversionState(), automaticWindows=True)
+        finally:
+            os.chdir(originalCwd)
+
+    discover.assert_called_once_with()
+    assert setup.key_account_folder is None
+
+
+def test_legacyCeweFolderFileIsIgnored():
+    """The retired cewe_folder.txt file must not silently override an INI."""
+    sourceMcf = PROJECT_ROOT / 'tests' / 'testEmptyPageOne' / 'test_emptyPageOne.mcf'
+
+    with TemporaryDirectory() as temporaryDirectory:
+        temporaryPath = Path(temporaryDirectory)
+        albumMcf = temporaryPath / sourceMcf.name
+        shutil.copy2(sourceMcf, albumMcf)
+        (temporaryPath / 'cewe_folder.txt').write_text(
+            r'C:\This legacy path must never be read', encoding='utf-8')
+        originalCwd = Path.cwd()
+        try:
+            os.chdir(temporaryPath)
+            with patch('conversionSetup.findAndRegisterFonts', return_value={}), \
+                    patch('conversionSetup.logging.warning') as warning:
+                setup = prepareConversion(str(albumMcf), None, None, ConversionState())
+        finally:
+            os.chdir(originalCwd)
+
+    assert setup.key_account_folder is None
+    assert any(
+        'Ignoring legacy CEWE configuration file' in call.args[0]
+        for call in warning.call_args_list)
+
+
 def test_defaultFontSubstitutionsNeedAvailableReplacementFonts():
     """Standalone mode falls back to Helvetica, not an absent test font."""
     state = ConversionState()

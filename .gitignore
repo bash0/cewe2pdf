@@ -63,6 +63,8 @@ nosetests.xml
 /tests/*/*.mcfx.pdf
 /tests/*/*.mcf.*.pdf
 /tests/*/*.mcfx.*.pdf
+/tests/*/*.mcf.log
+/tests/*/*.mcfx.log
 /tests/temp
 /junk*.pdf
 /tests/testIndex/test_index.mcf.*S.idx.png
@@ -77,4 +79,3 @@ nosetests.xml
 # Match that hidden-character variant anywhere in the repo.
 **/Icon?
 /tests/testEmptyPageOne/executable-smoke-linux.pdf
-*.log
