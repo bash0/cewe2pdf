@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="6590" article_name="CEWE%20FOTOBOK%20Kompakt%20kvadratisk%20-%20hardcover%20matt" externalProjectId="" folderID="136eb4d2-34ab-4774-b27b-323d4557fd5c" imagedir="test_imageOperations_mcf-Dateien" isDataMcf="0" productname="ALB131" startdatecalendarium="" useSpineLogo="1" version="4.0">
+    <project createdWithHPSVersion="8.1.3" createdWithHPSVersionBuild="20260410" multiPurposeText="" projectID="1e485c77-c217-4fe4-86ad-4068c26dc9bb" projectIDCreatedEpoch="1787118415"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="8.1.3" programversionBuild="20260410" savetime="2026-08-19 08:22"/>
+    <creationHistory clientId="38" clientVersion="8.1.3-20260410-default" creationDate="2026-08-18 18:36"/>
+    <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
+    <addOns/>
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="CEWE Head" fontitalics="0" fontsize="12" format="0" margin="131" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
+        <outline width="0"/>
+    </pagenumbering>
+    <ruler/>
+    <extra>
+        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <imageQuality version="1.3.56"/>
+    </extra>
+    <page designStyleID="196083" designStyleTemplateName="cover_back" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="1530" width="3135"/>
+        <designElementIDs background="201" layout="384109" styles_v2="196083"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
+        <area areatype="smartlayoutarea">
+            <position height="1405.33" left="81.6683" rotation="0" top="62.3333" width="1358.66" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="59.395121951219515"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1405.33" left="1694.67" rotation="0" top="62.3333" width="1358.66" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="59.395121951219515"/>
+            </smartlayout>
+        </area>
+        <area areatype="spinelogoarea">
+            <position height="91" left="1427.5" rotation="270" top="1444.5" width="280" zposition="6999"/>
+            <decoration/>
+            <clipart designElementId="0">
+                <ClipartConfiguration applySpotColor="0"/>
+            </clipart>
+        </area>
+        <area areatype="spinetextarea">
+            <position height="91" left="967.5" rotation="270" top="604.5" width="1200" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked::marker { content: "\2612"; }
+</style></head><body style=" font-family:'CEWE Head'; font-size:12pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="EB Garamond,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="230" left="1653" rotation="0" top="80" width="1422" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="title"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked::marker { content: "\2612"; }
+</style></head><body style=" font-family:'CEWE Head'; font-size:12pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="EB Garamond,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="cover_spine" pagenr="0" rotation="0" type="spine">
+        <bundlesize height="1530" width="3135"/>
+        <designElementIDs background="201" styles_v2="196083"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="cover_front" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="1530" width="3135"/>
+        <designElementIDs background="201" layout="422099" styles_v2="196083"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="422099" layout="1" templatename="fullcoverpage_with_title"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="96"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="imagebackgroundarea">
+            <position height="1540" left="1480" rotation="0" top="-30" width="1510" zposition="3"/>
+            <decoration/>
+            <imagebackground backgroundPosition="RIGHT_OR_BOTTOM" filename="safecontainer:/vu6237ko_1_20200306_111748.jpg" useABK="1">
+                <cutout left="-687.001" scale="0.785714" top="2.43615e-14"/>
+            </imagebackground>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="imagearea">
+            <position height="516" left="195.56" rotation="0" top="435.659" width="1062" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#ffff0000" enabled="1" gap="10" position="centered" width="7.9999999999999991"/>
+            </decoration>
+            <image filename="safecontainer:/20200306_111749_vu6237ko_1.jpg" useABK="1">
+                <cutout left="0" scale="0.541837" top="-834.343"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="imagebackgroundarea">
+            <position height="1540" left="-30" rotation="0" top="-30" width="1510" zposition="3"/>
+            <decoration/>
+            <imagebackground backgroundPosition="LEFT_OR_TOP" filename="safecontainer:/20200306_111749_vu6237ko_1.jpg" useABK="1">
+                <cutout left="0" scale="0.770408" top="-879"/>
+            </imagebackground>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="5" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="6" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="imagebackgroundarea">
+            <position height="1540" left="-30" rotation="0" top="-30" width="3020" zposition="1"/>
+            <decoration/>
+            <imagebackground backgroundPosition="BUNDLE" filename="safecontainer:/vu6237ko_2_20200306_111749.jpg" useABK="1">
+                <cutout left="0" scale="0.785714" top="0"/>
+            </imagebackground>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="7" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="8" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="9" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="10" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="11" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="12" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="13" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="14" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="15" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="16" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="17" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="18" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="19" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="20" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="21" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="22" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="23" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="24" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="97"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="1559.41" rotation="0" top="60.2963" width="1321.17" zposition="98"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="25" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+    </page>
+    <page designStyleID="196083" designStyleTemplateName="page_001" pagenr="26" rotation="0" type="normalpage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201" layout="125074" styles_v2="196083"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125074" layout="1" templatename="schema_quad_027"/>
+        <area areatype="smartlayoutarea">
+            <position height="1359.41" left="79.4146" rotation="0" top="60.2963" width="1321.17" zposition="96"/>
+            <decoration/>
+            <smartlayout>
+                <spacing horizontal="57.756097560975611"/>
+            </smartlayout>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="1480" width="2960"/>
+        <designElementIDs background="201"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships>
+        <foto id="file:///C:/Users/pete/source/repos/cewe2pdf/tests/unittest_fotobook/unittest_fotobook_mcf-Dateien/20200306_111748.jpg">
+            <foto id="safecontainer:/vu6237ko_1_20200306_111748.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY">
+                <foto id="safecontainer:/20200306_111749_vu6237ko_1.jpg" nature="RELATIONSHIP_MODIFIED_COPY">
+                    <foto id="safecontainer:/vu6237ko_2_20200306_111749.jpg" nature="RELATIONSHIP_MODIFIED_COPY"/>
+                </foto>
+            </foto>
+        </foto>
+    </fotoRelationships>
+    <statistics assistantUsed="0" countPauses="2" elapsedTimeGross="2026-08-18T18:36:46" elapsedTimeNet="7851" fotosAdded="27" fotosRemoved="16" pauseTime="4944" sessionsUsed="5"/>
+</fotobook>
