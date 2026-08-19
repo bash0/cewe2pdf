@@ -151,6 +151,11 @@
     <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testImageExtractor\test_imageExtractor.mcfx" />
+    <Content Include="tests\testImageOperations\cewe2pdf.ini" />
+    <Content Include="tests\testImageOperations\test_imageOperations.mcf" />
+    <Content Include="tests\testImageOperations\test_imageOperations_mcf-Dateien\20200306_111749_vu6237ko_1.jpg" />
+    <Content Include="tests\testImageOperations\test_imageOperations_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testImageOperations\test_imageOperations_mcf-Dateien\vu6237ko_1_20200306_111748.jpg" />
     <Content Include="tests\testIndexLarge\cewe2pdf.ini" />
     <Content Include="tests\testIndexLarge\test_indexLarge.mcf" />
     <Content Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\6ds3xtbb_1_20200306_111748.jpg" />
@@ -366,6 +371,7 @@
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
     <Compile Include="tests\testImageExtractor\test_imageExtractor.py" />
     <Compile Include="tests\testImageExtractor\test_imageFormats.py" />
+    <Compile Include="tests\testImageOperations\test_imageOperations.py" />
     <Compile Include="tests\testIndexLarge\test_indexLarge.py" />
     <Compile Include="tests\testIndex\test_index.py" />
     <Compile Include="tests\testLetterSpacing\test_letterSpacing.py" />
@@ -450,6 +456,8 @@
     <Folder Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\" />
     <Folder Include="tests\testImageExtractor\" />
     <Folder Include="tests\testImageExtractor\previous_result_pdfs\" />
+    <Folder Include="tests\testImageOperations\" />
+    <Folder Include="tests\testImageOperations\test_imageOperations_mcf-Dateien\" />
     <Folder Include="tests\testIndexLarge\" />
     <Folder Include="tests\testIndexLarge\previous_result_pdfs\" />
     <Folder Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\" />

@@ -32,13 +32,15 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     imagePath = imagePath.replace('safecontainer:/', '')
     image = PIL.Image.open(imagePath)
 
-    if imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM':
-        if AlbumInfo.isAlbumDoubleSide(productStyle):
-            imageTransx = transx + mcf2rl * pageWidth / 2
-        else:
-            imageTransx = transx + mcf2rl * pageWidth
-    else:
-        imageTransx = transx
+    imageTransx = transx
+    if (imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM' and
+            AlbumInfo.isAlbumDoubleSide(productStyle)):
+        # A double-side output canvas still uses the full CEWE spread.  The
+        # background position identifies its right half.  In single-side
+        # output, pageElements has already moved that half to local page
+        # coordinates, so applying another page-width shift would draw the
+        # image completely off the PDF page.
+        imageTransx += mcf2rl * pageWidth / 2
 
     # The source image is first cropped in MCF coordinates, then resized for
     # the output PDF. Decorations are applied to that final crop so masks,
