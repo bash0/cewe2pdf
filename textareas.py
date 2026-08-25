@@ -361,7 +361,9 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         # frameHeight = finalTotalHeight
         # Calculate offset to center this smaller frame in the original area
         emptySpace = originalFrameHeight - finalTotalHeight
-        a, d = pdfmetrics.getAscentDescent(pdf_styleN.fontName, pdf_styleN.fontSize * scaleFactor)
+        # CreateParagraphStyle has already applied scaleFactor to fontSize.
+        # Applying it again here would obtain metrics for a font that is too small.
+        a, d = pdfmetrics.getAscentDescent(pdf_styleN.fontName, pdf_styleN.fontSize)
         logging.debug(f"Font={pdf_styleN.fontName}, size={pdf_styleN.fontSize}, scaleFactor={scaleFactor:.2f}, metrics: a={a:.2f}, d={d:.2f}")
         if (a is not None and finalTotalHeight < 2*(a-d)):
             # We have a single line of text. To vertically center it, we need to re-lay it out with zero leading.
@@ -398,7 +400,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
                 bottomPad = emptySpace - topPad
                 logging.debug(f"Weird font, so splitting emptySpace={emptySpace:.2f} equally")
             else:
-                heightWithLeading = 1.0 * pdf_styleN.fontSize * scaleFactor
+                # As above, pdf_styleN.fontSize is already the scaled size.
+                heightWithLeading = pdf_styleN.fontSize
                 # Note that d is negative.
                 # fontH = a-d
                 # Assume leading is 100% above.

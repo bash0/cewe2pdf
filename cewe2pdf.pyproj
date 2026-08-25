@@ -207,6 +207,8 @@
     <Content Include="tests\testTextOutlines\cewe2pdf.ini" />
     <Content Include="tests\testTextOutlines\testTextOutlines.mcf" />
     <Content Include="tests\testTextOutlines\testTextOutlines_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testTextShrinkVAlign\cewe2pdf.ini" />
+    <Content Include="tests\testTextShrinkVAlign\testTextShrinkVAlign.mcf" />
     <Content Include="tests\testTextWrapVAlignBorder\cewe2pdf.ini" />
     <Content Include="tests\testTextWrapVAlignBorder\previous_result_pdfs\test_textwrapvalignborder.mcf.20251216S.pdf" />
     <Content Include="tests\testTextWrapVAlignBorder\previous_result_pdfs\test_textwrapvalignborder.mcf.20251217S.pdf" />
@@ -386,6 +388,7 @@
     <Compile Include="tests\testTextArt\test_textart.py" />
     <Compile Include="tests\testTextBox\test_textBox.py" />
     <Compile Include="tests\testTextOutlines\test_textOutlines.py" />
+    <Compile Include="tests\testTextShrinkVAlign\test_textShrinkVAlign.py" />
     <Compile Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder.py" />
     <Compile Include="tests\testTransparency\test_transparency.py" />
     <Compile Include="tests\testVersionInfo\test_versionInfo.py" />
@@ -493,6 +496,8 @@
     <Folder Include="tests\testTextOutlines\" />
     <Folder Include="tests\testTextOutlines\previous_result_pdfs\" />
     <Folder Include="tests\testTextOutlines\testTextOutlines_mcf-Dateien\" />
+    <Folder Include="tests\testTextShrinkVAlign\" />
+    <Folder Include="tests\testTextShrinkVAlign\previous_result_pdfs\" />
     <Folder Include="tests\testTextWrapVAlignBorder\" />
     <Folder Include="tests\testTextWrapVAlignBorder\previous_result_pdfs\" />
     <Folder Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder_mcf-Dateien\" />
