@@ -1,7 +1,4 @@
-import os
-
 import pytest
-os.environ['IGNORELOCALFONTS'] = "1"
 
 
 def runall():
