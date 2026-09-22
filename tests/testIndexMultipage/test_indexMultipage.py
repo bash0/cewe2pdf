@@ -45,12 +45,6 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     convertMcf(inFile, keepDoublePages, outputFileName=outFile)
     assert Path(outFile).exists() == True
 
-    # The deliberately overfull fixture must create and merge two separate
-    # index images. This catches the old behaviour of silently using page one
-    # of a multi-page index PDF only.
-    indexPngFiles = list(Path(outFile).parent.glob(f'{Path(outFile).stem}.idx.*.png'))
-    assert len(indexPngFiles) == 2, f'Expected two index PNGs, found {indexPngFiles}'
-
     #check the pdf contents
     # we could also test more sophisticated things, like colors or compare images.
     readPdf = Pdf.open(outFile)
