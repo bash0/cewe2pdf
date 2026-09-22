@@ -726,5 +726,3 @@ def processTextCore(pdf_flowableList, pdf_styleN, forceLeading, additional_fonts
 
     frameWidth = max(frameWidth, finalTotalWidth)
     return textWrapProblem, indexEntryText, finalTotalHeight, frameBottomLeft_x, frameBottomLeft_y, frameHeight, frameWidth, recentParagraphText
-
-

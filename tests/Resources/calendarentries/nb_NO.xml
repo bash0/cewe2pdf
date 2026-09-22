@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<holidays>
+    <country iso="Norge" locale="nb_NO">
+        <nationwide>
+            <day id="6" honor="free" name="Arbeidernes dag"/>
+            <day id="7" honor="free" name="Kr. Himmelfartsdag"/>
+            <day date="XXXX-02-06" honor="show" name="Samefolkets dag"/>
+            <day date="XXXX-02-14" honor="show" name="St. Valentines dag"/>
+            <day date="XXXX-04-01" honor="show" name="Første April"/>
+            <day date="XXXX-05-08" honor="show" name="Frigjøringsdagen"/>
+            <day date="2027-02-07" honor="show" name="Fastelavn"/>
+            <day date="2027-02-14" honor="show" name="Morsdag"/>
+            <day date="2028-03-26" honor="show" name="Sommertid"/>
+            <day date="XXXX-05-17" honor="free" name="Første etikett"/>
+            <day date="XXXX-05-17" honor="show" name="Andre etikett"/>
+            <day date="XXXX-03-08" honor="ignore" name="Kvinnedagen"/>
+        </nationwide>
+    </country>
+</holidays>

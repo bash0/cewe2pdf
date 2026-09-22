@@ -79,3 +79,5 @@ nosetests.xml
 # Match that hidden-character variant anywhere in the repo.
 **/Icon?
 /tests/testEmptyPageOne/executable-smoke-linux.pdf
+/tests/testCalendar/a4l/*.pdf
+/tests/testCalendar/a4p/*.pdf
