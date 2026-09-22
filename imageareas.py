@@ -36,8 +36,9 @@ def _isSavedIndexImage(imageFileName, outputFileName):
     stableStem = re.sub(r'\.\d{8}[sd]$', '', outputStem)
     stems = {outputStem, stableStem}
     for stem in stems:
-        # CEWE adds a prefix ending in an underscore.  An old one-page index
-        # has '.idx.png'; later multi-page output has '.idx.<number>.png'.
+        # CEWE adds a prefix ending in an underscore.  Current output always
+        # uses '.idx.<number>.png'; accept the old '.idx.png' convention too
+        # so existing CEWE albums can still have their stale index removed.
         pattern = rf'(?:^|_){re.escape(stem)}(?:\.[sd])?\.idx(?:\.\d+)?\.png$'
         if re.search(pattern, imageName):
             return True

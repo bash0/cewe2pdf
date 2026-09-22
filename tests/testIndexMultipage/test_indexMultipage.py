@@ -34,6 +34,10 @@ def test_savedIndexImageRecognitionUsesOutputStem():
     outputFile = 'test_indexMultipage.mcf.20260921S.pdf'
 
     assert _isSavedIndexImage(savedImage, outputFile)
+    # Single-page indexes used to have no page number.  Existing albums which
+    # saved one of those images must remain replaceable.
+    assert _isSavedIndexImage(
+        'safecontainer:/old_id_test_indexmultipage.mcf.s.idx.png', outputFile)
     assert not _isSavedIndexImage('safecontainer:/holiday.idx.1.png', outputFile)
     assert not _isSavedIndexImage('ordinary_photo.png', outputFile)
 
