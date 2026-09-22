@@ -29,6 +29,7 @@
     <Content Include=".github\workflows\pythonapp.yml" />
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
+    <Content Include="additional_fonts.example.txt" />
     <Content Include="cewe2pdf.spec" />
     <Content Include="DEVELOPER_GUIDE.md" />
     <Content Include="documents\mcf_feature_classification.md" />
@@ -36,11 +37,16 @@
     <Content Include="environments\cewe2pdfenvlinux.yml" />
     <Content Include="environments\cewe2pdfenvwindows.yml" />
     <Content Include="environments\environments.md" />
+    <Content Include="LICENSE" />
     <Content Include="pytest.ini" />
     <Content Include="requirements-pinned.txt" />
     <Content Include="requirements-winexe.txt" />
     <Content Include="tests\compare-pdf\LICENSE" />
     <Content Include="tests\compare-pdf\README.md" />
+    <Content Include="tests\Resources\calendarentries\en_GB.xml" />
+    <Content Include="tests\Resources\calendarentries\nb_NO.xml" />
+    <Content Include="tests\Resources\calendar_layout.xml" />
+    <Content Include="tests\Resources\calendar_schema.xml" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\447.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
@@ -132,6 +138,14 @@
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250326D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411S.pdf" />
+    <Content Include="tests\testCalendar\a4l\a4l.mcf" />
+    <Content Include="tests\testCalendar\a4l\a4l_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testCalendar\a4l\cewe2pdf.ini" />
+    <Content Include="tests\testCalendar\a4p\a4p.mcf" />
+    <Content Include="tests\testCalendar\a4p\a4p_mcf-Dateien\cew7d58g_1_20200320_124632.jpg" />
+    <Content Include="tests\testCalendar\a4p\a4p_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testCalendar\a4p\a4p_mcf-Dateien\gs4dszic_1_20200306_111748.jpg" />
+    <Content Include="tests\testCalendar\a4p\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250319S.pdf" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250326S.pdf" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250412S.pdf" />
@@ -256,7 +270,6 @@
     <Content Include="tests\testbackgrounds\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcf" />
-    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcfx" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_2_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_3_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
@@ -314,9 +327,15 @@
     <Compile Include="albumIndex.py" />
     <Compile Include="backgrounds.py" />
     <Compile Include="borders.py" />
+    <Compile Include="calendarAreas.py" />
+    <Compile Include="calendarEntries.py" />
+    <Compile Include="calendarLayouts.py" />
+    <Compile Include="calendarSchemas.py" />
+    <Compile Include="calendarSubstitutions.py" />
     <Compile Include="ceweInfo.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="cewePageResolver.py" />
     <Compile Include="clipArt.py">
       <SubType>Code</SubType>
     </Compile>
@@ -325,6 +344,7 @@
     <Compile Include="configUtils.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="conftest.py" />
     <Compile Include="conversionSetup.py" />
     <Compile Include="conversionState.py" />
     <Compile Include="corners.py" />
@@ -350,6 +370,7 @@
     <Compile Include="mcfx.py" />
     <Compile Include="messageCounterHandler.py" />
     <Compile Include="otf.py" />
+    <Compile Include="pageElements.py" />
     <Compile Include="pageNumbering.py" />
     <Compile Include="pages.py" />
     <Compile Include="pageTypes.py" />
@@ -364,6 +385,7 @@
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
     <Compile Include="tests\compare-pdf\setup.py" />
+    <Compile Include="tests\testCalendar\test_calendar.py" />
     <Compile Include="tests\testCewePageResolver\test_cewePageResolver.py" />
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
     <Compile Include="tests\testbackgrounds\test_backgrounds.py" />
@@ -437,6 +459,7 @@
     <Folder Include="tests\hps\5026\addons\63488\cliparts\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\decorations\" />
+    <Folder Include="tests\Resources\calendarentries\" />
     <Folder Include="tests\Resources\photofun\decorations\106793\" />
     <Folder Include="tests\Resources\photofun\decorations\106793\8394-DECO-SF\" />
     <Folder Include="tests\Resources\photofun\decorations\106796\" />
@@ -449,6 +472,13 @@
     <Folder Include="tests\Resources\photofun\decorations\63457\line_single_black\" />
     <Folder Include="tests\Resources\photofun\fonts\" />
     <Folder Include="tests\testbackgrounds\previous_result_pdfs\" />
+    <Folder Include="tests\testCalendar\" />
+    <Folder Include="tests\testCalendar\a4l\" />
+    <Folder Include="tests\testCalendar\a4l\a4l_mcf-Dateien\" />
+    <Folder Include="tests\testCalendar\a4l\previous_result_pdfs\" />
+    <Folder Include="tests\testCalendar\a4p\" />
+    <Folder Include="tests\testCalendar\a4p\a4p_mcf-Dateien\" />
+    <Folder Include="tests\testCalendar\a4p\previous_result_pdfs\" />
     <Folder Include="tests\testCewePageResolver\" />
     <Folder Include="tests\testClipartColorReplacement\previous_result_pdfs\" />
     <Folder Include="tests\testClipart\previous_result_pdfs\" />

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  A deliberately invented, minimal schema used by testCalendar.  It exercises
+  calendar-schema loading without reproducing CEWE's supplied definitions.
+-->
+<calendar_schemas>
+  <calendararea schema="cewe2pdf-test-yellow-weekends">
+    <cell type="CALENDAR_CELL_TYPE_HEAD_WEEKDAY" textcolor="#102030" bgcolor="#f2f2d0"/>
+    <cell type="CALENDAR_CELL_TYPE_WEEKDAY" textcolor="#102030" bgcolor="#ffffe8"/>
+    <cell type="CALENDAR_CELL_TYPE_HEAD_SATURDAY" textcolor="#602000" bgcolor="#ffc85a"/>
+    <cell type="CALENDAR_CELL_TYPE_SATURDAY" textcolor="#602000" bgcolor="#ffe0a0"/>
+    <cell type="CALENDAR_CELL_TYPE_HEAD_SUNDAY" textcolor="#8a1020" bgcolor="#ff9a70"/>
+    <cell type="CALENDAR_CELL_TYPE_SUNDAY" textcolor="#8a1020" bgcolor="#ffd0bc"/>
+  </calendararea>
+</calendar_schemas>

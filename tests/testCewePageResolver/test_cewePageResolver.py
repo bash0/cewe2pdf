@@ -31,8 +31,9 @@ def _memoryCardsFotobook():
     return root.find('fotobook') or root
 
 
-def _calendarFotobook():
-    testMcf = Path(__file__).parents[1] / 'testCalendar' / 'testCalendar.mcf'
+def _calendarFotobook(fixtureName):
+    testMcf = (Path(__file__).parents[1] / 'testCalendar' / fixtureName /
+               f'{fixtureName}.mcf')
     root = etree.parse(str(testMcf)).getroot()
     return root.find('fotobook') or root
 
@@ -73,11 +74,10 @@ def test_resolveMemoryCards():
     assert [int(page.element.get('pagenr')) for page in pages] == list(range(1, 26))
 
 
-def test_resolveCalendarPages():
+@pytest.mark.parametrize('fixtureName', ['a4p', 'a4l'])
+def test_resolveCalendarPages(fixtureName):
     """Calendar pages are independent, including their pagenr=0 cover."""
-    if not hasattr(ProductStyle, 'Calendar'):
-        pytest.skip('Calendar rendering is intentionally deferred.')
-    pages = list(resolvePages(_calendarFotobook(), ProductStyle.Calendar, 13))
+    pages = list(resolvePages(_calendarFotobook(fixtureName), ProductStyle.Calendar, 13))
 
     assert [page.page_number for page in pages] == list(range(13))
     assert all(page.page_type == PageProcessingType.CalendarPage for page in pages)

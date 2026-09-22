@@ -15,6 +15,7 @@ class ProductStyle(Enum):
     AlbumSingleSide = 1  # normal for albums, we divide the cewe 2 page bundle to single pages
     AlbumDoubleSide = 2  # any album when --keepdoublepages is set
     MemoryCard = 3 # CEWE Photo Pairs memory-card game (product code MEM3)
+    Calendar = 4 # CEWE wall calendars (currently CAL9 and CAL35)
 
 
 class AlbumInfo():
@@ -33,7 +34,9 @@ class AlbumInfo():
         # MEM3 is CEWE Photo Pairs: one 6 x 6 cm card per MCF normal-page.
         # Its bundlesize normally supplies the same dimensions at render time;
         # this fallback matters only when that element is absent.
-        "MEM3": (60 * reportlab.lib.pagesizes.mm, 60 * reportlab.lib.pagesizes.mm)
+        "MEM3": (60 * reportlab.lib.pagesizes.mm, 60 * reportlab.lib.pagesizes.mm),
+        "CAL9": reportlab.lib.pagesizes.A4,
+        "CAL35": reportlab.lib.pagesizes.landscape(reportlab.lib.pagesizes.A4)
         }
 
     # product style. The CEWE album products (which is what we are normally expecting in this
@@ -43,7 +46,9 @@ class AlbumInfo():
     # option will cause AlbumSingleSide to be changed to AlbumDoubleSide.
     # Other "non-album" styles which we handle appear in this table
     styles = {
-        "MEM3": ProductStyle.MemoryCard # CEWE Photo Pairs: 6 x 6 cm memory cards
+        "MEM3": ProductStyle.MemoryCard, # CEWE Photo Pairs: 6 x 6 cm memory cards
+        "CAL9": ProductStyle.Calendar, # A4 portrait wall calendar
+        "CAL35": ProductStyle.Calendar # A4 landscape wall calendar
         }
 
     @staticmethod
@@ -146,14 +151,6 @@ class CeweInfo():
     def ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat):
         if fotobook.tag != 'fotobook':
             invalidmsg = f"Cannot process invalid mcf file (root tag is not 'fotobook'): {mcfxmlname}"
-            if mcfxFormat:
-                invalidmsg = invalidmsg + f" (unpacked from {albumname})"
-            logging.error(invalidmsg)
-            sys.exit(1)
-
-        startdatecalendarium = fotobook.attrib['startdatecalendarium']
-        if startdatecalendarium is not None and len(startdatecalendarium) > 0:
-            invalidmsg = f"Cannot process calendar mcf files (yet!): {mcfxmlname}"
             if mcfxFormat:
                 invalidmsg = invalidmsg + f" (unpacked from {albumname})"
             logging.error(invalidmsg)
