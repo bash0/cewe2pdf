@@ -137,12 +137,10 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
         for pageNumber in range(pageCount):
             image = AlbumIndex._convert_to_opencv(doc.load_page(pageNumber), dpi=150)
             finalImage = AlbumIndex._make_white_transparent(image)
-            if pageCount == 1:
-                # Preserve the historic name for ordinary one-page indexes.
-                indexPngFileName = indexPdfFileName.replace('.pdf', '.png')
-            else:
-                indexPngFileName = indexPdfFileName.replace('.pdf',
-                                                             f'.{pageNumber + 1}.png')
+            # Use the same numbered convention for a one-page and a
+            # multi-page index: '.idx.1.png', '.idx.2.png', and so on.
+            indexPngFileName = indexPdfFileName.replace('.pdf',
+                                                         f'.{pageNumber + 1}.png')
             cv2.imwrite(indexPngFileName, finalImage, [cv2.IMWRITE_PNG_COMPRESSION, 9])
             indexPngFileNames.append(indexPngFileName)
         doc.close()
