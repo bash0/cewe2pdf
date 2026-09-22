@@ -80,3 +80,4 @@ nosetests.xml
 **/Icon?
 /tests/testEmptyPageOne/executable-smoke-linux.pdf
 /tests/testCalendar/a4p/a4p200-80.mcfx
+/tests/testCalendar/a4l/a4l.mcf.20260922.pdf
