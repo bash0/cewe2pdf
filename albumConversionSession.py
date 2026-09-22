@@ -155,7 +155,9 @@ class AlbumConversionSession:
         pageNumberingInfo = self._createPageNumberingInfo(pdf)
         processElementsForAlbum = partial(
             processElements, state=self.state, albumIndex=albumIndex,
-            calendarSchemas=self.setup.calendar_schemas)
+            calendarSchemas=self.setup.calendar_schemas,
+            calendarLayouts=self.setup.calendar_layouts,
+            calendarEntries=self.setup.calendar_entries)
 
         processPages(
             self.setup.fotobook, self.setup.mcf_base_folder, imageFolder,

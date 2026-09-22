@@ -142,7 +142,6 @@
     <Content Include="tests\testCalendar\a4p\a4p_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testCalendar\a4p\a4p_mcf-Dateien\gs4dszic_1_20200306_111748.jpg" />
     <Content Include="tests\testCalendar\a4p\cewe2pdf.ini" />
-    <Content Include="tests\testCalendar\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250319S.pdf" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250326S.pdf" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250412S.pdf" />
@@ -325,6 +324,7 @@
     <Compile Include="backgrounds.py" />
     <Compile Include="borders.py" />
     <Compile Include="calendarAreas.py" />
+    <Compile Include="calendarLayouts.py" />
     <Compile Include="calendarSchemas.py" />
     <Compile Include="ceweInfo.py">
       <SubType>Code</SubType>

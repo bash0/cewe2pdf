@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<holidays>
+    <country iso="United Kingdom" locale="en_GB">
+        <nationwide>
+            <day date="XXXX-01-01" honor="free" name="New Year's Day"/>
+        </nationwide>
+    </country>
+</holidays>

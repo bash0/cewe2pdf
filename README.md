@@ -355,9 +355,38 @@ __deleteIndexPdf__ etc determine whether or not the generated files are deleted 
 #### Large index limitations
 The index may span multiple pages. Add one index-marker page to the album for each expected index image; images are placed on matching pages in PDF order. If there are too few or too many marker pages for the generated index images, cewe2pdf logs an error or warning respectively.
 
+### Calendars
+
+Basic CEWE wall-calendar layouts are supported: the year and month headings,
+the `OneWeekPerRow` month grid, and the landscape `OneRow` strip.  CEWE stores
+only the chosen layout name in the MCF; the base sizes, alignment, borders and
+padding for its individual cells are defined by the installation's
+`Resources/calendar_layout.xml`.  The MCF's `fontsize_percentage` and
+`fontsize_percentage_holiddays` values are adjustments to those fixed point
+sizes, not sizes derived from the edited calendar rectangle.
+
+Without a CEWE installation, unsupported calendar layouts fall back to the
+built-in defaults where possible.  A project can also provide compatible local
+definitions and map editor names to them in an optional `[CALENDAR]` section:
+
+```
+[CALENDAR]
+layoutSubstitutions =
+    OneWeekPerRow (2), my-local-week-grid
+schemaSubstitutions =
+    editor-colours, my-local-colours
+```
+
+The local layout and colour resources use the same filenames and XML shape as
+CEWE's files, under `Resources/`.  This is primarily useful for regression
+tests and for deliberately self-contained calendar projects.
+
 
 ## Acceptable products
-The program was developed to handle CEWE photo books - photograph albums - and is absolutely **not** guaranteed to handle other products from the same editor such as calendars, cards, invitations, etc. Feeding *cewe2pdf* with one of these is at best unlikely to create the right result, and indeed is more likely to cause it to crash unpredictably.
+The program was developed to handle CEWE photo books - photograph albums - and
+is absolutely **not** guaranteed to handle every other product from the same
+editor.  Calendars have the limited support described above; cards and
+invitations are still unlikely to create the right result and may fail.
 
 Despite the above warning, changes in Nov 2024 should allow mcf files for the Photo Pairs game to be handled correctly. The resulting 6x6cm pages can be printed using Acrobat, using multiple sheets to a page with, for example, 4 across and 6 down on an A4 sheet. Print two copies, glue them to carton, cut them out and you have your memory game.
 

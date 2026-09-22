@@ -20,14 +20,41 @@ CalendarSchemas = dict[str, dict[str, CalendarCellStyle]]
 
 
 def colourFromHex(value, fallback=None):
-    """Convert CEWE's ``#RRGGBB`` or ``#RRGGBBAA`` notation to a colour.
+    """Convert CEWE's calendar colour notation to a ReportLab colour.
 
-    A missing colour, and CEWE's explicit transparent form (alpha ``00``),
-    deliberately become ``fallback`` rather than an opaque black rectangle.
+    CEWE uses more than one spelling in its supplied resources: ``#RRGGBB``,
+    CSS's short ``#RGB`` form, bare ``RRGGBB``,
+    ``RRGGBB,opacity-percent``, and ``transparent``.  A missing or transparent
+    colour deliberately becomes ``fallback`` rather than an opaque black
+    rectangle.
     """
-    if not value or len(value) < 7 or (len(value) >= 9 and value[7:9] == '00'):
+    if not value:
         return fallback
-    return colors.HexColor(value[:7])
+    colourValue, separator, opacity = value.strip().lower().partition(',')
+    if colourValue == 'transparent':
+        return fallback
+    if colourValue.startswith('#'):
+        colourValue = colourValue[1:]
+    if len(colourValue) in (3, 4):
+        colourValue = ''.join(component * 2 for component in colourValue)
+    if len(colourValue) not in (6, 8):
+        logging.warning('Ignoring invalid CEWE calendar colour %r', value)
+        return fallback
+    try:
+        colour = colors.HexColor('#' + colourValue[:6])
+    except ValueError:
+        logging.warning('Ignoring invalid CEWE calendar colour %r', value)
+        return fallback
+    if len(colourValue) == 8 and colourValue[6:8] == '00':
+        return fallback
+    if separator:
+        try:
+            alpha = max(0, min(100, float(opacity))) / 100
+        except ValueError:
+            logging.warning('Ignoring invalid CEWE calendar opacity %r', value)
+            return colour
+        return colors.Color(colour.red, colour.green, colour.blue, alpha=alpha)
+    return colour
 
 
 def loadCalendarSchemas(ceweFolder: str | None) -> CalendarSchemas:

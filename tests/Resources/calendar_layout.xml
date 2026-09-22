@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  A small, locally authored calendar-layout set for testCalendar.  It lets
+  tests exercise CEWE's layout-data path without distributing its resource
+  file.  MCF layout names are mapped to these definitions in each test INI.
+-->
+<calendar_layout>
+  <calendararea schema="cewe2pdf-test-year">
+    <cell type="CALENDAR_CELL_TYPE_YEAR">
+      <font face="FranklinGothic" bold="true" size="64"/>
+    </cell>
+  </calendararea>
+  <calendararea schema="cewe2pdf-test-month">
+    <cell type="CALENDAR_CELL_TYPE_MONTH" textalign="AlignTop,AlignLeft">
+      <font face="FranklinGothic" bold="true" size="22"/>
+    </cell>
+  </calendararea>
+  <calendararea schema="cewe2pdf-test-week-grid">
+    <cell type="CALENDAR_CELL_TYPE_WEEKDAY" textalign="AlignTop,AlignHCenter" paddingtop="10" paddingbottom="10">
+      <font face="FranklinGothic" size="14"/>
+    </cell>
+    <cell type="CALENDAR_CELL_TYPE_SATURDAY" textalign="AlignTop,AlignHCenter" paddingtop="10" paddingbottom="10">
+      <font face="FranklinGothic" size="14"/>
+    </cell>
+    <cell type="CALENDAR_CELL_TYPE_SUNDAY" textalign="AlignTop,AlignHCenter" paddingtop="10" paddingbottom="10">
+      <font face="FranklinGothic" bold="true" size="14"/>
+    </cell>
+    <cell type="CALENDAR_CELL_TYPE_SPECIAL_DAY">
+      <font face="FranklinGothic" size="10"/>
+    </cell>
+    <cell type="CALENDAR_CELL_TYPE_HEAD_WEEKDAY">
+      <font face="FranklinGothic" bold="true" size="16"/>
+    </cell>
+  </calendararea>
+  <calendararea schema="cewe2pdf-test-one-row">
+    <cell type="CALENDAR_CELL_TYPE_WEEKDAY"><font face="FranklinGothic" size="12"/></cell>
+    <cell type="CALENDAR_CELL_TYPE_SATURDAY"><font face="FranklinGothic" size="12"/></cell>
+    <cell type="CALENDAR_CELL_TYPE_SUNDAY"><font face="FranklinGothic" bold="true" size="12"/></cell>
+    <cell type="CALENDAR_CELL_TYPE_HEAD_WEEKDAY"><font face="FranklinGothic" size="10"/></cell>
+    <cell type="CALENDAR_CELL_TYPE_HEAD_SATURDAY"><font face="FranklinGothic" size="10"/></cell>
+    <cell type="CALENDAR_CELL_TYPE_HEAD_SUNDAY"><font face="FranklinGothic" bold="true" size="10"/></cell>
+  </calendararea>
+</calendar_layout>
