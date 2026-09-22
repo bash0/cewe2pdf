@@ -11,7 +11,7 @@ import logging
 from math import floor
 from typing import Any, Iterator
 
-from ceweInfo import AlbumInfo
+from ceweInfo import AlbumInfo, ProductStyle
 from pageTypes import PageProcessingType
 
 
@@ -81,6 +81,20 @@ def resolvePages(fotobook, productStyle, pageCount, pageNumbers=None) -> Iterato
 
     def isOddPage(number):
         return (number % 2) == 1
+
+    if productStyle == ProductStyle.Calendar:
+        # Calendar MCFs contain one independently renderable page for the
+        # cover and for each month.  They have no album covers, inside covers,
+        # or two-page bundles.
+        calendarPages = fotobook.findall("./page[@type='calendarcoverfront']") \
+            + fotobook.findall("./page[@type='normalpage']")
+        for page in calendarPages:
+            pageNumber = int(page.get('pagenr'))
+            if pageNumbers is not None and pageNumber not in pageNumbers:
+                continue
+            yield ResolvedPage(page, pageNumber, PageProcessingType.CalendarPage,
+                               False, pageNumber == pageCount - 1, pageNumber)
+        return
 
     if not AlbumInfo.isAlbumProduct(productStyle):
         # The supported non-album product is CEWE Photo Pairs (MEM3).  It has

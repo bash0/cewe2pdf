@@ -12,6 +12,7 @@ class PageProcessingType(Enum):
     Cover = 3
     FrontInsideCover = 4
     BackInsideCover = 5
+    CalendarPage = 6
 
     def __str__(self):
         return self.name
