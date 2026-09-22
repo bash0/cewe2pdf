@@ -1,5 +1,10 @@
 import pytest
 
+# A simple "pass/fail" alternative with no diagnostic output is simply to run
+#    python -m pytest -rs
+# from a command prompt with the correct environment activated (eg conda activate <environment>),
+# thus running all tests in the current directory and subdirectories and reporting the results
+# in a compact form.
 
 def runall():
     """Run the test suite and return pytest's operating-system exit status."""
