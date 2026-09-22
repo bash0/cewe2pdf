@@ -60,6 +60,7 @@ class AlbumConversionSession:
         if self.output_file_name is None:
             self.output_file_name = CeweInfo.getOutputFileName(self.album_name)
         CeweInfo.ensureAcceptableOutputFile(self.output_file_name)
+        self.state.output_file_name = self.output_file_name
         return self
 
     def __exit__(self, exceptionType, exceptionValue, traceback):
@@ -218,12 +219,14 @@ class AlbumConversionSession:
             return
         indexPdfFileName = albumIndex.SaveIndexPdf(
             self.output_file_name, self.setup.album_title, pageSize)
-        indexPngFileName = albumIndex.SaveIndexPng(indexPdfFileName)
-        albumIndex.MergeAlbumAndIndexPng(self.output_file_name, indexPngFileName)
+        indexPngFileNames = albumIndex.SaveIndexPngs(indexPdfFileName)
+        albumIndex.MergeAlbumAndIndexPngs(self.output_file_name, indexPngFileNames)
         if albumIndex.deleteIndexPdf and os.path.exists(indexPdfFileName):
             os.remove(indexPdfFileName)
-        if albumIndex.deleteIndexPng and os.path.exists(indexPngFileName):
-            os.remove(indexPngFileName)
+        if albumIndex.deleteIndexPng:
+            for indexPngFileName in indexPngFileNames:
+                if os.path.exists(indexPngFileName):
+                    os.remove(indexPngFileName)
 
 
 def cleanUpTemporaryFiles(fileList, unpackedFolder):

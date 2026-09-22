@@ -127,36 +127,29 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
             logging.error(f'Could not save the index output file: {str(ex)}')
         return indexFileName
 
-    def SaveIndexPng(self, indexPdfFileName):
+    def SaveIndexPngs(self, indexPdfFileName):
+        """Render every generated index-PDF page as an image for album merging."""
         if not self.indexing:
-            return None
+            return []
         doc = pymupdf.open(indexPdfFileName)
-        image = AlbumIndex._convert_to_opencv(doc.load_page(0), dpi=150)
-        transparent_image = AlbumIndex._make_white_transparent(image)
+        pageCount = len(doc)
+        indexPngFileNames = []
+        for pageNumber in range(pageCount):
+            image = AlbumIndex._convert_to_opencv(doc.load_page(pageNumber), dpi=150)
+            finalImage = AlbumIndex._make_white_transparent(image)
+            # Use the same numbered convention for a one-page and a
+            # multi-page index: '.idx.1.png', '.idx.2.png', and so on.
+            indexPngFileName = indexPdfFileName.replace('.pdf',
+                                                         f'.{pageNumber + 1}.png')
+            cv2.imwrite(indexPngFileName, finalImage, [cv2.IMWRITE_PNG_COMPRESSION, 9])
+            indexPngFileNames.append(indexPngFileName)
+        doc.close()
+        return indexPngFileNames
 
-        # I used to crop the image to reduce the size of the final png image
-        #   cropped_image = AlbumIndex._crop_transparent_borders(transparent_image)
-        # but the effect was that indexes in different albums were scaled differently,
-        # making it impossible to have consistent font size and margin sizes in the
-        # various .ini files and get the same resulting text sizes on the merged index page.
-        # By using the uncropped image we're always merging in a png image of the same size,
-        # and the text is scaled in the same way (slightly down so that the full page size
-        # of the index pdf now fits into a full page of the album but with margins)
-        # So all generated indexes now come out with the same size text on the merged index
-        # page. My guess is that a human editor including a smallish index png onto the
-        # index page in the album editor prior to sending it for quality printing might
-        # choose to scale it up for better readability, but that's his choice. He could
-        # also choose to increase the index font size in the .ini file - but at least he now
-        # does so from a consistent starting point for the size of the generated index text
-        final_image = transparent_image
-
-        indexPngFileName = indexPdfFileName.replace(".pdf",".png")
-        # this should write with standard 300 dpi
-        cv2.imwrite(indexPngFileName, final_image, [cv2.IMWRITE_PNG_COMPRESSION, 9])
-        # another possible technique ... convert NumPy array to Pillow Image
-        #   image = Image.fromarray(final_image)
-        #   image.save(indexPngFileName, dpi=(300, 300))
-        return indexPngFileName
+    def SaveIndexPng(self, indexPdfFileName):
+        """Backward-compatible single-image accessor for external callers."""
+        indexPngFileNames = self.SaveIndexPngs(indexPdfFileName)
+        return indexPngFileNames[0] if indexPngFileNames else None
 
     @staticmethod
     def _make_white_transparent(image):
@@ -197,103 +190,88 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
         cropped_image = image_rgba[top_left[0]:bottom_right[0], top_left[1]:bottom_right[1]]
         return cropped_image
 
-    def MergeAlbumAndIndexPng(self, albumPdfFileName, indexPngFileName):
-        if not self.indexing:
-            return
-        # Load the index png
-        indexImage = Image.open(indexPngFileName)
-        idx_width_px, idx_height_px = indexImage.size  # Get dimensions
-        # Get DPI (default to 300 if not specified)
-        dpi_x, dpi_y = indexImage.info.get("dpi", (300, 300))
-        indexImage.close()
-        # Convert image size to PDF points
-        idx_width_pt = idx_width_px * (72 / dpi_x)
-        idx_height_pt = idx_height_px * (72 / dpi_y)
-
-        # Load the album PDF and find the page where the user wants the index
-        albumDoc = pymupdf.open(albumPdfFileName)
+    def _findIndexMarkerPages(self, albumDoc):
+        """Return every album page carrying the configured invisible index marker."""
         pattern = re.compile(self.indexMarkerRegex)
-        page = None
-        img_width = 0
-        for pg in albumDoc:
-            blocks = pg.get_text("blocks")  # Extract text in block format
-            markerFound = False
-            for block in blocks:
-                x0, y0, x1, y1, text = block[:5]  # Extract bounding box and text pylint: disable=unused-variable # noqa: F841
-                # Split block text into individual lines since adjacent text items can
-                # be returned as one block
-                lines = text.split("\n")
-                for line in lines:
-                    if pattern.search(line):  # Check regex against each line separately
-                        markerFound = True
-                        # markerRect = pymupdf.Rect(x0, y0, x1, y1)
-                        # full block rect, this needs refining if the marker is to be removed
-            if not markerFound:
-                continue
-            page = pg
-            # Potentially remove marker text while leaving everything else unchanged. But it's
-            # a bit nicer if the marker text is something concrete on the index page, for
-            # example a heading "Contents" or "Index" or similar. Removal of the markers would
-            # be something like this
-            #    page.add_redact_annot(markerrect)
-            #    page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
-            # Look to see if the (human) album editor has added a previous version of the index
-            # image which would be the case if he generates his pdf version and then takes the
-            # image into the version which he plans to send for quality printing. We'll want to
-            # delete the old index image and replace it with the new one provided here
-            images = page.get_images(full=True)
-            for img in images:
-                xref = img[0]  # Image reference ID
-                img_info = albumDoc.extract_image(xref)
-                img_ext = img_info["ext"]  # Image format (ought to be PNG, since transparency exists)
-                if img_ext.lower() != 'png':
-                    continue
-                # Convert image bytes to NumPy array
-                img_bytes = img_info["image"]  # Raw image bytes
-                image_array = np.frombuffer(img_bytes, dtype=np.uint8)
-                # Unfortunately the cewe editor seems to lose the alpha channel on the inserted
-                # index image, so we can't use that to help us identify the old index image on the
-                # page. So we just load as RGB, with no transparency.
-                image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-                # Quite how this works I don't know, but the previously transparent pixels
-                # are now white. If this image is largely white, then it is *probably* the
-                # old index image we are looking for.
-                white_pixel_count = np.sum((image == [255, 255, 255]).all(axis=2))
-                total_pixels = image.shape[0] * image.shape[1]
-                white_ratio = white_pixel_count / total_pixels
-                # High white ratio (chosen by experimentation) suggests a converted transparent image
-                if white_ratio > 0.8:
-                    page.delete_image(xref)
+        markerPages = []
+        for page in albumDoc:
+            for block in page.get_text('blocks'):
+                text = block[4]
+                if any(pattern.search(line.strip()) for line in text.split('\n')):
+                    markerPages.append(page)
                     break
-                # another possible way to identify the old index image is the width, which will be
-                # the same as the new image (even if it has been resized in the album editor)
-                img_width = img[2]
-                if img_width == idx_width_px:
-                    page.delete_image(xref)
+        return markerPages
 
-        if page is None: # we didn't find a page on which we can place the new index image
-            return
-        page_width, page_height = page.rect.width, page.rect.height
+    @staticmethod
+    def _removePreviouslyMergedIndexImage(albumDoc, page, indexImageWidth):
+        """Remove an earlier likely-index image so repeat conversions remain idempotent."""
+        removedImage = False
+        for imageInfo in page.get_images(full=True):
+            xref = imageInfo[0]
+            extractedImage = albumDoc.extract_image(xref)
+            if extractedImage['ext'].lower() != 'png':
+                continue
+            imageArray = np.frombuffer(extractedImage['image'], dtype=np.uint8)
+            image = cv2.imdecode(imageArray, cv2.IMREAD_COLOR)
+            whiteRatio = np.sum((image == [255, 255, 255]).all(axis=2)) / image.shape[0] / image.shape[1]
+            # CEWE loses the alpha channel when an index image is reimported,
+            # leaving its once-transparent region white. Matching width covers
+            # the less common case where it has subsequently been cropped.
+            if whiteRatio > 0.8 or imageInfo[2] == indexImageWidth:
+                page.delete_image(xref)
+                removedImage = True
+        return removedImage
 
-        # Max available size for the image (without exceeding margins)
-        max_width_pt = page_width - self.mergeLeftMarginPt - self.mergeRightMarginPt
-        max_height_pt = page_height - self.mergeBottomMarginPt - self.mergeTopMarginPt
+    def _mergeIndexImage(self, albumDoc, page, indexPngFileName): # pylint: disable=too-many-locals
+        """Scale one transparent index image into one already-reserved album page."""
+        indexImage = Image.open(indexPngFileName)
+        indexWidthPx, indexHeightPx = indexImage.size
+        dpiX, dpiY = indexImage.info.get('dpi', (300, 300))
+        indexImage.close()
+        indexWidthPt = indexWidthPx * (72 / dpiX)
+        indexHeightPt = indexHeightPx * (72 / dpiY)
+        self._removePreviouslyMergedIndexImage(albumDoc, page, indexWidthPx)
 
-        # Scale the image proportionally to fit within the available space
-        scale_factor = min(max_width_pt / idx_width_pt, max_height_pt / idx_height_pt)
-        scaled_width_pt = idx_width_pt * scale_factor
-        scaled_height_pt = idx_height_pt * scale_factor
-
-        # Compute position
-        x0 = (page_width - scaled_width_pt) / 2 # centered horizontally
+        pageWidth, pageHeight = page.rect.width, page.rect.height
+        maxWidthPt = pageWidth - self.mergeLeftMarginPt - self.mergeRightMarginPt
+        maxHeightPt = pageHeight - self.mergeBottomMarginPt - self.mergeTopMarginPt
+        scaleFactor = min(maxWidthPt / indexWidthPt, maxHeightPt / indexHeightPt)
+        scaledWidthPt = indexWidthPt * scaleFactor
+        scaledHeightPt = indexHeightPt * scaleFactor
+        x0 = (pageWidth - scaledWidthPt) / 2
         y0 = self.mergeTopMarginPt
-        rect = pymupdf.Rect(x0, y0, x0 + scaled_width_pt, y0 + scaled_height_pt)
-
-        # Insert the scaled and centered image into the PDF
+        rect = pymupdf.Rect(x0, y0, x0 + scaledWidthPt, y0 + scaledHeightPt)
         page.insert_image(rect, filename=indexPngFileName, overlay=True)
 
-        albumDoc.save(albumPdfFileName, incremental=True, encryption=0) # overwriting the original
+    def MergeAlbumAndIndexPngs(self, albumPdfFileName, indexPngFileNames):
+        """Merge every index image onto the matching reserved album page in order."""
+        if not self.indexing:
+            return
+        if not indexPngFileNames:
+            return
+        albumDoc = pymupdf.open(albumPdfFileName)
+        markerPages = self._findIndexMarkerPages(albumDoc)
+        if not markerPages:
+            logging.warning('Cannot find an album page matching the index marker regex.')
+            albumDoc.close()
+            return
+        if len(markerPages) < len(indexPngFileNames):
+            logging.error(
+                f'Generated {len(indexPngFileNames)} index pages but found only '
+                f'{len(markerPages)} reserved index pages matching {self.indexMarkerRegex!r}.')
+        if len(markerPages) > len(indexPngFileNames):
+            logging.warning(
+                f'Found {len(markerPages)} reserved index pages but generated only '
+                f'{len(indexPngFileNames)} index pages; unused marker pages are unchanged.')
+        for page, indexPngFileName in zip(markerPages, indexPngFileNames):
+            self._mergeIndexImage(albumDoc, page, indexPngFileName)
+
+        albumDoc.save(albumPdfFileName, incremental=True, encryption=0)
         albumDoc.close()
+
+    def MergeAlbumAndIndexPng(self, albumPdfFileName, indexPngFileName):
+        """Backward-compatible single-page merge API."""
+        self.MergeAlbumAndIndexPngs(albumPdfFileName, [indexPngFileName])
 
     @staticmethod
     def MergeAlbumAndIndexPdf(albumPdfFileName, pagenr, indexPdfFileName):

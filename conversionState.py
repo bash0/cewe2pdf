@@ -24,4 +24,8 @@ class ConversionState:
     passepartout_files: dict[int, str] | None = None
     missing_font_substitutions: dict[str, str] = field(default_factory=dict)
     noted_font_substitutions: set[str] = field(default_factory=set)
+    # The output PDF is known before the album areas are rendered.  Image
+    # handling uses it to recognise old, CEWE-saved copies of our generated
+    # index PNGs, so they do not become an extra layer beneath a new index.
+    output_file_name: str | None = None
     message_counters: Any | None = None

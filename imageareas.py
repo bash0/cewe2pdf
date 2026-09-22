@@ -2,6 +2,7 @@
 
 import logging
 import os
+import re
 import tempfile
 from math import sqrt
 
@@ -18,6 +19,32 @@ from passepartout import Passepartout
 from renderContext import RenderContext
 
 
+def _isSavedIndexImage(imageFileName, outputFileName):
+    """Return whether a CEWE resource is a previously generated index PNG.
+
+    The album editor prefixes files copied into ``safecontainer:`` with its
+    own identifier.  The meaningful suffix remains our output stem followed
+    by ``.idx``.  Test output names add ``.YYYYMMDDS`` while ordinary runs use
+    ``.S`` or ``.D``; remove either suffix so an album saved after an earlier
+    run is recognised too.
+    """
+    if not outputFileName or not imageFileName.startswith('safecontainer:/'):
+        return False
+
+    imageName = os.path.basename(imageFileName).casefold()
+    outputStem = os.path.splitext(os.path.basename(outputFileName))[0].casefold()
+    stableStem = re.sub(r'\.\d{8}[sd]$', '', outputStem)
+    stems = {outputStem, stableStem}
+    for stem in stems:
+        # CEWE adds a prefix ending in an underscore.  Current output always
+        # uses '.idx.<number>.png'; accept the old '.idx.png' convention too
+        # so existing CEWE albums can still have their stale index removed.
+        pattern = rf'(?:^|_){re.escape(stem)}(?:\.[sd])?\.idx(?:\.\d+)?\.png$'
+        if re.search(pattern, imageName):
+            return True
+    return False
+
+
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDirectory,
                         productStyle, mcfBaseFolder, pageType, pdf, pageWidth,
                         transx, transy, context: RenderContext, state: ConversionState,
@@ -27,9 +54,21 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
         return
 
     mcf2rl = context.mcf_to_reportlab
-    imagePath = os.path.join(mcfBaseFolder, imageDirectory, imageTag.get('filename'))
+    imageFileName = imageTag.get('filename')
+    if _isSavedIndexImage(imageFileName, state.output_file_name):
+        logging.info(f'Omitting previously generated index image {imageFileName}')
+        return
+
+    imagePath = os.path.join(mcfBaseFolder, imageDirectory, imageFileName)
     # The layout software copies the images to another collection folder.
     imagePath = imagePath.replace('safecontainer:/', '')
+    if not os.path.isfile(imagePath):
+        # An MCF can retain a reference to a previously generated index image
+        # after that temporary PNG has been removed. Do not let one stale
+        # optional image prevent the page text and a replacement index from
+        # rendering; the missing image is reported for ordinary photos too.
+        logging.warning(f'Could not find image file {imagePath}; image omitted.')
+        return
     image = PIL.Image.open(imagePath)
 
     imageTransx = transx
