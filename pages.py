@@ -10,6 +10,7 @@ from backgrounds import processBackground
 from conversionState import ConversionState
 from ceweInfo import AlbumInfo
 from cewePageResolver import ResolvedPage, resolvePages
+from extraLoggers import mustsee
 from pageNumbering import addPageNumber
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
@@ -20,7 +21,7 @@ def parseInputPage(fotobook, mcfBaseFolder, backgroundLocations, imageDirectory,
                    state: ConversionState, availableFonts, lastPage,
                    context: RenderContext, processElements: Callable):
     """Set up one output page, draw its background, then delegate its areas."""
-    logging.info(f"Side {pageNumber} ({pageType}): parsing pagenr {page.get('pagenr')} of {pageCount}")
+    mustsee.info(f"Side {pageNumber} ({pageType}): parsing pagenr {page.get('pagenr')} of {pageCount}")
 
     bundleSize = page.find("./bundlesize")
     if bundleSize is not None:
