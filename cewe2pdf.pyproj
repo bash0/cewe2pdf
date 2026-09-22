@@ -29,6 +29,7 @@
     <Content Include=".github\workflows\pythonapp.yml" />
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
+    <Content Include="additional_fonts.example.txt" />
     <Content Include="cewe2pdf.spec" />
     <Content Include="DEVELOPER_GUIDE.md" />
     <Content Include="documents\mcf_feature_classification.md" />
@@ -36,6 +37,7 @@
     <Content Include="environments\cewe2pdfenvlinux.yml" />
     <Content Include="environments\cewe2pdfenvwindows.yml" />
     <Content Include="environments\environments.md" />
+    <Content Include="LICENSE" />
     <Content Include="pytest.ini" />
     <Content Include="requirements-pinned.txt" />
     <Content Include="requirements-winexe.txt" />
@@ -265,7 +267,6 @@
     <Content Include="tests\testbackgrounds\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\cewe2pdf.ini" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcf" />
-    <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement.mcfx" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_1_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_2_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
     <Content Include="tests\testClipartColorReplacement\test_clipart_colorreplacement_mcf-Dateien\abx6bvk1_3_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_%2825137605482%29.jpg" />
@@ -323,9 +324,12 @@
     <Compile Include="albumIndex.py" />
     <Compile Include="backgrounds.py" />
     <Compile Include="borders.py" />
+    <Compile Include="calendarAreas.py" />
+    <Compile Include="calendarSchemas.py" />
     <Compile Include="ceweInfo.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="cewePageResolver.py" />
     <Compile Include="clipArt.py">
       <SubType>Code</SubType>
     </Compile>
@@ -334,6 +338,7 @@
     <Compile Include="configUtils.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="conftest.py" />
     <Compile Include="conversionSetup.py" />
     <Compile Include="conversionState.py" />
     <Compile Include="corners.py" />
@@ -359,6 +364,7 @@
     <Compile Include="mcfx.py" />
     <Compile Include="messageCounterHandler.py" />
     <Compile Include="otf.py" />
+    <Compile Include="pageElements.py" />
     <Compile Include="pageNumbering.py" />
     <Compile Include="pages.py" />
     <Compile Include="pageTypes.py" />

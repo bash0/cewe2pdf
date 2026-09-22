@@ -32,7 +32,8 @@ def _memoryCardsFotobook():
 
 
 def _calendarFotobook(fixtureName):
-    testMcf = Path(__file__).parents[1] / 'testCalendar' / fixtureName / 'data.mcf'
+    testMcf = (Path(__file__).parents[1] / 'testCalendar' / fixtureName /
+               f'{fixtureName}.mcf')
     root = etree.parse(str(testMcf)).getroot()
     return root.find('fotobook') or root
 

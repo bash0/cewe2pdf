@@ -14,6 +14,7 @@ import logging
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 
+from calendarSchemas import CalendarCellStyle, CalendarSchemas, colourFromHex
 from renderContext import RenderContext
 
 
@@ -72,33 +73,36 @@ def _calendarNames(language):
     return NORWEGIAN_MONTHS, NORWEGIAN_WEEKDAYS
 
 
-def _colourFromHex(value, fallback):
-    """Convert CEWE's ``#RRGGBBAA`` colour notation, retaining a safe fallback."""
-    if not value or len(value) < 7:
-        return fallback
-    return colors.HexColor(value[:7])
-
-
-def _calendarTextColours(fotobook, calendarArea):
-    """Read the default and Sunday text colours from a saved user scheme."""
-    defaultColour = colors.black
-    sundayColour = defaultColour
+def _calendarCellStyles(fotobook, calendarArea, calendarSchemas):
+    """Return styles from an embedded scheme, or from CEWE's resource file."""
     schemeName = calendarArea.get('colorschema', '')
+    styles = dict(calendarSchemas.get(schemeName, {}))
     matchingSchemes = fotobook.xpath(
         f'./colorSchemata/calendararea[@colorschema="{schemeName}"]')
     if not matchingSchemes:
-        return defaultColour, sundayColour
+        return styles, CalendarCellStyle(colors.black, None)
     scheme = matchingSchemes[0]
     defaultCell = scheme.find('celldefault')
+    defaultStyle = CalendarCellStyle(colors.black, None)
     if defaultCell is not None:
-        defaultColour = _colourFromHex(defaultCell.get('textcolor'), defaultColour)
-        sundayColour = defaultColour
+        defaultStyle = CalendarCellStyle(
+            colourFromHex(defaultCell.get('textcolor'), colors.black),
+            colourFromHex(defaultCell.get('bgcolor')))
     for cell in scheme.findall('cell'):
-        if cell.get('type') in ('CALENDAR_CELL_TYPE_SUNDAY',
-                                'CALENDAR_CELL_TYPE_HOLIDAY',
-                                'CALENDAR_CELL_TYPE_HEAD_SUNDAY'):
-            sundayColour = _colourFromHex(cell.get('textcolor'), sundayColour)
-    return defaultColour, sundayColour
+        cellType = cell.get('type')
+        if cellType:
+            styles[cellType] = CalendarCellStyle(
+                colourFromHex(cell.get('textcolor'), defaultStyle.text_colour),
+                colourFromHex(cell.get('bgcolor'), defaultStyle.background_colour))
+    return styles, defaultStyle
+
+
+def _calendarStyle(styles, defaultStyle, *cellTypes):
+    """Choose the first defined style for equivalent CEWE calendar cell types."""
+    for cellType in cellTypes:
+        if cellType in styles:
+            return styles[cellType]
+    return defaultStyle
 
 
 def _norwegianHolidays(year):
@@ -177,7 +181,9 @@ def _drawBoldCentered(pdf, text, x, y, fontName, fontSize):
 
 
 def _drawMonthHeading(pdf, monthDate, bounds, fontName, percentage, language):
-    fontSize = max(8, bounds.height * (0.50 + percentage / 500))
+    # Calendar templates may give this small label a generously tall area;
+    # CEWE does not let the month heading grow without bound in that case.
+    fontSize = min(20, max(8, bounds.height * (0.54 + percentage / 500)))
     months, _ = _calendarNames(language)
     label = months[monthDate.month - 1]
     boldFontName = 'Helvetica-Bold' if fontName == 'Helvetica' else fontName
@@ -196,23 +202,30 @@ def _drawWeekRows(pdf, monthDate, bounds, fontName, percentage, showHolidays,
     headerHeight = bounds.height * 0.18
     rowHeight = (bounds.height - headerHeight) / weekCount
     columnWidth = bounds.width / 7
-    fontSize = max(5, min(rowHeight * 0.48, columnWidth * 0.28) *
+    fontSize = max(5, min(rowHeight * 0.38, columnWidth * 0.22) *
                    (1 + percentage / 250))
 
+    # CEWE's otherwise transparent calendar theme still places its month grid
+    # on an opaque white panel, so that date labels remain readable over a
+    # page background or photograph.
+    pdf.setFillColor(colors.white)
+    pdf.rect(bounds.x, bounds.y, bounds.width, bounds.height, fill=1, stroke=0)
     pdf.setStrokeColor(colors.black)
     pdf.setLineWidth(0.35)
     _, weekdays = _calendarNames(language)
     for column, weekday in enumerate(weekdays):
         _drawBoldCentered(pdf, weekday, bounds.x + (column + 0.5) * columnWidth,
                           bounds.y + bounds.height - headerHeight * 0.72,
-                          fontName, fontSize * 0.78)
+                          fontName, fontSize * 0.72)
     for row in range(weekCount + 1):
         pdf.line(bounds.x, bounds.y + row * rowHeight,
                  bounds.x + bounds.width, bounds.y + row * rowHeight)
     for column in range(8):
         pdf.line(bounds.x + column * columnWidth, bounds.y,
                  bounds.x + column * columnWidth,
-                 bounds.y + weekCount * rowHeight)
+                 bounds.y + bounds.height)
+    pdf.line(bounds.x, bounds.y + bounds.height,
+             bounds.x + bounds.width, bounds.y + bounds.height)
 
     holidays = _norwegianHolidays(monthDate.year) if showHolidays else set()
     holidayLabels = _norwegianHolidayLabels(monthDate.year) if showHolidays else {}
@@ -221,7 +234,9 @@ def _drawWeekRows(pdf, monthDate, bounds, fontName, percentage, showHolidays,
         cell = firstWeekday + dayNumber - 1
         row, column = divmod(cell, 7)
         dayX = bounds.x + (column + 0.5) * columnWidth
-        dayY = bounds.y + (weekCount - row - 0.62) * rowHeight
+        # CEWE places the date near the top of each cell, leaving the lower
+        # portion available for a handwritten note on the printed calendar.
+        dayY = bounds.y + (weekCount - row - 0.40) * rowHeight
         if column == 6 or dayDate in holidays:
             _drawBoldCentered(pdf, str(dayNumber), dayX, dayY, fontName, fontSize)
         else:
@@ -233,7 +248,7 @@ def _drawWeekRows(pdf, monthDate, bounds, fontName, percentage, showHolidays,
             labels.append('Sommertid')
         for labelNumber, label in enumerate(labels):
             _drawBoldCentered(pdf, label, dayX,
-                              bounds.y + (weekCount - row - 0.89 -
+                              bounds.y + (weekCount - row - 0.66 -
                                           labelNumber * 0.13) * rowHeight,
                               fontName, max(3.5, fontSize * 0.27))
 
@@ -250,29 +265,53 @@ def _drawYearHeading(pdf, startDate, bounds, fontName):
                       fontName, fontSize)
 
 
-def _drawOneRow(pdf, monthDate, bounds, fontName, percentage, colours,
-                language):
+def _drawOneRow(pdf, monthDate, bounds, fontName, percentage, styles,
+                defaultStyle, language):
     """Draw CEWE's landscape calendar strip: weekday and date in 31 columns."""
     _, weekdays = _calendarNames(language)
     _, numberOfDays = calendar.monthrange(monthDate.year, monthDate.month)
     columnWidth = bounds.width / numberOfDays
     fontSize = max(5, min(bounds.height * 0.27, columnWidth * 0.45) *
                    (1 + percentage / 250))
-    normalColour, sundayColour = colours
     for dayNumber in range(1, numberOfDays + 1):
         dayDate = date(monthDate.year, monthDate.month, dayNumber)
         dayX = bounds.x + (dayNumber - 0.5) * columnWidth
-        colour = sundayColour if dayDate.weekday() == 6 else normalColour
+        if dayDate.weekday() == 6:
+            headerStyle = _calendarStyle(
+                styles, defaultStyle, 'CALENDAR_CELL_TYPE_HEAD_SUNDAY',
+                'CALENDAR_CELL_TYPE_HEAD_HOLIDAY')
+            dayStyle = _calendarStyle(
+                styles, defaultStyle, 'CALENDAR_CELL_TYPE_SUNDAY',
+                'CALENDAR_CELL_TYPE_HOLIDAY')
+        elif dayDate.weekday() == 5:
+            headerStyle = _calendarStyle(
+                styles, defaultStyle, 'CALENDAR_CELL_TYPE_HEAD_SATURDAY')
+            dayStyle = _calendarStyle(styles, defaultStyle,
+                                      'CALENDAR_CELL_TYPE_SATURDAY')
+        else:
+            headerStyle = _calendarStyle(
+                styles, defaultStyle, 'CALENDAR_CELL_TYPE_HEAD_WEEKDAY')
+            dayStyle = _calendarStyle(styles, defaultStyle,
+                                      'CALENDAR_CELL_TYPE_WEEKDAY')
+        if headerStyle.background_colour is not None:
+            pdf.setFillColor(headerStyle.background_colour)
+            pdf.rect(dayX - columnWidth / 2, bounds.y + bounds.height * 0.5,
+                     columnWidth, bounds.height * 0.5, fill=1, stroke=0)
+        if dayStyle.background_colour is not None:
+            pdf.setFillColor(dayStyle.background_colour)
+            pdf.rect(dayX - columnWidth / 2, bounds.y, columnWidth,
+                     bounds.height * 0.5, fill=1, stroke=0)
         _drawCentered(pdf, weekdays[dayDate.weekday()], dayX,
                       bounds.y + bounds.height * 0.63,
-                      fontName, fontSize * 0.68, colour)
+                      fontName, fontSize * 0.68, headerStyle.text_colour)
         _drawCentered(pdf, str(dayNumber), dayX,
                       bounds.y + bounds.height * 0.20,
-                      fontName, fontSize, colour)
+                      fontName, fontSize, dayStyle.text_colour)
 
 
 def processCalendarArea(calendarArea, fotobook, pageNumber, area, pageHeight,
-                        pdf, context: RenderContext):
+                        pdf, context: RenderContext,
+                        calendarSchemas: CalendarSchemas):
     """Render one calendar area using the CEWE layout names currently supported.
 
     Unsupported layouts are reported but do not prevent the user's editable
@@ -303,7 +342,9 @@ def processCalendarArea(calendarArea, fotobook, pageNumber, area, pageHeight,
         _drawWeekRows(pdf, monthDate, bounds, fontName, percentage, showHolidays,
                       language)
     elif layout.startswith('OneRow'):
-        _drawOneRow(pdf, monthDate, bounds, fontName, percentage,
-                    _calendarTextColours(fotobook, calendarArea), language)
+        styles, defaultStyle = _calendarCellStyles(
+            fotobook, calendarArea, calendarSchemas)
+        _drawOneRow(pdf, monthDate, bounds, fontName, percentage, styles,
+                    defaultStyle, language)
     else:
         logging.warning(f'Unsupported calendar layout {layout!r}; area omitted')

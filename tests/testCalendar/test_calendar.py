@@ -13,11 +13,25 @@ from testutils import configureTestImportPaths
 configureTestImportPaths(__file__)
 
 from compare_pdf import ComparePDF, ShowDiffsStyle  # type: ignore
+from calendarSchemas import applyCalendarSchemaSubstitutions, loadCalendarSchemas
 from cewe2pdf import convertMcf
 from testutils import getLatestResultFile
 
 
 TEST_DIRECTORY = Path(__file__).parent
+
+
+def test_minimalCalendarSchemaIsLoaded():
+    """The test resource exercises built-in-style colours without CEWE data."""
+    schemas = loadCalendarSchemas(str(PROJECT_ROOT / 'tests'))
+    substitutedSchemas = applyCalendarSchemaSubstitutions(
+        schemas, 'new_15012019_160949, cewe2pdf-test-yellow-weekends')
+    styles = substitutedSchemas['new_15012019_160949']
+
+    assert styles['CALENDAR_CELL_TYPE_WEEKDAY'].background_colour is not None
+    assert styles['CALENDAR_CELL_TYPE_SUNDAY'].background_colour is not None
+    assert styles['CALENDAR_CELL_TYPE_SUNDAY'].text_colour.red > 0.5
+    assert styles['CALENDAR_CELL_TYPE_SUNDAY'].text_colour.green < 0.2
 
 
 def buildAndCompareCalendar(fixtureName, pageDimensions, caplog):
