@@ -156,7 +156,6 @@ class CeweInfo():
             logging.error(invalidmsg)
             sys.exit(1)
 
-
     @staticmethod
     def getCeweFontsFolder(cewe_folder):
         return os.path.join(cewe_folder, 'Resources', 'photofun', 'fonts')

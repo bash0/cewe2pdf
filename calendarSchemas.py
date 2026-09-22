@@ -7,6 +7,8 @@ from pathlib import Path
 from lxml import etree
 from reportlab.lib import colors
 
+from calendarSubstitutions import applyCalendarSubstitutions
+
 
 @dataclass(frozen=True)
 class CalendarCellStyle:
@@ -102,22 +104,4 @@ def applyCalendarSchemaSubstitutions(schemas: CalendarSchemas,
     from the optional ``[CALENDAR]`` INI section.  This lets a test use a
     small invented schema while retaining the editor's original MCF value.
     """
-    substitutedSchemas = dict(schemas)
-    for definition in definitions.splitlines():
-        if not definition.strip():
-            continue
-        sourceAndTarget = [part.strip() for part in definition.split(',', 1)]
-        if len(sourceAndTarget) != 2 or not all(sourceAndTarget):
-            logging.warning('Ignoring invalid calendar schema substitution: %r',
-                            definition)
-            continue
-        source, target = sourceAndTarget
-        replacement = schemas.get(target)
-        if replacement is None:
-            logging.warning(
-                'Calendar schema substitution %r cannot use missing schema %r',
-                source, target)
-            continue
-        substitutedSchemas[source] = replacement
-        logging.info('Using calendar schema %s in place of %s', target, source)
-    return substitutedSchemas
+    return applyCalendarSubstitutions(schemas, definitions, 'schema')

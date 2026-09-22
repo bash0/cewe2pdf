@@ -12,6 +12,8 @@ from pathlib import Path
 
 from lxml import etree
 
+from calendarSubstitutions import applyCalendarSubstitutions
+
 
 @dataclass(frozen=True)
 class CalendarCellLayout:
@@ -83,22 +85,4 @@ def loadCalendarLayouts(ceweFolder: str | None) -> CalendarLayouts:
 def applyCalendarLayoutSubstitutions(layouts: CalendarLayouts,
                                      definitions: str) -> CalendarLayouts:
     """Alias editor layout names to local compatible definitions from the INI."""
-    substitutedLayouts = dict(layouts)
-    for definition in definitions.splitlines():
-        if not definition.strip():
-            continue
-        sourceAndTarget = [part.strip() for part in definition.split(',', 1)]
-        if len(sourceAndTarget) != 2 or not all(sourceAndTarget):
-            logging.warning('Ignoring invalid calendar layout substitution: %r',
-                            definition)
-            continue
-        source, target = sourceAndTarget
-        replacement = layouts.get(target)
-        if replacement is None:
-            logging.warning(
-                'Calendar layout substitution %r cannot use missing layout %r',
-                source, target)
-            continue
-        substitutedLayouts[source] = replacement
-        logging.info('Using calendar layout %s in place of %s', target, source)
-    return substitutedLayouts
+    return applyCalendarSubstitutions(layouts, definitions, 'layout')

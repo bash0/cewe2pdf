@@ -139,8 +139,8 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
             finalImage = AlbumIndex._make_white_transparent(image)
             # Use the same numbered convention for a one-page and a
             # multi-page index: '.idx.1.png', '.idx.2.png', and so on.
-            indexPngFileName = indexPdfFileName.replace('.pdf',
-                                                         f'.{pageNumber + 1}.png')
+            indexPngFileName = indexPdfFileName.replace(
+                '.pdf', f'.{pageNumber + 1}.png')
             cv2.imwrite(indexPngFileName, finalImage, [cv2.IMWRITE_PNG_COMPRESSION, 9])
             indexPngFileNames.append(indexPngFileName)
         doc.close()

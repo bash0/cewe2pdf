@@ -43,6 +43,10 @@
     <Content Include="requirements-winexe.txt" />
     <Content Include="tests\compare-pdf\LICENSE" />
     <Content Include="tests\compare-pdf\README.md" />
+    <Content Include="tests\Resources\calendarentries\en_GB.xml" />
+    <Content Include="tests\Resources\calendarentries\nb_NO.xml" />
+    <Content Include="tests\Resources\calendar_layout.xml" />
+    <Content Include="tests\Resources\calendar_schema.xml" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\447.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
@@ -324,8 +328,10 @@
     <Compile Include="backgrounds.py" />
     <Compile Include="borders.py" />
     <Compile Include="calendarAreas.py" />
+    <Compile Include="calendarEntries.py" />
     <Compile Include="calendarLayouts.py" />
     <Compile Include="calendarSchemas.py" />
+    <Compile Include="calendarSubstitutions.py" />
     <Compile Include="ceweInfo.py">
       <SubType>Code</SubType>
     </Compile>
@@ -453,6 +459,7 @@
     <Folder Include="tests\hps\5026\addons\63488\cliparts\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\decorations\" />
+    <Folder Include="tests\Resources\calendarentries\" />
     <Folder Include="tests\Resources\photofun\decorations\106793\" />
     <Folder Include="tests\Resources\photofun\decorations\106793\8394-DECO-SF\" />
     <Folder Include="tests\Resources\photofun\decorations\106796\" />
