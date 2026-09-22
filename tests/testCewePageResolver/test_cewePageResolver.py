@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 
 from lxml import etree
+import pytest
 
 # This test imports the resolver directly rather than through cewe2pdf.py.
 # Derive the project root from this file so that pytest works from any cwd,
@@ -26,6 +27,12 @@ def _testFotobook():
 
 def _memoryCardsFotobook():
     testMcf = Path(__file__).parents[1] / 'testMemoryCards' / 'testMemoryCards.mcf'
+    root = etree.parse(str(testMcf)).getroot()
+    return root.find('fotobook') or root
+
+
+def _calendarFotobook():
+    testMcf = Path(__file__).parents[1] / 'testCalendar' / 'testCalendar.mcf'
     root = etree.parse(str(testMcf)).getroot()
     return root.find('fotobook') or root
 
@@ -64,3 +71,16 @@ def test_resolveMemoryCards():
     assert [page.page_number for page in pages] == list(range(1, 26))
     assert all(page.page_type == PageProcessingType.RegularPage for page in pages)
     assert [int(page.element.get('pagenr')) for page in pages] == list(range(1, 26))
+
+
+def test_resolveCalendarPages():
+    """Calendar pages are independent, including their pagenr=0 cover."""
+    if not hasattr(ProductStyle, 'Calendar'):
+        pytest.skip('Calendar rendering is intentionally deferred.')
+    pages = list(resolvePages(_calendarFotobook(), ProductStyle.Calendar, 13))
+
+    assert [page.page_number for page in pages] == list(range(13))
+    assert all(page.page_type == PageProcessingType.CalendarPage for page in pages)
+    assert all(not page.odd_page for page in pages)
+    assert all(page.finish_page for page in pages)
+    assert pages[-1].last_page
