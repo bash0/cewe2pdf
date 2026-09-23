@@ -647,7 +647,7 @@ Tests using compare-pdf originally used the modification time to sort result pdf
 ### Cleaning up temporary files 
 Running tests during development can leave temporary output files lying around. Cleaning these away is a bit tricky, because it's important not to delete the approved result pdfs. On Windows you can locate these files with a powershell command like this:
 ```
-$pattern = '^(test|unittest|allblack)[A-Za-z0-9._-]*\.mcf\.\d{8}[DS](\.pdf|\.idx(\.\d+)?\.png)$|^a4[pl]\.mcf\.\d{8}\.pdf$'
+$pattern = '^(test|unittest|allblack)[A-Za-z0-9._-]*\.mcfx?\.\d{8}[DS](\.pdf|\.idx(\.\d+)?\.png)$|^a4[pl]\.mcf\.\d{8}\.pdf$'
 Get-ChildItem -Recurse -File |
 Where-Object {
     $_.FullName -notmatch '\\previous_result_pdfs\\' -and
@@ -687,6 +687,6 @@ Finding the files on Linux is rather easier :-):
 find . -type f \( -name "*.pdf" -o -name "*.png" \) \
   ! -path "*/previous_result_pdfs/*" \
   ! -path "*/Dateien/*" \
-  | grep -E '/((test|unittest|allblack)[A-Za-z0-9._-]*\.mcf\.[0-9]{8}[DS](\.pdf|\.idx(\.[0-9]+)?\.png)|a4[pl]\.mcf\.[0-9]{8}\.pdf)$'
+  | grep -E '/((test|unittest|allblack)[A-Za-z0-9._-]*\.mcfx?\.[0-9]{8}[DS](\.pdf|\.idx(\.[0-9]+)?\.png)|a4[pl]\.mcf\.[0-9]{8}\.pdf)$'
 ```
 You can of course make the pattern matching a little more cautious if you want to be absolutely sure you don't delete something important!
