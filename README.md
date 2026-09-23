@@ -647,13 +647,19 @@ Tests using compare-pdf originally used the modification time to sort result pdf
 ### Cleaning up temporary files 
 Running tests during development can leave temporary output files lying around. Cleaning these away is a bit tricky, because it's important not to delete the approved result pdfs. On Windows you can locate these files with a powershell command like this:
 ```
-$pattern = '^(test|unittest|allblack)[A-Za-z0-9._-]*\.mcf\.\d{8}[DS]\.(pdf|idx\.png)$'
+$pattern = '^(test|unittest|allblack)[A-Za-z0-9._-]*\.mcf\.\d{8}[DS](\.pdf|\.idx(\.\d+)?\.png)$|^a4[pl]\.mcf\.\d{8}\.pdf$'
 Get-ChildItem -Recurse -File |
 Where-Object {
     $_.FullName -notmatch '\\previous_result_pdfs\\' -and
+    $_.FullName -notmatch '\\Dateien\\' -and
     $_.Name -match $pattern
 }
 ```
+The pattern covers the traditional dated single/double-page test PDFs, the
+portrait and landscape calendar PDFs (`a4p` and `a4l`), and both the former
+unnumbered and current numbered index PNGs.  The PNG part is deliberately
+limited to names generated from a dated test MCF; the separate `Dateien`
+exclusion is an additional safeguard for the album's own image files.
 and then delete them (via the recycle bin) with
 ```
 Add-Type -AssemblyName Microsoft.VisualBasic
@@ -661,6 +667,7 @@ Add-Type -AssemblyName Microsoft.VisualBasic
 Get-ChildItem -Recurse -File |
 Where-Object {
     $_.FullName -notmatch '\\previous_result_pdfs\\' -and
+    $_.FullName -notmatch '\\Dateien\\' -and
     $_.Name -match $pattern
 } |
 ForEach-Object {
@@ -677,8 +684,9 @@ Write-Output "Would delete: $($_.FullName)"
 ```
 Finding the files on Linux is rather easier :-):
 ```
-find . -type f -name "*.pdf" \
+find . -type f \( -name "*.pdf" -o -name "*.png" \) \
   ! -path "*/previous_result_pdfs/*" \
-  | grep -E "/[^/]*[0-9]{8}[DS]\.pdf$"
+  ! -path "*/Dateien/*" \
+  | grep -E '/((test|unittest|allblack)[A-Za-z0-9._-]*\.mcf\.[0-9]{8}[DS](\.pdf|\.idx(\.[0-9]+)?\.png)|a4[pl]\.mcf\.[0-9]{8}\.pdf)$'
 ```
 You can of course make the pattern matching a little more cautious if you want to be absolutely sure you don't delete something important!
