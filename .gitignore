@@ -82,4 +82,4 @@ nosetests.xml
 /tests/testEmptyPageOne/executable-smoke-linux.pdf
 /tests/testCalendar/a4l/*.pdf
 /tests/testCalendar/a4p/*.pdf
-/tests/testIndexLarge/test_indexLarge.mcf.20260924S.idx.1.png
+/tests/testIndexLarge/*.mcf.*.idx.*.png
