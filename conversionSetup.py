@@ -20,6 +20,7 @@ from lxml import etree
 
 from ceweInfo import CeweInfo
 from calendarEntries import CalendarEntries, loadCalendarEntries
+from calendarNames import CalendarNames, loadCalendarNames
 from calendarLayouts import (CalendarLayouts, applyCalendarLayoutSubstitutions,
                              loadCalendarLayouts)
 from calendarSchemas import (CalendarSchemas, applyCalendarSchemaSubstitutions,
@@ -55,6 +56,8 @@ class ConversionSetup:
     calendar_schemas: CalendarSchemas        # Named calendar cell styles loaded from CEWE or minimal test resources.
     calendar_layouts: CalendarLayouts        # Named calendar cell layouts loaded from CEWE or minimal test resources.
     calendar_entries: CalendarEntries        # Localised holiday and observance definitions loaded from CEWE resources.
+    calendar_names: CalendarNames            # Localised month, weekday, and week-heading labels loaded from CEWE resources.
+    calendar_event_image_folders: tuple[str, ...]  # Portable fallback folders for personal-event thumbnails.
 
     mcf_xml_name: str           # Actual XML file to parse: the source MCF, or data.mcf unpacked from MCFX.
     mcf_base_folder: str        # Folder containing mcf_xml_name, used to resolve album image references.
@@ -116,6 +119,8 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
     calendarSchemas = {}
     calendarLayouts = {}
     calendarEntries = {}
+    calendarNames = {}
+    calendarEventImageFolders = tuple[str, ...]()
 
     # Read the current-directory INI first and the album INI second, so the
     # album-specific values override the current-directory defaults. Neither
@@ -222,6 +227,7 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
     calendarSchemas = loadCalendarSchemas(ceweFolder)
     calendarLayouts = loadCalendarLayouts(ceweFolder)
     calendarEntries = loadCalendarEntries(ceweFolder)
+    calendarNames = loadCalendarNames(ceweFolder)
     if configuration.has_section('CALENDAR'):
         calendarSchemas = applyCalendarSchemaSubstitutions(
             calendarSchemas,
@@ -229,6 +235,13 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
         calendarLayouts = applyCalendarLayoutSubstitutions(
             calendarLayouts,
             configuration['CALENDAR'].get('layoutSubstitutions', ''))
+        calendarEventImageFolders = tuple(
+            str((mcfPathObj.parent / os.path.expandvars(folder.strip())).resolve())
+            if not os.path.isabs(os.path.expandvars(folder.strip())) else
+            os.path.expandvars(folder.strip())
+            for folder in configuration['CALENDAR'].get(
+                'calendarEventImageFolders', '').splitlines()
+            if folder.strip())
 
     availableFonts = findAndRegisterFonts(defaultConfigSection, appDataDir, albumBaseFolder, ceweFolder, state)
     # Extra clipart file mappings work independently of the CEWE installation.
@@ -250,6 +263,8 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
         calendar_schemas=calendarSchemas,
         calendar_layouts=calendarLayouts,
         calendar_entries=calendarEntries,
+        calendar_names=calendarNames,
+        calendar_event_image_folders=calendarEventImageFolders,
         mcf_xml_name=mcfxmlname,
         mcf_base_folder=mcfBaseFolder,
         unpacked_folder=unpackedFolder,

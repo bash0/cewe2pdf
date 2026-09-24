@@ -13,7 +13,9 @@ def applyCalendarSubstitutions(resources, definitions, resourceType):
     for definition in definitions.splitlines():
         if not definition.strip():
             continue
-        sourceAndTarget = [part.strip() for part in definition.split(',', 1)]
+        # CEWE names schemas such as ``Cell transparent, Text white``.  The
+        # final comma is therefore the delimiter before the replacement name.
+        sourceAndTarget = [part.strip() for part in definition.rsplit(',', 1)]
         if len(sourceAndTarget) != 2 or not all(sourceAndTarget):
             logging.warning('Ignoring invalid calendar %s substitution: %r',
                             resourceType, definition)

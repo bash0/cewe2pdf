@@ -157,7 +157,9 @@ class AlbumConversionSession:
             processElements, state=self.state, albumIndex=albumIndex,
             calendarSchemas=self.setup.calendar_schemas,
             calendarLayouts=self.setup.calendar_layouts,
-            calendarEntries=self.setup.calendar_entries)
+            calendarEntries=self.setup.calendar_entries,
+            calendarNames=self.setup.calendar_names,
+            calendarEventImageFolders=self.setup.calendar_event_image_folders)
 
         processPages(
             self.setup.fotobook, self.setup.mcf_base_folder, imageFolder,

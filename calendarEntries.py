@@ -1,7 +1,7 @@
 """Read CEWE's localised calendar-event definitions."""
 
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import logging
 from pathlib import Path
 
@@ -24,6 +24,7 @@ class CalendarEvent:
 
     name: str
     is_public_holiday: bool
+    image_path: str | None = None
 
 
 CalendarEntries = dict[str, tuple[CalendarEventDefinition, ...]]
@@ -121,3 +122,52 @@ def calendarEventsForYear(entries: CalendarEntries, language, year):
         if isPublicHoliday:
             publicHolidays.add(eventDate)
     return publicHolidays, eventsByDate
+
+
+def personalCalendarEventsForYear(fotobook, year):
+    """Resolve the user's optional MCF calendar entries for one rendered year."""
+    eventsByDate = {}
+    for eventElement in fotobook.findall('./CalendarEvents/CalendarEvent'):
+        name = (eventElement.findtext('Name') or '').strip()
+        dateTime = (eventElement.findtext('DateTime') or '').strip()
+        if not name or not dateTime:
+            continue
+        try:
+            sourceDate = datetime.fromisoformat(dateTime.replace('Z', '+00:00')).date()
+        except ValueError:
+            logging.warning('Ignoring calendar event with invalid date %r', dateTime)
+            continue
+        recurring = (eventElement.findtext('Recurrent') or '').strip().lower() == 'yes'
+        if recurring:
+            try:
+                eventDate = date(year, sourceDate.month, sourceDate.day)
+            except ValueError:
+                # A 29 February birthday understandably has no non-leap-year date.
+                continue
+        elif sourceDate.year == year:
+            eventDate = sourceDate
+        else:
+            continue
+        imagePath = (eventElement.findtext('Image') or '').strip() or None
+        eventsByDate.setdefault(eventDate, []).append(
+            CalendarEvent(name, False, imagePath))
+    return eventsByDate
+
+
+def resolveCalendarEventImage(imagePath, fallbackFolders):
+    """Locate an event image at its MCF path or by basename in fallbacks."""
+    if not imagePath:
+        return None
+    candidates = [Path(imagePath)]
+    # MCFs written by the Windows editor retain backslashes even when this
+    # renderer runs on GitHub's Linux workers.
+    imageName = Path(imagePath.replace('\\', '/')).name
+    candidates.extend(Path(folder) / imageName
+                      for folder in fallbackFolders)
+    for candidate in candidates:
+        try:
+            if candidate.is_file():
+                return str(candidate)
+        except OSError:
+            continue
+    return None

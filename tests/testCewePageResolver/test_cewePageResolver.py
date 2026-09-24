@@ -74,7 +74,7 @@ def test_resolveMemoryCards():
     assert [int(page.element.get('pagenr')) for page in pages] == list(range(1, 26))
 
 
-@pytest.mark.parametrize('fixtureName', ['a4p', 'a4l'])
+@pytest.mark.parametrize('fixtureName', ['a4p', 'a4l', 'sq21'])
 def test_resolveCalendarPages(fixtureName):
     """Calendar pages are independent, including their pagenr=0 cover."""
     pages = list(resolvePages(_calendarFotobook(fixtureName), ProductStyle.Calendar, 13))

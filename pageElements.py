@@ -12,6 +12,7 @@ from albumIndex import AlbumIndex
 from borders import processDecorationBorders
 from calendarAreas import processCalendarArea
 from calendarEntries import CalendarEntries
+from calendarNames import CalendarNames
 from calendarLayouts import CalendarLayouts
 from calendarSchemas import CalendarSchemas
 from ceweInfo import AlbumInfo
@@ -31,7 +32,9 @@ def processElements(additional_fonts, fotobook, imagedir,
                     context: RenderContext, state: ConversionState,
                     albumIndex: AlbumIndex, calendarSchemas: CalendarSchemas,
                     calendarLayouts: CalendarLayouts,
-                    calendarEntries: CalendarEntries):
+                    calendarEntries: CalendarEntries,
+                    calendarNames: CalendarNames,
+                    calendarEventImageFolders: tuple[str, ...]):
     """Render images, text, and clip art from one MCF page element.
 
     ``pages.processPages`` resolves the unusual cover and paired-page rules.
@@ -97,6 +100,8 @@ def processElements(additional_fonts, fotobook, imagedir,
             processCalendarArea(calendarArea, fotobook, pageNumber, area,
                                 pageH, pdf, context, calendarSchemas,
                                 calendarLayouts, calendarEntries,
+                                calendarNames,
+                                calendarEventImageFolders,
                                 additional_fonts, state)
 
         # A clipartarea has both designElementIDs and clipart elements.  The

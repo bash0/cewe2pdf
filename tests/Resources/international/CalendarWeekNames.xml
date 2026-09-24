@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CalendarWeekNames>
+  <Language language="nb" country="NO">
+    <weekname><shortname name="uke"/><longname name="uke"/></weekname>
+    <daysofweek>
+      <day key="Monday"><shortname name="ma"/></day>
+      <day key="Tuesday"><shortname name="ti"/></day>
+      <day key="Wednesday"><shortname name="on"/></day>
+      <day key="Thursday"><shortname name="to"/></day>
+      <day key="Friday"><shortname name="fr"/></day>
+      <day key="Saturday"><shortname name="lø"/></day>
+      <day key="Sunday"><shortname name="sø"/></day>
+    </daysofweek>
+    <monthnames>
+      <month key="January"><longname name="januar"/></month>
+      <month key="February"><longname name="februar"/></month>
+      <month key="March"><longname name="mars"/></month>
+      <month key="April"><longname name="april"/></month>
+      <month key="May"><longname name="mai"/></month>
+      <month key="June"><longname name="juni"/></month>
+      <month key="July"><longname name="juli"/></month>
+      <month key="August"><longname name="august"/></month>
+      <month key="September"><longname name="september"/></month>
+      <month key="October"><longname name="oktober"/></month>
+      <month key="November"><longname name="november"/></month>
+      <month key="December"><longname name="desember"/></month>
+    </monthnames>
+  </Language>
+  <Language language="en" country="GB">
+    <weekname><shortname name="Wk"/><longname name="Week"/></weekname>
+    <daysofweek>
+      <day key="Monday"><shortname name="Mon"/></day>
+      <day key="Tuesday"><shortname name="Tue"/></day>
+      <day key="Wednesday"><shortname name="Wed"/></day>
+      <day key="Thursday"><shortname name="Thu"/></day>
+      <day key="Friday"><shortname name="Fri"/></day>
+      <day key="Saturday"><shortname name="Sat"/></day>
+      <day key="Sunday"><shortname name="Sun"/></day>
+    </daysofweek>
+    <monthnames>
+      <month key="January"><longname name="January"/></month>
+      <month key="February"><longname name="February"/></month>
+      <month key="March"><longname name="March"/></month>
+      <month key="April"><longname name="April"/></month>
+      <month key="May"><longname name="May"/></month>
+      <month key="June"><longname name="June"/></month>
+      <month key="July"><longname name="July"/></month>
+      <month key="August"><longname name="August"/></month>
+      <month key="September"><longname name="September"/></month>
+      <month key="October"><longname name="October"/></month>
+      <month key="November"><longname name="November"/></month>
+      <month key="December"><longname name="December"/></month>
+    </monthnames>
+  </Language>
+</CalendarWeekNames>

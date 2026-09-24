@@ -16,9 +16,18 @@ class CalendarCellStyle:
 
     text_colour: colors.Color
     background_colour: colors.Color | None
+    border_colour: colors.Color | None = None
 
 
-CalendarSchemas = dict[str, dict[str, CalendarCellStyle]]
+@dataclass(frozen=True)
+class CalendarSchema:
+    """The cell styles and grid colour belonging to one named CEWE schema."""
+
+    cell_styles: dict[str, CalendarCellStyle]
+    grid_colour: colors.Color | None = None
+
+
+CalendarSchemas = dict[str, CalendarSchema]
 
 
 def colourFromHex(value, fallback=None):
@@ -89,9 +98,11 @@ def loadCalendarSchemas(ceweFolder: str | None) -> CalendarSchemas:
             if cellType:
                 cellStyles[cellType] = CalendarCellStyle(
                     colourFromHex(cell.get('textcolor'), colors.black),
-                    colourFromHex(cell.get('bgcolor')))
+                    colourFromHex(cell.get('bgcolor')),
+                    colourFromHex(cell.get('bordercolor')))
         if cellStyles:
-            schemas[schemaName] = cellStyles
+            schemas[schemaName] = CalendarSchema(
+                cellStyles, colourFromHex(calendarArea.get('gridcolor')))
     logging.info('Loaded %d calendar colour schemes from %s', len(schemas), schemaFile)
     return schemas
 

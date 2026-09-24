@@ -15,7 +15,7 @@ class ProductStyle(Enum):
     AlbumSingleSide = 1  # normal for albums, we divide the cewe 2 page bundle to single pages
     AlbumDoubleSide = 2  # any album when --keepdoublepages is set
     MemoryCard = 3 # CEWE Photo Pairs memory-card game (product code MEM3)
-    Calendar = 4 # CEWE wall calendars (currently CAL9 and CAL35)
+    Calendar = 4 # CEWE wall calendars (currently CAL9, CAL35, and CAL99)
 
 
 class AlbumInfo():
@@ -36,7 +36,8 @@ class AlbumInfo():
         # this fallback matters only when that element is absent.
         "MEM3": (60 * reportlab.lib.pagesizes.mm, 60 * reportlab.lib.pagesizes.mm),
         "CAL9": reportlab.lib.pagesizes.A4,
-        "CAL35": reportlab.lib.pagesizes.landscape(reportlab.lib.pagesizes.A4)
+        "CAL35": reportlab.lib.pagesizes.landscape(reportlab.lib.pagesizes.A4),
+        "CAL99": (210 * reportlab.lib.pagesizes.mm, 210 * reportlab.lib.pagesizes.mm)
         }
 
     # product style. The CEWE album products (which is what we are normally expecting in this
@@ -48,7 +49,8 @@ class AlbumInfo():
     styles = {
         "MEM3": ProductStyle.MemoryCard, # CEWE Photo Pairs: 6 x 6 cm memory cards
         "CAL9": ProductStyle.Calendar, # A4 portrait wall calendar
-        "CAL35": ProductStyle.Calendar # A4 landscape wall calendar
+        "CAL35": ProductStyle.Calendar, # A4 landscape wall calendar
+        "CAL99": ProductStyle.Calendar # 21 x 21 cm square wall calendar
         }
 
     @staticmethod
