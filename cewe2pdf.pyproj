@@ -177,6 +177,11 @@
     <Content Include="tests\testCalendar\a4p\a4p_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testCalendar\a4p\a4p_mcf-Dateien\gs4dszic_1_20200306_111748.jpg" />
     <Content Include="tests\testCalendar\a4p\cewe2pdf.ini" />
+    <Content Include="tests\testCalendar\a5l\a5l.mcf" />
+    <Content Include="tests\testCalendar\a5l\a5l_mcf-Dateien\20200306_111749_gs4dszic_1.jpg" />
+    <Content Include="tests\testCalendar\a5l\a5l_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testCalendar\a5l\a5l_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\testCalendar\a5l\cewe2pdf.ini" />
     <Content Include="tests\testCalendar\sq21\calendarEventFotos\.gitkeep" />
     <Content Include="tests\testCalendar\sq21\cewe2pdf.ini" />
     <Content Include="tests\testCalendar\sq21\sq21.mcf" />
@@ -523,6 +528,9 @@
     <Folder Include="tests\testCalendar\a4p\" />
     <Folder Include="tests\testCalendar\a4p\a4p_mcf-Dateien\" />
     <Folder Include="tests\testCalendar\a4p\previous_result_pdfs\" />
+    <Folder Include="tests\testCalendar\a5l\" />
+    <Folder Include="tests\testCalendar\a5l\a5l_mcf-Dateien\" />
+    <Folder Include="tests\testCalendar\a5l\previous_result_pdfs\" />
     <Folder Include="tests\testCalendar\sq21\" />
     <Folder Include="tests\testCalendar\sq21\calendarEventFotos\" />
     <Folder Include="tests\testCalendar\sq21\sq21_mcf-Dateien\" />

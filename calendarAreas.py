@@ -87,6 +87,34 @@ def _calendarWeekNumbers(fotobook):
     return True
 
 
+def _calendarHolidayEmphasis(fotobook):
+    """Read CEWE's separate ``Fremhev`` setting for public holidays."""
+    holidays = fotobook.find('holidays')
+    features = (holidays.get('features', '').split(',')
+                if holidays is not None else [])
+    return 'holiday_colors' in (feature.strip() for feature in features)
+
+
+def _calendarWeekNumberSuffix(fotobook):
+    """Interpret CEWE's declarative punctuation name for week numbers."""
+    holidays = fotobook.find('holidays')
+    weekText = holidays.get('weekText', '') if holidays is not None else ''
+    return {
+        '': '',
+        'dot': '.',
+        'comma': ',',
+        'colon': ':',
+        'hyphen': '-'
+    }.get(weekText, weekText)
+
+
+def _calendarWeekHeading(fotobook, names):
+    """Show CEWE's localised heading only when the MCF requests one."""
+    holidays = fotobook.find('holidays')
+    return names.week_name if holidays is not None and \
+        holidays.get('weekHeadline', '') else ''
+
+
 def _calendarCellStyles(fotobook, calendarArea, calendarSchemas):
     """Return styles from an embedded scheme, or from CEWE's resource file."""
     schemeName = calendarArea.get('colorschema', '')
@@ -182,10 +210,11 @@ def _wrapCalendarCaption(text, maximumWidth, fontName, fontSize, cell):
     return lines
 
 
-def _captionCellForEvent(caption, holidayCell, dayCell):
-    """Apply public-holiday and Sunday emphasis to one event caption."""
+def _captionCellForEvent(caption, holidayCell, dayCell, emphasiseHolidays):
+    """Apply requested public-holiday and inherent Sunday emphasis to captions."""
     return replace(holidayCell,
-                   bold=caption.is_public_holiday or dayCell.bold)
+                   bold=(emphasiseHolidays and caption.is_public_holiday) or
+                   dayCell.bold)
 
 
 def _drawMonthHeading(pdf, monthDate, bounds, fontName, percentage, names,
@@ -226,7 +255,8 @@ def _weekRowHeights(totalHeight, weekCount):
 def _drawWeekRows(pdf, monthDate, bounds, fontName, percentage,
                   holidayPercentage, showHolidays, language, layout,
                   calendarEntries, styles, defaultStyle, gridColour,
-                  showWeekNumbers, names, fotobook,
+                  showWeekNumbers, weekHeading, weekNumberSuffix,
+                  emphasiseHolidays, names, fotobook,
                   eventImageFolders): # pylint: disable=too-many-locals
     """Draw a Monday-to-Sunday month grid for CEWE's OneWeekPerRow layout."""
     firstWeekday, numberOfDays = calendar.monthrange(monthDate.year, monthDate.month)
@@ -256,7 +286,7 @@ def _drawWeekRows(pdf, monthDate, bounds, fontName, percentage,
     weekNumberFontSize = _scaledLayoutFontSize(weekNumberCell, percentage, 14)
     weekNumberWidth = 0
     if showWeekNumbers:
-        widestLabel = max(names.week_name, '53', key=len)
+        widestLabel = max(weekHeading, f'53{weekNumberSuffix}', key=len)
         weekNumberWidth = pdfmetrics.stringWidth(
             widestLabel, _calendarFontName(fontName, weekNumberCell),
             weekNumberFontSize)
@@ -301,7 +331,7 @@ def _drawWeekRows(pdf, monthDate, bounds, fontName, percentage,
                       fontName, headerFontSize, headerCell,
                       headerStyle.text_colour)
     if showWeekNumbers:
-        _drawCellText(pdf, names.week_name, bounds.x + weekNumberWidth / 2,
+        _drawCellText(pdf, weekHeading, bounds.x + weekNumberWidth / 2,
                       bounds.y + bounds.height - headerHeight * 0.72,
                       fontName, headerFontSize, headerCell,
                       headerStyle.text_colour)
@@ -330,10 +360,11 @@ def _drawWeekRows(pdf, monthDate, bounds, fontName, percentage,
         cell = firstWeekday + dayNumber - 1
         row, column = divmod(cell, 7)
         dayX = bounds.x + weekNumberWidth + (column + 0.5) * columnWidth
-        dayCell = sundayCell if column == 6 or dayDate in holidays else weekdayCell
+        dayCell = sundayCell if column == 6 or \
+            (emphasiseHolidays and dayDate in holidays) else weekdayCell
         dayStyle = _calendarStyle(
             styles, defaultStyle,
-            'CALENDAR_CELL_TYPE_HOLIDAY' if dayDate in holidays else
+            'CALENDAR_CELL_TYPE_HOLIDAY' if emphasiseHolidays and dayDate in holidays else
             ('CALENDAR_CELL_TYPE_SUNDAY' if column == 6 else
              'CALENDAR_CELL_TYPE_WEEKDAY'))
         captions = (list(holidayCaptions.get(dayDate, ())) +
@@ -361,7 +392,8 @@ def _drawWeekRows(pdf, monthDate, bounds, fontName, percentage,
 
         captionLines = []
         for caption in captions:
-            captionCell = _captionCellForEvent(caption, holidayCell, dayCell)
+            captionCell = _captionCellForEvent(caption, holidayCell, dayCell,
+                                                emphasiseHolidays)
             usableWidth = max(1, columnWidth - 4)
             captionLines.extend(
                 (line, captionCell) for line in _wrapCalendarCaption(
@@ -399,7 +431,7 @@ def _drawWeekRows(pdf, monthDate, bounds, fontName, percentage,
             timedelta(days=firstWeekday)
         for row in range(weekCount):
             weekDate = firstMonday + timedelta(days=row * 7)
-            _drawCellText(pdf, str(weekDate.isocalendar().week),
+            _drawCellText(pdf, f'{weekDate.isocalendar().week}{weekNumberSuffix}',
                           bounds.x + weekNumberWidth / 2,
                           bounds.y + (weekCount - row - 0.5) * rowHeight,
                           fontName, weekNumberFontSize, weekNumberCell,
@@ -507,6 +539,9 @@ def processCalendarArea(calendarArea, fotobook, pageNumber, area, pageHeight,
                         language)
         return
     showWeekNumbers = _calendarWeekNumbers(fotobook)
+    emphasiseHolidays = _calendarHolidayEmphasis(fotobook)
+    weekHeading = _calendarWeekHeading(fotobook, names)
+    weekNumberSuffix = _calendarWeekNumberSuffix(fotobook)
     styles, defaultStyle, gridColour = _calendarCellStyles(
         fotobook, calendarArea, calendarSchemas)
 
@@ -527,7 +562,8 @@ def processCalendarArea(calendarArea, fotobook, pageNumber, area, pageHeight,
         _drawWeekRows(pdf, monthDate, bounds, fontName, percentage,
                       holidayPercentage, showHolidays, language, cellLayout,
                       calendarEntries, styles, defaultStyle, gridColour,
-                      showWeekNumbers, names, fotobook,
+                      showWeekNumbers, weekHeading, weekNumberSuffix,
+                      emphasiseHolidays, names, fotobook,
                       calendarEventImageFolders)
     elif layout.startswith('OneRow'):
         _drawOneRow(pdf, monthDate, bounds, fontName, percentage, styles,

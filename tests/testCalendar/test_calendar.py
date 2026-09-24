@@ -15,7 +15,9 @@ from testutils import configureTestImportPaths
 configureTestImportPaths(__file__)
 
 from compare_pdf import ComparePDF, ShowDiffsStyle  # type: ignore
-from calendarAreas import (_calendarWeekNumbers, _captionCellForEvent,
+from calendarAreas import (_calendarHolidayEmphasis, _calendarWeekNumberSuffix,
+                           _calendarWeekNumbers,
+                           _captionCellForEvent,
                            _fontName, _weekRowHeights, _wrapCalendarCaption)
 from calendarEntries import (CalendarEvent, personalCalendarEventsForYear,
                              resolveCalendarEventImage)
@@ -137,6 +139,15 @@ def test_squareCalendarReadsWeekNumbersAndRecurringPersonalEvents():
     assert events[date(2027, 9, 24)][0].image_path is None
 
 
+def test_a5CalendarUsesTheMcfWeekNumberPunctuation():
+    """Week-number formatting comes from the calendar MCF, not its locale."""
+    root = etree.parse(str(TEST_DIRECTORY / 'a5l' / 'a5l.mcf')).getroot()
+    fotobook = root.find('fotobook') or root
+
+    assert _calendarWeekNumbers(fotobook) is True
+    assert _calendarWeekNumberSuffix(fotobook) == '.'
+
+
 def test_calendarEventImageUsesConfiguredBasenameFallback(tmp_path):
     """A portable fixture can replace the editor's machine-local AppData path."""
     fallbackFolder = tmp_path / 'calendarEventFotos'
@@ -173,9 +184,18 @@ def test_showEventCaptionInheritsSundayEmphasis():
     sundayCell = CalendarCellLayout(bold=True)
     captionCell = CalendarCellLayout(bold=False)
 
-    assert _captionCellForEvent(showEvent, captionCell, regularCell).bold is False
-    assert _captionCellForEvent(showEvent, captionCell, sundayCell).bold is True
-    assert _captionCellForEvent(freeEvent, captionCell, regularCell).bold is True
+    assert _captionCellForEvent(showEvent, captionCell, regularCell, True).bold is False
+    assert _captionCellForEvent(showEvent, captionCell, sundayCell, True).bold is True
+    assert _captionCellForEvent(freeEvent, captionCell, regularCell, True).bold is True
+    assert _captionCellForEvent(freeEvent, captionCell, regularCell, False).bold is False
+
+
+def test_a5CalendarSeparatesHolidayNamesFromHolidayEmphasis():
+    """The MCF can show names without applying CEWE's holiday emphasis."""
+    root = etree.parse(str(TEST_DIRECTORY / 'a5l' / 'a5l.mcf')).getroot()
+    fotobook = root.find('fotobook') or root
+
+    assert _calendarHolidayEmphasis(fotobook) is False
 
 
 def test_calendarFontUsesTheConfiguredMissingFontSubstitution():
@@ -231,6 +251,7 @@ def buildAndCompareCalendar(fixtureName, pageDimensions, caplog):
 @pytest.mark.parametrize(('fixtureName', 'pageDimensions'), [
     ('a4p', (595, 842)),
     ('a4l', (842, 595)),
+    ('a5l', (595, 420)),
     ('sq21', (595, 595)),
 ])
 def test_calendarRendersIndependentPages(caplog, fixtureName, pageDimensions):
