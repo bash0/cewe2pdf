@@ -18,7 +18,7 @@ class ProductStyle(Enum):
     Calendar = 4 # CEWE wall calendars (currently CAL9, CAL35, and CAL99)
 
 
-class AlbumInfo():
+class ProductInfo():
     def __init__(self):
         return
 

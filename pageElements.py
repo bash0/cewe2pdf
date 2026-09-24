@@ -15,7 +15,7 @@ from calendarEntries import CalendarEntries
 from calendarNames import CalendarNames
 from calendarLayouts import CalendarLayouts
 from calendarSchemas import CalendarSchemas
-from ceweInfo import AlbumInfo
+from ceweInfo import ProductInfo
 from cewePageResolver import getPageElementForPageNumber
 from clipartareas import processAreaClipartTag
 from conversionState import ConversionState
@@ -41,7 +41,7 @@ def processElements(additional_fonts, fotobook, imagedir,
     This function then selects the areas visible on this PDF page and delegates
     each area type to its specialist renderer.
     """
-    if (AlbumInfo.isAlbumDoubleSide(productstyle)
+    if (ProductInfo.isAlbumDoubleSide(productstyle)
             and pagetype == PageProcessingType.RegularPage
             and not oddpage and not lastpage):
         # In double-page mode, all images are drawn by the odd pages.
@@ -49,7 +49,7 @@ def processElements(additional_fonts, fotobook, imagedir,
 
     # The MCF stores ordinary album pages in pairs.  For an odd page, retrieve
     # the preceding even page element, which contains the shared areas.
-    if (AlbumInfo.isAlbumProduct(productstyle)
+    if (ProductInfo.isAlbumProduct(productstyle)
             and pagetype == PageProcessingType.RegularPage and oddpage):
         page = getPageElementForPageNumber(fotobook, 2 * floor(pageNumber / 2))
 
@@ -58,7 +58,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         areaLeft = float(areaPos.get('left').replace(',', '.'))
         if (pagetype != PageProcessingType.FrontInsideCoverBackground
                 or len(area.findall('imagebackground')) == 0):
-            if oddpage and AlbumInfo.isAlbumSingleSide(productstyle):
+            if oddpage and ProductInfo.isAlbumSingleSide(productstyle):
                 # Shift double-page content from the other page.
                 areaLeft -= pageW
         areaTop = float(areaPos.get('top').replace(',', '.'))
@@ -68,7 +68,7 @@ def processElements(additional_fonts, fotobook, imagedir,
 
         # Skip an image which is wholly outside this side of a single-page
         # album spread.
-        if (AlbumInfo.isAlbumSingleSide(productstyle)
+        if (ProductInfo.isAlbumSingleSide(productstyle)
                 and pagetype in [PageProcessingType.RegularPage,
                                  PageProcessingType.Cover]):
             if oddpage and (areaLeft + areaWidth) < 0:

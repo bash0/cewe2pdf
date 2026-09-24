@@ -9,7 +9,7 @@ from math import sqrt
 import PIL
 from reportlab.lib.utils import ImageReader
 
-from ceweInfo import AlbumInfo
+from ceweInfo import ProductInfo
 from clipArt import getClipConfig, loadClipart
 from clipartareas import insertClipartFile
 from conversionState import ConversionState
@@ -73,7 +73,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
 
     imageTransx = transx
     if (imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM' and
-            AlbumInfo.isAlbumDoubleSide(productStyle)):
+            ProductInfo.isAlbumDoubleSide(productStyle)):
         # A double-side output canvas still uses the full CEWE spread.  The
         # background position identifies its right half.  In single-side
         # output, pageElements has already moved that half to local page
