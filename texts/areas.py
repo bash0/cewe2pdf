@@ -17,14 +17,14 @@ import reportlab.lib.pagesizes
 from reportlab.pdfbase import pdfmetrics
 from lxml import etree
 
-from borders import processDecorationBorders
+from decorations.borders import processDecorationBorders
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
 from fontHandling import getAvailableFont
 from albumIndex import AlbumIndex
 from renderContext import RenderContext
-from shadows import warnAndIgnoreEnabledDecorationShadow
+from decorations.shadows import warnAndIgnoreEnabledDecorationShadow
 from .markup import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText,
                      CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle,
                      Dequote, LeadingForExplicitLineHeight)

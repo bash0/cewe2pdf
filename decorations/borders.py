@@ -5,7 +5,7 @@ from math import floor
 import reportlab.lib.colors
 from reportlab.platypus import Table
 
-from corners import buildCornerPath, hasImplementedCorners
+from .corners import buildCornerPath, hasImplementedCorners
 from renderContext import RenderContext
 
 

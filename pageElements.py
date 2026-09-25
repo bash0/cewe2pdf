@@ -9,7 +9,7 @@
 from math import floor
 
 from albumIndex import AlbumIndex
-from borders import processDecorationBorders
+from decorations.borders import processDecorationBorders
 from calendars.areas import processCalendarArea
 from calendars.entries import CalendarEntries
 from calendars.names import CalendarNames
@@ -22,7 +22,7 @@ from conversionState import ConversionState
 from imageareas import processAreaImageTag
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
-from shadows import processDecorationShadow
+from decorations.shadows import processDecorationShadow
 from texts.areas import processAreaTextTag
 
 

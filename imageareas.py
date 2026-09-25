@@ -13,9 +13,9 @@ from ceweInfo import ProductInfo
 from clipArt import getClipConfig, loadClipart
 from clipartareas import insertClipartFile
 from conversionState import ConversionState
-from corners import applyCornerMask, getCornersInfo
+from decorations.corners import applyCornerMask, getCornersInfo
 from imageUtils import autorot
-from passepartout import Passepartout
+from decorations.passepartout import Passepartout
 from renderContext import RenderContext
 
 

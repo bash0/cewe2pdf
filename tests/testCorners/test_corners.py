@@ -18,8 +18,9 @@ from pikepdf import Pdf, PdfImage
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
-from corners import (CornerInfo, CornerShape, CornersInfo, applyCornerMask,
-                     getCornerInfo, hasImplementedCorners) # type: ignore
+from decorations.corners import (CornerInfo, CornerShape, CornersInfo,
+                                 applyCornerMask, getCornerInfo,
+                                 hasImplementedCorners) # type: ignore
 
 from testutils import getLatestResultFile
 

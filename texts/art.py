@@ -5,7 +5,7 @@ from lxml import etree
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 
-from borders import processDecorationBorders
+from decorations.borders import processDecorationBorders
 from fontHandling import getMissingFontSubstitute
 from conversionState import ConversionState
 from renderContext import RenderContext

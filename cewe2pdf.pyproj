@@ -366,7 +366,6 @@
     <Compile Include="albumConversionSession.py" />
     <Compile Include="albumIndex.py" />
     <Compile Include="backgrounds.py" />
-    <Compile Include="borders.py" />
     <Compile Include="calendars\areas.py" />
     <Compile Include="calendars\entries.py" />
     <Compile Include="calendars\layouts.py" />
@@ -389,7 +388,11 @@
     <Compile Include="conftest.py" />
     <Compile Include="conversionSetup.py" />
     <Compile Include="conversionState.py" />
-    <Compile Include="corners.py" />
+    <Compile Include="decorations\borders.py" />
+    <Compile Include="decorations\corners.py" />
+    <Compile Include="decorations\passepartout.py" />
+    <Compile Include="decorations\shadows.py" />
+    <Compile Include="decorations\__init__.py" />
     <Compile Include="fontHandling.py">
       <SubType>Code</SubType>
     </Compile>
@@ -416,14 +419,12 @@
     <Compile Include="pageNumbering.py" />
     <Compile Include="pages.py" />
     <Compile Include="pageTypes.py" />
-    <Compile Include="passepartout.py" />
     <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
     <Compile Include="programversion.py" />
     <Compile Include="renderContext.py" />
     <Compile Include="runAllTests.py" />
     <Compile Include="setup.py" />
-    <Compile Include="shadows.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
     <Compile Include="tests\compare-pdf\setup.py" />
@@ -481,6 +482,7 @@
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
     <Folder Include="calendars\" />
+    <Folder Include="decorations\" />
     <Folder Include="documents\" />
     <Folder Include="environments\" />
     <Folder Include="tests" />
