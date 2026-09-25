@@ -17,7 +17,7 @@ from calendars.layouts import CalendarLayouts
 from calendars.schemas import CalendarSchemas
 from ceweInfo import ProductInfo
 from cewePageResolver import getPageElementForPageNumber
-from clipartareas import processAreaClipartTag
+from clipart.areas import processAreaClipartTag
 from conversionState import ConversionState
 from imageareas import processAreaImageTag
 from pageTypes import PageProcessingType

@@ -25,7 +25,7 @@ from calendars.layouts import (CalendarLayouts, applyCalendarLayoutSubstitutions
                                loadCalendarLayouts)
 from calendars.schemas import (CalendarSchemas, applyCalendarSchemaSubstitutions,
                                loadCalendarSchemas)
-from clipArt import readClipArtConfigXML
+from clipart.catalog import readClipArtConfigXML
 from configUtils import getConfigurationInt
 from conversionState import ConversionState
 from extraLoggers import mustsee

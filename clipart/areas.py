@@ -4,7 +4,7 @@ import logging
 
 from reportlab.lib.utils import ImageReader
 
-from clipArt import getClipConfig, loadClipart
+from .catalog import getClipConfig, loadClipart
 from renderContext import RenderContext
 
 

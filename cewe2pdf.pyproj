@@ -31,6 +31,11 @@
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.example.txt" />
     <Content Include="cewe2pdf.spec" />
+    <Content Include="clipart\CLP file format.txt" />
+    <Content Include="clipart\__pycache__\areas.cpython-312.pyc" />
+    <Content Include="clipart\__pycache__\catalog.cpython-312.pyc" />
+    <Content Include="clipart\__pycache__\clpfile.cpython-312.pyc" />
+    <Content Include="clipart\__pycache__\__init__.cpython-312.pyc" />
     <Content Include="DEVELOPER_GUIDE.md" />
     <Content Include="documents\mcf_feature_classification.md" />
     <Content Include="documents\readme.txt" />
@@ -154,7 +159,6 @@
     <Content Include="tests\Resources\photofun\fonts\Poppins-Thin.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-ThinItalic.ttf" />
     <Content Include="cewe2pdf.ini" />
-    <Content Include="CLP file format.txt" />
     <Content Include="loggerconfig.yaml" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
@@ -376,10 +380,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="cewePageResolver.py" />
-    <Compile Include="clipArt.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="clipartareas.py" />
+    <Compile Include="clipart\areas.py" />
+    <Compile Include="clipart\catalog.py" />
+    <Compile Include="clipart\clpfile.py" />
+    <Compile Include="clipart\__init__.py" />
     <Compile Include="colorFrame.py" />
     <Compile Include="configUtils.py">
       <SubType>Code</SubType>
@@ -393,7 +397,6 @@
     <Compile Include="decorations\shadows.py" />
     <Compile Include="decorations\__init__.py" />
     <Compile Include="cewe2pdf.py" />
-    <Compile Include="clpFile.py" />
     <Compile Include="colorUtils.py" />
     <Compile Include="extraLoggers.py">
       <SubType>Code</SubType>
@@ -480,6 +483,8 @@
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
     <Folder Include="calendars\" />
+    <Folder Include="clipart\" />
+    <Folder Include="clipart\__pycache__\" />
     <Folder Include="decorations\" />
     <Folder Include="documents\" />
     <Folder Include="environments\" />

@@ -7,7 +7,7 @@ from pathlib import Path
 from lxml import etree
 
 from ceweInfo import CeweInfo
-from clpFile import ClpFile  # for clipart .CLP and .SVG files
+from .clpfile import ClpFile  # for clipart .CLP and .SVG files
 from extraLoggers import configlogger
 from pathutils import findFileInDirs
 

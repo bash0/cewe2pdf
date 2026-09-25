@@ -10,8 +10,8 @@ import PIL
 from reportlab.lib.utils import ImageReader
 
 from ceweInfo import ProductInfo
-from clipArt import getClipConfig, loadClipart
-from clipartareas import insertClipartFile
+from clipart.catalog import getClipConfig, loadClipart
+from clipart.areas import insertClipartFile
 from conversionState import ConversionState
 from decorations.corners import applyCornerMask, getCornersInfo
 from imageUtils import autorot
