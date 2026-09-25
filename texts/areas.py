@@ -22,7 +22,7 @@ from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
 from fonts.manager import getAvailableFont
-from albumIndex import AlbumIndex
+from indexing.albumindex import AlbumIndex
 from renderContext import RenderContext
 from decorations.shadows import warnAndIgnoreEnabledDecorationShadow
 from .markup import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText,

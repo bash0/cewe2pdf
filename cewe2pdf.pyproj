@@ -364,7 +364,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="albumConversionSession.py" />
-    <Compile Include="albumIndex.py" />
     <Compile Include="backgrounds.py" />
     <Compile Include="calendars\areas.py" />
     <Compile Include="calendars\entries.py" />
@@ -410,6 +409,8 @@
     <Compile Include="imageUtils.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="indexing\albumindex.py" />
+    <Compile Include="indexing\__init__.py" />
     <Compile Include="mcfx.py" />
     <Compile Include="messageCounterHandler.py" />
     <Compile Include="pageElements.py" />
@@ -483,6 +484,7 @@
     <Folder Include="documents\" />
     <Folder Include="environments\" />
     <Folder Include="fonts\" />
+    <Folder Include="indexing\" />
     <Folder Include="tests" />
     <Folder Include="tests\compare-pdf\" />
     <Folder Include="tests\compare-pdf\compare_pdf\" />

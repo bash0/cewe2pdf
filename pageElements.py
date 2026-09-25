@@ -8,7 +8,7 @@
 
 from math import floor
 
-from albumIndex import AlbumIndex
+from indexing.albumindex import AlbumIndex
 from decorations.borders import processDecorationBorders
 from calendars.areas import processCalendarArea
 from calendars.entries import CalendarEntries

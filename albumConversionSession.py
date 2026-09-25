@@ -14,7 +14,7 @@ import sys
 import reportlab.lib.pagesizes
 from reportlab.pdfgen import canvas
 
-from albumIndex import AlbumIndex
+from indexing.albumindex import AlbumIndex
 from ceweInfo import ProductInfo, CeweInfo, ProductStyle
 from conversionSetup import prepareConversion
 from conversionState import ConversionState
