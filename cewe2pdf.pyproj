@@ -424,7 +424,6 @@
     <Compile Include="processManyMcfs.py" />
     <Compile Include="renderContext.py" />
     <Compile Include="runAllTests.py" />
-    <Compile Include="setup.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
     <Compile Include="tests\compare-pdf\setup.py" />
