@@ -15,19 +15,20 @@ from testutils import configureTestImportPaths
 configureTestImportPaths(__file__)
 
 from compare_pdf import ComparePDF, ShowDiffsStyle  # type: ignore
-from calendarAreas import (_calendarHolidayEmphasis, _calendarWeekNumberSuffix,
-                           _calendarWeekNumbers,
-                           _captionCellForEvent,
-                           _fontName, _weekRowHeights, _wrapCalendarCaption)
-from calendarEntries import (CalendarEvent, personalCalendarEventsForYear,
-                             resolveCalendarEventImage)
-from calendarLayouts import CalendarCellLayout
+from calendars.areas import (_calendarHolidayEmphasis, _calendarWeekNumberSuffix,
+                             _calendarWeekNumbers,
+                             _captionCellForEvent,
+                             _fontName, _weekRowHeights, _wrapCalendarCaption)
+from calendars.entries import (CalendarEvent, personalCalendarEventsForYear,
+                               resolveCalendarEventImage)
+from calendars.layouts import CalendarCellLayout
 from conversionState import ConversionState
-from calendarLayouts import applyCalendarLayoutSubstitutions, loadCalendarLayouts
-from calendarEntries import calendarEventsForYear, loadCalendarEntries
-from calendarNames import calendarNamesForLocale, loadCalendarNames
-from calendarSchemas import (applyCalendarSchemaSubstitutions, colourFromHex,
-                             loadCalendarSchemas)
+from calendars.layouts import (applyCalendarLayoutSubstitutions,
+                               loadCalendarLayouts)
+from calendars.entries import calendarEventsForYear, loadCalendarEntries
+from calendars.names import calendarNamesForLocale, loadCalendarNames
+from calendars.schemas import (applyCalendarSchemaSubstitutions, colourFromHex,
+                               loadCalendarSchemas)
 from cewe2pdf import convertMcf
 from testutils import getLatestResultFile
 

@@ -12,7 +12,7 @@ from pathlib import Path
 
 from lxml import etree
 
-from calendarSubstitutions import applyCalendarSubstitutions
+from .substitutions import applyCalendarSubstitutions
 
 
 @dataclass(frozen=True)

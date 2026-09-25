@@ -19,12 +19,12 @@ from typing import Any
 from lxml import etree
 
 from ceweInfo import CeweInfo
-from calendarEntries import CalendarEntries, loadCalendarEntries
-from calendarNames import CalendarNames, loadCalendarNames
-from calendarLayouts import (CalendarLayouts, applyCalendarLayoutSubstitutions,
-                             loadCalendarLayouts)
-from calendarSchemas import (CalendarSchemas, applyCalendarSchemaSubstitutions,
-                             loadCalendarSchemas)
+from calendars.entries import CalendarEntries, loadCalendarEntries
+from calendars.names import CalendarNames, loadCalendarNames
+from calendars.layouts import (CalendarLayouts, applyCalendarLayoutSubstitutions,
+                               loadCalendarLayouts)
+from calendars.schemas import (CalendarSchemas, applyCalendarSchemaSubstitutions,
+                               loadCalendarSchemas)
 from clipArt import readClipArtConfigXML
 from configUtils import getConfigurationInt
 from conversionState import ConversionState

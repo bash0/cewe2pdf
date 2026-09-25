@@ -367,12 +367,13 @@
     <Compile Include="albumIndex.py" />
     <Compile Include="backgrounds.py" />
     <Compile Include="borders.py" />
-    <Compile Include="calendarAreas.py" />
-    <Compile Include="calendarEntries.py" />
-    <Compile Include="calendarLayouts.py" />
-    <Compile Include="calendarNames.py" />
-    <Compile Include="calendarSchemas.py" />
-    <Compile Include="calendarSubstitutions.py" />
+    <Compile Include="calendars\areas.py" />
+    <Compile Include="calendars\entries.py" />
+    <Compile Include="calendars\layouts.py" />
+    <Compile Include="calendars\names.py" />
+    <Compile Include="calendars\schemas.py" />
+    <Compile Include="calendars\substitutions.py" />
+    <Compile Include="calendars\__init__.py" />
     <Compile Include="ceweInfo.py">
       <SubType>Code</SubType>
     </Compile>
@@ -480,6 +481,7 @@
   <ItemGroup>
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
+    <Folder Include="calendars\" />
     <Folder Include="documents\" />
     <Folder Include="environments\" />
     <Folder Include="tests" />

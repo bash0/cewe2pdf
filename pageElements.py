@@ -10,11 +10,11 @@ from math import floor
 
 from albumIndex import AlbumIndex
 from borders import processDecorationBorders
-from calendarAreas import processCalendarArea
-from calendarEntries import CalendarEntries
-from calendarNames import CalendarNames
-from calendarLayouts import CalendarLayouts
-from calendarSchemas import CalendarSchemas
+from calendars.areas import processCalendarArea
+from calendars.entries import CalendarEntries
+from calendars.names import CalendarNames
+from calendars.layouts import CalendarLayouts
+from calendars.schemas import CalendarSchemas
 from ceweInfo import ProductInfo
 from cewePageResolver import getPageElementForPageNumber
 from clipartareas import processAreaClipartTag

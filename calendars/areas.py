@@ -16,12 +16,12 @@ from reportlab.lib import fonts as reportlabFonts
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.utils import ImageReader
 
-from calendarLayouts import CalendarCellLayout, CalendarLayouts
-from calendarEntries import (CalendarEntries, calendarEventsForYear,
-                             personalCalendarEventsForYear,
-                             resolveCalendarEventImage)
-from calendarNames import CalendarNames, calendarNamesForLocale
-from calendarSchemas import CalendarCellStyle, CalendarSchemas, colourFromHex
+from .layouts import CalendarCellLayout, CalendarLayouts
+from .entries import (CalendarEntries, calendarEventsForYear,
+                      personalCalendarEventsForYear,
+                      resolveCalendarEventImage)
+from .names import CalendarNames, calendarNamesForLocale
+from .schemas import CalendarCellStyle, CalendarSchemas, colourFromHex
 from fontHandling import getAvailableFont
 from renderContext import RenderContext
 

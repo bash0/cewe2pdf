@@ -7,7 +7,7 @@ from pathlib import Path
 from lxml import etree
 from reportlab.lib import colors
 
-from calendarSubstitutions import applyCalendarSubstitutions
+from .substitutions import applyCalendarSubstitutions
 
 
 @dataclass(frozen=True)
