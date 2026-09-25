@@ -22,9 +22,9 @@ from lxml import etree
 from reportlab.lib.styles import ParagraphStyle
 
 from conversionState import ConversionState
-from text import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart,
-                  AppendText, CollectFontInfo)
-from textoutlines import TextEffectsParagraph
+from .markup import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart,
+                     AppendText, CollectFontInfo)
+from .outlines import TextEffectsParagraph
 
 
 def processTextLists(pdf_flowableList, forceLeading, paragraphText: str, additional_fonts, body,  # noqa: C901

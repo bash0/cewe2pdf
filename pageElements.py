@@ -23,7 +23,7 @@ from imageareas import processAreaImageTag
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
 from shadows import processDecorationShadow
-from textareas import processAreaTextTag
+from texts.areas import processAreaTextTag
 
 
 def processElements(additional_fonts, fotobook, imagedir,

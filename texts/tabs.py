@@ -23,7 +23,7 @@ from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.platypus import Flowable
 
-from text import CollectFontInfo, IsBold, IsItalic, IsUnderline
+from .markup import CollectFontInfo, IsBold, IsItalic, IsUnderline
 from conversionState import ConversionState
 
 

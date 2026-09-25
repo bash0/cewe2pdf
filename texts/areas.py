@@ -25,14 +25,14 @@ from fontHandling import getAvailableFont
 from albumIndex import AlbumIndex
 from renderContext import RenderContext
 from shadows import warnAndIgnoreEnabledDecorationShadow
-from text import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText,
-                  CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle,
-                  Dequote, LeadingForExplicitLineHeight)
-from textart import processTextArt
-from textoutlines import TextEffectsParagraph, getTextOutline
-from texttabs import getTabbedTextLine
-from textlists import processTextLists
-from textspacing import getLetterSpacing
+from .markup import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText,
+                     CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle,
+                     Dequote, LeadingForExplicitLineHeight)
+from .art import processTextArt
+from .outlines import TextEffectsParagraph, getTextOutline
+from .tabs import getTabbedTextLine
+from .lists import processTextLists
+from .spacing import getLetterSpacing
 
 
 def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,  # noqa: C901

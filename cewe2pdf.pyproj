@@ -466,15 +466,14 @@
     <Compile Include="testutils.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="text.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="textareas.py" />
-    <Compile Include="textart.py" />
-    <Compile Include="textlists.py" />
-    <Compile Include="textoutlines.py" />
-    <Compile Include="textspacing.py" />
-    <Compile Include="texttabs.py" />
+    <Compile Include="texts\areas.py" />
+    <Compile Include="texts\art.py" />
+    <Compile Include="texts\lists.py" />
+    <Compile Include="texts\markup.py" />
+    <Compile Include="texts\outlines.py" />
+    <Compile Include="texts\spacing.py" />
+    <Compile Include="texts\tabs.py" />
+    <Compile Include="texts\__init__.py" />
     <Compile Include="versionInfo.py" />
     <Compile Include="windowsIntegration.py" />
   </ItemGroup>
@@ -627,6 +626,7 @@
     <Folder Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\" />
     <Folder Include="tests\unittest_fotobook\previous_result_pdfs\" />
     <Folder Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\" />
+    <Folder Include="texts\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf312" />
