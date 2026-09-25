@@ -4,7 +4,7 @@ import os
 import sys
 import yaml
 
-from messageCounterHandler import MsgCounterHandler
+from .messageCounterHandler import MsgCounterHandler
 
 if os.path.exists('loggerconfig.yaml'):
     with open('loggerconfig.yaml', 'r') as loggeryaml: # this works on all relevant platforms so pylint: disable=unspecified-encoding

@@ -57,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # only needed when the program is frozen (i.e. compiled).
 import sys
 
-from versionInfo import getVersionInformationText
+from infrastructure.versionInfo import getVersionInformationText
 
 # Let a user identify an executable without loading image libraries or reading
 # any album files.  argparse also knows about --version below for its help.
@@ -86,9 +86,11 @@ import PIL
 from packaging.version import parse as parse_version
 from albumConversionSession import AlbumConversionSession
 from pageElements import processElements
-from windowsIntegration import (confirmInstallation, installWindowsIntegration,
-                                isWindowsFrozenExecutable, showMessage,
-                                uninstallWindowsIntegration)
+from infrastructure.windowsIntegration import (confirmInstallation,
+                                                installWindowsIntegration,
+                                                isWindowsFrozenExecutable,
+                                                showMessage,
+                                                uninstallWindowsIntegration)
 
 
 # work around a breaking change in pil 10.0.0, see

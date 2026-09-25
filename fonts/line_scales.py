@@ -1,4 +1,4 @@
-from extraLoggers import mustsee, configlogger
+from infrastructure.extraLoggers import mustsee, configlogger
 
 class LineScales:
     """Line-spacing settings read for one conversion.

@@ -11,8 +11,8 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, newTable
 from fontTools.cu2qu import errors # noqa: errors not used here, but this ensures that pyinstaller gets it pylint: disable=unused-import
 
-from extraLoggers import configlogger
-from pathutils import appdata_dir
+from infrastructure.extraLoggers import configlogger
+from infrastructure.pathutils import appdata_dir
 
 # default approximation error, measured in UPEM
 MAX_ERR = 1.0

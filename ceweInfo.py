@@ -8,7 +8,7 @@ from enum import Enum
 import reportlab.lib.pagesizes
 
 from lxml import etree
-from extraLoggers import mustsee
+from infrastructure.extraLoggers import mustsee
 
 
 class ProductStyle(Enum):

@@ -15,7 +15,7 @@ import logging
 from dataclasses import dataclass
 from lxml import etree
 
-from extraLoggers import configlogger
+from infrastructure.extraLoggers import configlogger
 
 class Passepartout():
     def __init__(self):

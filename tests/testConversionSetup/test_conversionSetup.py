@@ -14,7 +14,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from conversionSetup import prepareConversion
 from conversionState import ConversionState
-from extraLoggers import configlogger
+from infrastructure.extraLoggers import configlogger
 from fonts.manager import getMissingFontSubstitute, loadMissingFontSubstitutions
 
 

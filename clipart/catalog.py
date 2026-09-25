@@ -8,8 +8,8 @@ from lxml import etree
 
 from ceweInfo import CeweInfo
 from .clpfile import ClpFile  # for clipart .CLP and .SVG files
-from extraLoggers import configlogger
-from pathutils import findFileInDirs
+from infrastructure.extraLoggers import configlogger
+from infrastructure.pathutils import findFileInDirs
 
 
 def loadClipart(fileName, clipartPathList) -> ClpFile:

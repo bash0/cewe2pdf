@@ -385,9 +385,6 @@
     <Compile Include="clipart\clpfile.py" />
     <Compile Include="clipart\__init__.py" />
     <Compile Include="colorFrame.py" />
-    <Compile Include="configUtils.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="conftest.py" />
     <Compile Include="conversionSetup.py" />
     <Compile Include="conversionState.py" />
@@ -398,9 +395,6 @@
     <Compile Include="decorations\__init__.py" />
     <Compile Include="cewe2pdf.py" />
     <Compile Include="colorUtils.py" />
-    <Compile Include="extraLoggers.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="fonts\line_scales.py" />
     <Compile Include="fonts\manager.py" />
     <Compile Include="fonts\otf.py" />
@@ -414,15 +408,20 @@
     </Compile>
     <Compile Include="indexing\albumindex.py" />
     <Compile Include="indexing\__init__.py" />
+    <Compile Include="infrastructure\configUtils.py" />
+    <Compile Include="infrastructure\extraLoggers.py" />
+    <Compile Include="infrastructure\messageCounterHandler.py" />
+    <Compile Include="infrastructure\pathutils.py" />
+    <Compile Include="infrastructure\programversion.py" />
+    <Compile Include="infrastructure\versionInfo.py" />
+    <Compile Include="infrastructure\windowsIntegration.py" />
+    <Compile Include="infrastructure\__init__.py" />
     <Compile Include="mcfx.py" />
-    <Compile Include="messageCounterHandler.py" />
     <Compile Include="pageElements.py" />
     <Compile Include="pageNumbering.py" />
     <Compile Include="pages.py" />
     <Compile Include="pageTypes.py" />
-    <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
-    <Compile Include="programversion.py" />
     <Compile Include="renderContext.py" />
     <Compile Include="runAllTests.py" />
     <Compile Include="setup.py" />
@@ -476,8 +475,6 @@
     <Compile Include="texts\spacing.py" />
     <Compile Include="texts\tabs.py" />
     <Compile Include="texts\__init__.py" />
-    <Compile Include="versionInfo.py" />
-    <Compile Include="windowsIntegration.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />
@@ -490,6 +487,7 @@
     <Folder Include="environments\" />
     <Folder Include="fonts\" />
     <Folder Include="indexing\" />
+    <Folder Include="infrastructure\" />
     <Folder Include="tests" />
     <Folder Include="tests\compare-pdf\" />
     <Folder Include="tests\compare-pdf\compare_pdf\" />

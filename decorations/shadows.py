@@ -10,7 +10,7 @@ import reportlab.lib.colors
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import Table
 
-from configUtils import getConfigurationBool
+from infrastructure.configUtils import getConfigurationBool
 from conversionState import ConversionState
 from renderContext import RenderContext
 

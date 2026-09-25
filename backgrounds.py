@@ -11,9 +11,9 @@ import PIL
 from reportlab.lib.utils import ImageReader
 
 from ceweInfo import ProductInfo
-from configUtils import getConfigurationBool
+from infrastructure.configUtils import getConfigurationBool
 from conversionState import ConversionState
-from pathutils import findFileInDirs
+from infrastructure.pathutils import findFileInDirs
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
 

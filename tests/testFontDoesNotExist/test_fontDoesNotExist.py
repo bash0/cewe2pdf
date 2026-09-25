@@ -14,8 +14,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from conversionState import ConversionState
 from fonts.manager import addAdditionalFontsFromFile, findAndRegisterFonts
-from extraLoggers import configlogger
-from pathutils import systemfont_dirs
+from infrastructure.extraLoggers import configlogger
+from infrastructure.pathutils import systemfont_dirs
 
 
 def test_missingAdditionalFontIsLoggedAndIgnored():

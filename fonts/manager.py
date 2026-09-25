@@ -6,11 +6,12 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 from ceweInfo import CeweInfo
-from configUtils import getConfigurationBool
+from infrastructure.configUtils import getConfigurationBool
 from conversionState import ConversionState
-from extraLoggers import mustsee, configlogger
+from infrastructure.extraLoggers import mustsee, configlogger
 from .otf import getTtfsFromOtfs
-from pathutils import localfont_dir, systemfont_dirs, findFileInDirs, findFilesInDir
+from infrastructure.pathutils import (localfont_dir, systemfont_dirs,
+                                      findFileInDirs, findFilesInDir)
 
 
 def addAdditionalFontsFromFile(configFontFileName, ttfFiles, fontDirs):

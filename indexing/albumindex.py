@@ -8,7 +8,8 @@ from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from PIL import Image
 
-from configUtils import getConfigurationBool, getConfigurationFloat, getConfigurationInt
+from infrastructure.configUtils import (getConfigurationBool, getConfigurationFloat,
+                                        getConfigurationInt)
 
 class AlbumIndex(): # pylint: disable=too-many-instance-attributes
 

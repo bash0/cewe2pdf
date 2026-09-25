@@ -18,11 +18,11 @@ from indexing.albumindex import AlbumIndex
 from ceweInfo import ProductInfo, CeweInfo, ProductStyle
 from conversionSetup import prepareConversion
 from conversionState import ConversionState
-from extraLoggers import ConversionMessageCounters, configlogger, mustsee
+from infrastructure.extraLoggers import ConversionMessageCounters, configlogger, mustsee
 from pageNumbering import PageNumberingInfo
 from pages import processPages
 from renderContext import RenderContext
-from versionInfo import logVersionInformation
+from infrastructure.versionInfo import logVersionInformation
 
 
 class AlbumConversionSession:

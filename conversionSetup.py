@@ -26,13 +26,13 @@ from calendars.layouts import (CalendarLayouts, applyCalendarLayoutSubstitutions
 from calendars.schemas import (CalendarSchemas, applyCalendarSchemaSubstitutions,
                                loadCalendarSchemas)
 from clipart.catalog import readClipArtConfigXML
-from configUtils import getConfigurationInt
+from infrastructure.configUtils import getConfigurationInt
 from conversionState import ConversionState
-from extraLoggers import mustsee
+from infrastructure.extraLoggers import mustsee
 from fonts.manager import findAndRegisterFonts
 from fonts.line_scales import LineScales
 from mcfx import unpackMcfx
-from windowsIntegration import findInstalledCeweFolder
+from infrastructure.windowsIntegration import findInstalledCeweFolder
 
 
 @dataclass
