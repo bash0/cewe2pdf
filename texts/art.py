@@ -6,7 +6,7 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 
 from decorations.borders import processDecorationBorders
-from fontHandling import getMissingFontSubstitute
+from fonts.manager import getMissingFontSubstitute
 from conversionState import ConversionState
 from renderContext import RenderContext
 

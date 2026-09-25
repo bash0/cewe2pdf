@@ -9,7 +9,7 @@ from ceweInfo import CeweInfo
 from configUtils import getConfigurationBool
 from conversionState import ConversionState
 from extraLoggers import mustsee, configlogger
-from otf import getTtfsFromOtfs
+from .otf import getTtfsFromOtfs
 from pathutils import localfont_dir, systemfont_dirs, findFileInDirs, findFilesInDir
 
 

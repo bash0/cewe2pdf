@@ -22,7 +22,7 @@ from .entries import (CalendarEntries, calendarEventsForYear,
                       resolveCalendarEventImage)
 from .names import CalendarNames, calendarNamesForLocale
 from .schemas import CalendarCellStyle, CalendarSchemas, colourFromHex
-from fontHandling import getAvailableFont
+from fonts.manager import getAvailableFont
 from renderContext import RenderContext
 
 

@@ -8,7 +8,7 @@ from ceweInfo import ProductStyle
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
-from fontHandling import getAvailableFont
+from fonts.manager import getAvailableFont
 from renderContext import RenderContext
 from texts.outlines import TextEffectsParagraph
 

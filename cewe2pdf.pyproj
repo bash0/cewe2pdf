@@ -393,15 +393,16 @@
     <Compile Include="decorations\passepartout.py" />
     <Compile Include="decorations\shadows.py" />
     <Compile Include="decorations\__init__.py" />
-    <Compile Include="fontHandling.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="cewe2pdf.py" />
     <Compile Include="clpFile.py" />
     <Compile Include="colorUtils.py" />
     <Compile Include="extraLoggers.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="fonts\line_scales.py" />
+    <Compile Include="fonts\manager.py" />
+    <Compile Include="fonts\otf.py" />
+    <Compile Include="fonts\__init__.py" />
     <Compile Include="imageareas.py" />
     <Compile Include="imageExtractor.py">
       <SubType>Code</SubType>
@@ -409,12 +410,8 @@
     <Compile Include="imageUtils.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="lineScales.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="mcfx.py" />
     <Compile Include="messageCounterHandler.py" />
-    <Compile Include="otf.py" />
     <Compile Include="pageElements.py" />
     <Compile Include="pageNumbering.py" />
     <Compile Include="pages.py" />
@@ -485,6 +482,7 @@
     <Folder Include="decorations\" />
     <Folder Include="documents\" />
     <Folder Include="environments\" />
+    <Folder Include="fonts\" />
     <Folder Include="tests" />
     <Folder Include="tests\compare-pdf\" />
     <Folder Include="tests\compare-pdf\compare_pdf\" />

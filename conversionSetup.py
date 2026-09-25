@@ -29,8 +29,8 @@ from clipArt import readClipArtConfigXML
 from configUtils import getConfigurationInt
 from conversionState import ConversionState
 from extraLoggers import mustsee
-from fontHandling import findAndRegisterFonts
-from lineScales import LineScales
+from fonts.manager import findAndRegisterFonts
+from fonts.line_scales import LineScales
 from mcfx import unpackMcfx
 from windowsIntegration import findInstalledCeweFolder
 

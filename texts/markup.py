@@ -4,8 +4,8 @@ import reportlab.lib.enums
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 
-from fontHandling import getAvailableFont
-from lineScales import LineScales
+from fonts.manager import getAvailableFont
+from fonts.line_scales import LineScales
 from conversionState import ConversionState
 
 

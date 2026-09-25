@@ -21,7 +21,7 @@ from decorations.borders import processDecorationBorders
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
-from fontHandling import getAvailableFont
+from fonts.manager import getAvailableFont
 from albumIndex import AlbumIndex
 from renderContext import RenderContext
 from decorations.shadows import warnAndIgnoreEnabledDecorationShadow
