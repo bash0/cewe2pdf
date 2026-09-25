@@ -95,7 +95,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        version=$(python -c "from programversion import PROGRAM_VERSION; print(PROGRAM_VERSION)")
+        version=$(python -c "from infrastructure.programversion import PROGRAM_VERSION; print(PROGRAM_VERSION)")
         tag="cewe2pdf-v${version}-build-${GITHUB_RUN_NUMBER}"
         if git rev-parse -q --verify "refs/tags/${tag}"; then
           existing_commit=$(git rev-list -n 1 "${tag}")
