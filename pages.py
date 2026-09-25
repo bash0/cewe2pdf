@@ -8,9 +8,9 @@ from typing import Callable
 
 from backgrounds import processBackground
 from conversionState import ConversionState
-from ceweInfo import AlbumInfo
+from ceweInfo import ProductInfo
 from cewePageResolver import ResolvedPage, resolvePages
-from extraLoggers import mustsee
+from infrastructure.extraLoggers import mustsee
 from pageNumbering import addPageNumber
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
@@ -27,7 +27,7 @@ def parseInputPage(fotobook, mcfBaseFolder, backgroundLocations, imageDirectory,
     if bundleSize is not None:
         pageWidth = float(bundleSize.get('width'))
         pageHeight = float(bundleSize.get('height'))
-        if AlbumInfo.isAlbumSingleSide(productStyle):
+        if ProductInfo.isAlbumSingleSide(productStyle):
             pageWidth = pageWidth / 2
     else:
         # Assume A4 page size.
@@ -43,7 +43,7 @@ def parseInputPage(fotobook, mcfBaseFolder, backgroundLocations, imageDirectory,
                       backgroundLocations, productStyle, pageType, pdf,
                       pageHeight, pageWidth, context)
 
-    if AlbumInfo.isAlbumSingleSide(productStyle) and \
+    if ProductInfo.isAlbumSingleSide(productStyle) and \
             pageType == PageProcessingType.FrontInsideCoverBackground:
         # The front inside cover is processed again to draw its elements after
         # this initial background-only pass.
@@ -97,14 +97,14 @@ def _renderResolvedPage(resolvedPage: ResolvedPage, fotobook, mcfBaseFolder,
                       productStyle, resolvedPage.odd_page, context)
         return
 
-    if AlbumInfo.isAlbumProduct(productStyle) and resolvedPage.page_type in [
+    if ProductInfo.isAlbumProduct(productStyle) and resolvedPage.page_type in [
             PageProcessingType.FrontInsideCover, PageProcessingType.RegularPage]:
         addPageNumber(pageNumberingInfo, pdf, resolvedPage.page_number,
                       productStyle, resolvedPage.odd_page, context)
 
-    if not AlbumInfo.isAlbumProduct(productStyle):
+    if not ProductInfo.isAlbumProduct(productStyle):
         pdf.showPage()
-    elif AlbumInfo.isAlbumSingleSide(productStyle):
+    elif ProductInfo.isAlbumSingleSide(productStyle):
         pdf.showPage()
     elif resolvedPage.odd_page or (
             resolvedPage.page_type == PageProcessingType.Cover and

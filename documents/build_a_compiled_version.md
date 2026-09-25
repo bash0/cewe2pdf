@@ -32,19 +32,3 @@ As of Mar 2024, with the latest versions of everything installed, as shown below
 - a Cairo installation for windows from github vcpkg (in the local PATH)
     - no version, but dated 03/05/2020
 
-## Method 2: py2exe
-    pip install py2exe
-
-then run the installer script
-
-    python setup.py install
-
-The result .exe will have a problem: it can't load the cairocffi._generated folder.
-To fix this, you need to go to your Anaconda install path, under: `anaconda3\Lib\site-packages\cairocffi\_generated`
-
-and create an empty file called: `__init__.py`
-This file will help py2exe to recognize this package and include it.
-
-Then there will be problems finding VERSION from cairosvg, cairoffi, cssselect2, tinycss2.
-The error from cairosvg can be solved by copying the VERSION file to to the dist folder, but the error fro cairocffi indicates, that it searches for the file inside the .zip file. But you can't modify the zip file, otherwise the .exe won't start.
-So needs to be patched in the libraries.

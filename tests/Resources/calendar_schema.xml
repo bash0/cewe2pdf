@@ -4,6 +4,19 @@
   calendar-schema loading without reproducing CEWE's supplied definitions.
 -->
 <calendar_schemas>
+  <!-- Invented local stand-ins for named CEWE themes used by calendar tests. -->
+  <calendararea schema="cewe2pdf-test-transparent-white" gridcolor="transparent">
+    <cell type="CALENDAR_CELL_TYPE_YEAR" textcolor="#ffffff" bgcolor="transparent"/>
+    <cell type="CALENDAR_CELL_TYPE_MONTH" textcolor="#ffffff" bgcolor="transparent"/>
+  </calendararea>
+  <calendararea schema="cewe2pdf-test-black-white" gridcolor="#000000">
+    <cell type="CALENDAR_CELL_TYPE_HEAD_WEEKDAY" textcolor="#000000" bgcolor="#ffffff"/>
+    <cell type="CALENDAR_CELL_TYPE_WEEKDAY" textcolor="#000000" bgcolor="#ffffff"/>
+    <cell type="CALENDAR_CELL_TYPE_SATURDAY" textcolor="#000000" bgcolor="#ffffff"/>
+    <cell type="CALENDAR_CELL_TYPE_SUNDAY" textcolor="#000000" bgcolor="#ffffff"/>
+    <cell type="CALENDAR_CELL_TYPE_HOLIDAY" textcolor="#000000" bgcolor="#ffffff"/>
+    <cell type="CALENDAR_CELL_TYPE_WEEK_OF_YEAR" textcolor="#000000" bgcolor="#ffffff"/>
+  </calendararea>
   <calendararea schema="cewe2pdf-test-yellow-weekends">
     <cell type="CALENDAR_CELL_TYPE_HEAD_WEEKDAY" textcolor="#102030" bgcolor="#f2f2d0"/>
     <cell type="CALENDAR_CELL_TYPE_WEEKDAY" textcolor="#102030" bgcolor="#ffffe8"/>

@@ -31,6 +31,11 @@
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.example.txt" />
     <Content Include="cewe2pdf.spec" />
+    <Content Include="clipart\CLP file format.txt" />
+    <Content Include="clipart\__pycache__\areas.cpython-312.pyc" />
+    <Content Include="clipart\__pycache__\catalog.cpython-312.pyc" />
+    <Content Include="clipart\__pycache__\clpfile.cpython-312.pyc" />
+    <Content Include="clipart\__pycache__\__init__.cpython-312.pyc" />
     <Content Include="DEVELOPER_GUIDE.md" />
     <Content Include="documents\mcf_feature_classification.md" />
     <Content Include="documents\readme.txt" />
@@ -47,6 +52,7 @@
     <Content Include="tests\Resources\calendarentries\nb_NO.xml" />
     <Content Include="tests\Resources\calendar_layout.xml" />
     <Content Include="tests\Resources\calendar_schema.xml" />
+    <Content Include="tests\Resources\international\CalendarWeekNames.xml" />
     <Content Include="tests\Resources\photofun\backgrounds\212.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\447.jpg" />
     <Content Include="tests\Resources\photofun\backgrounds\6001.jpg" />
@@ -88,11 +94,21 @@
     <Content Include="tests\Resources\photofun\decorations\rect_lightyellow.xml" />
     <Content Include="tests\Resources\photofun\decorations\rect_terracotta.xml" />
     <Content Include="tests\Resources\photofun\decorations\rect_white.xml" />
+    <Content Include="tests\Resources\photofun\fonts\ArchivoNarrow-Bold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\ArchivoNarrow-BoldItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\ArchivoNarrow-Italic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\ArchivoNarrow-Regular.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Bodoni-11-Bold-Italic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Bodoni-11-Bold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Bodoni-11-Book-Italic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Bodoni-11-Book.ttf" />
     <Content Include="tests\Resources\photofun\fonts\CraftyGirls-Regular.ttf" />
     <Content Include="tests\Resources\photofun\fonts\DancingScript-Bold.ttf" />
     <Content Include="tests\Resources\photofun\fonts\DancingScript-Medium.ttf" />
     <Content Include="tests\Resources\photofun\fonts\DancingScript-Regular.ttf" />
     <Content Include="tests\Resources\photofun\fonts\DancingScript-SemiBold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Dancing_Script\OFL.txt" />
+    <Content Include="tests\Resources\photofun\fonts\Dancing_Script\README.txt" />
     <Content Include="tests\Resources\photofun\fonts\EBGaramond-Bold.ttf" />
     <Content Include="tests\Resources\photofun\fonts\EBGaramond-BoldItalic.ttf" />
     <Content Include="tests\Resources\photofun\fonts\EBGaramond-ExtraBold.ttf" />
@@ -103,6 +119,12 @@
     <Content Include="tests\Resources\photofun\fonts\EBGaramond-Regular.ttf" />
     <Content Include="tests\Resources\photofun\fonts\EBGaramond-SemiBold.ttf" />
     <Content Include="tests\Resources\photofun\fonts\EBGaramond-SemiBoldItalic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\EB_Garamond\OFL.txt" />
+    <Content Include="tests\Resources\photofun\fonts\EB_Garamond\README.txt" />
+    <Content Include="tests\Resources\photofun\fonts\liberation-narrow-fonts-ttf-1.07.6\AUTHORS" />
+    <Content Include="tests\Resources\photofun\fonts\liberation-narrow-fonts-ttf-1.07.6\COPYING" />
+    <Content Include="tests\Resources\photofun\fonts\liberation-narrow-fonts-ttf-1.07.6\License.txt" />
+    <Content Include="tests\Resources\photofun\fonts\liberation-narrow-fonts-ttf-1.07.6\README.rst" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSans-BaDn.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansBold-1adM.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansBoldItalic-ngV4.ttf" />
@@ -111,6 +133,13 @@
     <Content Include="tests\Resources\photofun\fonts\LiberationSansNarrow-BoldItalic.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansNarrow-Italic.ttf" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSansNarrow-Regular.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSans\info.txt" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\AUTHORS-e301" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\ChangeLog-0f6e" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\COPYING-94d5" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\License%282%29-f555.txt" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\License-8eb1.txt" />
+    <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\README-75f0" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-Black.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-BlackItalic.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-Bold.ttf" />
@@ -130,11 +159,17 @@
     <Content Include="tests\Resources\photofun\fonts\Poppins-Thin.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-ThinItalic.ttf" />
     <Content Include="cewe2pdf.ini" />
-    <Content Include="CLP file format.txt" />
     <Content Include="loggerconfig.yaml" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="TestingOnWSL.md" />
+    <Content Include="tests\Resources\photofun\fonts\Poppins\OFL.txt" />
+    <Content Include="tests\Resources\photofun\fonts\Stafford Bold Italic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Stafford Bold.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Stafford Italic.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Stafford Regular.ttf" />
+    <Content Include="tests\Resources\photofun\fonts\Stafford\readme.html" />
+    <Content Include="tests\Resources\photofun\fonts\Stafford\_readmefirst.txt" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250326D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411S.pdf" />
@@ -146,6 +181,15 @@
     <Content Include="tests\testCalendar\a4p\a4p_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testCalendar\a4p\a4p_mcf-Dateien\gs4dszic_1_20200306_111748.jpg" />
     <Content Include="tests\testCalendar\a4p\cewe2pdf.ini" />
+    <Content Include="tests\testCalendar\a5l\a5l.mcf" />
+    <Content Include="tests\testCalendar\a5l\a5l_mcf-Dateien\20200306_111749_gs4dszic_1.jpg" />
+    <Content Include="tests\testCalendar\a5l\a5l_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testCalendar\a5l\a5l_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\testCalendar\a5l\cewe2pdf.ini" />
+    <Content Include="tests\testCalendar\sq21\calendarEventFotos\.gitkeep" />
+    <Content Include="tests\testCalendar\sq21\cewe2pdf.ini" />
+    <Content Include="tests\testCalendar\sq21\sq21.mcf" />
+    <Content Include="tests\testCalendar\sq21\sq21_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250319S.pdf" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250326S.pdf" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250412S.pdf" />
@@ -324,39 +368,37 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="albumConversionSession.py" />
-    <Compile Include="albumIndex.py" />
     <Compile Include="backgrounds.py" />
-    <Compile Include="borders.py" />
-    <Compile Include="calendarAreas.py" />
-    <Compile Include="calendarEntries.py" />
-    <Compile Include="calendarLayouts.py" />
-    <Compile Include="calendarSchemas.py" />
-    <Compile Include="calendarSubstitutions.py" />
+    <Compile Include="calendars\areas.py" />
+    <Compile Include="calendars\entries.py" />
+    <Compile Include="calendars\layouts.py" />
+    <Compile Include="calendars\names.py" />
+    <Compile Include="calendars\schemas.py" />
+    <Compile Include="calendars\substitutions.py" />
+    <Compile Include="calendars\__init__.py" />
     <Compile Include="ceweInfo.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="cewePageResolver.py" />
-    <Compile Include="clipArt.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="clipartareas.py" />
+    <Compile Include="clipart\areas.py" />
+    <Compile Include="clipart\catalog.py" />
+    <Compile Include="clipart\clpfile.py" />
+    <Compile Include="clipart\__init__.py" />
     <Compile Include="colorFrame.py" />
-    <Compile Include="configUtils.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="conftest.py" />
     <Compile Include="conversionSetup.py" />
     <Compile Include="conversionState.py" />
-    <Compile Include="corners.py" />
-    <Compile Include="fontHandling.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="decorations\borders.py" />
+    <Compile Include="decorations\corners.py" />
+    <Compile Include="decorations\passepartout.py" />
+    <Compile Include="decorations\shadows.py" />
+    <Compile Include="decorations\__init__.py" />
     <Compile Include="cewe2pdf.py" />
-    <Compile Include="clpFile.py" />
     <Compile Include="colorUtils.py" />
-    <Compile Include="extraLoggers.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="fonts\line_scales.py" />
+    <Compile Include="fonts\manager.py" />
+    <Compile Include="fonts\otf.py" />
+    <Compile Include="fonts\__init__.py" />
     <Compile Include="imageareas.py" />
     <Compile Include="imageExtractor.py">
       <SubType>Code</SubType>
@@ -364,24 +406,24 @@
     <Compile Include="imageUtils.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="lineScales.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="indexing\albumindex.py" />
+    <Compile Include="indexing\__init__.py" />
+    <Compile Include="infrastructure\configUtils.py" />
+    <Compile Include="infrastructure\extraLoggers.py" />
+    <Compile Include="infrastructure\messageCounterHandler.py" />
+    <Compile Include="infrastructure\pathutils.py" />
+    <Compile Include="infrastructure\programversion.py" />
+    <Compile Include="infrastructure\versionInfo.py" />
+    <Compile Include="infrastructure\windowsIntegration.py" />
+    <Compile Include="infrastructure\__init__.py" />
     <Compile Include="mcfx.py" />
-    <Compile Include="messageCounterHandler.py" />
-    <Compile Include="otf.py" />
     <Compile Include="pageElements.py" />
     <Compile Include="pageNumbering.py" />
     <Compile Include="pages.py" />
     <Compile Include="pageTypes.py" />
-    <Compile Include="passepartout.py" />
-    <Compile Include="pathutils.py" />
     <Compile Include="processManyMcfs.py" />
-    <Compile Include="programversion.py" />
     <Compile Include="renderContext.py" />
     <Compile Include="runAllTests.py" />
-    <Compile Include="setup.py" />
-    <Compile Include="shadows.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
     <Compile Include="tests\compare-pdf\setup.py" />
@@ -424,23 +466,27 @@
     <Compile Include="testutils.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="text.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="textareas.py" />
-    <Compile Include="textart.py" />
-    <Compile Include="textlists.py" />
-    <Compile Include="textoutlines.py" />
-    <Compile Include="textspacing.py" />
-    <Compile Include="texttabs.py" />
-    <Compile Include="versionInfo.py" />
-    <Compile Include="windowsIntegration.py" />
+    <Compile Include="texts\areas.py" />
+    <Compile Include="texts\art.py" />
+    <Compile Include="texts\lists.py" />
+    <Compile Include="texts\markup.py" />
+    <Compile Include="texts\outlines.py" />
+    <Compile Include="texts\spacing.py" />
+    <Compile Include="texts\tabs.py" />
+    <Compile Include="texts\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
+    <Folder Include="calendars\" />
+    <Folder Include="clipart\" />
+    <Folder Include="clipart\__pycache__\" />
+    <Folder Include="decorations\" />
     <Folder Include="documents\" />
     <Folder Include="environments\" />
+    <Folder Include="fonts\" />
+    <Folder Include="indexing\" />
+    <Folder Include="infrastructure\" />
     <Folder Include="tests" />
     <Folder Include="tests\compare-pdf\" />
     <Folder Include="tests\compare-pdf\compare_pdf\" />
@@ -460,6 +506,7 @@
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\decorations\" />
     <Folder Include="tests\Resources\calendarentries\" />
+    <Folder Include="tests\Resources\international\" />
     <Folder Include="tests\Resources\photofun\decorations\106793\" />
     <Folder Include="tests\Resources\photofun\decorations\106793\8394-DECO-SF\" />
     <Folder Include="tests\Resources\photofun\decorations\106796\" />
@@ -471,6 +518,13 @@
     <Folder Include="tests\Resources\photofun\decorations\63457\" />
     <Folder Include="tests\Resources\photofun\decorations\63457\line_single_black\" />
     <Folder Include="tests\Resources\photofun\fonts\" />
+    <Folder Include="tests\Resources\photofun\fonts\Dancing_Script\" />
+    <Folder Include="tests\Resources\photofun\fonts\EB_Garamond\" />
+    <Folder Include="tests\Resources\photofun\fonts\liberation-narrow-fonts-ttf-1.07.6\" />
+    <Folder Include="tests\Resources\photofun\fonts\LiberationSans\" />
+    <Folder Include="tests\Resources\photofun\fonts\LiberationSans\misc\" />
+    <Folder Include="tests\Resources\photofun\fonts\Poppins\" />
+    <Folder Include="tests\Resources\photofun\fonts\Stafford\" />
     <Folder Include="tests\testbackgrounds\previous_result_pdfs\" />
     <Folder Include="tests\testCalendar\" />
     <Folder Include="tests\testCalendar\a4l\" />
@@ -479,6 +533,12 @@
     <Folder Include="tests\testCalendar\a4p\" />
     <Folder Include="tests\testCalendar\a4p\a4p_mcf-Dateien\" />
     <Folder Include="tests\testCalendar\a4p\previous_result_pdfs\" />
+    <Folder Include="tests\testCalendar\a5l\" />
+    <Folder Include="tests\testCalendar\a5l\a5l_mcf-Dateien\" />
+    <Folder Include="tests\testCalendar\a5l\previous_result_pdfs\" />
+    <Folder Include="tests\testCalendar\sq21\" />
+    <Folder Include="tests\testCalendar\sq21\calendarEventFotos\" />
+    <Folder Include="tests\testCalendar\sq21\sq21_mcf-Dateien\" />
     <Folder Include="tests\testCewePageResolver\" />
     <Folder Include="tests\testClipartColorReplacement\previous_result_pdfs\" />
     <Folder Include="tests\testClipart\previous_result_pdfs\" />
@@ -570,6 +630,7 @@
     <Folder Include="tests\testMcfxExtraction\McfOriginals\testMcfxExtraction_mcf-Dateien\" />
     <Folder Include="tests\unittest_fotobook\previous_result_pdfs\" />
     <Folder Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\" />
+    <Folder Include="texts\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf312" />

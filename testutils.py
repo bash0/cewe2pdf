@@ -4,7 +4,7 @@ import os.path
 import sys
 
 from pathlib import Path
-from extraLoggers import mustsee
+from infrastructure.extraLoggers import mustsee
 
 
 def configureTestImportPaths(testFile):

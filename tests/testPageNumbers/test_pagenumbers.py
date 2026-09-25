@@ -20,7 +20,7 @@ from pikepdf import Pdf
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
-from extraLoggers import mustsee # type: ignore
+from infrastructure.extraLoggers import mustsee # type: ignore
 
 from testutils import getLatestResultFile, getOutFileBasename, runModifications
 

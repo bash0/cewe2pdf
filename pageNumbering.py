@@ -8,9 +8,9 @@ from ceweInfo import ProductStyle
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
-from fontHandling import getAvailableFont
+from fonts.manager import getAvailableFont
 from renderContext import RenderContext
-from textoutlines import TextEffectsParagraph
+from texts.outlines import TextEffectsParagraph
 
 mcf2rl = reportlab.lib.pagesizes.mm/10 # == 72/254, converts from mcf (unit=0.1mm) to reportlab (unit=inch/72)
 

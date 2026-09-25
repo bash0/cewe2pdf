@@ -8,21 +8,22 @@
 
 from math import floor
 
-from albumIndex import AlbumIndex
-from borders import processDecorationBorders
-from calendarAreas import processCalendarArea
-from calendarEntries import CalendarEntries
-from calendarLayouts import CalendarLayouts
-from calendarSchemas import CalendarSchemas
-from ceweInfo import AlbumInfo
+from indexing.albumindex import AlbumIndex
+from decorations.borders import processDecorationBorders
+from calendars.areas import processCalendarArea
+from calendars.entries import CalendarEntries
+from calendars.names import CalendarNames
+from calendars.layouts import CalendarLayouts
+from calendars.schemas import CalendarSchemas
+from ceweInfo import ProductInfo
 from cewePageResolver import getPageElementForPageNumber
-from clipartareas import processAreaClipartTag
+from clipart.areas import processAreaClipartTag
 from conversionState import ConversionState
 from imageareas import processAreaImageTag
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
-from shadows import processDecorationShadow
-from textareas import processAreaTextTag
+from decorations.shadows import processDecorationShadow
+from texts.areas import processAreaTextTag
 
 
 def processElements(additional_fonts, fotobook, imagedir,
@@ -31,14 +32,16 @@ def processElements(additional_fonts, fotobook, imagedir,
                     context: RenderContext, state: ConversionState,
                     albumIndex: AlbumIndex, calendarSchemas: CalendarSchemas,
                     calendarLayouts: CalendarLayouts,
-                    calendarEntries: CalendarEntries):
+                    calendarEntries: CalendarEntries,
+                    calendarNames: CalendarNames,
+                    calendarEventImageFolders: tuple[str, ...]):
     """Render images, text, and clip art from one MCF page element.
 
     ``pages.processPages`` resolves the unusual cover and paired-page rules.
     This function then selects the areas visible on this PDF page and delegates
     each area type to its specialist renderer.
     """
-    if (AlbumInfo.isAlbumDoubleSide(productstyle)
+    if (ProductInfo.isAlbumDoubleSide(productstyle)
             and pagetype == PageProcessingType.RegularPage
             and not oddpage and not lastpage):
         # In double-page mode, all images are drawn by the odd pages.
@@ -46,7 +49,7 @@ def processElements(additional_fonts, fotobook, imagedir,
 
     # The MCF stores ordinary album pages in pairs.  For an odd page, retrieve
     # the preceding even page element, which contains the shared areas.
-    if (AlbumInfo.isAlbumProduct(productstyle)
+    if (ProductInfo.isAlbumProduct(productstyle)
             and pagetype == PageProcessingType.RegularPage and oddpage):
         page = getPageElementForPageNumber(fotobook, 2 * floor(pageNumber / 2))
 
@@ -55,7 +58,7 @@ def processElements(additional_fonts, fotobook, imagedir,
         areaLeft = float(areaPos.get('left').replace(',', '.'))
         if (pagetype != PageProcessingType.FrontInsideCoverBackground
                 or len(area.findall('imagebackground')) == 0):
-            if oddpage and AlbumInfo.isAlbumSingleSide(productstyle):
+            if oddpage and ProductInfo.isAlbumSingleSide(productstyle):
                 # Shift double-page content from the other page.
                 areaLeft -= pageW
         areaTop = float(areaPos.get('top').replace(',', '.'))
@@ -65,7 +68,7 @@ def processElements(additional_fonts, fotobook, imagedir,
 
         # Skip an image which is wholly outside this side of a single-page
         # album spread.
-        if (AlbumInfo.isAlbumSingleSide(productstyle)
+        if (ProductInfo.isAlbumSingleSide(productstyle)
                 and pagetype in [PageProcessingType.RegularPage,
                                  PageProcessingType.Cover]):
             if oddpage and (areaLeft + areaWidth) < 0:
@@ -97,6 +100,8 @@ def processElements(additional_fonts, fotobook, imagedir,
             processCalendarArea(calendarArea, fotobook, pageNumber, area,
                                 pageH, pdf, context, calendarSchemas,
                                 calendarLayouts, calendarEntries,
+                                calendarNames,
+                                calendarEventImageFolders,
                                 additional_fonts, state)
 
         # A clipartarea has both designElementIDs and clipart elements.  The

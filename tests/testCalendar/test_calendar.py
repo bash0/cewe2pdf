@@ -6,6 +6,7 @@ import sys
 
 import pikepdf
 import pytest
+from lxml import etree
 from reportlab.lib import colors
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -14,15 +15,20 @@ from testutils import configureTestImportPaths
 configureTestImportPaths(__file__)
 
 from compare_pdf import ComparePDF, ShowDiffsStyle  # type: ignore
-from calendarAreas import (_captionCellForEvent, _fontName, _weekRowHeights,
-                           _wrapCalendarCaption)
-from calendarEntries import CalendarEvent
-from calendarLayouts import CalendarCellLayout
+from calendars.areas import (_calendarHolidayEmphasis, _calendarWeekNumberSuffix,
+                             _calendarWeekNumbers,
+                             _captionCellForEvent,
+                             _fontName, _weekRowHeights, _wrapCalendarCaption)
+from calendars.entries import (CalendarEvent, personalCalendarEventsForYear,
+                               resolveCalendarEventImage)
+from calendars.layouts import CalendarCellLayout
 from conversionState import ConversionState
-from calendarLayouts import applyCalendarLayoutSubstitutions, loadCalendarLayouts
-from calendarEntries import calendarEventsForYear, loadCalendarEntries
-from calendarSchemas import (applyCalendarSchemaSubstitutions, colourFromHex,
-                             loadCalendarSchemas)
+from calendars.layouts import (applyCalendarLayoutSubstitutions,
+                               loadCalendarLayouts)
+from calendars.entries import calendarEventsForYear, loadCalendarEntries
+from calendars.names import calendarNamesForLocale, loadCalendarNames
+from calendars.schemas import (applyCalendarSchemaSubstitutions, colourFromHex,
+                               loadCalendarSchemas)
 from cewe2pdf import convertMcf
 from testutils import getLatestResultFile
 
@@ -35,7 +41,7 @@ def test_minimalCalendarSchemaIsLoaded():
     schemas = loadCalendarSchemas(str(PROJECT_ROOT / 'tests'))
     substitutedSchemas = applyCalendarSchemaSubstitutions(
         schemas, 'new_15012019_160949, cewe2pdf-test-yellow-weekends')
-    styles = substitutedSchemas['new_15012019_160949']
+    styles = substitutedSchemas['new_15012019_160949'].cell_styles
 
     assert styles['CALENDAR_CELL_TYPE_WEEKDAY'].background_colour is not None
     assert styles['CALENDAR_CELL_TYPE_SUNDAY'].background_colour is not None
@@ -106,6 +112,55 @@ def test_calendarEventsUseTheRequestedBritishEnglishLocale():
         "New Year's Day"]
 
 
+def test_calendarNamesUseTheRequestedResourceLocale():
+    """Week, weekday, and month labels come from CEWE's locale resource."""
+    names = loadCalendarNames(str(PROJECT_ROOT / 'tests'))
+
+    norwegian = calendarNamesForLocale(names, 'nb_NO')
+    britishEnglish = calendarNamesForLocale(names, 'en_GB')
+
+    assert norwegian.week_name == 'uke'
+    assert norwegian.weekday_names == ('ma', 'ti', 'on', 'to', 'fr', 'lø', 'sø')
+    assert norwegian.month_names[0] == 'januar'
+    assert britishEnglish.week_name == 'Wk'
+    assert britishEnglish.month_names[8] == 'September'
+
+
+def test_squareCalendarReadsWeekNumbersAndRecurringPersonalEvents():
+    """The MCF controls both its ISO-week column and its own entries."""
+    root = etree.parse(str(TEST_DIRECTORY / 'sq21' / 'sq21.mcf')).getroot()
+    fotobook = root.find('fotobook') or root
+
+    assert _calendarWeekNumbers(fotobook) is True
+    events = personalCalendarEventsForYear(fotobook, 2027)
+    assert [event.name for event in events[date(2027, 9, 23)]] == [
+        "Somebody's birthday"]
+    assert [event.name for event in events[date(2027, 9, 24)]] == ['No picture']
+    assert events[date(2027, 9, 23)][0].image_path.endswith('.jpg')
+    assert events[date(2027, 9, 24)][0].image_path is None
+
+
+def test_a5CalendarUsesTheMcfWeekNumberPunctuation():
+    """Week-number formatting comes from the calendar MCF, not its locale."""
+    root = etree.parse(str(TEST_DIRECTORY / 'a5l' / 'a5l.mcf')).getroot()
+    fotobook = root.find('fotobook') or root
+
+    assert _calendarWeekNumbers(fotobook) is True
+    assert _calendarWeekNumberSuffix(fotobook) == '.'
+
+
+def test_calendarEventImageUsesConfiguredBasenameFallback(tmp_path):
+    """A portable fixture can replace the editor's machine-local AppData path."""
+    fallbackFolder = tmp_path / 'calendarEventFotos'
+    fallbackFolder.mkdir()
+    fallbackImage = fallbackFolder / 'editor-event.jpg'
+    fallbackImage.write_bytes(b'fixture image')
+
+    assert resolveCalendarEventImage(
+        r'C:\\Users\\someone\\AppData\\Local\\CEWE\\editor-event.jpg',
+        (str(fallbackFolder),)) == str(fallbackImage)
+
+
 def test_weekdayHeaderRowIsShallowerThanCalendarWeeks():
     """CEWE's compact weekday header shares the grid height without dominating it."""
     headerHeight, weekHeight = _weekRowHeights(700, 6)
@@ -130,9 +185,18 @@ def test_showEventCaptionInheritsSundayEmphasis():
     sundayCell = CalendarCellLayout(bold=True)
     captionCell = CalendarCellLayout(bold=False)
 
-    assert _captionCellForEvent(showEvent, captionCell, regularCell).bold is False
-    assert _captionCellForEvent(showEvent, captionCell, sundayCell).bold is True
-    assert _captionCellForEvent(freeEvent, captionCell, regularCell).bold is True
+    assert _captionCellForEvent(showEvent, captionCell, regularCell, True).bold is False
+    assert _captionCellForEvent(showEvent, captionCell, sundayCell, True).bold is True
+    assert _captionCellForEvent(freeEvent, captionCell, regularCell, True).bold is True
+    assert _captionCellForEvent(freeEvent, captionCell, regularCell, False).bold is False
+
+
+def test_a5CalendarSeparatesHolidayNamesFromHolidayEmphasis():
+    """The MCF can show names without applying CEWE's holiday emphasis."""
+    root = etree.parse(str(TEST_DIRECTORY / 'a5l' / 'a5l.mcf')).getroot()
+    fotobook = root.find('fotobook') or root
+
+    assert _calendarHolidayEmphasis(fotobook) is False
 
 
 def test_calendarFontUsesTheConfiguredMissingFontSubstitution():
@@ -188,6 +252,8 @@ def buildAndCompareCalendar(fixtureName, pageDimensions, caplog):
 @pytest.mark.parametrize(('fixtureName', 'pageDimensions'), [
     ('a4p', (595, 842)),
     ('a4l', (842, 595)),
+    ('a5l', (595, 420)),
+    ('sq21', (595, 595)),
 ])
 def test_calendarRendersIndependentPages(caplog, fixtureName, pageDimensions):
     """Each fixture produces its cover plus twelve independent month pages."""

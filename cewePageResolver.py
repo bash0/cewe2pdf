@@ -11,7 +11,7 @@ import logging
 from math import floor
 from typing import Any, Iterator
 
-from ceweInfo import AlbumInfo, ProductStyle
+from ceweInfo import ProductInfo, ProductStyle
 from pageTypes import PageProcessingType
 
 
@@ -96,7 +96,7 @@ def resolvePages(fotobook, productStyle, pageCount, pageNumbers=None) -> Iterato
                                False, pageNumber == pageCount - 1, pageNumber)
         return
 
-    if not AlbumInfo.isAlbumProduct(productStyle):
+    if not ProductInfo.isAlbumProduct(productStyle):
         # The supported non-album product is CEWE Photo Pairs (MEM3).  It has
         # neither covers nor two-page bundles: each normal-page element is one
         # 6 x 6 cm card.  CEWE numbers cards from one, unlike the zero-based
@@ -114,12 +114,12 @@ def resolvePages(fotobook, productStyle, pageCount, pageNumbers=None) -> Iterato
 
         # Normal MCF pages run from pagenr 1 to 26. A default album also
         # contains five pagenr 0 elements for covers and inside covers.
-        if AlbumInfo.isAlbumProduct(productStyle) and (number == 0 or isBackCover(number)):
+        if ProductInfo.isAlbumProduct(productStyle) and (number == 0 or isBackCover(number)):
             page = _fullCoverPage(fotobook)
             if page is None:
                 logging.warning("Cannot locate a cover page, is this really an album?")
                 continue
-            if AlbumInfo.isAlbumDoubleSide(productStyle) and isBackCover(number):
+            if ProductInfo.isAlbumDoubleSide(productStyle) and isBackCover(number):
                 # The final double-page output already includes the left side
                 # of the cover, so CEWE's cover element must not be repeated.
                 continue
@@ -129,7 +129,7 @@ def resolvePages(fotobook, productStyle, pageCount, pageNumbers=None) -> Iterato
                                number == 0, lastPage, number)
             continue
 
-        if AlbumInfo.isAlbumProduct(productStyle) and number == 1:
+        if ProductInfo.isAlbumProduct(productStyle) and number == 1:
             # Draw the first normal page's background before the inside-cover
             # elements. This is requested by selecting output page zero.
             realFirstPages = fotobook.findall("./page[@pagenr='1'][@type='normalpage']")
@@ -147,7 +147,7 @@ def resolvePages(fotobook, productStyle, pageCount, pageNumbers=None) -> Iterato
                                    True, lastPage, number)
             continue
 
-        if AlbumInfo.isAlbumProduct(productStyle) and lastPage:
+        if ProductInfo.isAlbumProduct(productStyle) and lastPage:
             # The final ordinary page and the back inside cover are two
             # distinct rendering operations in the same position in the MCF.
             if pageNumbers is None or number in pageNumbers:

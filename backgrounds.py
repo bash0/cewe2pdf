@@ -10,10 +10,10 @@ import logging
 import PIL
 from reportlab.lib.utils import ImageReader
 
-from ceweInfo import AlbumInfo
-from configUtils import getConfigurationBool
+from ceweInfo import ProductInfo
+from infrastructure.configUtils import getConfigurationBool
 from conversionState import ConversionState
-from pathutils import findFileInDirs
+from infrastructure.pathutils import findFileInDirs
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
 
@@ -28,15 +28,15 @@ def processBackground(backgroundTags, state: ConversionState, backgroundLocation
     if pagetype == PageProcessingType.FrontInsideCover:
         # This pass processes the inside-cover / first-page pair after its
         # background was handled by FrontInsideCoverBackground.
-        if AlbumInfo.isAlbumSingleSide(productstyle):
+        if ProductInfo.isAlbumSingleSide(productstyle):
             return
-        if AlbumInfo.isAlbumDoubleSide(productstyle):
+        if ProductInfo.isAlbumDoubleSide(productstyle):
             areaWidth = areaWidth / 2
 
     if pagetype == PageProcessingType.BackInsideCover:
-        if AlbumInfo.isAlbumSingleSide(productstyle):
+        if ProductInfo.isAlbumSingleSide(productstyle):
             return
-        if AlbumInfo.isAlbumDoubleSide(productstyle):
+        if ProductInfo.isAlbumDoubleSide(productstyle):
             areaWidth = areaWidth / 2
             areaXOffset = areaXOffset + areaWidth
 
@@ -56,7 +56,7 @@ def processBackground(backgroundTags, state: ConversionState, backgroundLocation
         if backgroundTag is None:
             return
 
-        if pagetype == PageProcessingType.RegularPage and AlbumInfo.isAlbumDoubleSide(productstyle) and \
+        if pagetype == PageProcessingType.RegularPage and ProductInfo.isAlbumDoubleSide(productstyle) and \
                 backgroundTag.get('alignment') == '3':
             areaWidth = areaWidth / 2
             areaXOffset = areaXOffset + areaWidth

@@ -13,9 +13,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from conversionState import ConversionState
-from fontHandling import addAdditionalFontsFromFile, findAndRegisterFonts
-from extraLoggers import configlogger
-from pathutils import systemfont_dirs
+from fonts.manager import addAdditionalFontsFromFile, findAndRegisterFonts
+from infrastructure.extraLoggers import configlogger
+from infrastructure.pathutils import systemfont_dirs
 
 
 def test_missingAdditionalFontIsLoggedAndIgnored():
@@ -62,7 +62,7 @@ def test_systemFontFoldersAreOptIn():
         # with the project root as its working directory.  ValueError is the
         # normal signal from findFileInDirs when a file is not found.
         with patch.dict(os.environ, {'IGNORELOCALFONTS': '1'}), \
-                patch('fontHandling.findFileInDirs', side_effect=ValueError):
+                patch('fonts.manager.findFileInDirs', side_effect=ValueError):
             availableFonts = findAndRegisterFonts(
                 configuration['DEFAULT'], None, str(temporaryPath), None,
                 ConversionState())
@@ -77,9 +77,9 @@ def test_systemFontFoldersAreOptIn():
         # receive every registration request, allowing the final assertion to
         # verify that each discovered font would have been registered.
         with patch.dict(os.environ, {'IGNORELOCALFONTS': '1'}), \
-                patch('fontHandling.findFileInDirs', side_effect=ValueError), \
-                patch('fontHandling.pdfmetrics.registerFont') as registerFont, \
-                patch('fontHandling.pdfmetrics.registerFontFamily'):
+                patch('fonts.manager.findFileInDirs', side_effect=ValueError), \
+                patch('fonts.manager.pdfmetrics.registerFont') as registerFont, \
+                patch('fonts.manager.pdfmetrics.registerFontFamily'):
             availableFonts = findAndRegisterFonts(
                 configuration['DEFAULT'], None, str(temporaryPath), None,
                 ConversionState())

@@ -10,10 +10,11 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from testutils import configureTestImportPaths
 configureTestImportPaths(__file__)
 
-from windowsIntegration import (_executableFolderFromCommand, findInstalledCeweFolder,
-                                isCeweInstallationFolder)
+from infrastructure.windowsIntegration import (_executableFolderFromCommand,
+                                                findInstalledCeweFolder,
+                                                isCeweInstallationFolder)
 from albumConversionSession import AlbumConversionSession
-from extraLoggers import configlogger, mustsee
+from infrastructure.extraLoggers import configlogger, mustsee
 
 
 def _makeCeweFolder(folder: Path) -> Path:

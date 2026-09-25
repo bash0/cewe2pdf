@@ -14,15 +14,15 @@ import sys
 import reportlab.lib.pagesizes
 from reportlab.pdfgen import canvas
 
-from albumIndex import AlbumIndex
-from ceweInfo import AlbumInfo, CeweInfo, ProductStyle
+from indexing.albumindex import AlbumIndex
+from ceweInfo import ProductInfo, CeweInfo, ProductStyle
 from conversionSetup import prepareConversion
 from conversionState import ConversionState
-from extraLoggers import ConversionMessageCounters, configlogger, mustsee
+from infrastructure.extraLoggers import ConversionMessageCounters, configlogger, mustsee
 from pageNumbering import PageNumberingInfo
 from pages import processPages
 from renderContext import RenderContext
-from versionInfo import logVersionInformation
+from infrastructure.versionInfo import logVersionInformation
 
 
 class AlbumConversionSession:
@@ -157,7 +157,9 @@ class AlbumConversionSession:
             processElements, state=self.state, albumIndex=albumIndex,
             calendarSchemas=self.setup.calendar_schemas,
             calendarLayouts=self.setup.calendar_layouts,
-            calendarEntries=self.setup.calendar_entries)
+            calendarEntries=self.setup.calendar_entries,
+            calendarNames=self.setup.calendar_names,
+            calendarEventImageFolders=self.setup.calendar_event_image_folders)
 
         processPages(
             self.setup.fotobook, self.setup.mcf_base_folder, imageFolder,
@@ -189,10 +191,10 @@ class AlbumConversionSession:
         pageSize = reportlab.lib.pagesizes.A4
         productStyle = ProductStyle.AlbumSingleSide
         productName = self.setup.fotobook.get('productname')
-        if productName in AlbumInfo.formats:
-            pageSize = AlbumInfo.formats[productName]
-        if productName in AlbumInfo.styles:
-            productStyle = AlbumInfo.styles[productName]
+        if productName in ProductInfo.formats:
+            pageSize = ProductInfo.formats[productName]
+        if productName in ProductInfo.styles:
+            productStyle = ProductInfo.styles[productName]
         if self.keep_double_pages:
             if productStyle == ProductStyle.AlbumSingleSide:
                 productStyle = ProductStyle.AlbumDoubleSide
@@ -202,7 +204,7 @@ class AlbumConversionSession:
 
     @staticmethod
     def _getPageCount(articleConfigElement, productStyle):
-        if AlbumInfo.isAlbumProduct(productStyle):
+        if ProductInfo.isAlbumProduct(productStyle):
             # Albums record only usable inside pages in normalpages. The two
             # outer covers make the corresponding single-sided PDF page count.
             return int(articleConfigElement.get('normalpages')) + 2
