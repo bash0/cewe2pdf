@@ -46,7 +46,7 @@ def test_resolveAlbumPages():
     assert [page.page_type for page in pages[:3]] == [
         PageProcessingType.Cover,
         PageProcessingType.FrontInsideCoverBackground,
-        PageProcessingType.FrontInsideCover,
+        PageProcessingType.OpeningContentPage,
     ]
     assert pages[-3].page_type == PageProcessingType.RegularPage
     assert pages[-3].page_number == 26

@@ -44,8 +44,8 @@ def _fullCoverPage(fotobook):
     return None
 
 
-def _frontInsideCoverPage(fotobook):
-    """Return the pagenr=0 element CEWE uses for the front inside cover."""
+def _openingContentPage(fotobook):
+    """Return CEWE's pagenr=0 record holding page 1's content."""
     pages = [candidate for candidate in
         fotobook.findall("./page[@pagenr='0'][@type='EMPTY']")
         + fotobook.findall("./page[@pagenr='0'][@type='emptypage']")
@@ -138,12 +138,12 @@ def resolvePages(fotobook, productStyle, pageCount, pageNumbers=None) -> Iterato
                                    PageProcessingType.FrontInsideCoverBackground,
                                    True, False, number)
 
-            page = _frontInsideCoverPage(fotobook)
+            page = _openingContentPage(fotobook)
             if page is None:
-                logging.error(f'Failed to locate initial emptypage when processing page {number}')
+                logging.error(f'Failed to locate opening content record when processing page {number}')
                 continue
             if pageNumbers is None or 1 in pageNumbers:
-                yield ResolvedPage(page, 1, PageProcessingType.FrontInsideCover,
+                yield ResolvedPage(page, 1, PageProcessingType.OpeningContentPage,
                                    True, lastPage, number)
             continue
 

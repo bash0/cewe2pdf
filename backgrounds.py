@@ -25,9 +25,9 @@ def processBackground(backgroundTags, state: ConversionState, backgroundLocation
     areaWidth = pw
     areaXOffset = 0
 
-    if pagetype == PageProcessingType.FrontInsideCover:
-        # This pass processes the inside-cover / first-page pair after its
-        # background was handled by FrontInsideCoverBackground.
+    if pagetype == PageProcessingType.OpeningContentPage:
+        # This pass processes page 1 after FrontInsideCoverBackground has
+        # drawn its alternative endpaper background.
         if ProductInfo.isAlbumSingleSide(productstyle):
             return
         if ProductInfo.isAlbumDoubleSide(productstyle):
@@ -40,7 +40,7 @@ def processBackground(backgroundTags, state: ConversionState, backgroundLocation
             areaWidth = areaWidth / 2
             areaXOffset = areaXOffset + areaWidth
 
-    if pagetype in [PageProcessingType.FrontInsideCover, PageProcessingType.BackInsideCover] and \
+    if pagetype in [PageProcessingType.OpeningContentPage, PageProcessingType.BackInsideCover] and \
             not getConfigurationBool(context.default_config_section, 'insideCoverWhite', 'False'):
         # Returning accepts the background already underneath.  An explicit
         # configuration setting instead draws CEWE's default white background.
