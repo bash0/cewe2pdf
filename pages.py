@@ -41,7 +41,7 @@ def parseInputPage(fotobook, mcfBaseFolder, backgroundLocations, imageDirectory,
     backgroundTags = page.findall('background')
     processBackground(backgroundTags, state,
                       backgroundLocations, productStyle, pageType, pdf,
-                      pageHeight, pageWidth, context)
+                      pageHeight, pageWidth, pageNumber, lastPage, context)
 
     if ProductInfo.isAlbumSingleSide(productStyle) and \
             pageType == PageProcessingType.FrontInsideCoverBackground:

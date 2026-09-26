@@ -19,6 +19,10 @@ mustsee = logging.getLogger("cewe2pdf.mustsee")
 # a logger for configuration, to distinguish that from logging in the album processing
 configlogger = logging.getLogger("cewe2pdf.config")
 
+# A focused trace of the page backgrounds and content actually sent to the
+# canvas.  It is normally enabled only in developer logger configurations.
+page_rendering = logging.getLogger("cewe2pdf.page_rendering")
+
 class ConversionMessageCounters:
     """Count log records for one conversion and detach cleanly afterwards.
 

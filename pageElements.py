@@ -19,6 +19,7 @@ from ceweInfo import ProductInfo
 from cewePageResolver import getPageElementForPageNumber
 from clipart.areas import processAreaClipartTag
 from conversionState import ConversionState
+from infrastructure.extraLoggers import page_rendering
 from imageareas import processAreaImageTag
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
@@ -52,6 +53,13 @@ def processElements(additional_fonts, fotobook, imagedir,
     if (ProductInfo.isAlbumProduct(productstyle)
             and pagetype == PageProcessingType.RegularPage and oddpage):
         page = getPageElementForPageNumber(fotobook, 2 * floor(pageNumber / 2))
+
+    if pagetype == PageProcessingType.OpeningContentPage:
+        page_rendering.debug('Page %d: drawing opening content from CEWE pagenr %s.',
+                      pageNumber, page.get('pagenr'))
+    elif pagetype == PageProcessingType.RegularPage and lastpage:
+        page_rendering.debug('Page %d: drawing closing content from CEWE pagenr %s.',
+                      pageNumber, page.get('pagenr'))
 
     for area in page.findall('area'):
         areaPos = area.find('position')

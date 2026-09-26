@@ -18,7 +18,8 @@ from indexing.albumindex import AlbumIndex
 from ceweInfo import ProductInfo, CeweInfo, PdfProductStyle
 from conversionSetup import prepareConversion
 from conversionState import ConversionState
-from infrastructure.extraLoggers import ConversionMessageCounters, configlogger, mustsee
+from infrastructure.extraLoggers import (
+    ConversionMessageCounters, configlogger, mustsee, page_rendering)
 from pageNumbering import PageNumberingInfo
 from pages import processPages
 from renderContext import RenderContext
@@ -109,7 +110,7 @@ class AlbumConversionSession:
         # them, and adding the same handler again would duplicate every line.
         rootLogger = logging.getLogger()
         self.automatic_loggers = [rootLogger]
-        for logger in (configlogger, mustsee):
+        for logger in (configlogger, mustsee, page_rendering):
             if not logger.propagate:
                 self.automatic_loggers.append(logger)
         for logger in self.automatic_loggers:

@@ -1,132 +1,199 @@
 # Developer guide
 
-This is an introduction for a programmer joining the project. It explains the current structure of the converter and its tests; it is not a second user manual. The source deliberately retains some long-established CEWE-specific code, so favour a small, well-tested change over a general rewrite.
+This guide is for contributors working on the converter. It describes the current source layout, rendering model, and test workflow. User installation, command-line options, CEWE-resource configuration, and the standalone executable are documented in [README.md](README.md).
 
-## Start here
+The converter is a careful interpretation of an undocumented CEWE format. A small, well-tested change based on an MCF fixture is usually preferable to a large theoretical rewrite.
 
-The command-line entry point is [`cewe2pdf.py`](cewe2pdf.py). Its public `convertMcf(...)` function is also the usual API for another Python program. One call creates an `AlbumConversionSession`, which owns the work and cleanup for one `.mcf` or `.mcfx` conversion.
+## First steps
 
-Read these files in this order:
-
-1. [`cewe2pdf.py`](cewe2pdf.py) - command line, constants and public API.
-2. [`albumConversionSession.py`](albumConversionSession.py) - the conversion lifetime and high-level orchestration.
-3. [`conversionSetup.py`](conversionSetup.py) - input, configuration and resource discovery.
-4. [`cewePageResolver.py`](cewePageResolver.py), [`pages.py`](pages.py) and [`pageElements.py`](pageElements.py) - which CEWE pages become PDF pages, then how each page's areas are rendered.
-
-## Conversion at a glance
-
-```mermaid
-flowchart TD
-    Input["MCF or MCFX album"] --> Setup["prepareConversion\nconversionSetup.py"]
-    Setup --> Resources["Configuration, fonts, backgrounds, clip art,\npassepartouts and album XML"]
-    Resources --> Session["AlbumConversionSession"]
-    Session --> Resolver["Resolve CEWE pages\ncewePageResolver.py"]
-    Resolver --> Pages["Render selected PDF pages\npages.py"]
-    Pages --> Elements["Paint background and areas in Z order\npageElements.py"]
-    Elements --> Handlers["Image, text and clip-art handlers"]
-    Handlers --> PDF["ReportLab canvas / PDF"]
-    Session --> Index["Optional album index"]
-    Index --> PDF
-    Session --> Cleanup["Diagnostics and temporary-file cleanup"]
-```
-
-`AlbumConversionSession` is the ownership boundary. It logs the version, prepares the album, creates the ReportLab canvas, renders the pages, saves the PDF, creates an optional index, reports diagnostic counts and deletes its temporary files. Its context-manager cleanup also happens after an exception.
-
-### Data and state ownership
-
-The project intentionally does not use conversion-time global variables. Different kinds of information are separated by how they change:
-
-```mermaid
-classDiagram
-    class AlbumConversionSession {
-      +setup: ConversionSetup
-      +state: ConversionState
-      +render(processElements)
-    }
-    class ConversionSetup {
-      +fotobook
-      +configuration
-      +available_fonts
-      +resource_locations
-    }
-    class ConversionState {
-      +temporary_files
-      +passepartout_cache
-      +font_substitutions
-      +message_counters
-    }
-    class RenderContext {
-      +mcf_to_reportlab
-      +image_settings
-      +clipart_paths
-      +passepartout_folders
-    }
-    AlbumConversionSession *-- ConversionSetup
-    AlbumConversionSession *-- ConversionState
-    AlbumConversionSession ..> RenderContext : creates per render
-```
-
-- `ConversionSetup` contains resolved input and resources which are normally fixed after startup.
-- `ConversionState` contains values that deliberately accumulate or change, such as temporary file names, caches and message counters.
-- `RenderContext` contains common drawing inputs passed to area handlers. It avoids every handler having its own approximation of units or image settings.
-- `AlbumIndex` is deliberately separate: it is optional, mutable index data rather than general conversion state.
-
-When adding a value, first decide which of those ownership rules it follows. Do not restore a module-level mutable global just to avoid passing a dependency.
-
-## Pages and areas
-
-MCF files describe CEWE product pages, which are not always one-for-one with PDF pages. `cewePageResolver.py` interprets covers, inside pages, double-page bundles, requested page numbers and the Photo Pairs memory-card product. `pages.py` renders the resolved page sequence. This separation makes the selection logic testable without producing a PDF.
-
-For each rendered page, `pageElements.py`:
-
-1. paints the page background;
-2. gathers page areas and orders them by CEWE `zposition`;
-3. delegates each area to an image, text or clip-art handler;
-4. adds page numbering where requested.
-
-Specialist modules are intentionally narrow. For example, [`imageareas.py`](imageareas.py) deals with image crop/placement and uses [`corners.py`](corners.py), [`borders.py`](borders.py) and [`shadows.py`](shadows.py) where needed. [`textareas.py`](textareas.py) coordinates HTML-like CEWE text and delegates details to modules such as `texttabs.py`, `textlists.py`, `textoutlines.py`, `textspacing.py` and `textart.py`.
-
-MCF geometry is in tenths of a millimetre. ReportLab uses points. The `mcf_to_reportlab` value in `RenderContext` is the single conversion factor passed to renderers. Area renderers translate to an area's centre before applying rotation, then draw relative to `(0, 0)`.
-
-## Input, configuration and resources
-
-`conversionSetup.prepareConversion(...)` accepts either an `.mcf` XML file or an `.mcfx` SQLite container, unpacked temporarily by [`mcfx.py`](mcfx.py). It combines configuration, album-local files and CEWE installation resources. The album's `cewe2pdf.ini` overrides the normal configuration.
-
-Missing CEWE resources are warned about rather than treated as a separate code path, so a simple text-only album can still be converted without a CEWE installation. Font handling is deliberately conservative: CEWE fonts are the normal source. Users can supply `additional_fonts.txt` beside an album, and may opt in to system-font scanning with `loadSystemFonts=True`. Tests normally set `IGNORELOCALFONTS=1` so their output does not depend on a developer's installed fonts.
-
-## Testing and approved output
-
-Run the normal suite with:
+Python 3.12 is the supported development and CI version. Create an isolated environment and install the pinned dependencies:
 
 ```bash
+python -m pip install -r requirements-pinned.txt
 python runAllTests.py
 ```
 
-It runs `pytest`, sets `IGNORELOCALFONTS=1`, and stops at the first failure by default. The commented alternative in `runAllTests.py` continues after failures, which is useful during interactive work.
+`requirements.txt` lists direct dependencies; `requirements-pinned.txt` is the reproducible development/CI environment generated with `pip-compile`; and `requirements-winexe.txt` is the additional Windows-only PyInstaller overlay. See the README's development section before changing a dependency.
 
-Most feature tests follow this layout:
+The public Python entry point is `convertMcf(...)` in [cewe2pdf.py](cewe2pdf.py). The command-line entry point is in the same file:
+
+```bash
+python cewe2pdf.py --version
+python cewe2pdf.py album.mcf
+```
+
+For a first reading of the code, use this order:
+
+1. [cewe2pdf.py](cewe2pdf.py) — command line and public conversion API.
+2. [albumConversionSession.py](albumConversionSession.py) — ownership and lifetime of one conversion.
+3. [conversionSetup.py](conversionSetup.py) — input, configuration, and resource discovery.
+4. [ceweInfo.py](ceweInfo.py) and [cewePageResolver.py](cewePageResolver.py) — product/PDF style and CEWE page interpretation.
+5. [pages.py](pages.py), [backgrounds.py](backgrounds.py), and [pageElements.py](pageElements.py) — the PDF page-rendering path.
+
+## Conversion model
+
+```mermaid
+flowchart TD
+    Input[MCF or MCFX] --> Setup[prepareConversion]
+    Setup --> Resources[INI, CEWE resources, fonts and calendar data]
+    Resources --> Session[AlbumConversionSession]
+    Session --> Product[ProductInfo.pdfStyleFromMcf]
+    Product --> Resolver[resolvePages]
+    Resolver --> Page[pages.py]
+    Page --> Background[backgrounds.py]
+    Page --> Areas[pageElements.py]
+    Areas --> Specialists[images, texts, clip art, calendars and decorations]
+    Specialists --> PDF[ReportLab PDF canvas]
+    Session --> Index[optional album index]
+    Index --> PDF
+```
+
+`AlbumConversionSession` is the lifetime boundary. It prepares the album, creates and saves the ReportLab canvas, owns temporary files and diagnostic counters, and cleans those resources up even when rendering fails. Do not add conversion-time mutable globals: one Python process may convert several albums.
+
+### Data ownership
+
+| Object | Owns |
+| --- | --- |
+| `ConversionSetup` | Parsed MCF, merged configuration, resolved resource locations, registered fonts, line scales, and calendar data. These are normally fixed after setup. |
+| `RenderContext` | Drawing settings and shared resources passed to renderers: unit scale, resolutions, image settings, clip art/passepartout locations, and line scales. |
+| `ConversionState` | Mutable per-run caches, missing-resource reports, font substitutions, temporary files, and diagnostic counters. |
+| `AlbumIndex` | Optional mutable index data, deliberately separate from general state. |
+
+MCF geometry is in tenths of a millimetre; ReportLab geometry is in points. `RenderContext.mcf_to_reportlab` is the conversion factor. Area renderers translate to the area centre, rotate, then draw around `(0, 0)`.
+
+## Product and page interpretation
+
+`PdfProductStyle` describes the shape of the output PDF, not CEWE's product marketing name:
+
+- `AlbumSingleSide` is the normal album output. CEWE stores a spread, while the PDF contains individual pages.
+- `AlbumDoubleSide` is selected by `--keepdoublepages` for an album.
+- `Calendar` represents independently rendered calendar cover/month pages.
+- `MemoryCard` represents CEWE Photo Pairs (`MEM3`) cards.
+
+`ProductInfo.pdfStyleFromMcf(...)` derives the style from MCF structure before using an identifier fallback. In particular, calendar cover/area tags are more reliable than retailer-specific CAL identifiers. Product IDs and `ceweFormats` are fallback/diagnostic information: actual `bundlesize` values on MCF pages determine normal rendering dimensions. A diagnostic warns when the product identifier and structure disagree or a known fallback differs substantially from the MCF.
+
+### Album pages are asymmetric
+
+CEWE album XML does not map cleanly to visible pages. `cewePageResolver.py` is the single location for this interpretation. It yields immutable `ResolvedPage` values; `pages.py` performs drawing and decides when to call `showPage()`.
+
+- The composite `fullcover` MCF record supplies visible cover/spine artwork. The separate `spine` record is structural metadata and is not independently drawn.
+- The opening `emptypage` record can hold the first real content page, while normal page 1 supplies its background. The resolver labels those operations `FrontInsideCoverBackground` and `OpeningContentPage`.
+- The final normal page holds the closing content; the trailing `emptypage` is the back inside-cover/endpaper record. Both operations share the final PDF canvas where appropriate.
+- In the normal single-page PDF the inside cover/endpaper pages are omitted. In a double-page PDF, their backgrounds default to the facing content-page background. `insideCoverWhite=True` instead reproduces CEWE's white printed endpapers.
+
+When changing those rules, extend `tests/testCewePageResolver/test_cewePageResolver.py` first. Do not scatter tests for raw CEWE `pagenr` values into area renderers.
+
+## Source layout
+
+The top level retains the conversion spine and cross-cutting modules. Specialist packages keep feature code out of `pageElements.py`.
+
+| Location | Responsibility |
+| --- | --- |
+| `calendars/` | Calendar area rendering; CEWE schemas/layouts; localised month, weekday, holiday, and personal-event data; layout substitutions. |
+| `texts/` | CEWE HTML-like text, markup, lists, tabs, spacing, outlines, and text art. |
+| `decorations/` | Borders, corners, passepartouts, and shadows used by image/text/clip-art areas. |
+| `clipart/` | Clip-art catalogue lookup, area rendering, and CEWE `.clp` parsing. |
+| `fonts/` | Font discovery/registration, OTF handling, and line-scale rules. |
+| `indexing/` | The optional cewe2pdf-only album index. |
+| `infrastructure/` | Configuration helpers, paths, version/build information, logging, and Windows Explorer integration. |
+| `imageareas.py`, `imageUtils.py`, `imageExtractor.py` | Image-area rendering, shared image helpers, and image extraction. Image rendering remains top-level because it is tightly coupled to page-area traversal. |
+| `colorUtils.py`, `colorFrame.py` | Shared CEWE colour decoding and colour-frame support. |
+| `pageNumbering.py` | Optional page-number drawing. |
+
+Package `__init__.py` files deliberately contain no public façade. Import the specific module which provides the operation you need.
+
+`pageElements.py` paints areas in CEWE z-order and delegates to the specialist modules. Keep it a coordinator: put feature-specific interpretation and drawing in the appropriate package whenever possible.
+
+## Calendars
+
+Calendar support is data-driven from the MCF and CEWE resources:
+
+- Calendar detection comes from `calendarcoverfront` / `calendariumarea` structure, with CAL product IDs as compatibility fallbacks.
+- `calendar_schema.xml` supplies cell colours/styles and `calendar_layout.xml` supplies named layout geometry.
+- Language resources supply month names, weekday labels, and holiday/event definitions. Do not add a Python list of national holidays or month names as a general fallback when the relevant CEWE resource can be located.
+- Portable test fixtures under `tests/Resources/calendar*` provide minimum data for self-contained calendar tests. A real configured CEWE installation provides delivered resources instead.
+
+New calendar behaviour should begin with a small MCF fixture and an editor screenshot. Use layout/schema data or MCF attributes rather than product-ID or month-specific adjustments.
+
+## Configuration and resources
+
+`prepareConversion(...)` reads `cewe2pdf.ini` from the current directory, then from the album directory; later settings override earlier ones. The album-specific file is normally the least surprising place for user settings. `additional_fonts.txt` is searched in album directory, current directory, and program directory, using the first one found.
+
+The converter can render simple albums without CEWE installed. It warns about unavailable CEWE fonts, backgrounds, clip art, and passepartouts rather than inventing a separate no-CEWE code path. Tests use fixture resources and set `IGNORELOCALFONTS=1` so a developer's local fonts do not alter approved PDFs.
+
+Keep resource lookup data-driven. Add a configurable or fixture location before hard-coding a machine-specific AppData or installation path.
+
+## Logging and diagnostics
+
+`infrastructure/extraLoggers.py` defines named loggers:
+
+- `cewe2pdf.mustsee` — short, user-visible conversion facts such as the product diagnostic and rendered side.
+- `cewe2pdf.config` — configuration and font-resource diagnostics.
+- `cewe2pdf.page_rendering` — focused debug trace of opening/closing content and inside-cover/endpaper backgrounds actually sent to the PDF canvas.
+
+`loggerconfig.yaml` is read at import time from the **process working directory**, not beside the MCF or test file. It enables the focused `page_rendering` trace without enabling all root debug output. A Visual Studio test launch may use the project directory as its working directory; do not assume it uses the selected test's directory.
+
+Explorer automatic mode writes `<album>.mcf.log` or `<album>.mcfx.log` beside the album. It attaches the automatic file handler to all named loggers that do not propagate, including `page_rendering`, so the same trace is retained after Explorer closes the console.
+
+Use `mustsee` for important conversion facts, ordinary `logging` for general diagnostics, and a specialised named logger only for a coherent optional trace. Avoid adding high-volume detail to `mustsee`.
+
+## Tests and approved output
+
+Run all tests:
+
+```bash
+python runAllTests.py
+# Or, without the helper's stop-at-first-failure behaviour:
+python -m pytest -rs
+```
+
+Useful focused runs:
+
+```bash
+python -m pytest tests/testCewePageResolver/test_cewePageResolver.py -q
+python -m pytest tests/testCalendar -q
+python -m pytest -rs --ignore=tests/testCalendar
+```
+
+Most rendering tests have this form:
 
 ```text
 tests/testFeature/
-  testFeature.mcf                 input album and its resources
-  cewe2pdf.ini                    test-specific configuration, if needed
-  test_feature.py                 test driver
-  previous_result_pdfs/           visually approved PDF/PNG output
+  example.mcf
+  example_mcf-Dateien/             album pictures, where needed
+  cewe2pdf.ini                     fixture resource configuration, where needed
+  test_feature.py
+  previous_result_pdfs/            approved PDF/PNG results
 ```
 
-The test driver writes a date-stamped result and uses the PDF comparison helper to compare its pixels with the most recent approved result. This is why a small intentional rendering change requires a visual inspection before its golden file is replaced. The broader `unittest_fotobook` fixture is useful for regression coverage but uses fonts unavailable on GitHub's Linux runner; its value is stable output under the configured substitutions, not exact Windows-font fidelity.
+Tests create date-stamped PDFs and compare them pixel-for-pixel with the newest approved result. This makes visual inspection mandatory before updating a golden result: a passing comparison proves only that output matches the approved rendering, not that it matches CEWE. Keep editor screenshots or notes for fixtures which demonstrate reverse-engineered behaviour.
 
-Prefer a focused fixture when implementing a CEWE feature: make the smallest album that exposes one variable at a time, keep an editor screenshot while developing it, then approve the resulting PDF only after visual comparison.
+`tests/testPageNumbers` demonstrates controlled programmatic edits to an MCF for several related cases. Prefer a compact dedicated fixture when isolating a new CEWE feature.
 
-## Practical rules for changes
+### Linting
 
-- Put feature-specific drawing code in a specialist module rather than growing `cewe2pdf.py` again.
-- Preserve the established public `convertMcf(...)` API unless a deliberate compatibility change is being made.
-- Use `ConversionSetup`, `ConversionState` and `RenderContext` according to their ownership rules instead of passing unrelated state everywhere.
-- Use f-strings for new diagnostic messages. Messages are part of the user experience, so include useful dimensions and recovery advice where possible.
-- Maintain CRLF line endings in touched Python and text files.
-- Run the focused test first, then `python runAllTests.py`. Do not replace a golden result merely to make a test green.
+The GitHub workflow treats Python syntax/undefined-name flake8 findings as errors and reports broader style/complexity findings as warnings. Run:
 
-## Boundaries of support
+```bash
+python -m flake8 .
+python -m pylint --rcfile=.pylintrc *.py calendars clipart decorations fonts indexing infrastructure texts
+```
 
-The main target is CEWE photo books. The Photo Pairs memory-card product is also explicitly handled. Other editor products, CEWE-only features and third-party HTML features may be partially rendered, ignored with a warning, or unsupported. Keep that distinction visible in code and documentation: approximate rendering is sometimes useful, but it should not be presented as pixel-identical CEWE compatibility.
+Use a local pylint suppression only when the parameter-rich rendering boundary is genuinely clearer than an artificial wrapper; explain the reason in a nearby comment.
+
+### Cleaning generated test output
+
+Do not delete approved PDFs under `previous_result_pdfs`, or album images under a `Dateien` directory. The canonical PowerShell discovery pattern and Recycle Bin cleanup command are maintained in the [README cleanup section](README.md#cleaning-up-temporary-files). Review listed files before sending them to the Recycle Bin, especially when extending the pattern for a new fixture naming convention.
+
+## Change discipline
+
+- Preserve the public `convertMcf(...)` API unless making an explicit compatibility decision.
+- Derive rendering from MCF tags and installed/fixture resources before adding product-ID, language, or layout-specific code.
+- Keep page selection in `cewePageResolver.py`, page-level canvas policy in `pages.py`/`backgrounds.py`, and area-specific drawing in a specialist module.
+- Add focused tests before updating a golden PDF. Run the focused test, then the full suite.
+- Keep CRLF line endings in touched Python and text files.
+- Treat messages as part of the user interface: state the useful fact, include dimensions or recovery advice where applicable, and avoid speculative claims of pixel-identical CEWE compatibility.
+
+## Support boundary
+
+The primary target is CEWE albums. Calendar pages and the Photo Pairs memory-card product have explicit support. CEWE-only or third-party features can be approximated, omitted with a warning, or unsupported. Keep that distinction visible in both code and documentation.
