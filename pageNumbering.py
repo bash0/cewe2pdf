@@ -4,7 +4,7 @@ import reportlab.lib.colors
 import reportlab.lib.enums
 import reportlab.lib.styles
 from reportlab.lib.styles import ParagraphStyle
-from ceweInfo import ProductStyle
+from ceweInfo import PdfProductStyle
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
@@ -189,7 +189,7 @@ def horizontalPageNumberAdjustment(pnp, pageNumberingInfo, sideWidth, frameWidth
     # that the repositioned number might clash with some element on the page, but that's
     # up to the user to check (and is why the default value is the original placement)
 
-    if productStyle == ProductStyle.AlbumSingleSide:
+    if productStyle == PdfProductStyle.AlbumSingleSide:
         if pnp == PageNumberPosition.RIGHT:
             return sideWidth - pageNumberingInfo.horizontalMargin - frameWidth
         if pnp == PageNumberPosition.LEFT:
@@ -205,7 +205,7 @@ def horizontalPageNumberAdjustment(pnp, pageNumberingInfo, sideWidth, frameWidth
 def getPageNumberXy(pnp, pageNumberingInfo, pdf, frameWidth, frameHeight, productStyle, oddpage):
     pagesize = (pdf._pagesize[0],pdf._pagesize[1]) # pagesize in rl units
     sideHeight = pagesize[1]
-    if productStyle == ProductStyle.AlbumDoubleSide:
+    if productStyle == PdfProductStyle.AlbumDoubleSide:
         sideWidth = pagesize[0] / 2
         cx = sideWidth if oddpage else 0 # moving to right hand side for odd pages in double sided
     else:

@@ -10,7 +10,7 @@ class PageProcessingType(Enum):
     RegularPage = 1
     FrontInsideCoverBackground = 2
     Cover = 3
-    FrontInsideCover = 4
+    OpeningContentPage = 4
     BackInsideCover = 5
     CalendarPage = 6
 

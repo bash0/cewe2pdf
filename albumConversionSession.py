@@ -15,10 +15,11 @@ import reportlab.lib.pagesizes
 from reportlab.pdfgen import canvas
 
 from indexing.albumindex import AlbumIndex
-from ceweInfo import ProductInfo, CeweInfo, ProductStyle
+from ceweInfo import ProductInfo, CeweInfo, PdfProductStyle
 from conversionSetup import prepareConversion
 from conversionState import ConversionState
-from infrastructure.extraLoggers import ConversionMessageCounters, configlogger, mustsee
+from infrastructure.extraLoggers import (
+    ConversionMessageCounters, configlogger, mustsee, page_rendering)
 from pageNumbering import PageNumberingInfo
 from pages import processPages
 from renderContext import RenderContext
@@ -109,7 +110,7 @@ class AlbumConversionSession:
         # them, and adding the same handler again would duplicate every line.
         rootLogger = logging.getLogger()
         self.automatic_loggers = [rootLogger]
-        for logger in (configlogger, mustsee):
+        for logger in (configlogger, mustsee, page_rendering):
             if not logger.propagate:
                 self.automatic_loggers.append(logger)
         for logger in self.automatic_loggers:
@@ -173,7 +174,7 @@ class AlbumConversionSession:
             logging.error(f'Could not save the output file: {str(exception)}')
 
         self._createIndexOutput(albumIndex, pageSize)
-        if productStyle == ProductStyle.MemoryCard:
+        if productStyle == PdfProductStyle.MemoryCard:
             print()
             print('Use Adobe Acrobat to print the memory cards. Set custom pages per sheet, 4 wide x 6 down')
             print(' and print two copies!')
@@ -189,17 +190,16 @@ class AlbumConversionSession:
 
     def _getProductDetails(self):
         pageSize = reportlab.lib.pagesizes.A4
-        productStyle = ProductStyle.AlbumSingleSide
         productName = self.setup.fotobook.get('productname')
-        if productName in ProductInfo.formats:
-            pageSize = ProductInfo.formats[productName]
-        if productName in ProductInfo.styles:
-            productStyle = ProductInfo.styles[productName]
+        if productName in ProductInfo.ceweFormats:
+            pageSize = ProductInfo.ceweFormats[productName]
+        productStyle = ProductInfo.pdfStyleFromMcf(self.setup.fotobook)
         if self.keep_double_pages:
-            if productStyle == ProductStyle.AlbumSingleSide:
-                productStyle = ProductStyle.AlbumDoubleSide
-            elif productStyle == ProductStyle.MemoryCard:
+            if productStyle == PdfProductStyle.AlbumSingleSide:
+                productStyle = PdfProductStyle.AlbumDoubleSide
+            elif productStyle == PdfProductStyle.MemoryCard:
                 logging.warning('keepdoublepages option is irrelevant and ignored for a memory card product')
+        ProductInfo.reportMcfProduct(self.setup.fotobook, productStyle)
         return pageSize, productStyle
 
     @staticmethod

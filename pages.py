@@ -41,7 +41,7 @@ def parseInputPage(fotobook, mcfBaseFolder, backgroundLocations, imageDirectory,
     backgroundTags = page.findall('background')
     processBackground(backgroundTags, state,
                       backgroundLocations, productStyle, pageType, pdf,
-                      pageHeight, pageWidth, context)
+                      pageHeight, pageWidth, pageNumber, lastPage, context)
 
     if ProductInfo.isAlbumSingleSide(productStyle) and \
             pageType == PageProcessingType.FrontInsideCoverBackground:
@@ -85,8 +85,8 @@ def _renderResolvedPage(resolvedPage: ResolvedPage, fotobook, mcfBaseFolder,
                    resolvedPage.last_page, context, processElements)
 
     if resolvedPage.page_type == PageProcessingType.FrontInsideCoverBackground:
-        # This is a preparatory background draw for the first inside cover.
-        # It shares the canvas with the following FrontInsideCover request and
+        # This prepares the alternative endpaper background for page 1.
+        # It shares the canvas with the following OpeningContentPage request and
         # must not add a page number or call showPage().
         return
 
@@ -98,7 +98,7 @@ def _renderResolvedPage(resolvedPage: ResolvedPage, fotobook, mcfBaseFolder,
         return
 
     if ProductInfo.isAlbumProduct(productStyle) and resolvedPage.page_type in [
-            PageProcessingType.FrontInsideCover, PageProcessingType.RegularPage]:
+            PageProcessingType.OpeningContentPage, PageProcessingType.RegularPage]:
         addPageNumber(pageNumberingInfo, pdf, resolvedPage.page_number,
                       productStyle, resolvedPage.odd_page, context)
 

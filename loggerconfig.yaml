@@ -33,6 +33,10 @@ loggers:
     level: INFO
     handlers: [consoleMustSee]
     propagate: no
+  cewe2pdf.page_rendering:
+    level: DEBUG
+    handlers: [consoleEverything]
+    propagate: no
   cewe2pdf.test:
     level: INFO
     handlers: [consoleWarningOrWorse]
