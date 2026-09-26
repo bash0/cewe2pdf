@@ -6,12 +6,13 @@ import sys
 from enum import Enum
 
 import reportlab.lib.pagesizes
+from reportlab.lib.units import mm
 
 from lxml import etree
 from infrastructure.extraLoggers import mustsee
 
 
-class ProductStyle(Enum):
+class PdfProductStyle(Enum):
     AlbumSingleSide = 1  # normal for albums, we divide the cewe 2 page bundle to single pages
     AlbumDoubleSide = 2  # any album when --keepdoublepages is set
     MemoryCard = 3 # CEWE Photo Pairs memory-card game (product code MEM3)
@@ -22,14 +23,21 @@ class ProductInfo():
     def __init__(self):
         return
 
-    # page sizes for various products. Probably not important since the bundlesize element
-    # is used to set the page sizes along the way
-    formats = {
-        "ALB82": reportlab.lib.pagesizes.A4,
-        "ALB98": reportlab.lib.pagesizes.A4, # unittest, L 20.5cm x 27.0cm
-        "ALB32": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm), # album XL, 30 x 30 cm
-        "ALB17": (205 * reportlab.lib.pagesizes.mm, 205 * reportlab.lib.pagesizes.mm), # album kvadratisk, 20.5 x 20.5 cm
-        "ALB69": (5400/100/2*reportlab.lib.units.cm, 3560/100*reportlab.lib.units.cm),
+    # Fallback page sizes for product records without a ``bundlesize`` element.
+    # A normal MCF supplies its actual page dimensions on every page, so these
+    # product identifiers are not the source of truth for rendering.
+    ceweFormats = {
+        # These are internal-page dimensions.  Cover bundles are slightly
+        # larger to allow for binding bleed.
+        "ALB14": (205 * reportlab.lib.pagesizes.mm, 270 * reportlab.lib.pagesizes.mm),
+        "ALB15": (205 * reportlab.lib.pagesizes.mm, 270 * reportlab.lib.pagesizes.mm),
+        "ALB17": (205 * reportlab.lib.pagesizes.mm, 205 * reportlab.lib.pagesizes.mm),
+        "ALB32": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm),
+        "ALB42": (382 * reportlab.lib.pagesizes.mm, 290 * reportlab.lib.pagesizes.mm),
+        "ALB69": (270 * reportlab.lib.pagesizes.mm, 356 * reportlab.lib.pagesizes.mm),
+        "ALB82": (205 * reportlab.lib.pagesizes.mm, 270 * reportlab.lib.pagesizes.mm),
+        "ALB98": (205 * reportlab.lib.pagesizes.mm, 270 * reportlab.lib.pagesizes.mm),
+        "ALB131": (148 * reportlab.lib.pagesizes.mm, 148 * reportlab.lib.pagesizes.mm),
         # add other page sizes here
         # MEM3 is CEWE Photo Pairs: one 6 x 6 cm card per MCF normal-page.
         # Its bundlesize normally supplies the same dimensions at render time;
@@ -41,31 +49,158 @@ class ProductInfo():
         "CAL55": reportlab.lib.pagesizes.landscape(reportlab.lib.pagesizes.A5)
         }
 
-    # product style. The CEWE album products (which is what we are normally expecting in this
-    # code) are basically defined in two page bundles. We normally will want single side pdfs
-    # so we let the style default to ProductStyle.AlbumSingleSide unless the product is found
-    # in this table. If we want to keep the double side layout in the pdf, then the keepDoublePages
-    # option will cause AlbumSingleSide to be changed to AlbumDoubleSide.
-    # Other "non-album" styles which we handle appear in this table
-    styles = {
-        "MEM3": ProductStyle.MemoryCard, # CEWE Photo Pairs: 6 x 6 cm memory cards
-        "CAL9": ProductStyle.Calendar, # A4 portrait wall calendar
-        "CAL35": ProductStyle.Calendar, # A4 landscape wall calendar
-        "CAL99": ProductStyle.Calendar, # 21 x 21 cm square wall calendar
-        "CAL55": ProductStyle.Calendar # A5 landscape wall calendar
+    # Product-ID fallbacks for MCFs whose page structure is incomplete or from
+    # an older editor.  ``pdfStyleFromMcf`` normally derives Calendar directly
+    # from calendar pages/areas, and also uses the CAL prefix as its calendar
+    # fallback. Albums remain the default two-page product. MEM3 is retained
+    # here because its independent-card structure has not yet been
+    # generalised to all independent-page products.
+    pdfStyles = {
+        "MEM3": PdfProductStyle.MemoryCard # CEWE Photo Pairs: 6 x 6 cm memory cards
         }
 
     @staticmethod
-    def isAlbumProduct(ps: ProductStyle):
-        return ps in (ProductStyle.AlbumSingleSide, ProductStyle.AlbumDoubleSide)
+    def pdfStyleFromMcf(fotobook):
+        """Choose the PDF rendering style from MCF structure and ID fallbacks.
+
+        The PDF style includes CEWE-spread handling, so an ordinary CEWE album
+        becomes a single-sided PDF by default.  Calendar pages have a distinct
+        structure: the cover is marked as a
+        calendar cover and the monthly pages contain calendar areas.  That is
+        more reliable than maintaining a list of retailer-specific calendar
+        product identifiers.  The existing identifier table remains a
+        compatibility fallback for incomplete or older MCFs.
+        """
+        productName = fotobook.get('productname', '')
+        hasCalendarCover = any(
+            (page.get('type') or '').casefold() == 'calendarcoverfront'
+            for page in fotobook.findall('./page'))
+        hasCalendarArea = any(
+            (area.get('areatype') or '').casefold() == 'calendariumarea'
+            for area in fotobook.findall('.//area'))
+        if hasCalendarCover or hasCalendarArea:
+            if not productName.upper().startswith('CAL'):
+                mustsee.warning(
+                    'Calendar structure detected for product %r, which does not '
+                    'use a CAL product identifier; using calendar page rules.',
+                    productName or '(missing)')
+            return PdfProductStyle.Calendar
+        if productName.upper().startswith('CAL'):
+            mustsee.warning(
+                'Product %r uses a CAL product identifier but has no calendar '
+                'cover or calendar area; using the product-ID fallback.',
+                productName)
+            return PdfProductStyle.Calendar
+
+        if productName.upper().startswith('ALB'):
+            pageTypes = {
+                (page.get('type') or '').casefold()
+                for page in fotobook.findall('./page')}
+            # CEWE's spine page is structural metadata.  The visible spine
+            # artwork is stored in the composite fullcover page instead.
+            expectedAlbumTypes = {'fullcover', 'spine', 'emptypage'}
+            missingTypes = expectedAlbumTypes - pageTypes
+            if missingTypes:
+                mustsee.warning(
+                    'Album product %r lacks expected %s page records; using '
+                    'the generic album page rules.', productName,
+                    ', '.join(sorted(missingTypes)))
+        if productName in ProductInfo.pdfStyles:
+            return ProductInfo.pdfStyles[productName]
+        return PdfProductStyle.AlbumSingleSide
 
     @staticmethod
-    def isAlbumSingleSide(ps: ProductStyle):
-        return ps == ProductStyle.AlbumSingleSide
+    def reportMcfProduct(fotobook, productStyle: PdfProductStyle):
+        """Report the MCF product and its PDF page-size diagnostics.
+
+        Product IDs are descriptive metadata, not the normal source of page
+        dimensions or product style.  A known entry can nevertheless warn
+        about a seriously unexpected bundle, which is useful evidence when
+        CEWE changes an MCF format.
+        """
+        productName = fotobook.get('productname', '')
+        knownProduct = (
+            productName in ProductInfo.ceweFormats
+            or productName in ProductInfo.pdfStyles)
+        bundlesBySize = {}
+        sizesByPageType = {}
+        for page in fotobook.findall('./page'):
+            bundleSize = page.find('./bundlesize')
+            if bundleSize is None:
+                continue
+            bundle = (float(bundleSize.get('width')),
+                      float(bundleSize.get('height')))
+            pageType = (page.get('type') or '(missing)').casefold()
+            bundlesBySize.setdefault(bundle, set()).add(pageType)
+            sizesByPageType.setdefault(pageType, set()).add(bundle)
+        if not bundlesBySize:
+            mustsee.warning(
+                'Product %s (%s) has no bundle size; using the fallback page '
+                'dimensions.', productName or '(missing)',
+                'known' if knownProduct else 'unknown')
+            return
+
+        pageWidthDivisor = 2 if ProductInfo.isAlbumSingleSide(productStyle) else 1
+        for pageType, pageBundles in sorted(sizesByPageType.items()):
+            if len(pageBundles) > 1:
+                sizes = ', '.join(
+                    f'{width / pageWidthDivisor / 10:.1f} × {height / 10:.1f} mm'
+                    for width, height in sorted(pageBundles))
+                mustsee.warning(
+                    'Product %s uses multiple bundle sizes for %s pages: %s.',
+                    productName or '(missing)', pageType, sizes)
+
+        expectedSize = ProductInfo.ceweFormats.get(productName)
+        expectedWidth = expectedHeight = None
+        if expectedSize is not None:
+            expectedWidth = expectedSize[0] / mm * 10
+            expectedHeight = expectedSize[1] / mm * 10
+            # ceweFormats holds one PDF-page width.  The normal album path
+            # already halves the CEWE spread below; only --keepdoublepages
+            # needs the expected width expanded to a spread.
+            if ProductInfo.isAlbumDoubleSide(productStyle):
+                expectedWidth *= 2
+
+        bundleDescriptions = []
+        sizeMismatch = False
+        for (bundleWidth, bundleHeight), pageTypes in sorted(bundlesBySize.items()):
+            pdfPageWidth = bundleWidth / pageWidthDivisor
+            description = (
+                f'{pdfPageWidth / 10:.1f} × {bundleHeight / 10:.1f} mm '
+                f'({", ".join(sorted(pageTypes))}')
+            if expectedSize is not None:
+                widthDifference = (
+                    (pdfPageWidth - expectedWidth) / expectedWidth * 100)
+                heightDifference = (
+                    (bundleHeight - expectedHeight) / expectedHeight * 100)
+                if widthDifference or heightDifference:
+                    description += (
+                        f'; {widthDifference:+.2f}% width, '
+                        f'{heightDifference:+.2f}% height')
+                if abs(widthDifference) > 10 or abs(heightDifference) > 10:
+                    sizeMismatch = True
+            bundleDescriptions.append(description + ')')
+        mustsee.info(
+            'Product %s (%s; %s): %s.', productName or '(missing)',
+            'known' if knownProduct else 'unknown', productStyle.name,
+            '; '.join(bundleDescriptions))
+        if sizeMismatch:
+            mustsee.warning(
+                'Product %s has a page bundle outside the 10%% tolerance for '
+                'its known %.1f × %.1f mm format.', productName,
+                expectedWidth / 10, expectedHeight / 10)
 
     @staticmethod
-    def isAlbumDoubleSide(ps: ProductStyle):
-        return ps == ProductStyle.AlbumDoubleSide
+    def isAlbumProduct(ps: PdfProductStyle):
+        return ps in (PdfProductStyle.AlbumSingleSide, PdfProductStyle.AlbumDoubleSide)
+
+    @staticmethod
+    def isAlbumSingleSide(ps: PdfProductStyle):
+        return ps == PdfProductStyle.AlbumSingleSide
+
+    @staticmethod
+    def isAlbumDoubleSide(ps: PdfProductStyle):
+        return ps == PdfProductStyle.AlbumDoubleSide
 
 
 class CeweInfo():

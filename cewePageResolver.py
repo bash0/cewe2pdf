@@ -11,7 +11,7 @@ import logging
 from math import floor
 from typing import Any, Iterator
 
-from ceweInfo import ProductInfo, ProductStyle
+from ceweInfo import ProductInfo, PdfProductStyle
 from pageTypes import PageProcessingType
 
 
@@ -82,7 +82,7 @@ def resolvePages(fotobook, productStyle, pageCount, pageNumbers=None) -> Iterato
     def isOddPage(number):
         return (number % 2) == 1
 
-    if productStyle == ProductStyle.Calendar:
+    if productStyle == PdfProductStyle.Calendar:
         # Calendar MCFs contain one independently renderable page for the
         # cover and for each month.  They have no album covers, inside covers,
         # or two-page bundles.
