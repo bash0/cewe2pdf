@@ -106,7 +106,9 @@ def isExplorerLaunch() -> bool:
         return True
 
     processId = os.getppid()
-    executableName = Path(sys.executable).name.casefold()
+    # PureWindowsPath keeps this comparison testable on non-Windows CI too;
+    # PyInstaller's executable path is necessarily a Windows path in use.
+    executableName = PureWindowsPath(sys.executable).name.casefold()
     for _ in range(3):
         parent = _processInformation(processId)
         if parent is None:
