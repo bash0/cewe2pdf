@@ -424,7 +424,7 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --keepDoublePages     Each page in the .pdf will be a double-sided page, instead of a normal single page. (default: False)
-  --pages PAGES         Page numbers to render, e.g. 1,2,4-9 (default: None, which of course processes all the pages). These refer to the inside page numbers as you see them in the album editor - the first user editable inside page is number 1. If you want the front cover, then ask for page 0. Asking for the back cover explicitly will not work!
+  --pages PAGES         Content page numbers to render, e.g. cover,1-12,15. Numbers use the editor's editable-page numbering; cover selects the outer cover(s). In --keepDoublePages mode, selecting either content page selects its complete spread. (default: None)
   --tmp-dir MCFXTMP     Directory for .mcfx file extraction (default: None)
   --appdata-dir APPDATA
                          Directory for persistent app data, eg ttf fonts converted from otf fonts (default: None)

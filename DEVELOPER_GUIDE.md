@@ -170,6 +170,31 @@ Tests create date-stamped PDFs and compare them pixel-for-pixel with the newest 
 
 `tests/testPageNumbers` demonstrates controlled programmatic edits to an MCF for several related cases. Prefer a compact dedicated fixture when isolating a new CEWE feature.
 
+### Selecting pages
+
+`--pages` accepts a comma-separated mixture of positive editable content-page
+numbers, inclusive ranges, and the `cover` keyword:
+
+```text
+--pages cover,1-12,15
+```
+
+`cover` selects both outer covers for a single-page album PDF and the complete
+outer-cover spread for a double-page album PDF. Zero is not a page number and
+is rejected by the command line; it was a former front-cover shorthand that
+could not express the back cover. Calendar `cover` selects its front cover;
+Photo Pairs has no cover and rejects that keyword.
+
+In `--keepDoublePages` mode, selecting either member of an ordinary spread
+selects both content pages. Page 1 includes its front endpaper and page 26 (or
+the final content page) includes its back endpaper, because those are the
+physical opening and closing spreads. A selection is de-duplicated and is
+always emitted in natural album order.
+
+The command line parses a `PageSelection` object. The public `convertMcf`
+argument retains its historical `pageNumbers` name and accepts either that
+object or the old iterable of integers; legacy zero maps to `cover`.
+
 ### Linting
 
 The GitHub workflow treats Python syntax/undefined-name flake8 findings as errors and reports broader style/complexity findings as warnings. Run:
