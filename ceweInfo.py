@@ -32,7 +32,7 @@ class ProductInfo():
         "ALB14": (205 * reportlab.lib.pagesizes.mm, 270 * reportlab.lib.pagesizes.mm),
         "ALB15": (205 * reportlab.lib.pagesizes.mm, 270 * reportlab.lib.pagesizes.mm),
         "ALB17": (205 * reportlab.lib.pagesizes.mm, 205 * reportlab.lib.pagesizes.mm),
-        "ALB32": (300 * reportlab.lib.pagesizes.mm, 300 * reportlab.lib.pagesizes.mm),
+        "ALB32": (290 * reportlab.lib.pagesizes.mm, 290 * reportlab.lib.pagesizes.mm),
         "ALB42": (382 * reportlab.lib.pagesizes.mm, 290 * reportlab.lib.pagesizes.mm),
         "ALB69": (270 * reportlab.lib.pagesizes.mm, 356 * reportlab.lib.pagesizes.mm),
         "ALB82": (205 * reportlab.lib.pagesizes.mm, 270 * reportlab.lib.pagesizes.mm),
