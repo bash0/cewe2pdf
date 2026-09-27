@@ -17,6 +17,7 @@ configureTestImportPaths(__file__)
 
 from ceweInfo import ProductInfo, PdfProductStyle
 from cewePageResolver import resolvePages
+from pageSelection import PageSelection, parse_page_selection
 from pageTypes import PageProcessingType
 
 
@@ -40,19 +41,24 @@ def _calendarFotobook(fixtureName):
 
 
 def test_resolveAlbumPages():
-    pages = list(resolvePages(_testFotobook(), PdfProductStyle.AlbumSingleSide, 28))
+    pages = list(resolvePages(_testFotobook(), PdfProductStyle.AlbumSingleSide, 32))
 
-    assert len(pages) == 30
+    assert len(pages) == 34
     assert [page.page_type for page in pages[:3]] == [
         PageProcessingType.Cover,
         PageProcessingType.FrontInsideCoverBackground,
         PageProcessingType.OpeningContentPage,
     ]
     assert pages[-3].page_type == PageProcessingType.RegularPage
-    assert pages[-3].page_number == 26
+    assert pages[-3].page_number == 30
     assert not pages[-3].finish_page
     assert pages[-2].page_type == PageProcessingType.BackInsideCover
     assert pages[-1].page_type == PageProcessingType.Cover
+
+
+def test_unsupportedProductStyleIsRejected():
+    with pytest.raises(ValueError, match='Unsupported PDF product style'):
+        list(resolvePages(_testFotobook(), object(), 32))
 
 
 @pytest.mark.parametrize(('productName', 'expectedSize'), [
@@ -71,13 +77,72 @@ def test_albumFallbackSizesDescribeTheirInternalPages(productName, expectedSize)
 
 def test_resolveSelectedAlbumPages():
     pages = list(resolvePages(_testFotobook(), PdfProductStyle.AlbumSingleSide,
-                              28, pageNumbers=[0, 26]))
+                              32, PageSelection(frozenset([1, 30]), True)))
 
     assert [(page.page_number, page.page_type) for page in pages] == [
         (0, PageProcessingType.Cover),
         (1, PageProcessingType.FrontInsideCoverBackground),
-        (26, PageProcessingType.RegularPage),
+        (1, PageProcessingType.OpeningContentPage),
+        (30, PageProcessingType.RegularPage),
+        (31, PageProcessingType.BackInsideCover),
+        (31, PageProcessingType.Cover),
     ]
+
+
+def test_doublePageSelectionExpandsToTheWholeContentSpread():
+    pages = list(resolvePages(_testFotobook(), PdfProductStyle.AlbumDoubleSide,
+                              32, PageSelection(frozenset([3]))))
+
+    assert [(page.page_number, page.page_type) for page in pages] == [
+        (2, PageProcessingType.RegularPage),
+        (3, PageProcessingType.RegularPage),
+    ]
+
+
+def test_doublePageSelectionKeepsTheOpeningAndClosingSpreadsWhole():
+    pages = list(resolvePages(_testFotobook(), PdfProductStyle.AlbumDoubleSide,
+                              32, PageSelection(frozenset([1, 30]))))
+
+    assert [(page.page_number, page.page_type) for page in pages] == [
+        (1, PageProcessingType.FrontInsideCoverBackground),
+        (1, PageProcessingType.OpeningContentPage),
+        (30, PageProcessingType.RegularPage),
+        (31, PageProcessingType.BackInsideCover),
+    ]
+
+
+def test_finalPageBeyondDefaultAlbumLengthKeepsItsClosingSpreadWhole():
+    pages = list(resolvePages(
+        _testFotobook(), PdfProductStyle.AlbumDoubleSide,
+        32, PageSelection(frozenset([30]))))
+
+    assert [(page.page_number, page.page_type) for page in pages] == [
+        (30, PageProcessingType.RegularPage),
+        (31, PageProcessingType.BackInsideCover),
+    ]
+
+
+def test_doublePageCoverSelectionProducesTheOuterCoverSpreadOnce():
+    pages = list(resolvePages(_testFotobook(), PdfProductStyle.AlbumDoubleSide,
+                              32, PageSelection(include_cover=True)))
+
+    assert [(page.page_number, page.page_type) for page in pages] == [
+        (0, PageProcessingType.Cover),
+    ]
+
+
+def test_parsePageSelectionUsesCoverAndPositiveContentPageNumbers():
+    selection = parse_page_selection('Cover,1-3,3,15')
+
+    assert selection.include_cover
+    assert selection.page_numbers == frozenset([1, 2, 3, 15])
+    assert selection.describe() == 'cover, 1-3, 15'
+
+
+@pytest.mark.parametrize('expression', ['0', '0-3', 'cover-3', '3-1', '1,,2'])
+def test_parsePageSelectionRejectsInvalidExpressions(expression):
+    with pytest.raises(ValueError):
+        parse_page_selection(expression)
 
 
 def test_resolveMemoryCards():
@@ -87,6 +152,13 @@ def test_resolveMemoryCards():
     assert [page.page_number for page in pages] == list(range(1, 26))
     assert all(page.page_type == PageProcessingType.RegularPage for page in pages)
     assert [int(page.element.get('pagenr')) for page in pages] == list(range(1, 26))
+
+
+def test_memoryCardSelectionUsesItsCardNumbers():
+    pages = list(resolvePages(_memoryCardsFotobook(), PdfProductStyle.MemoryCard,
+                              25, PageSelection(frozenset([3]))))
+
+    assert [page.page_number for page in pages] == [3]
 
 
 @pytest.mark.parametrize('fixtureName', ['a4p', 'a4l', 'a5l', 'sq21'])
@@ -99,6 +171,13 @@ def test_resolveCalendarPages(fixtureName):
     assert all(not page.odd_page for page in pages)
     assert all(page.finish_page for page in pages)
     assert pages[-1].last_page
+
+
+def test_calendarSelectionUsesCoverForItsFrontPage():
+    pages = list(resolvePages(_calendarFotobook('sq21'), PdfProductStyle.Calendar,
+                              13, PageSelection(frozenset([2]), include_cover=True)))
+
+    assert [page.page_number for page in pages] == [0, 2]
 
 
 def test_detectCalendarStructureWithoutCalendarProductId(caplog):

@@ -20,10 +20,11 @@ from conversionSetup import prepareConversion
 from conversionState import ConversionState
 from infrastructure.extraLoggers import (
     ConversionMessageCounters, configlogger, mustsee, page_rendering)
+from infrastructure.versionInfo import logVersionInformation
+from pageSelection import PageSelection
 from pageNumbering import PageNumberingInfo
 from pages import processPages
 from renderContext import RenderContext
-from infrastructure.versionInfo import logVersionInformation
 
 
 class AlbumConversionSession:
@@ -39,7 +40,7 @@ class AlbumConversionSession:
                  pilAntialias, automaticWindows=False):
         self.album_name = albumName
         self.keep_double_pages = keepDoublePages
-        self.page_numbers = pageNumbers
+        self.page_numbers = PageSelection.from_value(pageNumbers)
         self.mcfx_tmp_dir = mcfxTmpDir
         self.app_data_dir = appDataDir
         self.output_file_name = outputFileName
@@ -143,6 +144,8 @@ class AlbumConversionSession:
 
         pageSize, productStyle = self._getProductDetails()
         pageCount = self._getPageCount(articleConfigElement, productStyle)
+        if not self._validatePageSelection(productStyle, pageCount):
+            return False
         imageFolder = self.setup.fotobook.get('imagedir')
         renderContext = RenderContext(
             self.mcf_to_reportlab, self.setup.image_resolution, self.image_quality,
@@ -162,6 +165,7 @@ class AlbumConversionSession:
             calendarNames=self.setup.calendar_names,
             calendarEventImageFolders=self.setup.calendar_event_image_folders)
 
+        self._reportPartialPageSelection(productStyle, pageCount)
         processPages(
             self.setup.fotobook, self.setup.mcf_base_folder, imageFolder,
             productStyle, pdf, pageCount, self.page_numbers,
@@ -193,7 +197,7 @@ class AlbumConversionSession:
         productName = self.setup.fotobook.get('productname')
         if productName in ProductInfo.ceweFormats:
             pageSize = ProductInfo.ceweFormats[productName]
-        productStyle = ProductInfo.pdfStyleFromMcf(self.setup.fotobook)
+        productStyle = self.setup.product_style
         if self.keep_double_pages:
             if productStyle == PdfProductStyle.AlbumSingleSide:
                 productStyle = PdfProductStyle.AlbumDoubleSide
@@ -211,6 +215,49 @@ class AlbumConversionSession:
         # Photo Pairs records each card as a real MCF page; it has neither
         # covers nor two-page bundles, so do not apply the album +2 rule.
         return int(articleConfigElement.get('totalpages'))
+
+    def _validatePageSelection(self, productStyle, pageCount):
+        """Reject a user page selection which cannot name a visible page."""
+        selection = self.page_numbers
+        if selection is None:
+            return True
+        if selection.include_cover and productStyle == PdfProductStyle.MemoryCard:
+            logging.error('This Photo Pairs product has no outer cover; omit cover from --pages.')
+            return False
+
+        finalContentPage = self._finalContentPage(productStyle, pageCount)
+        invalidPages = sorted(
+            number for number in selection.page_numbers
+            if number > finalContentPage)
+        if invalidPages:
+            numbers = ', '.join(str(number) for number in invalidPages)
+            logging.error(
+                'Selected page number(s) %s are outside this product\'s '
+                'content-page range 1-%d.', numbers, finalContentPage)
+            return False
+        return True
+
+    def _reportPartialPageSelection(self, productStyle, pageCount):
+        """Report a requested subset immediately before page rendering begins."""
+        selection = self.page_numbers
+        if selection is None:
+            return
+        finalContentPage = self._finalContentPage(productStyle, pageCount)
+        includesEveryContentPage = selection.page_numbers == frozenset(
+            range(1, finalContentPage + 1))
+        hasEveryOutputPage = (includesEveryContentPage and
+                              (productStyle == PdfProductStyle.MemoryCard or
+                               selection.include_cover))
+        if not hasEveryOutputPage:
+            mustsee.info(f'Processing selected pages: {selection.describe()}.')
+
+    @staticmethod
+    def _finalContentPage(productStyle, pageCount):
+        if ProductInfo.isAlbumProduct(productStyle):
+            return pageCount - 2
+        if productStyle == PdfProductStyle.Calendar:
+            return pageCount - 1
+        return pageCount
 
     def _createPageNumberingInfo(self, pdf):
         pageNumberElement = self.setup.fotobook.find('pagenumbering')

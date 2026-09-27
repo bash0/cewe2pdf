@@ -18,7 +18,7 @@ from typing import Any
 
 from lxml import etree
 
-from ceweInfo import CeweInfo
+from ceweInfo import CeweInfo, ProductInfo, PdfProductStyle
 from calendars.entries import CalendarEntries, loadCalendarEntries
 from calendars.names import CalendarNames, loadCalendarNames
 from calendars.layouts import (CalendarLayouts, applyCalendarLayoutSubstitutions,
@@ -65,6 +65,7 @@ class ConversionSetup:
     album_base_folder: str      # Original album location, used to find its optional configuration file.
 
     fotobook: Any       # Root <fotobook> XML element used by the page-processing stage.
+    product_style: PdfProductStyle  # Rendering style derived once from the MCF structure.
     album_title: str    # Human-readable album name, used as the PDF document title.
 
     available_fonts: Any        # Font faces successfully registered with ReportLab for this conversion.
@@ -106,6 +107,7 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
 
     fotobook = mcf.getroot()
     CeweInfo.ensureAcceptableAlbumMcf(fotobook, albumname, mcfxmlname, mcfxFormat)
+    productStyle = ProductInfo.pdfStyleFromMcf(fotobook)
 
     clipartFiles = {}
     passepartoutFolders = tuple[str]()
@@ -224,11 +226,12 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
     if ceweFolder and keyAccountFolder is not None:
         passepartoutFolders += CeweInfo.getCewePassepartoutFolders(ceweFolder, keyAccountFolder)
 
-    calendarSchemas = loadCalendarSchemas(ceweFolder)
-    calendarLayouts = loadCalendarLayouts(ceweFolder)
-    calendarEntries = loadCalendarEntries(ceweFolder)
-    calendarNames = loadCalendarNames(ceweFolder)
-    if configuration.has_section('CALENDAR'):
+    if productStyle == PdfProductStyle.Calendar:
+        calendarSchemas = loadCalendarSchemas(ceweFolder)
+        calendarLayouts = loadCalendarLayouts(ceweFolder)
+        calendarEntries = loadCalendarEntries(ceweFolder)
+        calendarNames = loadCalendarNames(ceweFolder)
+    if productStyle == PdfProductStyle.Calendar and configuration.has_section('CALENDAR'):
         calendarSchemas = applyCalendarSchemaSubstitutions(
             calendarSchemas,
             configuration['CALENDAR'].get('schemaSubstitutions', ''))
@@ -270,6 +273,7 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
         unpacked_folder=unpackedFolder,
         album_base_folder=albumBaseFolder,
         fotobook=fotobook,
+        product_style=productStyle,
         album_title=albumTitle,
         available_fonts=availableFonts,
         line_scales=lineScales,

@@ -16,15 +16,16 @@ from pikepdf import Pdf, PdfImage
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
+from pageSelection import PageSelection # type: ignore
 
 from testutils import getLatestResultFile, getOutFileBasename
 
 
-def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages, expectedEqualBackgroundPageLists):
+def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, pageSelection, expectedPages, expectedEqualBackgroundPageLists):
     if os.path.exists(outFile) == True:
         os.remove(outFile)
     assert os.path.exists(outFile) == False
-    convertMcf(inFile, keepDoublePages, outputFileName=outFile)
+    convertMcf(inFile, keepDoublePages, pageNumbers=pageSelection, outputFileName=outFile)
     assert Path(outFile).exists() == True
 
     # check the pdf contents
@@ -110,13 +111,19 @@ def test_testBackgrounds(main=False):
     outFileBasename = getOutFileBasename(main, albumBasename,yyyymmdd,styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
-    tryToBuildBook(inFile, outFile, latestResultFile, False, 28, [[0,27],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]])
+    pageSelection = PageSelection(frozenset([1,2,3,4,5,7,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]), include_cover=True) # page 6,8,9 deselected
+    # 3 pages missing in a 28 page book, leaving 25
+    tryToBuildBook(inFile, outFile, latestResultFile, False, pageSelection, 25,
+        [[0,24], list(range(1,24))])
 
     styleid = "D"
     outFileBasename = getOutFileBasename(main, albumBasename,yyyymmdd,styleid)
     outFile = str(Path(Path.cwd(), 'tests', f"{albumFolderBasename}", outFileBasename))
     latestResultFile = getLatestResultFile(albumFolderBasename, f"*{styleid}.pdf")
-    tryToBuildBook(inFile, outFile, latestResultFile, True, 15, [[0],[1,2,3,4,5,6,7,8,9,10,11,12,13,14]])
+    # page 6 is deselected but 5 is not so the 5,6 spread is present.
+    # page 8,9 are deselected so the 8,9 spread is missing, leaving 14 double spreads
+    tryToBuildBook(inFile, outFile, latestResultFile, True, pageSelection, 14, [[0],[1,2,3,4,5,6,7,8,9,10,11,12,13]])
+
 
 if __name__ == '__main__':
     #only executed when this file is run directly.

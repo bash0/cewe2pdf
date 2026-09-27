@@ -47,6 +47,32 @@ def test_prepareConversionWithoutCeweConfiguration():
     assert setup.passepartout_folders == ()
 
 
+def test_albumSetupDoesNotLoadCalendarResources():
+    """Calendar resources are only useful after calendar structure is detected."""
+    sourceMcf = PROJECT_ROOT / 'tests' / 'testEmptyPageOne' / 'test_emptyPageOne.mcf'
+
+    with TemporaryDirectory() as temporaryDirectory:
+        temporaryPath = Path(temporaryDirectory)
+        albumMcf = temporaryPath / sourceMcf.name
+        shutil.copy2(sourceMcf, albumMcf)
+        originalCwd = Path.cwd()
+        try:
+            os.chdir(temporaryPath)
+            with patch('conversionSetup.findAndRegisterFonts', return_value={}), \
+                    patch('conversionSetup.loadCalendarSchemas') as schemas, \
+                    patch('conversionSetup.loadCalendarLayouts') as layouts, \
+                    patch('conversionSetup.loadCalendarEntries') as entries, \
+                    patch('conversionSetup.loadCalendarNames') as names:
+                prepareConversion(str(albumMcf), None, None, ConversionState())
+        finally:
+            os.chdir(originalCwd)
+
+    schemas.assert_not_called()
+    layouts.assert_not_called()
+    entries.assert_not_called()
+    names.assert_not_called()
+
+
 def test_automaticWindowsSetupEnablesSystemFontsWithoutCewe():
     """Explorer mode must need neither an INI file nor an installed CEWE app."""
     sourceMcf = PROJECT_ROOT / 'tests' / 'testEmptyPageOne' / 'test_emptyPageOne.mcf'

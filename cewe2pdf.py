@@ -85,12 +85,11 @@ import PIL
 
 from packaging.version import parse as parse_version
 from albumConversionSession import AlbumConversionSession
+from infrastructure.windowsIntegration import (
+    confirmInstallation, installWindowsIntegration, isWindowsFrozenExecutable,
+    showMessage, uninstallWindowsIntegration)
 from pageElements import processElements
-from infrastructure.windowsIntegration import (confirmInstallation,
-                                                installWindowsIntegration,
-                                                isWindowsFrozenExecutable,
-                                                showMessage,
-                                                uninstallWindowsIntegration)
+from pageSelection import parse_page_selection
 
 
 # work around a breaking change in pil 10.0.0, see
@@ -161,9 +160,9 @@ def collectArgsAndConvert():
                         help='Each page in the .pdf will be a double-sided page, instead of a normal single page.')
     parser.add_argument('--pages', dest='pages', action='store',
         default=None,
-        help='Page numbers to render, e.g. 1,2,4-9 (default: None, which of course processes all the pages). '
-            'These refer to the inside page numbers as you see them in the album editor - the first user editable inside page is number 1. '
-            'If you want the front cover, then ask for page 0. Asking for the back cover explicitly will not work!')
+        help='Content page numbers to render, e.g. cover,1-12,15. Numbers use the editor\'s '
+            'editable-page numbering; cover selects the outer cover(s). In --keepDoublePages '
+            'mode, selecting either content page selects its complete spread.')
     parser.add_argument('--tmp-dir', dest='mcfxTmp', action='store',
                         default=None,
                         help='Directory for .mcfx file extraction')
@@ -244,26 +243,10 @@ def collectArgsAndConvert():
 
     pages = None
     if args.pages is not None:
-        pages = []
-        for expr in args.pages.split(','):
-            expr = expr.strip()
-            if expr.isnumeric():
-                pages.append(int(expr)) # simple number "23"
-            elif expr.find('-') > -1:
-                # page range: 23-42
-                fromTo = expr.split('-', 2)
-                if not fromTo[0].isnumeric() or not fromTo[1].isnumeric():
-                    logging.error(f'Invalid page range: {expr}')
-                    sys.exit(1)
-                pageFrom = int(fromTo[0])
-                pageTo = int(fromTo[1])
-                if pageTo < pageFrom:
-                    logging.error(f'Invalid page range: {expr}')
-                    sys.exit(1)
-                pages = pages + list(range(pageFrom, pageTo + 1))
-            else:
-                logging.error(f'Invalid page number: {expr}')
-                sys.exit(1)
+        try:
+            pages = parse_page_selection(args.pages)
+        except ValueError as exception:
+            parser.error(str(exception))
 
     mcfxTmp = None
     if args.mcfxTmp is not None:
