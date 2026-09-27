@@ -6,6 +6,7 @@ they are unavailable.
 """
 
 import ctypes
+from ctypes import wintypes
 import os
 from pathlib import Path, PureWindowsPath
 import re
@@ -23,6 +24,99 @@ INSTALL_REGISTRY_KEY = r'Software\cewe2pdf'
 def isWindowsFrozenExecutable() -> bool:
     """Return whether this is the Windows executable made by PyInstaller."""
     return os.name == 'nt' and getattr(sys, 'frozen', False)
+
+
+def _processInformation(processId: int) -> tuple[str, int] | None:
+    """Return an executable name and parent ID for a Windows process."""
+    if os.name != 'nt':
+        return None
+
+    class ProcessEntry32(ctypes.Structure):
+        _fields_ = [
+            ('dwSize', wintypes.DWORD),
+            ('cntUsage', wintypes.DWORD),
+            ('th32ProcessID', wintypes.DWORD),
+            ('th32DefaultHeapID', ctypes.c_size_t),
+            ('th32ModuleID', wintypes.DWORD),
+            ('cntThreads', wintypes.DWORD),
+            ('th32ParentProcessID', wintypes.DWORD),
+            ('pcPriClassBase', wintypes.LONG),
+            ('dwFlags', wintypes.DWORD),
+            ('szExeFile', wintypes.WCHAR * 260),
+        ]
+
+    kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+    createSnapshot = kernel32.CreateToolhelp32Snapshot
+    createSnapshot.argtypes = (wintypes.DWORD, wintypes.DWORD)
+    createSnapshot.restype = wintypes.HANDLE
+    processFirst = kernel32.Process32FirstW
+    processFirst.argtypes = (wintypes.HANDLE, ctypes.POINTER(ProcessEntry32))
+    processFirst.restype = wintypes.BOOL
+    processNext = kernel32.Process32NextW
+    processNext.argtypes = (wintypes.HANDLE, ctypes.POINTER(ProcessEntry32))
+    processNext.restype = wintypes.BOOL
+    closeHandle = kernel32.CloseHandle
+    closeHandle.argtypes = (wintypes.HANDLE,)
+    closeHandle.restype = wintypes.BOOL
+
+    snapshot = createSnapshot(0x00000002, 0)
+    invalidHandle = ctypes.c_void_p(-1).value
+    if snapshot == invalidHandle:
+        return None
+    try:
+        process = ProcessEntry32()
+        process.dwSize = ctypes.sizeof(process)
+        foundProcess = processFirst(snapshot, ctypes.byref(process))
+        while foundProcess:
+            if process.th32ProcessID == processId:
+                return process.szExeFile, process.th32ParentProcessID
+            foundProcess = processNext(snapshot, ctypes.byref(process))
+    finally:
+        closeHandle(snapshot)
+    return None
+
+
+def _consoleProcessCount() -> int:
+    """Return the number of processes attached to this console on Windows."""
+    if os.name != 'nt':
+        return 0
+    kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+    getConsoleProcessList = kernel32.GetConsoleProcessList
+    getConsoleProcessList.argtypes = (ctypes.POINTER(wintypes.DWORD), wintypes.DWORD)
+    getConsoleProcessList.restype = wintypes.DWORD
+    processIds = (wintypes.DWORD * 64)()
+    return getConsoleProcessList(processIds, len(processIds))
+
+
+def isExplorerLaunch() -> bool:
+    """Return whether the frozen EXE was launched directly by Explorer.
+
+    This is intentionally a narrow convenience heuristic.  It preserves the
+    friendly double-click installer without allowing an argument-free shell
+    command to offer installation.  A PyInstaller one-file bootloader may be
+    an intermediate process with the same executable name, so it is skipped;
+    any other parent ends the search.  Launchers which obscure both signals
+    fall back to explicit ``--install``.
+    """
+    # Explorer creates a fresh console for a console-subsystem executable;
+    # a shell invocation inherits the shell's console.  This is more robust
+    # than the immediate parent for PyInstaller one-file executables, whose
+    # child process may have the bootloader as its parent.
+    if _consoleProcessCount() == 1:
+        return True
+
+    processId = os.getppid()
+    executableName = Path(sys.executable).name.casefold()
+    for _ in range(3):
+        parent = _processInformation(processId)
+        if parent is None:
+            return False
+        parentName, processId = parent
+        if parentName.casefold() == 'explorer.exe':
+            return True
+        if parentName.casefold() != executableName:
+            return False
+    return False
 
 
 def isCeweInstallationFolder(folder: str | Path) -> bool:
