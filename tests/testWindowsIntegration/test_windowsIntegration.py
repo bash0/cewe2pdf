@@ -3,6 +3,7 @@
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 # Keep direct execution as reliable as pytest collection from the repository root.
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -12,7 +13,8 @@ configureTestImportPaths(__file__)
 
 from infrastructure.windowsIntegration import (_executableFolderFromCommand,
                                                 findInstalledCeweFolder,
-                                                isCeweInstallationFolder)
+                                                isCeweInstallationFolder,
+                                                isExplorerLaunch)
 from albumConversionSession import AlbumConversionSession
 from infrastructure.extraLoggers import configlogger, mustsee
 
@@ -56,6 +58,39 @@ def test_executableFolderFromCommand_handlesNormalWindowsAssociation():
     executableFolder = _executableFolderFromCommand(command)
 
     assert executableFolder == r'C:\Program Files\Elkjop fotoservice'
+
+
+@patch('infrastructure.windowsIntegration._consoleProcessCount', return_value=2)
+@patch('infrastructure.windowsIntegration._processInformation',
+       return_value=('explorer.exe', 0))
+def test_isExplorerLaunch_recognisesExplorerParent(_processInformation,
+                                                   _consoleProcessCount):
+    assert isExplorerLaunch()
+
+
+@patch('infrastructure.windowsIntegration._consoleProcessCount', return_value=1)
+@patch('infrastructure.windowsIntegration._processInformation', return_value=None)
+def test_isExplorerLaunch_recognisesFreshExplorerConsole(_processInformation,
+                                                         _consoleProcessCount):
+    assert isExplorerLaunch()
+
+
+@patch('infrastructure.windowsIntegration._consoleProcessCount', return_value=2)
+@patch('infrastructure.windowsIntegration._processInformation',
+       return_value=('pwsh.exe', 0))
+def test_isExplorerLaunch_rejectsCommandShellParent(_processInformation,
+                                                     _consoleProcessCount):
+    assert not isExplorerLaunch()
+
+
+@patch('infrastructure.windowsIntegration.sys.executable',
+       r'C:\\tools\\cewe2pdf.exe')
+@patch('infrastructure.windowsIntegration._consoleProcessCount', return_value=2)
+@patch('infrastructure.windowsIntegration._processInformation',
+       side_effect=[('cewe2pdf.exe', 100), ('explorer.exe', 0)])
+def test_isExplorerLaunch_skipsOneFileBootloader(_processInformation,
+                                                 _consoleProcessCount):
+    assert isExplorerLaunch()
 
 
 def test_automaticSessionWritesAllUserVisibleLoggers():

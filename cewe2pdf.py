@@ -86,7 +86,8 @@ import PIL
 from packaging.version import parse as parse_version
 from albumConversionSession import AlbumConversionSession
 from infrastructure.windowsIntegration import (
-    confirmInstallation, installWindowsIntegration, isWindowsFrozenExecutable,
+    confirmInstallation, installWindowsIntegration, isExplorerLaunch,
+    isWindowsFrozenExecutable,
     showMessage, uninstallWindowsIntegration)
 from pageElements import processElements
 from pageSelection import parse_page_selection
@@ -217,7 +218,7 @@ def collectArgsAndConvert():
         parser.error('--automatic is reserved for the Windows Explorer command.')
 
     if args.inputFile is None:
-        if isWindowsFrozenExecutable():
+        if isWindowsFrozenExecutable() and isExplorerLaunch():
             if confirmInstallation():
                 try:
                     installedPath = installWindowsIntegration()

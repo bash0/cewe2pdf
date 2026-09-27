@@ -604,7 +604,7 @@ test files.
 
 The executable is intended to be shared privately by the developer who builds
 it; the project does not publish executable releases. Its recipient can simply
-double-click `cewe2pdf.exe`. It offers to install itself for that Windows user:
+double-click `cewe2pdf.exe` in Explorer. It offers to install itself for that Windows user:
 the EXE is copied from (for example) the USB stick to
 `%LOCALAPPDATA%\cewe2pdf`, and an Explorer menu item, **Create PDF with
 cewe2pdf**, is added for `.mcf` and `.mcfx` files. No administrator rights are
@@ -621,6 +621,9 @@ log named `<album>.mcf.log` (or `<album>.mcfx.log`), retaining the conversion
 messages which would otherwise disappear when Explorer closes the console.
 
 Running the EXE with `--install` performs the same installation explicitly.
+An argument-free command-line invocation only shows help; it does not offer
+installation. A direct Explorer launch of this console executable receives a
+fresh console and is recognised separately so it can still offer installation.
 `--uninstall` removes the Explorer menu entries but deliberately leaves the
 copied EXE in place, so that no running program has to delete itself.
 ### Test verification using pixel level result comparison with compare-pdf
