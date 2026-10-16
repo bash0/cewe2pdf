@@ -1,5 +1,6 @@
 import logging
 import re
+from dataclasses import dataclass
 # pylint: disable=no-member
 import cv2 # the no_member warning is a false positive, cv2 is imported correctly and used in the code
 import pymupdf
@@ -11,10 +12,24 @@ from PIL import Image
 from infrastructure.configUtils import (getConfigurationBool, getConfigurationFloat,
                                         getConfigurationInt)
 
+
+@dataclass(frozen=True)
+class IndexLink:
+    """One index-line rectangle and its one-based final-PDF destination."""
+
+    index_page_number: int
+    left: float
+    bottom: float
+    right: float
+    top: float
+    output_page_number: int
+
+
 class AlbumIndex(): # pylint: disable=too-many-instance-attributes
 
     def __init__(self, configSection):
         self.indexEntries = {}
+        self.indexLinks = []
         if configSection is None:
             self.indexing = False
             return
@@ -80,6 +95,7 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
         if not self.indexing:
             return
         logging.info("Generating index page")
+        self.indexLinks = []
         page_width = self.pageWidth * mm
         page_height = self.pageHeight * mm
         pdf.setPageSize((page_width, page_height))
@@ -96,6 +112,7 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
             return ypos
 
         y_position = pageSetup()
+        index_page_number = 0
 
         for page, texts in sorted(self.indexEntries.items()):
             for text in texts:
@@ -109,10 +126,15 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
                 pdf.drawString(left_margin, y_position, text)
                 pdf.drawString(left_margin + text_width, y_position, dots)
                 pdf.drawString(right_margin - page_number_width, y_position, page_number_str)
+                self.indexLinks.append(IndexLink(
+                    index_page_number, left_margin, y_position - self.indexFontSize * 0.25,
+                    right_margin, y_position + self.indexFontSize * 0.9,
+                    self.outputPageNumbers[page]))
 
                 y_position -= line_spacing
                 if y_position < bottom_margin:
                     pdf.showPage()
+                    index_page_number += 1
                     y_position = pageSetup()
 
         pdf.showPage()
@@ -247,6 +269,26 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
         y0 = self.mergeTopMarginPt
         rect = pymupdf.Rect(x0, y0, x0 + scaledWidthPt, y0 + scaledHeightPt)
         page.insert_image(rect, filename=indexPngFileName, overlay=True)
+        return rect
+
+    def _addIndexLinks(self, page, indexPageNumber, indexImageRect):
+        """Overlay each visible index row with an invisible PDF page link."""
+        indexWidth = self.pageWidth * mm
+        indexHeight = self.pageHeight * mm
+        for indexLink in self.indexLinks:
+            if indexLink.index_page_number != indexPageNumber:
+                continue
+            rect = pymupdf.Rect(
+                indexImageRect.x0 + indexLink.left / indexWidth * indexImageRect.width,
+                indexImageRect.y0 + (indexHeight - indexLink.top) / indexHeight * indexImageRect.height,
+                indexImageRect.x0 + indexLink.right / indexWidth * indexImageRect.width,
+                indexImageRect.y0 + (indexHeight - indexLink.bottom) / indexHeight * indexImageRect.height)
+            page.insert_link({
+                'kind': pymupdf.LINK_GOTO,
+                'from': rect,
+                'page': indexLink.output_page_number - 1,
+                'to': pymupdf.Point(0, 0),
+            })
 
     def MergeAlbumAndIndexPngs(self, albumPdfFileName, indexPngFileNames):
         """Merge every index image onto the matching reserved album page in order."""
@@ -268,8 +310,10 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
             logging.warning(
                 f'Found {len(markerPages)} reserved index pages but generated only '
                 f'{len(indexPngFileNames)} index pages; unused marker pages are unchanged.')
-        for page, indexPngFileName in zip(markerPages, indexPngFileNames):
-            self._mergeIndexImage(albumDoc, page, indexPngFileName)
+        for indexPageNumber, (page, indexPngFileName) in enumerate(
+                zip(markerPages, indexPngFileNames)):
+            indexImageRect = self._mergeIndexImage(albumDoc, page, indexPngFileName)
+            self._addIndexLinks(page, indexPageNumber, indexImageRect)
 
         albumDoc.save(albumPdfFileName, incremental=True, encryption=0)
         albumDoc.close()

@@ -41,6 +41,14 @@ def assertPdfOutline(outFile):
         ]
 
 
+def assertPdfIndexLinks(outFile):
+    """The visible index lines also link to their final PDF destinations."""
+    with pymupdf.open(outFile) as renderedPdf:
+        links = renderedPdf[1].get_links()
+        assert [link['kind'] for link in links] == [pymupdf.LINK_GOTO] * 5
+        assert [link['page'] for link in links] == [2, 3, 3, 3, 6]
+
+
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
     if os.path.exists(outFile) == True:
         os.remove(outFile)
@@ -55,6 +63,7 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     assert numPages == expectedPages, f"Expected {expectedPages} pages, found {numPages}"
     readPdf.close()
     assertPdfOutline(outFile)
+    assertPdfIndexLinks(outFile)
 
     if latestResultFile is not None:
         # compare our result with the latest one
