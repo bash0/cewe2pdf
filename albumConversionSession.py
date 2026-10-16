@@ -273,6 +273,7 @@ class AlbumConversionSession:
             self.output_file_name, self.setup.album_title, pageSize)
         indexPngFileNames = albumIndex.SaveIndexPngs(indexPdfFileName)
         albumIndex.MergeAlbumAndIndexPngs(self.output_file_name, indexPngFileNames)
+        albumIndex.AddPdfOutline(self.output_file_name)
         if albumIndex.deleteIndexPdf and os.path.exists(indexPdfFileName):
             os.remove(indexPdfFileName)
         if albumIndex.deleteIndexPng:

@@ -348,7 +348,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
 
     # Just add one index entry
     if indexEntryText:
-        albumIndex.AddIndexEntry(pgno, indexEntryText)
+        albumIndex.AddIndexEntry(pgno, indexEntryText, pdf.getPageNumber())
 
     # Apply vertical centering if ALIGNVCENTER is specified. We previously set topPad and bottomPad
     # to zero. Now we have the actual text height, we can calculate the required padding to center

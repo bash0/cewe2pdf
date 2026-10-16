@@ -19,12 +19,26 @@ from xml.dom.minidom import parse, Document
 
 from datetime import datetime
 from pikepdf import Pdf
+import pymupdf
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 from infrastructure.extraLoggers import mustsee # type: ignore
 
 from testutils import getLatestResultFile, getOutFileBasename, runModifications
+
+
+def assertPdfOutline(outFile):
+    """The visible index also supplies reader navigation to its real PDF pages."""
+    with pymupdf.open(outFile) as renderedPdf:
+        assert renderedPdf.get_toc() == [
+            [1, 'Contents', 2],
+            [2, '2 June 2025. A heading text', 3],
+            [2, '28-29 April 2025 A second heading paragraph', 4],
+            [2, '4 June 2025. A longer heading text', 4],
+            [2, '5 June 2025. A different font heading', 4],
+            [2, '19 June 2025. Later in the journey', 7],
+        ]
 
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
@@ -40,6 +54,7 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
     numPages =  len(readPdf.pages)
     assert numPages == expectedPages, f"Expected {expectedPages} pages, found {numPages}"
     readPdf.close()
+    assertPdfOutline(outFile)
 
     if latestResultFile is not None:
         # compare our result with the latest one

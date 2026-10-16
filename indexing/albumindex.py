@@ -19,6 +19,7 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
             self.indexing = False
             return
         self.indexing = getConfigurationBool(configSection, "indexing", "False")
+        self.outputPageNumbers = {}
         self.indexEntryDefs = [] # font names and sizes used to recognise index terms
         lines = configSection.get('indexEntryFonts', '').splitlines()  # newline separated list
         indexDefs = filter(lambda bg: (len(bg) != 0), lines)
@@ -35,6 +36,7 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
         self.pageWidth = getConfigurationInt(configSection, "pageWidth", 210, 100)
         self.pageHeight = getConfigurationInt(configSection, "pageHeight", 291, 100) # A4 is 297. 291 is the size of the paper in a 30x30 album
         self.indexMarkerRegex = configSection.get("indexMarkerRegex", "Contents").strip()
+        self.outlineTitle = configSection.get("outlineTitle", "Contents").strip() or "Contents"
         # The margins here are for the placement of the index image on the index page
         mm2pt = 72/25.4
         self.mergeTopMarginPt = getConfigurationInt(configSection, "topMargin", 10, 0) * mm2pt
@@ -59,13 +61,15 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
                 return True
         return False
 
-    def AddIndexEntry(self, pageNumber, text):
+    def AddIndexEntry(self, pageNumber, text, outputPageNumber):
+        """Record one visible-index entry and its final PDF destination."""
         if not self.indexing:
             return
         if pageNumber in self.indexEntries:
             self.indexEntries[pageNumber].append(text)
         else:
             self.indexEntries[pageNumber] = [text]
+        self.outputPageNumbers[pageNumber] = outputPageNumber
 
     def ShowIndex(self):
         for page, entries in self.indexEntries.items():
@@ -267,6 +271,26 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
         for page, indexPngFileName in zip(markerPages, indexPngFileNames):
             self._mergeIndexImage(albumDoc, page, indexPngFileName)
 
+        albumDoc.save(albumPdfFileName, incremental=True, encryption=0)
+        albumDoc.close()
+
+    def AddPdfOutline(self, albumPdfFileName):
+        """Add PDF-reader navigation for the headings collected for the index."""
+        if not self.indexing or not self.indexEntries:
+            return
+
+        logging.info('Generating PDF outline')
+        albumDoc = pymupdf.open(albumPdfFileName)
+        markerPages = self._findIndexMarkerPages(albumDoc)
+        firstLogicalPage = min(self.outputPageNumbers)
+        firstEntryPage = self.outputPageNumbers[firstLogicalPage]
+        contentsPage = markerPages[0].number + 1 if markerPages else firstEntryPage
+        tableOfContents = [[1, self.outlineTitle, contentsPage]]
+        for logicalPage, texts in sorted(self.indexEntries.items()):
+            outputPage = self.outputPageNumbers[logicalPage]
+            tableOfContents.extend([2, text, outputPage] for text in texts)
+
+        albumDoc.set_toc(tableOfContents, collapse=1)
         albumDoc.save(albumPdfFileName, incremental=True, encryption=0)
         albumDoc.close()
 
