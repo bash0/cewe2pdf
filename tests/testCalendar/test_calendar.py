@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 
 import pikepdf
+import pymupdf
 import pytest
 from lxml import etree
 from reportlab.lib import colors
@@ -232,6 +233,10 @@ def buildAndCompareCalendar(fixtureName, pageDimensions, caplog):
         pageBox = firstPage.mediabox
         assert round(float(pageBox[2])) == pageDimensions[0]
         assert round(float(pageBox[3])) == pageDimensions[1]
+    with pymupdf.open(outputPdf) as renderedPdf:
+        assert renderedPdf.get_page_labels() == [
+            {'startpage': 0, 'prefix': 'Cover', 'firstpagenum': 1},
+            {'startpage': 1, 'prefix': '', 'style': 'D', 'firstpagenum': 1}]
 
     assert not any('Unsupported calendar layout' in record.message
                    for record in caplog.records)

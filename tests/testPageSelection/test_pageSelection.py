@@ -5,6 +5,7 @@ import sys
 from unittest.mock import patch
 
 from pikepdf import Pdf
+import pymupdf
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -16,6 +17,7 @@ from cewe2pdf import convertMcf
 from albumConversionSession import AlbumConversionSession
 from ceweInfo import PdfProductStyle
 from infrastructure.extraLoggers import mustsee
+from pageLabels import PdfPageLabel, pageLabelDefinitions
 from pageSelection import PageSelection
 
 
@@ -32,6 +34,31 @@ def test_doublePageSelectionProducesCompletePhysicalSpreads(tmp_path):
 
     with Pdf.open(outputFile) as pdf:
         assert len(pdf.pages) == 4
+
+    with pymupdf.open(outputFile) as pdf:
+        assert pdf.get_page_labels() == [
+            {'startpage': 0, 'prefix': 'Cover', 'firstpagenum': 1},
+            {'startpage': 1, 'prefix': '', 'style': 'D', 'firstpagenum': 1},
+            {'startpage': 2, 'prefix': '2-3', 'firstpagenum': 1},
+            {'startpage': 3, 'prefix': '', 'style': 'D', 'firstpagenum': 30},
+        ]
+
+
+def test_pageLabelDefinitionsRestartAtGapsAndSpreadLabels():
+    """Selections and retained spreads cannot use one continuous number run."""
+    labels = [
+        PdfPageLabel(prefix='Cover'),
+        PdfPageLabel(style='D', first_page_number=1),
+        PdfPageLabel(style='D', first_page_number=4),
+        PdfPageLabel(prefix='5-6'),
+    ]
+
+    assert pageLabelDefinitions(labels) == [
+        {'startpage': 0, 'prefix': 'Cover', 'style': '', 'firstpagenum': 1},
+        {'startpage': 1, 'prefix': '', 'style': 'D', 'firstpagenum': 1},
+        {'startpage': 2, 'prefix': '', 'style': 'D', 'firstpagenum': 4},
+        {'startpage': 3, 'prefix': '5-6', 'style': '', 'firstpagenum': 1},
+    ]
 
 
 def test_partialPageSelectionIsReportedBeforeRendering():

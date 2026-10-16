@@ -13,6 +13,7 @@ import sys
 
 import reportlab.lib.pagesizes
 from reportlab.pdfgen import canvas
+import pymupdf
 
 from indexing.albumindex import AlbumIndex
 from ceweInfo import ProductInfo, CeweInfo, PdfProductStyle
@@ -23,6 +24,7 @@ from infrastructure.extraLoggers import (
 from infrastructure.versionInfo import logVersionInformation
 from pageSelection import PageSelection
 from pageNumbering import PageNumberingInfo
+from pageLabels import pageLabelDefinitions
 from pages import processPages
 from renderContext import RenderContext
 
@@ -166,7 +168,7 @@ class AlbumConversionSession:
             calendarEventImageFolders=self.setup.calendar_event_image_folders)
 
         self._reportPartialPageSelection(productStyle, pageCount)
-        processPages(
+        outputPageLabels = processPages(
             self.setup.fotobook, self.setup.mcf_base_folder, imageFolder,
             productStyle, pdf, pageCount, self.page_numbers,
             self.setup.available_fonts, self.setup.background_locations, self.state,
@@ -178,6 +180,7 @@ class AlbumConversionSession:
             logging.error(f'Could not save the output file: {str(exception)}')
 
         self._createIndexOutput(albumIndex, pageSize)
+        self._addPdfPageLabels(outputPageLabels)
         if productStyle == PdfProductStyle.MemoryCard:
             print()
             print('Use Adobe Acrobat to print the memory cards. Set custom pages per sheet, 4 wide x 6 down')
@@ -280,6 +283,22 @@ class AlbumConversionSession:
             for indexPngFileName in indexPngFileNames:
                 if os.path.exists(indexPngFileName):
                     os.remove(indexPngFileName)
+
+    def _addPdfPageLabels(self, outputPageLabels):
+        """Store CEWE-aware page labels for PDF readers' page navigation."""
+        if not outputPageLabels:
+            return
+        renderedPdf = pymupdf.open(self.output_file_name)
+        try:
+            if len(renderedPdf) != len(outputPageLabels):
+                logging.warning(
+                    'Cannot set PDF page labels: rendered %d pages but recorded %d.',
+                    len(renderedPdf), len(outputPageLabels))
+                return
+            renderedPdf.set_page_labels(pageLabelDefinitions(outputPageLabels))
+            renderedPdf.save(self.output_file_name, incremental=True, encryption=0)
+        finally:
+            renderedPdf.close()
 
 
 def cleanUpTemporaryFiles(fileList, unpackedFolder):

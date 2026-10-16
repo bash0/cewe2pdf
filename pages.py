@@ -4,13 +4,14 @@ import logging
 from typing import Callable
 
 # A failed page must be logged and the remainder of the album rendered.
-# pylint: disable=broad-exception-caught
+# pylint: disable=broad-exception-caught,too-many-arguments
 
 from backgrounds import processBackground
 from conversionState import ConversionState
 from ceweInfo import ProductInfo
 from cewePageResolver import ResolvedPage, resolvePages
 from infrastructure.extraLoggers import mustsee
+from pageLabels import labelForRenderedPage
 from pageNumbering import addPageNumber
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
@@ -61,16 +62,20 @@ def processPages(fotobook, mcfBaseFolder, imageDirectory, productStyle, pdf, pag
                  pageNumberingInfo, processElements: Callable):
     """Render the requested album pages, including covers and inside covers."""
 
+    outputPageLabels = []
     for resolvedPage in resolvePages(fotobook, productStyle, pageCount, pageNumbers):
         try:
-            _renderResolvedPage(resolvedPage, fotobook, mcfBaseFolder,
-                                backgroundLocations, imageDirectory, productStyle, pdf,
-                                pageCount, state, availableFonts, context,
-                                pageNumberingInfo, processElements)
+            label = _renderResolvedPage(
+                resolvedPage, fotobook, mcfBaseFolder, backgroundLocations,
+                imageDirectory, productStyle, pdf, pageCount, state,
+                availableFonts, context, pageNumberingInfo, processElements)
+            if label is not None:
+                outputPageLabels.append(label)
 
         except Exception as pageException:
             logging.exception("Exception")
             logging.error(f'error on page {resolvedPage.source_number}: {pageException.args[0]}')
+    return outputPageLabels
 
 
 def _renderResolvedPage(resolvedPage: ResolvedPage, fotobook, mcfBaseFolder,
@@ -88,14 +93,14 @@ def _renderResolvedPage(resolvedPage: ResolvedPage, fotobook, mcfBaseFolder,
         # This prepares the alternative endpaper background for page 1.
         # It shares the canvas with the following OpeningContentPage request and
         # must not add a page number or call showPage().
-        return
+        return None
 
     if not resolvedPage.finish_page:
         # CEWE places the final ordinary page and its back inside cover on the
         # same PDF canvas.  The following resolved page will finish it.
         addPageNumber(pageNumberingInfo, pdf, resolvedPage.page_number,
                       productStyle, resolvedPage.odd_page, context)
-        return
+        return None
 
     if ProductInfo.isAlbumProduct(productStyle) and resolvedPage.page_type in [
             PageProcessingType.OpeningContentPage, PageProcessingType.RegularPage]:
@@ -104,9 +109,13 @@ def _renderResolvedPage(resolvedPage: ResolvedPage, fotobook, mcfBaseFolder,
 
     if not ProductInfo.isAlbumProduct(productStyle):
         pdf.showPage()
-    elif ProductInfo.isAlbumSingleSide(productStyle):
+        return labelForRenderedPage(resolvedPage, productStyle)
+    if ProductInfo.isAlbumSingleSide(productStyle):
         pdf.showPage()
-    elif resolvedPage.odd_page or (
+        return labelForRenderedPage(resolvedPage, productStyle)
+    if resolvedPage.odd_page or (
             resolvedPage.page_type == PageProcessingType.Cover and
             resolvedPage.source_number != pageCount - 1):
         pdf.showPage()
+        return labelForRenderedPage(resolvedPage, productStyle)
+    return None
