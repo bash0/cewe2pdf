@@ -3,6 +3,9 @@ name: Check Linux standalone executable
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   linux_executable:
     runs-on: ubuntu-latest
