@@ -16,6 +16,7 @@ from datetime import datetime
 from xml.etree import ElementTree
 from PIL import Image
 from pikepdf import Pdf, PdfImage
+import pymupdf
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
@@ -34,6 +35,10 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages):
     readPdf = Pdf.open(outFile)
     numPages =  len(readPdf.pages)
     assert numPages == 25, f"Expected 25 pages, found {numPages}"
+    readPdf.close()
+    with pymupdf.open(outFile) as renderedPdf:
+        assert renderedPdf.get_page_labels() == [
+            {'startpage': 0, 'prefix': '', 'style': 'D', 'firstpagenum': 1}]
 
     # page = readPdf.pages[0]
     # imagesizes = [(412,385),(412,288),(412,423),(219,225),(10,10)]
