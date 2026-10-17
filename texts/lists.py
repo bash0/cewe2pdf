@@ -12,7 +12,6 @@ supports only the flat imported lists currently observed in MCF files.
 # pylint: disable=too-many-arguments,too-many-locals,too-many-nested-blocks
 # pylint: disable=too-many-branches,too-many-statements
 
-import html
 import logging
 from math import floor
 from typing import Any
@@ -22,8 +21,8 @@ from lxml import etree
 from reportlab.lib.styles import ParagraphStyle
 
 from conversionState import ConversionState
-from .markup import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart,
-                     AppendText, CollectFontInfo)
+from .markup import (AddAlbumText, AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart,
+                     CollectFontInfo)
 from .outlines import TextEffectsParagraph
 
 
@@ -103,7 +102,7 @@ def processTextLists(pdf_flowableList, forceLeading, paragraphText: str, additio
                     paragraphText = AppendSpanStart(
                         paragraphText, spanfont, spanfs, spanweight, spanstyle, bstyle)
                     if item.text is not None:
-                        paragraphText = AppendText(paragraphText, html.escape(item.text))
+                        paragraphText = AddAlbumText(paragraphText, item.text)
 
                     breaks = item.findall('.//br')
                     if breaks:
@@ -118,7 +117,7 @@ def processTextLists(pdf_flowableList, forceLeading, paragraphText: str, additio
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
                     if item.tail is not None:
-                        paragraphText = AppendText(paragraphText, html.escape(item.tail))
+                        paragraphText = AddAlbumText(paragraphText, item.tail)
                 else:
                     logging.warning(
                         f"Ignoring unhandled tag {item.tag} in list item "

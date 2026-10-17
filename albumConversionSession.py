@@ -27,6 +27,7 @@ from pageNumbering import PageNumberingInfo
 from pageLabels import pageLabelDefinitions
 from pages import processPages
 from renderContext import RenderContext
+from texts.links import addWebLinksToPdf, getAlbumTextUrls
 
 
 class AlbumConversionSession:
@@ -180,6 +181,7 @@ class AlbumConversionSession:
             logging.error(f'Could not save the output file: {str(exception)}')
 
         self._createIndexOutput(albumIndex, pageSize)
+        self._addWebLinks()
         self._addPdfPageLabels(outputPageLabels)
         if productStyle == PdfProductStyle.MemoryCard:
             print()
@@ -299,6 +301,11 @@ class AlbumConversionSession:
             renderedPdf.save(self.output_file_name, incremental=True, encryption=0)
         finally:
             renderedPdf.close()
+
+    def _addWebLinks(self):
+        """Make literal MCF web addresses interactive after text layout."""
+        if self.setup is not None:
+            addWebLinksToPdf(self.output_file_name, getAlbumTextUrls(self.setup.fotobook))
 
 
 def cleanUpTemporaryFiles(fileList, unpackedFolder):

@@ -266,6 +266,8 @@
     <Content Include="tests\testTextArt\test_textart.mcf" />
     <Content Include="tests\testTextArt\test_textart_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\testTextBox\cewe2pdf.ini" />
+    <Content Include="tests\testTextLinks\cewe2pdf.ini" />
+    <Content Include="tests\testTextLinks\testTextLinks.mcf" />
     <Content Include="tests\testTextOutlines\cewe2pdf.ini" />
     <Content Include="tests\testTextOutlines\testTextOutlines.mcf" />
     <Content Include="tests\testTextOutlines\testTextOutlines_mcf-Dateien\folderid.xml" />
@@ -456,6 +458,8 @@
     <Compile Include="tests\testTabs\test_tabs.py" />
     <Compile Include="tests\testTextArt\test_textart.py" />
     <Compile Include="tests\testTextBox\test_textBox.py" />
+    <Compile Include="tests\testTextLinks\test_links.py" />
+    <Compile Include="tests\testTextLinks\test_textLinks.py" />
     <Compile Include="tests\testTextOutlines\test_textOutlines.py" />
     <Compile Include="tests\testTextShrinkVAlign\test_textShrinkVAlign.py" />
     <Compile Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder.py" />
@@ -592,6 +596,7 @@
     <Folder Include="tests\testTextArt\test_textart_mcf-Dateien\" />
     <Folder Include="tests\testTextBox\" />
     <Folder Include="tests\testTextBox\previous_result_pdfs\" />
+    <Folder Include="tests\testTextLinks\" />
     <Folder Include="tests\testTextOutlines\" />
     <Folder Include="tests\testTextOutlines\previous_result_pdfs\" />
     <Folder Include="tests\testTextOutlines\testTextOutlines_mcf-Dateien\" />
