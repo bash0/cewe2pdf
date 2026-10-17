@@ -1,4 +1,6 @@
 import html
+import re
+
 import reportlab.lib.enums
 
 from reportlab.lib.styles import ParagraphStyle
@@ -7,6 +9,12 @@ from reportlab.pdfbase import pdfmetrics
 from fonts.manager import getAvailableFont
 from fonts.line_scales import LineScales
 from conversionState import ConversionState
+
+
+_WEB_ADDRESS = re.compile(r'https?://[^\s<]+', re.IGNORECASE)
+# ReportLab's zero-size spans have invalid leading.  0.01 pt is below any
+# visible PDF resolution while still producing a genuine word boundary.
+_ZERO_WIDTH_SPACE = '<font size="0.01"> </font>'
 
 
 def CreateParagraphStyle(textcolor, font, fontsize, font_size_adjust, line_scales: LineScales):
@@ -120,16 +128,45 @@ def CollectItemFontFamily(item, dfltfont):
     return itemfont
 
 
-def AppendText(paratext, newtext):
+def AddBasicText(paratext, newtext):
+    """Append trusted ReportLab paragraph markup."""
     if newtext is None:
         return paratext
     return paratext + newtext.replace('\t', '&nbsp;&nbsp;&nbsp;')
 
 
+def AddAlbumText(paragraphText, text):
+    """Append literal CEWE text while preserving its layout.
+
+    Most ordinary CEWE text reaches this function through the ReportLab
+    Paragraph route.  The supported simple-tab route is rendered directly by
+    ``TabbedTextLine`` before that route and deliberately does not call here.
+    If it cannot use that direct renderer, it falls back here and retains the
+    older non-breaking-space tab approximation from ``AddBasicText``.
+
+    Web-link annotations are added only after the complete PDF has been laid
+    out. That keeps literal URL text subject to exactly the same wrapping as
+    CEWE text which is not a link.
+    """
+    if text is None:
+        return paragraphText
+    escapedText = html.escape(text)
+    # CEWE may wrap a web address after a slash. A literal space in a near-zero
+    # font is invisible, but gives ReportLab a genuine word boundary. This
+    # prevents ReportLab from splitting path components at arbitrary letters.
+    escapedText = _WEB_ADDRESS.sub(_addUrlBreakOpportunities, escapedText)
+    return AddBasicText(paragraphText, escapedText)
+
+
+def _addUrlBreakOpportunities(match):
+    """Return a URL with invisible optional breaks after its slashes."""
+    return match.group().replace('/', f'/{_ZERO_WIDTH_SPACE}')
+
+
 def AppendBreak(paragraphText, parachild):
     br = parachild
-    paragraphText = AppendText(paragraphText, "<br></br>&nbsp;")
-    paragraphText = AppendText(paragraphText, br.tail)
+    paragraphText = AddBasicText(paragraphText, "<br></br>&nbsp;")
+    paragraphText = AddAlbumText(paragraphText, br.tail)
     return paragraphText
 
 
@@ -139,35 +176,35 @@ def AppendSpanStart(paragraphText, font, fsize, fweight, fstyle, outerstyle):
     See 6.2 Paragraph XML Markup Tags in the reportlabs user guide.
     """
     # format font size with two decimals so ReportLab receives a stable float
-    paragraphText = AppendText(paragraphText, f'<font name="{font}" size={fsize:.2f}')
+    paragraphText = AddBasicText(paragraphText, f'<font name="{font}" size={fsize:.2f}')
 
     if 'color' in fstyle:
-        paragraphText = AppendText(paragraphText, ' color=' + fstyle['color'])
+        paragraphText = AddBasicText(paragraphText, ' color=' + fstyle['color'])
 
     # This old strategy doesn't interpret background alpha values correctly, background is
     # now done in processAreaTextTag (credit seaeagle1, changeset 687fe50)
     #    if bgColorAttrib is not None:
-    #        paragraphText = AppendText(paragraphText, ' backcolor=' + bgColorAttrib)
+    #        paragraphText = AddBasicText(paragraphText, ' backcolor=' + bgColorAttrib)
 
-    paragraphText = AppendText(paragraphText, '>')
+    paragraphText = AddBasicText(paragraphText, '>')
 
     if IsBold(fweight):  # ref https://www.w3schools.com/csSref/pr_font_weight.asp
-        paragraphText = AppendText(paragraphText, "<b>")
+        paragraphText = AddBasicText(paragraphText, "<b>")
     if IsItalic(fstyle, outerstyle):
-        paragraphText = AppendText(paragraphText, '<i>')
+        paragraphText = AddBasicText(paragraphText, '<i>')
     if IsUnderline(fstyle, outerstyle):
-        paragraphText = AppendText(paragraphText, '<u>')
+        paragraphText = AddBasicText(paragraphText, '<u>')
     return paragraphText
 
 
 def AppendSpanEnd(paragraphText, weight, style, outerstyle):
     if IsUnderline(style, outerstyle):
-        paragraphText = AppendText(paragraphText, '</u>')
+        paragraphText = AddBasicText(paragraphText, '</u>')
     if IsItalic(style, outerstyle):
-        paragraphText = AppendText(paragraphText, '</i>')
+        paragraphText = AddBasicText(paragraphText, '</i>')
     if IsBold(weight):
-        paragraphText = AppendText(paragraphText, "</b>")
-    paragraphText = AppendText(paragraphText, '</font>')
+        paragraphText = AddBasicText(paragraphText, "</b>")
+    paragraphText = AddBasicText(paragraphText, '</font>')
     return paragraphText
 
 
@@ -177,8 +214,8 @@ def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, body
         item, pdf, additional_fonts, bodyfont, bodyfs, bweight, fontScaleFactor, state)
     paragraphText = AppendSpanStart(paragraphText, pfont, pfs, pweight, pstyle, bstyle)
     if text is None:
-        paragraphText = AppendText(paragraphText, "")
+        paragraphText = AddBasicText(paragraphText, "")
     else:
-        paragraphText = AppendText(paragraphText, html.escape(text))
+        paragraphText = AddAlbumText(paragraphText, text)
     paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle, bstyle)
     return paragraphText, pfs

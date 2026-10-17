@@ -5,7 +5,6 @@
 # where possible instead of abandoning the complete album conversion.
 # pylint: disable=bare-except,broad-exception-caught
 
-import html
 import logging
 import re
 from math import floor
@@ -18,14 +17,14 @@ from reportlab.pdfbase import pdfmetrics
 from lxml import etree
 
 from decorations.borders import processDecorationBorders
+from decorations.shadows import warnAndIgnoreEnabledDecorationShadow
 from colorFrame import ColorFrame
 from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
 from fonts.manager import getAvailableFont
 from indexing.albumindex import AlbumIndex
 from renderContext import RenderContext
-from decorations.shadows import warnAndIgnoreEnabledDecorationShadow
-from .markup import (AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart, AppendText,
+from .markup import (AddAlbumText, AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart,
                      CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle,
                      Dequote, LeadingForExplicitLineHeight)
 from .art import processTextArt
@@ -516,6 +515,9 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                 return LeadingForExplicitLineHeight(bodyfont, usefs, pLineHeight, line_scales)
             return usefs * finalLeadingFactor
 
+        # Try direct tab rendering before normal Paragraph construction.  A
+        # supported line is drawn by TabbedTextLine and therefore does not
+        # pass its literal text through AddAlbumText below.
         htmlspans = p.findall(".*")
         tabbed_text_line = getTabbedTextLine(
             p, pdf, additional_fonts, bodyfont, bodyfs, bweight, bstyle,
@@ -529,6 +531,10 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
             pdf_flowableList.append(tabbed_text_line)
             continue
 
+        # A tabbed paragraph rejected above joins the normal paragraph route;
+        # AddAlbumText deliberately retains its older non-breaking-space tab
+        # approximation while it escapes literal text. URLs are annotated only
+        # after the complete PDF has been laid out.
         if len(htmlspans) < 1: # i.e. there are no spans, just a paragraph
             paragraphText = f'<para autoLeading="{autoLeading}">'
             paragraphText, maxfs = AppendItemTextInStyle(paragraphText, p.text, p, pdf,
@@ -578,7 +584,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                     paragraphText = AppendSpanStart(paragraphText, spanfont, spanfs, spanweight, spanstyle, bstyle)
 
                     if span.text is not None:
-                        paragraphText = AppendText(paragraphText, html.escape(span.text))
+                        paragraphText = AddAlbumText(paragraphText, span.text)
                         originalFont = CollectItemFontFamily(span, family)
                         if albumIndex.CheckForIndexEntry(originalFont, spanfs):
                             indexEntryText = AlbumIndex.AppendIndexText(indexEntryText, span.text)
@@ -604,7 +610,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
                     if span.tail is not None:
-                        paragraphText = AppendText(paragraphText, html.escape(span.tail))
+                        paragraphText = AddAlbumText(paragraphText, span.tail)
 
                 else:
                     logging.warning(

@@ -312,6 +312,8 @@ This feature may be useful in, for example, an album which represents a day-by-d
 
 It is normal to allow cewe2pdf to delete the index PDF but to retain the index PNGs. They are consistently named `album.idx.1.png`, `album.idx.2.png`, and so on, even if there is only one page. That allows you to manually insert the index PNG onto the index page in the album editor, and thus have it as part of the album which is sent for quality printing (if you do that!). If you rerun the album PDF generation, cewe2pdf recognises and omits any earlier generated index image saved into the CEWE album before merging the newly generated replacement.
 
+Literal `http://` and `https://` addresses in ordinary text areas are also emitted as invisible, clickable web links in the PDF. They retain the same visible typography as the surrounding CEWE text, including when an address wraps across lines.
+
 The page on which the index is to be placed is recognised by the presence of a text on the page. The text is identified with a regular expression defined in the .ini file, and would often be a visible text such as "Contents". If you don't want a visible text, you can always set the colour of the text to "None". Other things on the index page (photos, clip-art, text, etc) are left undisturbed and should be visible since the background of the index image is transparent.
 
 There are a host of index configuration options which can be specified in a separate section of the .ini file. No indexing will take place unless there is an __INDEX__ section and the __indexing__ value is __True__
