@@ -44,13 +44,18 @@ def addWebLinksToPdf(pdfFileName, urls):
             words = page.get_text('words', sort=True)
             for url in urls:
                 for rects in _rectanglesForUrl(words, url):
-                    for rect in rects:
-                        page.insert_link({
-                            'kind': pymupdf.LINK_URI,
-                            'from': rect,
-                            'uri': url,
-                        })
-                        linkCount += 1
+                    # A PDF link annotation has one rectangular hit area.
+                    # Keeping one annotation per wrapped URL makes link lists
+                    # in readers such as MJ PDF show duplicate destinations.
+                    # Its enclosing rectangle is a slightly more generous
+                    # hit target in return for representing one logical URL
+                    # as one logical PDF link.
+                    page.insert_link({
+                        'kind': pymupdf.LINK_URI,
+                        'from': _enclosingRectangle(rects),
+                        'uri': url,
+                    })
+                    linkCount += 1
         if linkCount:
             renderedPdf.save(pdfFileName, incremental=True, encryption=0)
     finally:
@@ -74,6 +79,14 @@ def _stripTrailingPunctuation(url):
         while url.endswith(closing) and url.count(closing) > url.count(opening):
             url = url[:-1]
     return url
+
+
+def _enclosingRectangle(rectangles):
+    """Return the smallest rectangle containing all visible URL fragments."""
+    enclosingRectangle = pymupdf.Rect(rectangles[0])
+    for rectangle in rectangles[1:]:
+        enclosingRectangle.include_rect(rectangle)
+    return enclosingRectangle
 
 
 def _rectanglesForUrl(words, url):

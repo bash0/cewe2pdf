@@ -44,6 +44,7 @@ def tryToBuildBook(inputFile, outputFile, latestResultFile, expectedPages):
     assert links
     assert all(link['kind'] == pymupdf.LINK_URI for link in links)
     assert {link['uri'] for link in links} == URLS
+    assert len(links) == len(URLS)
 
     if latestResultFile is not None:
         print(f'Compare {outputFile} with {latestResultFile}')
