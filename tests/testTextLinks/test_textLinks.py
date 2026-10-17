@@ -25,6 +25,7 @@ URLS = {
     'https://example.com/cewe2pdf/a/long/link/which/wraps/across/lines',
     'https://example.com/blue-link',
     'https://example.com/cewe2pdf/a/normal/link.htm',
+    'https://www.youtube.com/watch?v=zvB0jZKRKrk',
 }
 
 

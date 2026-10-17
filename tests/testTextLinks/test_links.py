@@ -16,7 +16,7 @@ from testutils import configureTestImportPaths
 
 configureTestImportPaths(__file__)
 
-from texts.links import addWebLinksToPdf
+from texts.links import _urlsInText, addWebLinksToPdf
 from texts.markup import AddAlbumText
 from texts.outlines import TextEffectsParagraph
 
@@ -66,3 +66,8 @@ def test_albumTextEscapesUrlAndAddsInvisibleSlashBreaks():
 
 def test_albumTextEscapesOrdinaryTextWithoutSubstitution():
     assert AddAlbumText('', 'The sea & sky') == 'The sea &amp; sky'
+
+
+def test_urlInParenthesesExcludesTheClosingParenthesis():
+    assert _urlsInText('(https://www.youtube.com/watch?v=zvB0jZKRKrk)') == {
+        'https://www.youtube.com/watch?v=zvB0jZKRKrk'}
