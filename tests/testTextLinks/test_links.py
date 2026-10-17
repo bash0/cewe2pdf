@@ -44,7 +44,7 @@ def test_literalHttpUrlBecomesExternalPdfLink(tmp_path):
     assert {link['uri'] for link in links} == {url}
 
 
-def test_wrappedHttpUrlCreatesExternalPdfLinks(tmp_path):
+def test_wrappedHttpUrlCreatesOneExternalPdfLink(tmp_path):
     outputFile = tmp_path / 'wrapped-web-link.pdf'
     url = 'http://example.com/a/long/path/which/wraps/onto/another/line'
     _renderParagraph(outputFile, 120, url)
@@ -53,7 +53,9 @@ def test_wrappedHttpUrlCreatesExternalPdfLinks(tmp_path):
     with pymupdf.open(outputFile) as renderedPdf:
         links = renderedPdf[0].get_links()
 
-    assert len(links) > 1
+    # One logical URL must stay one annotation even when its rendering is
+    # divided into several slash-separated fragments.
+    assert len(links) == 1
     assert all(link['kind'] == pymupdf.LINK_URI for link in links)
     assert {link['uri'] for link in links} == {url}
 
