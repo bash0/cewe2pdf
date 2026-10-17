@@ -158,7 +158,9 @@ class AlbumConversionSession:
             self.setup.line_scales)
 
         pdf = canvas.Canvas(self.output_file_name, pagesize=pageSize)
-        pdf.setTitle(self.setup.album_title)
+        pdf.setTitle(self.setup.pdf_title)
+        if self.setup.pdf_author:
+            pdf.setAuthor(self.setup.pdf_author)
         pageNumberingInfo = self._createPageNumberingInfo(pdf)
         processElementsForAlbum = partial(
             processElements, state=self.state, albumIndex=albumIndex,

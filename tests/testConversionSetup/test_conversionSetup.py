@@ -45,6 +45,31 @@ def test_prepareConversionWithoutCeweConfiguration():
     assert setup.clipart_files == {}
     assert setup.clipart_paths == ()
     assert setup.passepartout_folders == ()
+    assert setup.pdf_title == 'test_emptyPageOne'
+    assert setup.pdf_author == ''
+
+
+def test_pdfMetadataComesFromDedicatedIniSection():
+    """Title and author are optional document properties, not CEWE settings."""
+    sourceMcf = PROJECT_ROOT / 'tests' / 'testEmptyPageOne' / 'test_emptyPageOne.mcf'
+
+    with TemporaryDirectory() as temporaryDirectory:
+        temporaryPath = Path(temporaryDirectory)
+        albumMcf = temporaryPath / sourceMcf.name
+        shutil.copy2(sourceMcf, albumMcf)
+        (temporaryPath / 'cewe2pdf.ini').write_text(
+            '[PDF_METADATA]\ntitle = A readable album title\nauthor = Pete\n',
+            encoding='utf-8')
+        originalCwd = Path.cwd()
+        try:
+            os.chdir(temporaryPath)
+            with patch('conversionSetup.findAndRegisterFonts', return_value={}):
+                setup = prepareConversion(str(albumMcf), None, None, ConversionState())
+        finally:
+            os.chdir(originalCwd)
+
+    assert setup.pdf_title == 'A readable album title'
+    assert setup.pdf_author == 'Pete'
 
 
 def test_albumSetupDoesNotLoadCalendarResources():

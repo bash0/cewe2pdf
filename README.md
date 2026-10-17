@@ -155,6 +155,12 @@ insideCoverWhite = False
 # Default False, if True then no shadows are created on objects
 noShadows = False
 
+# Optional PDF document properties.  If title is omitted, the input filename
+# (without .mcf or .mcfx) remains the PDF title.
+[PDF_METADATA]
+title = My photo album
+author = Your name
+
 # These possibilities are seldom needed in the latest versions of the program
 #extraBackgroundFolders =
 #	${PROGRAMDATA}/hps/${KEYACCOUNT}/addons/447/backgrounds/v1/backgrounds

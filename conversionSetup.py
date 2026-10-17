@@ -66,7 +66,9 @@ class ConversionSetup:
 
     fotobook: Any       # Root <fotobook> XML element used by the page-processing stage.
     product_style: PdfProductStyle  # Rendering style derived once from the MCF structure.
-    album_title: str    # Human-readable album name, used as the PDF document title.
+    album_title: str    # Human-readable album name used in generated album content and as the PDF-title fallback.
+    pdf_title: str      # PDF title from [PDF_METADATA], or album_title when it is not configured.
+    pdf_author: str     # Optional PDF author from [PDF_METADATA].
 
     available_fonts: Any        # Font faces successfully registered with ReportLab for this conversion.
     line_scales: LineScales     # Default and per-font line-spacing rules read from the INI configuration.
@@ -146,6 +148,8 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
     configuration = configparser.ConfigParser()
     filesread = configuration.read(['cewe2pdf.ini', os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
     defaultConfigSection = configuration['DEFAULT']
+    metadataSection = (configuration['PDF_METADATA']
+                       if configuration.has_section('PDF_METADATA') else None)
     if automaticWindows:
         # Explorer's context menu is designed for non-programmers: do not
         # require manual INI editing. Local system fonts are also useful in
@@ -252,6 +256,11 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
     # clipart lookup then uses its normal "not found" warning.
     clipartPaths = readClipArtConfigXML(ceweFolder, keyAccountFolder, clipartFiles)
 
+    # An empty title would be less useful than the established filename-based
+    # default.  Author deliberately remains empty unless the user supplies it.
+    pdfTitle = metadataSection.get('title', '').strip() if metadataSection else ''
+    pdfAuthor = metadataSection.get('author', '').strip() if metadataSection else ''
+
     # Use names here rather than relying on ConversionSetup's declaration
     # order.  The dataclass is intentionally grouped for readability above,
     # and its fields should be freely rearrangeable without changing values.
@@ -275,6 +284,8 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
         fotobook=fotobook,
         product_style=productStyle,
         album_title=albumTitle,
+        pdf_title=pdfTitle or albumTitle,
+        pdf_author=pdfAuthor,
         available_fonts=availableFonts,
         line_scales=lineScales,
         image_resolution=imageResolution,
