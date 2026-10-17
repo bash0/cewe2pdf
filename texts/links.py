@@ -64,7 +64,16 @@ def addWebLinksToPdf(pdfFileName, urls):
 
 
 def _urlsInText(text):
-    return {url.rstrip(_TRAILING_PUNCTUATION) for url in _URL.findall(text)}
+    return {_stripTrailingPunctuation(url) for url in _URL.findall(text)}
+
+
+def _stripTrailingPunctuation(url):
+    """Discard prose punctuation without losing brackets which belong to a URL."""
+    url = url.rstrip(_TRAILING_PUNCTUATION)
+    for closing, opening in ((')', '('), (']', '['), ('}', '{')):
+        while url.endswith(closing) and url.count(closing) > url.count(opening):
+            url = url[:-1]
+    return url
 
 
 def _rectanglesForUrl(words, url):
@@ -84,7 +93,13 @@ def _rectanglesForUrl(words, url):
 def _rectanglesWithinBlock(words, url):
     """Yield URL rectangles from one continuous PDF text block."""
     for startIndex, word in enumerate(words):
-        wordText = word[4]
+        # A styled URL can touch its preceding opening parenthesis. PyMuPDF
+        # then returns one word such as ``(https:/``. Start matching at the
+        # scheme rather than requiring the PDF word to start with it.
+        schemeStart = word[4].lower().find('http')
+        if schemeStart < 0:
+            continue
+        wordText = word[4][schemeStart:]
         if wordText.startswith(url):
             yield [pymupdf.Rect(*word[:4])]
             continue
@@ -98,7 +113,7 @@ def _rectanglesWithinBlock(words, url):
             if not url.startswith(extendedText):
                 # The last visible fragment can include sentence punctuation.
                 # It remains part of the clickable rectangle, but not the URL.
-                if extendedText.rstrip(_TRAILING_PUNCTUATION) == url:
+                if _stripTrailingPunctuation(extendedText) == url:
                     rectangles.append(pymupdf.Rect(*nextWord[:4]))
                     yield rectangles
                 break
