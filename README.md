@@ -161,6 +161,15 @@ noShadows = False
 title = My photo album
 author = Your name
 
+# Make the top-left 10 mm of photographs with EXIF GPS coordinates clickable,
+# opening their position in Google Maps. This is disabled by default because
+# location may be sensitive personal data. ``urlTemplate`` supports
+# {latitude} and {longitude}; replace it to use another map service.
+[PDF_GEO_LINKS]
+enabled = True
+hotspotSizeMm = 10
+urlTemplate = https://www.google.com/maps?q={latitude},{longitude}
+
 # These possibilities are seldom needed in the latest versions of the program
 #extraBackgroundFolders =
 #	${PROGRAMDATA}/hps/${KEYACCOUNT}/addons/447/backgrounds/v1/backgrounds

@@ -8,6 +8,8 @@ configuration and resource arguments.
 from dataclasses import dataclass
 from typing import Any
 
+from imageUtils import DEFAULT_GEO_LINK_URL_TEMPLATE
+
 
 @dataclass
 class RenderContext:
@@ -23,3 +25,6 @@ class RenderContext:
     clipart_paths: tuple[str, ...]
     passepartout_folders: tuple[str, ...] = ()
     line_scales: Any = None
+    geo_links_enabled: bool = False
+    geo_link_hotspot_size_mm: float = 10
+    geo_link_url_template: str = DEFAULT_GEO_LINK_URL_TEMPLATE

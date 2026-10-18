@@ -14,7 +14,7 @@ from clipart.catalog import getClipConfig, loadClipart
 from clipart.areas import insertClipartFile
 from conversionState import ConversionState
 from decorations.corners import applyCornerMask, getCornersInfo
-from imageUtils import autorot
+from imageUtils import autorot, getMapUrlFromExif
 from decorations.passepartout import Passepartout
 from renderContext import RenderContext
 
@@ -70,6 +70,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
         logging.warning(f'Could not find image file {imagePath}; image omitted.')
         return
     image = PIL.Image.open(imagePath)
+    geoLinkUrl = (getMapUrlFromExif(image, context.geo_link_url_template)
+                  if context.geo_links_enabled else None)
 
     imageTransx = transx
     if (imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM' and
@@ -177,6 +179,21 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
                   mcf2rl * -0.5 * imageCropHeight_mcfunit,
                   width=mcf2rl * imageCropWidth_mcfunit,
                   height=mcf2rl * imageCropHeight_mcfunit, mask='auto')
+    if geoLinkUrl is not None:
+        # Relative coordinates use the photograph's existing CEWE transforms,
+        # including rotation and double-page positioning.
+        hotspotSize_mcfunit = min(
+            context.geo_link_hotspot_size_mm * 10,
+            imageCropWidth_mcfunit, imageCropHeight_mcfunit)
+        left = -0.5 * imageCropWidth_mcfunit
+        top = 0.5 * imageCropHeight_mcfunit
+        pdf.linkURL(
+            geoLinkUrl,
+            (mcf2rl * left,
+             mcf2rl * (top - hotspotSize_mcfunit),
+             mcf2rl * (left + hotspotSize_mcfunit),
+             mcf2rl * top),
+            relative=True, thickness=0)
     pdf.translate(frameShiftX_mcf * mcf2rl, frameShiftY_mcf * mcf2rl)
 
     if frameClipartFileName is not None:

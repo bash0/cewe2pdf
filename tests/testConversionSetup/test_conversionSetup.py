@@ -47,6 +47,7 @@ def test_prepareConversionWithoutCeweConfiguration():
     assert setup.passepartout_folders == ()
     assert setup.pdf_title == 'test_emptyPageOne'
     assert setup.pdf_author == ''
+    assert not setup.geo_links_enabled
 
 
 def test_pdfMetadataComesFromDedicatedIniSection():

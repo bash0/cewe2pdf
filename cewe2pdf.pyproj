@@ -209,6 +209,10 @@
     <Content Include="tests\testFontSubstitution\previous_result_pdfs\testfontsubstitution.mcf.20250411S.pdf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testGeoLinks\cewe2pdf.ini" />
+    <Content Include="tests\testGeoLinks\testGeoLinks.mcf" />
+    <Content Include="tests\testGeoLinks\testGeoLinks_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testGeoLinks\testGeoLinks_mcf-Dateien\y2cp6ylk_1_20260428_100739.jpg" />
     <Content Include="tests\testImageExtractor\test_imageExtractor.mcfx" />
     <Content Include="tests\testImageOperations\cewe2pdf.ini" />
     <Content Include="tests\testImageOperations\test_imageOperations.mcf" />
@@ -441,6 +445,7 @@
     <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
+    <Compile Include="tests\testGeoLinks\test_geoLinks.py" />
     <Compile Include="tests\testImageExtractor\test_imageExtractor.py" />
     <Compile Include="tests\testImageExtractor\test_imageFormats.py" />
     <Compile Include="tests\testImageOperations\test_imageOperations.py" />
@@ -557,6 +562,8 @@
     <Folder Include="tests\testfontsubstitution\" />
     <Folder Include="tests\testFontSubstitution\previous_result_pdfs\" />
     <Folder Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\" />
+    <Folder Include="tests\testGeoLinks\" />
+    <Folder Include="tests\testGeoLinks\testGeoLinks_mcf-Dateien\" />
     <Folder Include="tests\testImageExtractor\" />
     <Folder Include="tests\testImageExtractor\previous_result_pdfs\" />
     <Folder Include="tests\testImageOperations\" />
