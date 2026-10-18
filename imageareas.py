@@ -19,6 +19,33 @@ from decorations.passepartout import Passepartout
 from renderContext import RenderContext
 
 
+def _applyDecorationAlpha(image, area):
+    """Apply a CEWE image area's optional decoration opacity to ``image``.
+
+    CEWE stores an area's opacity on its ``decoration`` element, for both
+    clipart and photographs.  Preserve any alpha already supplied by the
+    source image, a passepartout mask, or a corner mask by scaling rather
+    than replacing its alpha channel.
+    """
+    decoration = area.find('decoration')
+    if decoration is None or decoration.get('alpha') is None:
+        return image
+
+    alphaText = decoration.get('alpha')
+    try:
+        opacity = max(0, min(1, float(alphaText)))
+    except ValueError:
+        logging.warning('Ignoring invalid image decoration alpha %r', alphaText)
+        return image
+
+    if opacity == 1:
+        return image
+
+    image = image.convert('RGBA')
+    image.putalpha(image.getchannel('A').point(lambda value: int(value * opacity)))
+    return image
+
+
 def _isSavedIndexImage(imageFileName, outputFileName):
     """Return whether a CEWE resource is a previously generated index PNG.
 
@@ -151,6 +178,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
 
     cornersInfo = getCornersInfo(area)
     image = applyCornerMask(image, cornersInfo, imageCropWidth_mcfunit)
+    image = _applyDecorationAlpha(image, area)
 
     temporaryImage = tempfile.NamedTemporaryFile()
     # The file must be closed before PIL can reopen it on Windows.

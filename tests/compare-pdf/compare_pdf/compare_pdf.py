@@ -2,6 +2,7 @@
 
 import logging
 import argparse
+import os
 from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
 
@@ -16,8 +17,11 @@ class ShowDiffsStyle(Enum):
 
 class ComparePDF:
     def __init__(self, pdf_paths, showdiffs):
-        self.pdf_paths = pdf_paths
-        self.pdf_documents = [pymupdf.open(path) for path in pdf_paths]
+        # PyMuPDF accepts ``pathlib.Path`` objects, but the diagnostic strings
+        # below are joined. Normalise once at this public boundary so callers
+        # can use either strings or Path objects consistently.
+        self.pdf_paths = [os.fspath(path) for path in pdf_paths]
+        self.pdf_documents = [pymupdf.open(path) for path in self.pdf_paths]
         self.showdiffs = showdiffs
         self.logger = logging.getLogger('cewe2pdf.test')
 
