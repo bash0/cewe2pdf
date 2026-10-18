@@ -123,7 +123,7 @@ def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
 def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
                             context: RenderContext, state: ConversionState, im=None,
                             imgCropWidth_mcfunit=None,
-                            imgCropHeight_mcfunit=None):
+                            imgCropHeight_mcfunit=None, areaRotation=0):
     """Draw an enabled CEWE shadow decoration for an already-positioned area."""
     if getConfigurationBool(context.default_config_section, "noShadows", "False"):
         return
@@ -170,6 +170,10 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
             shadowAngle = shadowAngle + 360
 
         if im is not None:
+            # CEWE stores shadow angles in page coordinates. This image is drawn
+            # on a rotated canvas, so compensate to keep the cast direction fixed
+            # on the finished page.
+            shadowAngle = (shadowAngle - areaRotation) % 360
             drawBlurredImageShadow(
                 pdf, im, imgCropWidth_mcfunit, imgCropHeight_mcfunit,
                 shadowDistance_mcfunit, shadowAngle, intensity,

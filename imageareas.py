@@ -197,7 +197,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
 
     for decorationTag in area.findall('decoration'):
         drawShadow(decorationTag, areaHeight, areaWidth, pdf, context, state,
-                   image, imageCropWidth_mcfunit, imageCropHeight_mcfunit)
+                   image, imageCropWidth_mcfunit, imageCropHeight_mcfunit,
+                   areaRotation=areaRot)
 
     pdf.drawImage(ImageReader(temporaryImage.name),
                   mcf2rl * -0.5 * imageCropWidth_mcfunit,
