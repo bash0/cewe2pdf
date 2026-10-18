@@ -171,6 +171,9 @@
     <Content Include="tests\Resources\photofun\fonts\Stafford Regular.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Stafford\readme.html" />
     <Content Include="tests\Resources\photofun\fonts\Stafford\_readmefirst.txt" />
+    <Content Include="tests\testBackgroundAlignment\cewe2pdf.ini" />
+    <Content Include="tests\testBackgroundAlignment\testBackgroundAlignment.mcf" />
+    <Content Include="tests\testBackgroundAlignment\testBackgroundAlignment_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250326D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411S.pdf" />
@@ -209,6 +212,10 @@
     <Content Include="tests\testFontSubstitution\previous_result_pdfs\testfontsubstitution.mcf.20250411S.pdf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution.mcf" />
     <Content Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testGeoLinks\cewe2pdf.ini" />
+    <Content Include="tests\testGeoLinks\testGeoLinks.mcf" />
+    <Content Include="tests\testGeoLinks\testGeoLinks_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testGeoLinks\testGeoLinks_mcf-Dateien\y2cp6ylk_1_20260428_100739.jpg" />
     <Content Include="tests\testImageExtractor\test_imageExtractor.mcfx" />
     <Content Include="tests\testImageOperations\cewe2pdf.ini" />
     <Content Include="tests\testImageOperations\test_imageOperations.mcf" />
@@ -430,6 +437,7 @@
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
     <Compile Include="tests\compare-pdf\setup.py" />
+    <Compile Include="tests\testBackgroundAlignment\test_backgroundAlignment.py" />
     <Compile Include="tests\testCalendar\test_calendar.py" />
     <Compile Include="tests\testCewePageResolver\test_cewePageResolver.py" />
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
@@ -441,6 +449,7 @@
     <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
+    <Compile Include="tests\testGeoLinks\test_geoLinks.py" />
     <Compile Include="tests\testImageExtractor\test_imageExtractor.py" />
     <Compile Include="tests\testImageExtractor\test_imageFormats.py" />
     <Compile Include="tests\testImageOperations\test_imageOperations.py" />
@@ -530,6 +539,9 @@
     <Folder Include="tests\Resources\photofun\fonts\LiberationSans\misc\" />
     <Folder Include="tests\Resources\photofun\fonts\Poppins\" />
     <Folder Include="tests\Resources\photofun\fonts\Stafford\" />
+    <Folder Include="tests\testBackgroundAlignment\" />
+    <Folder Include="tests\testBackgroundAlignment\previous_result_pdfs\" />
+    <Folder Include="tests\testBackgroundAlignment\testBackgroundAlignment_mcf-Dateien\" />
     <Folder Include="tests\testbackgrounds\previous_result_pdfs\" />
     <Folder Include="tests\testCalendar\" />
     <Folder Include="tests\testCalendar\a4l\" />
@@ -557,6 +569,8 @@
     <Folder Include="tests\testfontsubstitution\" />
     <Folder Include="tests\testFontSubstitution\previous_result_pdfs\" />
     <Folder Include="tests\testfontsubstitution\testfontsubstitution_mcf-Dateien\" />
+    <Folder Include="tests\testGeoLinks\" />
+    <Folder Include="tests\testGeoLinks\testGeoLinks_mcf-Dateien\" />
     <Folder Include="tests\testImageExtractor\" />
     <Folder Include="tests\testImageExtractor\previous_result_pdfs\" />
     <Folder Include="tests\testImageOperations\" />

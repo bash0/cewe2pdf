@@ -21,7 +21,8 @@ from renderContext import RenderContext
 
 def processBackground(backgroundTags, state: ConversionState, backgroundLocations,
                       productstyle, pagetype, pdf, ph, pw, pageNumber,
-                      lastPage, context: RenderContext):
+                      oddPage, lastPage, context: RenderContext,
+                      facingBackgroundTags=None):
     """Draw the page background, including special handling for inside covers."""
     areaHeight = ph
     areaWidth = pw
@@ -63,24 +64,40 @@ def processBackground(backgroundTags, state: ConversionState, backgroundLocation
 
     _drawBackground(backgroundTags, state, backgroundLocations, productstyle,
                     pagetype, pdf, areaHeight, areaWidth, areaXOffset,
-                    pageNumber, lastPage, context)
+                    pageNumber, oddPage, lastPage, context,
+                    facingBackgroundTags)
 
 
 def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
                     productstyle, pagetype, pdf, areaHeight, areaWidth,
-                    areaXOffset, pageNumber, lastPage,
-                    context: RenderContext):
+                    areaXOffset, pageNumber, oddPage, lastPage,
+                    context: RenderContext, facingBackgroundTags=None):
     """Find, load, and draw the selected background image."""
     backgroundTag = next((tag for tag in backgroundTags or []
                           if tag.get('alignment') is not None), None)
     if backgroundTag is None or backgroundTag.get('designElementId') is None:
         return
 
+    isSpreadBackground = (pagetype == PageProcessingType.RegularPage
+                          and ProductInfo.isAlbumDoubleSide(productstyle)
+                          and _sameBackground(backgroundTag, facingBackgroundTags))
+    if isSpreadBackground and oddPage:
+        # The even-page operation has already painted this one CEWE spread
+        # background across both physical pages.
+        return
+
     if (pagetype == PageProcessingType.RegularPage
             and ProductInfo.isAlbumDoubleSide(productstyle)
-            and backgroundTag.get('alignment') == '3'):
+            and not lastPage
+            and not isSpreadBackground):
+        # Individual album pages retain their own background record even
+        # though their areas are stored as a two-page CEWE bundle.  Paint that
+        # record into its physical half of the PDF spread.  The final content
+        # page instead fills the complete spread, because its background is
+        # deliberately retained for the facing back endpaper.
         areaWidth = areaWidth / 2
-        areaXOffset = areaXOffset + areaWidth
+        if oddPage:
+            areaXOffset += areaWidth
 
     bg = backgroundTag.get('designElementId')
     _reportUnsupportedBackgroundAttributes(backgroundTag)
@@ -89,6 +106,9 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
                                 backgroundLocations)
         logging.debug(f"Reading background file: {bgPath}")
         image = PIL.Image.open(bgPath).convert('RGB')
+        if pagetype == PageProcessingType.RegularPage and not isSpreadBackground:
+            image = _cropBackgroundToArea(
+                image, areaWidth, areaHeight, backgroundTag.get('alignment'))
         memFileHandle = BytesIO()
         image.save(memFileHandle, 'jpeg')
         memFileHandle.seek(0)
@@ -102,6 +122,38 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
             logging.warning(
                 f'Could not find background {bg}; leaving the page background unchanged.')
         state.background_not_found_paths.add(bg)
+
+
+def _sameBackground(backgroundTag, facingBackgroundTags):
+    """Return whether two regular album pages use one CEWE spread background."""
+    facingBackgroundTag = next((tag for tag in facingBackgroundTags or []
+                                if tag.get('alignment') is not None), None)
+    return (facingBackgroundTag is not None
+            and backgroundTag.get('designElementId') ==
+            facingBackgroundTag.get('designElementId'))
+
+
+def _cropBackgroundToArea(image, areaWidth, areaHeight, alignment):
+    """Crop a background without distorting it, respecting CEWE alignment.
+
+    CEWE's values 1, 2 and 3 mean left, centre and right respectively.  They
+    select the horizontal part of an image when its aspect ratio is wider than
+    the destination area.  A portrait source needs vertical cropping instead;
+    CEWE has no vertical background alignment value, so retain its centre.
+    """
+    targetRatio = areaWidth / areaHeight
+    sourceRatio = image.width / image.height
+    if sourceRatio > targetRatio:
+        cropWidth = int(round(image.height * targetRatio))
+        availableWidth = image.width - cropWidth
+        horizontalPosition = {'1': 0, '2': 0.5, '3': 1}.get(alignment, 0.5)
+        left = int(round(availableWidth * horizontalPosition))
+        return image.crop((left, 0, left + cropWidth, image.height))
+    if sourceRatio < targetRatio:
+        cropHeight = int(round(image.width / targetRatio))
+        top = (image.height - cropHeight) // 2
+        return image.crop((0, top, image.width, top + cropHeight))
+    return image
 
 
 def _reportUnsupportedBackgroundAttributes(backgroundTag):

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="6685f316-9ade-4ea0-980e-1eb5d63811b1" imagedir="testGeoLinks_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+    <project createdWithHPSVersion="8.1.3" createdWithHPSVersionBuild="20260410" multiPurposeText="" projectID="34053316-f24d-44bb-988f-3191f6c6addd" projectIDCreatedEpoch="1792272087"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="8.1.3" programversionBuild="20260410" savetime="2026-10-18 08:01"/>
+    <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
+    <addOns>
+        <addOn ordertxt="FLF11" priceClass="FLF11" variant="flyleafcolor:white"/>
+    </addOns>
+    <pagenumbering bgcolor="#00000000" fontbold="0" fontfamily="Calibri" fontitalics="0" fontsize="24" format="0" margin="50" position="0" textcolor="#ff000000" textstring="%" verticalMargin="50">
+        <outline width="0"/>
+    </pagenumbering>
+    <ruler/>
+    <extra>
+        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <imageQuality version="1.3.56"/>
+    </extra>
+    <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4290"/>
+        <designElementIDs background="201" layout="384109"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
+        <area areatype="spinetextarea">
+            <position height="106" left="820" rotation="270" top="1322" width="2650" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="spine"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked::marker { content: "\2612"; }
+</style></head><body style=" font-family:'CEWE Head'; font-size:11pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="Liberation Sans,11,-1,5,700,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ffffffff" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="spine">
+        <bundlesize height="2750" width="4290"/>
+        <designElementIDs background="201"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
+        <bundlesize height="2750" width="4290"/>
+        <designElementIDs background="201" layout="422099"/>
+        <background alignment="4" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="422099" layout="1" templatename="fullcoverpage_with_title"/>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <page designStyleID="-1" pagenr="1" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="2" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="imagearea">
+            <position height="790" left="148.5" rotation="0" top="140.672" width="1753" zposition="100"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/y2cp6ylk_1_20260428_100739.jpg" useABK="1">
+                <cutout left="-0.00886383" scale="0.435022" top="2.00329e-14"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="379.463" left="2649.1" rotation="0" top="140.849" width="530.547" zposition="101"/>
+            <decoration/>
+            <image filename="safecontainer:/r9ozcqmh_1_20260506_144655.jpg" useABK="1">
+                <cutout left="-0.0209048" scale="0.233946" top="0"/>
+                <quality jpeg="1" noise="0.680248" resolution="1" sharpness="1" summarized="0.920062" texture="1"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="382.096" left="148.5" rotation="0" top="1098.68" width="743.945" zposition="102"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/y2cp6ylk_1_20260428_100739.jpg" useABK="1">
+                <cutout left="-142.387" scale="0.255286" top="-40.2983"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="382" left="1081.5" rotation="14" top="1108.67" width="744" zposition="103"/>
+            <decoration>
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/y2cp6ylk_1_20260428_100739.jpg" useABK="1">
+                <cutout left="-142" scale="0.255286" top="-40"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="604.92" left="2176.56" rotation="0" top="138.599" width="339.195" zposition="105"/>
+            <decoration alpha="0.30000000000000004">
+                <border applySpotColor="0" color="#fff3f6fa" enabled="1" gap="10" position="centered" width="4"/>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="10" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/ed03iu3f_1_20260428_122438.jpg" useABK="1">
+                <cutout left="0" scale="0.15003" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+            </image>
+        </area>
+        <area areatype="textarea">
+            <position height="104" left="2643.57" rotation="0" top="548.056" width="539.997" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">No location data, no border or shadow</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="57" left="148.5" rotation="0" top="957.711" width="615.223" zposition="7002"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Has location data, in Denmark</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="57" left="148.5" rotation="0" top="1523.89" width="542.463" zposition="7003"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Has location data, cropped</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="104" left="1054.4" rotation="0" top="1539.15" width="464.09" zposition="7004"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Has location data, cropped and rotated</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+        <area areatype="textarea">
+            <position height="104" left="2168.32" rotation="0" top="779.718" width="370.524" zposition="7005"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Has location data, transparent</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
+    </page>
+    <page designStyleID="-1" pagenr="3" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="4" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="5" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="6" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="7" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="8" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="9" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="10" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="11" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="12" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="13" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="14" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="15" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="16" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="17" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="18" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="19" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="20" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="21" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="22" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="23" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="24" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="25" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="26" rotation="0" type="normalpage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" layout="125061" styles_v2="1226557"/>
+        <background alignment="1" designElementId="201" rotation="0" type="1"/>
+        <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+    </page>
+    <page designStyleID="-1" pagenr="0" rotation="0" type="emptypage">
+        <bundlesize height="2700" width="4100"/>
+        <designElementIDs background="201" styles_v2="1226557"/>
+        <background alignment="3" designElementId="201" rotation="0" type="1"/>
+    </page>
+    <userfeedback></userfeedback>
+    <fotoRelationships>
+        <foto id="file:///C:/Users/pete/Pictures/PhotoAlbumWork/PhotoAlbum2026/AlbumCandidates/StorysOnTheRoad2026/20260428_100739.jpg">
+            <foto id="safecontainer:/y2cp6ylk_1_20260428_100739.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
+        <foto id="file:///C:/Users/pete/source/repos/cewe2pdf/tests/testGeoLinks/20260506_144655.jpg">
+            <foto id="safecontainer:/r9ozcqmh_1_20260506_144655.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
+        <foto id="file:///C:/Users/pete/Pictures/PhotoAlbumWork/PhotoAlbum2026/AlbumCandidates/StorysOnTheRoad2026/20260428_122438.jpg">
+            <foto id="safecontainer:/ed03iu3f_1_20260428_122438.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
+    </fotoRelationships>
+    <statistics assistantUsed="0" countPauses="74" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="478046" fotosAdded="18" fotosRemoved="6" pauseTime="388735" sessionsUsed="57"/>
+</fotobook>

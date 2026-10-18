@@ -5,6 +5,7 @@ import os
 import sys
 from pathlib import Path
 from datetime import datetime
+from xml.etree import ElementTree
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -14,6 +15,7 @@ from pikepdf import Pdf
 
 from compare_pdf import ComparePDF, ShowDiffsStyle  # type: ignore
 from cewe2pdf import convertMcf  # type: ignore
+from imageareas import _applyDecorationAlpha
 from testutils import getLatestResultFile
 
 
@@ -39,6 +41,18 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages,
         assert compare.compare(), 'Pixel comparison failed'
     finally:
         compare.cleanup()
+
+
+def test_imageDecorationAlphaPreservesExistingAlpha():
+    """Photo opacity multiplies, rather than replaces, image transparency."""
+    from PIL import Image
+
+    area = ElementTree.fromstring('<area><decoration alpha="0.3"/></area>')
+    image = Image.new('RGBA', (1, 1), (10, 20, 30, 200))
+
+    renderedImage = _applyDecorationAlpha(image, area)
+
+    assert renderedImage.getpixel((0, 0)) == (10, 20, 30, 60)
 
 
 def test_transparency(main=False):

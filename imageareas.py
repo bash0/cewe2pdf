@@ -14,9 +14,36 @@ from clipart.catalog import getClipConfig, loadClipart
 from clipart.areas import insertClipartFile
 from conversionState import ConversionState
 from decorations.corners import applyCornerMask, getCornersInfo
-from imageUtils import autorot
+from imageUtils import autorot, getMapUrlFromExif
 from decorations.passepartout import Passepartout
 from renderContext import RenderContext
+
+
+def _applyDecorationAlpha(image, area):
+    """Apply a CEWE image area's optional decoration opacity to ``image``.
+
+    CEWE stores an area's opacity on its ``decoration`` element, for both
+    clipart and photographs.  Preserve any alpha already supplied by the
+    source image, a passepartout mask, or a corner mask by scaling rather
+    than replacing its alpha channel.
+    """
+    decoration = area.find('decoration')
+    if decoration is None or decoration.get('alpha') is None:
+        return image
+
+    alphaText = decoration.get('alpha')
+    try:
+        opacity = max(0, min(1, float(alphaText)))
+    except ValueError:
+        logging.warning('Ignoring invalid image decoration alpha %r', alphaText)
+        return image
+
+    if opacity == 1:
+        return image
+
+    image = image.convert('RGBA')
+    image.putalpha(image.getchannel('A').point(lambda value: int(value * opacity)))
+    return image
 
 
 def _isSavedIndexImage(imageFileName, outputFileName):
@@ -70,16 +97,15 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
         logging.warning(f'Could not find image file {imagePath}; image omitted.')
         return
     image = PIL.Image.open(imagePath)
+    geoLinkUrl = (getMapUrlFromExif(image, context.geo_link_url_template)
+                  if context.geo_links_enabled else None)
 
+    # ``transx`` already contains the MCF area's position.  In a double-page
+    # output a RIGHT_OR_BOTTOM background area therefore already lies in the
+    # right half of the spread; applying a second half-page offset would put
+    # it beyond the canvas.  For a single-page output, pageElements has
+    # already made the equivalent move into local page coordinates.
     imageTransx = transx
-    if (imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM' and
-            ProductInfo.isAlbumDoubleSide(productStyle)):
-        # A double-side output canvas still uses the full CEWE spread.  The
-        # background position identifies its right half.  In single-side
-        # output, pageElements has already moved that half to local page
-        # coordinates, so applying another page-width shift would draw the
-        # image completely off the PDF page.
-        imageTransx += mcf2rl * pageWidth / 2
 
     # The source image is first cropped in MCF coordinates, then resized for
     # the output PDF. Decorations are applied to that final crop so masks,
@@ -149,6 +175,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
 
     cornersInfo = getCornersInfo(area)
     image = applyCornerMask(image, cornersInfo, imageCropWidth_mcfunit)
+    image = _applyDecorationAlpha(image, area)
 
     temporaryImage = tempfile.NamedTemporaryFile()
     # The file must be closed before PIL can reopen it on Windows.
@@ -177,6 +204,21 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
                   mcf2rl * -0.5 * imageCropHeight_mcfunit,
                   width=mcf2rl * imageCropWidth_mcfunit,
                   height=mcf2rl * imageCropHeight_mcfunit, mask='auto')
+    if geoLinkUrl is not None:
+        # Relative coordinates use the photograph's existing CEWE transforms,
+        # including rotation and double-page positioning.
+        hotspotSize_mcfunit = min(
+            context.geo_link_hotspot_size_mm * 10,
+            imageCropWidth_mcfunit, imageCropHeight_mcfunit)
+        left = -0.5 * imageCropWidth_mcfunit
+        top = 0.5 * imageCropHeight_mcfunit
+        pdf.linkURL(
+            geoLinkUrl,
+            (mcf2rl * left,
+             mcf2rl * (top - hotspotSize_mcfunit),
+             mcf2rl * (left + hotspotSize_mcfunit),
+             mcf2rl * top),
+            relative=True, thickness=0)
     pdf.translate(frameShiftX_mcf * mcf2rl, frameShiftY_mcf * mcf2rl)
 
     if frameClipartFileName is not None:

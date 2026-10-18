@@ -155,7 +155,9 @@ class AlbumConversionSession:
             self.setup.background_resolution, self.pil_antialias,
             self.setup.default_config_section, self.setup.clipart_files,
             self.setup.clipart_paths, self.setup.passepartout_folders,
-            self.setup.line_scales)
+            self.setup.line_scales, self.setup.geo_links_enabled,
+            self.setup.geo_link_hotspot_size_mm,
+            self.setup.geo_link_url_template)
 
         pdf = canvas.Canvas(self.output_file_name, pagesize=pageSize)
         pdf.setTitle(self.setup.pdf_title)

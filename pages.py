@@ -39,10 +39,29 @@ def parseInputPage(fotobook, mcfBaseFolder, backgroundLocations, imageDirectory,
 
     # The designElementIDs preceding the background element match it only for
     # an original, unfiltered stock background.
-    backgroundTags = page.findall('background')
+    # Page areas are stored in pairs, but each physical page has its own
+    # background record.  Retrieve that record separately for ordinary album
+    # pages so a right-hand page does not inherit its left-hand neighbour's
+    # background or alignment.
+    backgroundPage = page
+    facingBackgroundTags = None
+    if (ProductInfo.isAlbumProduct(productStyle)
+            and pageType == PageProcessingType.RegularPage):
+        physicalPage = fotobook.find(
+            f"./page[@pagenr='{pageNumber}'][@type='normalpage']")
+        if physicalPage is not None:
+            backgroundPage = physicalPage
+        if ProductInfo.isAlbumDoubleSide(productStyle) and not lastPage:
+            facingPageNumber = pageNumber - 1 if oddPage else pageNumber + 1
+            facingPage = fotobook.find(
+                f"./page[@pagenr='{facingPageNumber}'][@type='normalpage']")
+            if facingPage is not None:
+                facingBackgroundTags = facingPage.findall('background')
+    backgroundTags = backgroundPage.findall('background')
     processBackground(backgroundTags, state,
                       backgroundLocations, productStyle, pageType, pdf,
-                      pageHeight, pageWidth, pageNumber, lastPage, context)
+                      pageHeight, pageWidth, pageNumber, oddPage, lastPage,
+                      context, facingBackgroundTags)
 
     if ProductInfo.isAlbumSingleSide(productStyle) and \
             pageType == PageProcessingType.FrontInsideCoverBackground:
