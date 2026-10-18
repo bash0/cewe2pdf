@@ -1,4 +1,4 @@
-"""Pixel-comparison regression test for CEWE background left/centre/right alignment."""
+"""Pixel regression test for CEWE image and stock-background positioning."""
 
 from datetime import datetime
 import os
@@ -45,7 +45,7 @@ def tryToBuildBook(inputFile, outputFile, latestResultFile, keepDoublePages,
 
 
 def test_backgroundAlignment(main=False):
-    """The fixture contains otherwise identical left, centre, and right backgrounds."""
+    """Check stock alignment plus left/right and full-spread photo backgrounds."""
     folder = 'testBackgroundAlignment'
     album = 'testBackgroundAlignment'
     inputFile = PROJECT_ROOT / 'tests' / folder / f'{album}.mcf'

@@ -100,15 +100,12 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     geoLinkUrl = (getMapUrlFromExif(image, context.geo_link_url_template)
                   if context.geo_links_enabled else None)
 
+    # ``transx`` already contains the MCF area's position.  In a double-page
+    # output a RIGHT_OR_BOTTOM background area therefore already lies in the
+    # right half of the spread; applying a second half-page offset would put
+    # it beyond the canvas.  For a single-page output, pageElements has
+    # already made the equivalent move into local page coordinates.
     imageTransx = transx
-    if (imageTag.get('backgroundPosition') == 'RIGHT_OR_BOTTOM' and
-            ProductInfo.isAlbumDoubleSide(productStyle)):
-        # A double-side output canvas still uses the full CEWE spread.  The
-        # background position identifies its right half.  In single-side
-        # output, pageElements has already moved that half to local page
-        # coordinates, so applying another page-width shift would draw the
-        # image completely off the PDF page.
-        imageTransx += mcf2rl * pageWidth / 2
 
     # The source image is first cropped in MCF coordinates, then resized for
     # the output PDF. Decorations are applied to that final crop so masks,

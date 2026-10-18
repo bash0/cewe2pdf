@@ -21,7 +21,8 @@ from renderContext import RenderContext
 
 def processBackground(backgroundTags, state: ConversionState, backgroundLocations,
                       productstyle, pagetype, pdf, ph, pw, pageNumber,
-                      oddPage, lastPage, context: RenderContext):
+                      oddPage, lastPage, context: RenderContext,
+                      facingBackgroundTags=None):
     """Draw the page background, including special handling for inside covers."""
     areaHeight = ph
     areaWidth = pw
@@ -63,22 +64,32 @@ def processBackground(backgroundTags, state: ConversionState, backgroundLocation
 
     _drawBackground(backgroundTags, state, backgroundLocations, productstyle,
                     pagetype, pdf, areaHeight, areaWidth, areaXOffset,
-                    pageNumber, oddPage, lastPage, context)
+                    pageNumber, oddPage, lastPage, context,
+                    facingBackgroundTags)
 
 
 def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
                     productstyle, pagetype, pdf, areaHeight, areaWidth,
                     areaXOffset, pageNumber, oddPage, lastPage,
-                    context: RenderContext):
+                    context: RenderContext, facingBackgroundTags=None):
     """Find, load, and draw the selected background image."""
     backgroundTag = next((tag for tag in backgroundTags or []
                           if tag.get('alignment') is not None), None)
     if backgroundTag is None or backgroundTag.get('designElementId') is None:
         return
 
+    isSpreadBackground = (pagetype == PageProcessingType.RegularPage
+                          and ProductInfo.isAlbumDoubleSide(productstyle)
+                          and _sameBackground(backgroundTag, facingBackgroundTags))
+    if isSpreadBackground and oddPage:
+        # The even-page operation has already painted this one CEWE spread
+        # background across both physical pages.
+        return
+
     if (pagetype == PageProcessingType.RegularPage
             and ProductInfo.isAlbumDoubleSide(productstyle)
-            and not lastPage):
+            and not lastPage
+            and not isSpreadBackground):
         # Individual album pages retain their own background record even
         # though their areas are stored as a two-page CEWE bundle.  Paint that
         # record into its physical half of the PDF spread.  The final content
@@ -95,7 +106,7 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
                                 backgroundLocations)
         logging.debug(f"Reading background file: {bgPath}")
         image = PIL.Image.open(bgPath).convert('RGB')
-        if pagetype == PageProcessingType.RegularPage:
+        if pagetype == PageProcessingType.RegularPage and not isSpreadBackground:
             image = _cropBackgroundToArea(
                 image, areaWidth, areaHeight, backgroundTag.get('alignment'))
         memFileHandle = BytesIO()
@@ -111,6 +122,15 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
             logging.warning(
                 f'Could not find background {bg}; leaving the page background unchanged.')
         state.background_not_found_paths.add(bg)
+
+
+def _sameBackground(backgroundTag, facingBackgroundTags):
+    """Return whether two regular album pages use one CEWE spread background."""
+    facingBackgroundTag = next((tag for tag in facingBackgroundTags or []
+                                if tag.get('alignment') is not None), None)
+    return (facingBackgroundTag is not None
+            and backgroundTag.get('designElementId') ==
+            facingBackgroundTag.get('designElementId'))
 
 
 def _cropBackgroundToArea(image, areaWidth, areaHeight, alignment):
