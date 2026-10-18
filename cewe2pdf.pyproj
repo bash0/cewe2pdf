@@ -171,6 +171,9 @@
     <Content Include="tests\Resources\photofun\fonts\Stafford Regular.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Stafford\readme.html" />
     <Content Include="tests\Resources\photofun\fonts\Stafford\_readmefirst.txt" />
+    <Content Include="tests\testBackgroundAlignment\cewe2pdf.ini" />
+    <Content Include="tests\testBackgroundAlignment\testBackgroundAlignment.mcf" />
+    <Content Include="tests\testBackgroundAlignment\testBackgroundAlignment_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250326D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411D.pdf" />
     <Content Include="tests\testbackgrounds\previous_result_pdfs\allblackbackgrounds.mcf.20250411S.pdf" />
@@ -434,6 +437,7 @@
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\__init__.py" />
     <Compile Include="tests\compare-pdf\setup.py" />
+    <Compile Include="tests\testBackgroundAlignment\test_backgroundAlignment.py" />
     <Compile Include="tests\testCalendar\test_calendar.py" />
     <Compile Include="tests\testCewePageResolver\test_cewePageResolver.py" />
     <Compile Include="tests\testClipartColorReplacement\test_clipartColorReplacement.py" />
@@ -535,6 +539,9 @@
     <Folder Include="tests\Resources\photofun\fonts\LiberationSans\misc\" />
     <Folder Include="tests\Resources\photofun\fonts\Poppins\" />
     <Folder Include="tests\Resources\photofun\fonts\Stafford\" />
+    <Folder Include="tests\testBackgroundAlignment\" />
+    <Folder Include="tests\testBackgroundAlignment\previous_result_pdfs\" />
+    <Folder Include="tests\testBackgroundAlignment\testBackgroundAlignment_mcf-Dateien\" />
     <Folder Include="tests\testbackgrounds\previous_result_pdfs\" />
     <Folder Include="tests\testCalendar\" />
     <Folder Include="tests\testCalendar\a4l\" />
