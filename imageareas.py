@@ -19,6 +19,20 @@ from decorations.passepartout import Passepartout
 from renderContext import RenderContext
 
 
+def _getDecorationOpacity(area):
+    """Return an image area's CEWE decoration opacity as a value from 0 to 1."""
+    decoration = area.find('decoration')
+    if decoration is None or decoration.get('alpha') is None:
+        return 1
+
+    alphaText = decoration.get('alpha')
+    try:
+        return max(0, min(1, float(alphaText)))
+    except ValueError:
+        logging.warning('Ignoring invalid image decoration alpha %r', alphaText)
+        return 1
+
+
 def _applyDecorationAlpha(image, area):
     """Apply a CEWE image area's optional decoration opacity to ``image``.
 
@@ -27,16 +41,7 @@ def _applyDecorationAlpha(image, area):
     source image, a passepartout mask, or a corner mask by scaling rather
     than replacing its alpha channel.
     """
-    decoration = area.find('decoration')
-    if decoration is None or decoration.get('alpha') is None:
-        return image
-
-    alphaText = decoration.get('alpha')
-    try:
-        opacity = max(0, min(1, float(alphaText)))
-    except ValueError:
-        logging.warning('Ignoring invalid image decoration alpha %r', alphaText)
-        return image
+    opacity = _getDecorationOpacity(area)
 
     if opacity == 1:
         return image
@@ -121,7 +126,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     maskClipartFileName = None
     frameDeltaX_mcfunit = 0
     frameDeltaY_mcfunit = 0
-    frameAlpha = 255
+    # A passepartout has a separately drawn frame as well as the masked photo.
+    # CEWE applies the image area's decoration opacity to both components.
+    frameAlpha = int(_getDecorationOpacity(area) * 255)
     imageCropWidth_mcfunit = areaWidth
     imageCropHeight_mcfunit = areaHeight
     if passepartoutId is not None:

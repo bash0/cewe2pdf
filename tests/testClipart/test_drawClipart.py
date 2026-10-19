@@ -18,11 +18,26 @@ from testutils import configureTestImportPaths
 configureTestImportPaths(__file__)
 from datetime import datetime
 from pikepdf import Pdf, PdfImage
+from PIL import Image
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
+from clipart.clpfile import ClpFile
 
 from testutils import getLatestResultFile
+
+
+def test_rgbaClipartOpacityPreservesExistingAlpha(monkeypatch):
+    """Decoration opacity scales an SVG's existing antialiased alpha."""
+    clipart = ClpFile()
+    monkeypatch.setattr(
+        clipart, 'rasterSvgData',
+        lambda width, height: Image.new('RGBA', (1, 1), (10, 20, 30, 200)))
+
+    clipart.convertToPngInBuffer(1, 1, alpha=76)
+    renderedImage = Image.open(clipart.pngMemFile)
+
+    assert renderedImage.getpixel((0, 0)) == (10, 20, 30, 59)
 
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages):
