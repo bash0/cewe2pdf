@@ -31,6 +31,8 @@
     <Content Include=".gitignore" />
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.example.txt" />
+    <Content Include="assets\cewe2pdf-icon.ico" />
+    <Content Include="assets\cewe2pdf-icon.png" />
     <Content Include="cewe2pdf.spec" />
     <Content Include="clipart\CLP file format.txt" />
     <Content Include="clipart\__pycache__\areas.cpython-312.pyc" />
@@ -493,6 +495,7 @@
   <ItemGroup>
     <Folder Include=".github\" />
     <Folder Include=".github\workflows\" />
+    <Folder Include="assets\" />
     <Folder Include="calendars\" />
     <Folder Include="clipart\" />
     <Folder Include="clipart\__pycache__\" />
