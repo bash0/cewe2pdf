@@ -72,6 +72,16 @@ class ClpFile():
                     if (pixels[i, j] != 0):
                         pixels[i, j] = alpha
             scaledImage.putalpha(alphamask)
+        else:
+            # SVGs with transparent pixels arrive as RGBA.  Preserve their
+            # existing antialiased alpha, while applying the decoration's
+            # opacity to the whole clipart.  Previously the alpha argument
+            # was ignored for this common case, leaving passepartout frames
+            # opaque when their photographs were transparent.
+            scaledImage = scaledImage.convert('RGBA')
+            scaledImage.putalpha(
+                scaledImage.getchannel('A').point(
+                    lambda value: int(value * alpha / 255)))
 
         if flipX:
             scaledImage = scaledImage.transpose(Image.Transpose.FLIP_LEFT_RIGHT)

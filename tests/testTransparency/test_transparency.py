@@ -15,7 +15,7 @@ from pikepdf import Pdf
 
 from compare_pdf import ComparePDF, ShowDiffsStyle  # type: ignore
 from cewe2pdf import convertMcf  # type: ignore
-from imageareas import _applyDecorationAlpha
+from imageareas import _applyDecorationAlpha, _getDecorationOpacity
 from testutils import getLatestResultFile
 
 
@@ -53,6 +53,14 @@ def test_imageDecorationAlphaPreservesExistingAlpha():
     renderedImage = _applyDecorationAlpha(image, area)
 
     assert renderedImage.getpixel((0, 0)) == (10, 20, 30, 60)
+
+
+def test_imageDecorationOpacityIsSharedWithPassepartoutFrames():
+    """The separately drawn passepartout frame uses the photo's opacity."""
+    area = ElementTree.fromstring('<area><decoration alpha="0.3"/></area>')
+
+    assert _getDecorationOpacity(area) == 0.3
+    assert int(_getDecorationOpacity(area) * 255) == 76
 
 
 def test_transparency(main=False):
