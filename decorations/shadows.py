@@ -53,16 +53,18 @@ def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
     # was downsampled earlier in processAreaImageTag.
     pixelsPerMcfunit = im.width / imgCropWidth_mcfunit
 
-    # CEWE's displayed shadow expands by about three quarters of the nominal
-    # half-width on each side. This was measured from the width-only test page
+    # CEWE's displayed shadow expands by about three tenths of the nominal
+    # width on each side. This was calibrated against the width-only test page
     # (0 .. 10 mm); the old ReportLab Table is noticeably larger at high values.
     spreadRadius_px = int(round(
-        shadowWidth_mcfunit * pixelsPerMcfunit * 0.375
+        shadowWidth_mcfunit * pixelsPerMcfunit * 0.30
     ))
 
     # shadowBlurNew is stored in MCF units. Pillow's GaussianBlur has a wider
-    # visible tail than CEWE's editor, so use half the nominal radius. A
-    # three-radius transparent margin prevents that tail being clipped.
+    # visible tail than CEWE's editor, so use half the nominal radius. The
+    # reduced spread above keeps the overall extent compact while this retains
+    # CEWE-like softness at the visible edge. A three-radius transparent margin
+    # prevents that tail being clipped.
     # Keep the fractional radius: rounding it would make several of CEWE's
     # small blur settings render identically at the configured image DPI.
     blurRadius_px = shadowBlur_mcfunit * pixelsPerMcfunit * 0.5
@@ -101,9 +103,10 @@ def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
     # vector shadow code: the angle identifies where the shadow is cast, not
     # the light source. The Y calculation is in PDF coordinates (Y upwards).
     angleRadians = np.radians(shadowAngle - 90)
-    # The editor casts a shadow about three quarters of the stored distance.
-    # This is independently visible in the angle and distance test pages.
-    shadowDistanceScale = 0.75
+    # The editor casts a shadow a little under three quarters of the stored
+    # distance.  The 0.70 calibration keeps the softened shadow just inside
+    # the endpoints of the corresponding rotated image edge.
+    shadowDistanceScale = 0.70
     shadowOffsetX_mcfunit = shadowDistanceScale * shadowDistance_mcfunit * np.cos(angleRadians)
     shadowOffsetY_mcfunit = -shadowDistanceScale * shadowDistance_mcfunit * np.sin(angleRadians)
     padding_mcfunit = padding_px / pixelsPerMcfunit

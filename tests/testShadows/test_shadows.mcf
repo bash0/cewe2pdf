@@ -1075,6 +1075,48 @@ li.checked::marker { content: "\2612"; }
         <designElementIDs background="201" layout="125061"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <!-- Diagnostic matrix: the same rotated, unmasked image with only the
+             stored shadow style and angle changed. -->
+        <area areatype="imagearea">
+            <position height="514" left="362" rotation="132" top="225" width="514" zposition="200"/>
+            <decoration>
+                <shadow shadowAngle="90" shadowBlurNew="0" shadowDistance="10" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/20260427_190731_e4gt8mxg_1_(1).jpg" useABK="1">
+                <cutout left="0" scale="0.170124" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="0.994962" texture="0.97985"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="514" left="1248" rotation="132" top="225" width="514" zposition="201"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="0" shadowDistance="10" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <image filename="safecontainer:/20260427_190731_e4gt8mxg_1_(1).jpg" useABK="1">
+                <cutout left="0" scale="0.170124" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="0.994962" texture="0.97985"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="514" left="362" rotation="132" top="1500" width="514" zposition="202"/>
+            <decoration>
+                <shadow shadowAngle="90" shadowBlurNew="4" shadowDistance="18" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/20260427_190731_e4gt8mxg_1_(1).jpg" useABK="1">
+                <cutout left="0" scale="0.170124" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="0.994962" texture="0.97985"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="514" left="1248" rotation="132" top="1500" width="514" zposition="203"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="18" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
+            </decoration>
+            <image filename="safecontainer:/20260427_190731_e4gt8mxg_1_(1).jpg" useABK="1">
+                <cutout left="0" scale="0.170124" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="0.994962" texture="0.97985"/>
+            </image>
+        </area>
     </page>
     <page designStyleID="0" pagenr="13" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
