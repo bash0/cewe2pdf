@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<decorations>
+    <decoration type="fading">
+        <categories>
+            <category>category-leisure_time</category>
+        </categories>
+        <fading designElementType="passepartout" file="tennisball.svg"
+                keepAspectRatio="1" designElementId="46602"/>
+    </decoration>
+</decorations>

@@ -1,1 +1,1 @@
-from .compare_pdf import ComparePDF, ShowDiffsStyle
+from .compare_pdf import ComparePDF, PageTolerance, ShowDiffsStyle
