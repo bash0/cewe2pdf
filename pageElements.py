@@ -119,7 +119,8 @@ def processElements(additional_fonts, fotobook, imagedir,
             for clipartElement in area.findall('clipart'):
                 processAreaClipartTag(
                     clipartElement, areaHeight, areaRot, areaWidth, pdf,
-                    transCx, transCy, decoration, context,
+                    transCx, transCy, decoration, context, state,
+                    processDecorationShadow,
                     lambda decoration, height, width, canvas:
                     processDecorationBorders(decoration, height, width,
                                              canvas, context))
