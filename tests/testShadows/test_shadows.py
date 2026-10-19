@@ -5,6 +5,7 @@
 
 # Bootstrap the project root so this test can also run directly.
 import os, os.path
+import platform
 import sys
 from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -18,11 +19,36 @@ from xml.dom.minidom import parse, Document
 from datetime import datetime
 from pikepdf import Pdf
 
-from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
+from compare_pdf import ComparePDF, PageTolerance, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 from infrastructure.extraLoggers import mustsee # type: ignore
 
 from testutils import getLatestResultFile, runModifications
+
+
+def shadow_page_tolerances():
+    """Allow only the known Linux CairoSVG antialiasing variation.
+
+    The approved result was made on Windows.  The tennis-ball SVG
+    passepartout on PDF page 11 produces a tiny, repeatable difference when
+    CairoSVG uses Linux's native Cairo library: 146 pixels, maximum
+    per-channel difference 14, maximum combined RGB difference 41.
+    Keep a small margin for Cairo patch releases, while retaining exact
+    comparison for Windows and every other page on every platform.
+    """
+    if platform.system() != 'Linux':
+        return {}
+
+    return {
+        11: PageTolerance(
+            max_different_pixels=160,
+            max_channel_difference=15,
+            max_combined_rgb_difference=45,
+            reason=(
+                'CairoSVG/native-Cairo antialiasing of the tennis-ball SVG '
+                'passepartout differs slightly from the Windows approved result.'),
+        ),
+    }
 
 
 def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedPages):
@@ -43,7 +69,8 @@ def tryToBuildBook(inFile, outFile, latestResultFile, keepDoublePages, expectedP
         # compare our result with the latest one
         print(f"Compare {outFile} with {latestResultFile}")
         files = [outFile, latestResultFile]
-        compare = ComparePDF(files, ShowDiffsStyle.Nothing)
+        compare = ComparePDF(files, ShowDiffsStyle.Nothing,
+                             page_tolerances=shadow_page_tolerances())
         result = compare.compare()
         compare.cleanup() # to force closure of the files and allow us to delete them
         assert result, "Pixel comparison failed"

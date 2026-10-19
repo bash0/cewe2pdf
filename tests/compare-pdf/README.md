@@ -4,6 +4,36 @@
 [![PyPI](https://img.shields.io/pypi/v/compare-pdf)](https://pypi.org/project/compare-pdf)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/compare-pdf)
 
+## Page-specific tolerances when used from Python
+
+`ComparePDF` compares every rendered page exactly by default.  A test may
+declare a narrowly scoped exception for a known platform-dependent
+rasterisation difference:
+
+```python
+from compare_pdf import ComparePDF, PageTolerance, ShowDiffsStyle
+
+comparison = ComparePDF(
+    [new_pdf, approved_pdf],
+    ShowDiffsStyle.Nothing,
+    page_tolerances={
+        11: PageTolerance(
+            max_different_pixels=200,
+            max_channel_difference=2,
+            max_combined_rgb_difference=4,
+            reason="Brief explanation of the known rendering variation.",
+        ),
+    },
+)
+```
+
+Page numbers are one-based.  A tolerated page passes only if the number of
+changed pixels, the greatest individual RGB-channel difference, and the
+greatest combined RGB difference all meet their limits.  The comparator logs
+these diagnostics for every non-exact page and records when a tolerance was
+used.  Command-line comparison remains exact; tolerances are deliberately a
+test-code API for now.
+
 PDF Visual Comparison Tool
 ==========================
 This utility compares PDF files visually by converting each page into images and then comparing them using OpenCV.

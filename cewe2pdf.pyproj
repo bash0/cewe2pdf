@@ -49,6 +49,8 @@
     <Content Include="requirements-winexe.txt" />
     <Content Include="tests\compare-pdf\LICENSE" />
     <Content Include="tests\compare-pdf\README.md" />
+    <Content Include="tests\hps\5026\addons\46602\masks\v1\decorations\tennisball.clp" />
+    <Content Include="tests\hps\5026\addons\46602\masks\v1\decorations\tennisball.xml" />
     <Content Include="tests\Resources\calendarentries\en_GB.xml" />
     <Content Include="tests\Resources\calendarentries\nb_NO.xml" />
     <Content Include="tests\Resources\calendar_layout.xml" />
@@ -307,7 +309,6 @@
     <Content Include="tests\Resources\photofun\decorations\5351-Clip-GD.clp" />
     <Content Include="tests\Resources\photofun\decorations\7065-CLIP-SF.clp" />
     <Content Include="tests\Resources\photofun\decorations\circle.clp" />
-    <Content Include="tests\Resources\photofun\decorations\cliparts_default.xml" />
     <Content Include="tests\Resources\photofun\decorations\customClipart1.clp" />
     <Content Include="tests\Resources\photofun\decorations\customClipart2.clp" />
     <Content Include="tests\Resources\photofun\decorations\original circle.svg" />
@@ -515,6 +516,10 @@
     <Folder Include="tests\hps\5026\addons\125186\masks\" />
     <Folder Include="tests\hps\5026\addons\125186\masks\v1\" />
     <Folder Include="tests\hps\5026\addons\125186\masks\v1\decorations\" />
+    <Folder Include="tests\hps\5026\addons\46602\" />
+    <Folder Include="tests\hps\5026\addons\46602\masks\" />
+    <Folder Include="tests\hps\5026\addons\46602\masks\v1\" />
+    <Folder Include="tests\hps\5026\addons\46602\masks\v1\decorations\" />
     <Folder Include="tests\hps\5026\addons\63488\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\" />
     <Folder Include="tests\hps\5026\addons\63488\cliparts\v1\" />
