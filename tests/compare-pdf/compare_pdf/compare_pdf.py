@@ -134,7 +134,14 @@ class ComparePDF:
     def _compare_images(self, images, page_num) -> bool:
         equal = all(np.array_equal(images[0], img) for img in images)
         if equal:
-            self.logger.info(f"All images on Page {page_num} are equal")
+            tolerance = self.page_tolerances.get(page_num)
+            if tolerance is None:
+                self.logger.info(f"All images on Page {page_num} are equal")
+            else:
+                self.logger.info(
+                    "All images on Page %s are equal; the configured page "
+                    "tolerance was not needed. Consider removing or narrowing it. "
+                    "Reason: %s", page_num, tolerance.reason)
             return True
 
         comparison_result = True

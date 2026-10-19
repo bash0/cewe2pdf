@@ -60,6 +60,22 @@ def test_page_tolerance_requires_every_limit(caplog):
     assert tolerance.reason in caplog.text
 
 
+def test_exact_page_reports_an_unused_configured_tolerance(caplog):
+    image = np.zeros((2, 2, 3), dtype=np.uint8)
+    tolerance = PageTolerance(
+        max_different_pixels=1,
+        max_channel_difference=1,
+        max_combined_rgb_difference=1,
+        reason='A tolerance that should be reviewed when unused.',
+    )
+
+    with caplog.at_level(logging.INFO, logger='cewe2pdf.test'):
+        assert comparison_with_tolerances({1: tolerance})._compare_images([image, image], 1)
+
+    assert 'tolerance was not needed' in caplog.text
+    assert tolerance.reason in caplog.text
+
+
 def test_page_tolerance_rejects_a_difference_above_any_limit():
     new, approved = one_pixel_difference()
     tolerance = PageTolerance(

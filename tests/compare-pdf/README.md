@@ -30,9 +30,10 @@ comparison = ComparePDF(
 Page numbers are one-based.  A tolerated page passes only if the number of
 changed pixels, the greatest individual RGB-channel difference, and the
 greatest combined RGB difference all meet their limits.  The comparator logs
-these diagnostics for every non-exact page and records when a tolerance was
-used.  Command-line comparison remains exact; tolerances are deliberately a
-test-code API for now.
+these diagnostics for every non-exact page, records when a tolerance was
+used, and reports when a configured tolerance was unnecessary because the
+page matched exactly.  Command-line comparison remains exact; tolerances are
+deliberately a test-code API for now.
 
 PDF Visual Comparison Tool
 ==========================
