@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="5ab26b13-11b7-4072-95bb-34e53022f1cf" imagedir="test_shadows_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="9141" article_name="CEWE%20FOTOBOK%20stor%20Hardcover%20standard%20digitaltrykk" externalProjectId="" folderID="9ea02e79-0ab1-4df1-ae39-d009531514fe" imagedir="test_shadows_mcf-Dateien" isDataMcf="0" productname="ALB15" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="8.1.3" createdWithHPSVersionBuild="20260410" multiPurposeText="" projectID="84362b57-b1f0-467e-853c-5cd62a8067e9" projectIDCreatedEpoch="1786000702"/>
-    <savingVersion compatibilityVersion="6.4.2" programversion="8.1.3" programversionBuild="20260410" savetime="2026-10-18 22:12"/>
+    <savingVersion compatibilityVersion="6.4.2" programversion="8.1.3" programversionBuild="20260410" savetime="2026-10-19 22:49"/>
     <creationHistory clientId="38" clientVersion="7.4.4-20240826-default" creationDate="2025-04-23 07:21"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns/>
@@ -10,7 +10,7 @@
     </pagenumbering>
     <ruler/>
     <extra>
-        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="3" VerticalIndentMargin="3" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="Liberation Sans,72,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.3.56"/>
     </extra>
     <page designStyleID="0" pagenr="0" rotation="0" type="fullcover">
@@ -18,6 +18,13 @@
         <designElementIDs background="201" layout="384109"/>
         <background alignment="4" designElementId="201" rotation="0" type="1"/>
         <background designElementId="384109" layout="1" templatename="full_page_fotobooks"/>
+        <area areatype="textarea">
+            <position height="275" left="2892.38" rotation="0" top="542.5" width="671.73" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Poppins'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Front cover</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="2" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,18,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
         <area areatype="spinetextarea">
             <position height="91" left="812.5" rotation="270" top="1329.5" width="2650" zposition="7000"/>
             <decoration/>
@@ -30,13 +37,6 @@ li.checked::marker { content: "\2612"; }
 </style></head><body style=" font-family:'CEWE Head'; font-size:12pt; font-weight:400; font-style:normal;">
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
                 <textFormat Alignment="ALIGNVCENTER,ALIGNLEADING" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
-            </text>
-        </area>
-        <area areatype="textarea">
-            <position height="275" left="2892.38" rotation="0" top="542.5" width="671.73" zposition="7000"/>
-            <decoration/>
-            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Poppins'; font-size:18pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Front cover</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNHCENTER" IndentMargin="2" VerticalIndentMargin="50" backgroundColor="#00000000" font="Poppins,18,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea">
@@ -140,9 +140,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="0" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -156,9 +156,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="2" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -172,9 +172,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="4" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -188,9 +188,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="6" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -204,9 +204,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="7.9999999999999991" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -220,9 +220,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="9.9999999999999982" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -364,9 +364,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="1" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -380,9 +380,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="60" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -396,9 +396,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="120" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -412,9 +412,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="180" shadowBlurNew="5" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -428,9 +428,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="240" shadowBlurNew="5.0000000000000009" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -444,9 +444,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="300" shadowBlurNew="5.0000000000000009" shadowDistance="40" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -588,9 +588,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -604,9 +604,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="9.9999999999999982" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -620,9 +620,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="20.000000000000007" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -636,9 +636,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="29.999999999999993" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -652,9 +652,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="40.000000000000007" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -668,9 +668,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5.0000000000000009" shadowDistance="49.999999999999964" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -812,9 +812,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -828,9 +828,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="2"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -844,9 +844,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="4"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -860,9 +860,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="6"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -876,9 +876,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="8"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -892,9 +892,9 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="30" shadowBlurNew="5" shadowDistance="0" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="10"/>
                 <corners enabled="yes">
                     <corner length="100" shape="convex" where="bottom-right"/>
-                    <corner length="100" shape="convex" where="top-right"/>
                     <corner length="100" shape="convex" where="bottom-left"/>
                     <corner length="100" shape="convex" where="top-left"/>
+                    <corner length="100" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg" useABK="1">
@@ -977,15 +977,15 @@ li.checked::marker { content: "\2612"; }
                 <shadow shadowAngle="90" shadowBlurNew="4" shadowDistance="18.000000000000007" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1.5"/>
                 <corners enabled="yes">
                     <corner length="1480" shape="convex" where="bottom-right"/>
-                    <corner length="1480" shape="convex" where="top-right"/>
                     <corner length="1480" shape="convex" where="bottom-left"/>
                     <corner length="1480" shape="convex" where="top-left"/>
+                    <corner length="1480" shape="convex" where="top-right"/>
                 </corners>
             </decoration>
             <image filename="safecontainer:/20260427_190731_e4gt8mxg_1_(1).jpg" passepartoutDesignElementId="46602" useABK="1">
-                <cutout left="3.16969e-14" scale="0.170304" top="3.16969e-14"/>
+                <cutout left="5.21487e-14" scale="0.170304" top="5.21487e-14"/>
                 <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="0.994962" texture="0.97985"/>
-                <ClipartConfiguration applySpotColor="1"/>
+                <ClipartConfiguration applySpotColor="0"/>
             </image>
         </area>
         <area areatype="imagearea">
@@ -997,7 +997,7 @@ li.checked::marker { content: "\2612"; }
             <image filename="safecontainer:/20260427_190731_e4gt8mxg_1_(1).jpg" passepartoutDesignElementId="46602" useABK="1">
                 <cutout left="0" scale="0.170124" top="0"/>
                 <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="0.994962" texture="0.97985"/>
-                <ClipartConfiguration applySpotColor="1"/>
+                <ClipartConfiguration applySpotColor="0"/>
             </image>
         </area>
         <area areatype="imagearea">
@@ -1007,7 +1007,7 @@ li.checked::marker { content: "\2612"; }
             <image filename="safecontainer:/20260427_190731_e4gt8mxg_1_(1).jpg" passepartoutDesignElementId="46602" useABK="1">
                 <cutout left="0" scale="0.170124" top="0"/>
                 <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="0.994962" texture="0.97985"/>
-                <ClipartConfiguration applySpotColor="1"/>
+                <ClipartConfiguration applySpotColor="0"/>
             </image>
         </area>
         <area areatype="imagearea">
@@ -1075,8 +1075,6 @@ li.checked::marker { content: "\2612"; }
         <designElementIDs background="201" layout="125061"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
-        <!-- Diagnostic matrix: the same rotated, unmasked image with only the
-             stored shadow style and angle changed. -->
         <area areatype="imagearea">
             <position height="514" left="362" rotation="132" top="225" width="514" zposition="200"/>
             <decoration>
@@ -1117,6 +1115,66 @@ li.checked::marker { content: "\2612"; }
                 <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="0.994962" texture="0.97985"/>
             </image>
         </area>
+        <area areatype="clipartarea" layoutContent="1">
+            <position height="200" left="2469.27" rotation="0" top="100" width="1246.49" zposition="204"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="100" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="0"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="0"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea" layoutContent="1">
+            <position height="200" left="2469.27" rotation="0" top="525" width="1246.49" zposition="205"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="100" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="4"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="0"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea" layoutContent="1">
+            <position height="200" left="2469.27" rotation="0" top="950" width="1246.49" zposition="206"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="100" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="1"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="0"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea" layoutContent="1">
+            <position height="200" left="2469.27" rotation="0" top="1375" width="1246.49" zposition="207"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="0" shadowDistance="100" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="0"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="0"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea" layoutContent="1">
+            <position height="200" left="2469.27" rotation="0" top="1800" width="1246.49" zposition="208"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="50" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="0"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="0"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea" layoutContent="1">
+            <position height="200" left="2469.27" rotation="0" top="2225" width="1246.49" zposition="209"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="100" shadowEnabled="1" shadowIntensity="128" shadowWidthInMM="0"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="0"/>
+            </clipart>
+        </area>
     </page>
     <page designStyleID="0" pagenr="13" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
@@ -1129,6 +1187,65 @@ li.checked::marker { content: "\2612"; }
         <designElementIDs background="201" layout="125061"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_002"/>
+        <area areatype="clipartarea" layoutContent="1">
+            <position height="200" left="323.913" rotation="0" top="233.796" width="1247" zposition="100"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="100" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="0"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="200" left="323.913" rotation="0" top="653.137" width="1247" zposition="101"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="100" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="5"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="200" left="323.913" rotation="0" top="1072.48" width="1247" zposition="102"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="100" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="10"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="200" left="323.913" rotation="0" top="1491.82" width="1247" zposition="103"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="100" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="15"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="clipartarea">
+            <position height="200" left="323.913" rotation="0" top="1911.16" width="1247" zposition="104"/>
+            <designElementIDs clipart="121285"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="5" shadowDistance="100" shadowEnabled="1" shadowIntensity="51" shadowWidthInMM="20"/>
+            </decoration>
+            <clipart designElementId="121285">
+                <ClipartConfiguration applySpotColor="1"/>
+            </clipart>
+        </area>
+        <area areatype="textarea">
+            <position height="294" left="2670.03" rotation="0" top="483.801" width="565.955" zposition="7000"/>
+            <decoration>
+                <shadow shadowAngle="135" shadowBlurNew="4" shadowDistance="22" shadowEnabled="1" shadowIntensity="62" shadowWidthInMM="1.5"/>
+            </decoration>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" font-size:72pt; color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Text</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
     </page>
     <page designStyleID="0" pagenr="15" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
@@ -1209,10 +1326,8 @@ li.checked::marker { content: "\2612"; }
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships>
-        <foto id="file:///C:/Users/pete/AppData/Local/CEWE/tmp/hps9517333462828168249_28304_SafeRegion 6/e4gt8mxg_1_20260427_190730(1).jpg">
-            <foto id="safecontainer:/20260427_190731_e4gt8mxg_1_(1).jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
-        </foto>
         <foto id="safecontainer:/z31qhpgx_1_greysquareblueborder.jpg"/>
+        <foto id="safecontainer:/20260427_190731_e4gt8mxg_1_(1).jpg"/>
     </fotoRelationships>
-    <statistics assistantUsed="0" countPauses="50" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="272111" fotosAdded="242" fotosRemoved="36" pauseTime="238008" sessionsUsed="22"/>
+    <statistics assistantUsed="0" countPauses="52" elapsedTimeGross="2025-04-23T07:21:02" elapsedTimeNet="274859" fotosAdded="242" fotosRemoved="36" pauseTime="239646" sessionsUsed="24"/>
 </fotobook>

@@ -53,10 +53,11 @@ def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
     # was downsampled earlier in processAreaImageTag.
     pixelsPerMcfunit = im.width / imgCropWidth_mcfunit
 
-    # CEWE's displayed shadow expands by about three tenths of the nominal
-    # width on each side. This was calibrated against the width-only test page
-    # (0 .. 10 mm); the old ReportLab Table is noticeably larger at high values.
-    spreadRadius_px = int(round(
+    # CEWE's displayed shadow protrudes by about three tenths of the nominal
+    # width on each side.  It enlarges the shadow's bounding box rather than
+    # thickening every opaque pixel.  The distinction is invisible for a
+    # solid rectangle but essential for open artwork such as arrows.
+    spreadOutset_px = int(round(
         shadowWidth_mcfunit * pixelsPerMcfunit * 0.30
     ))
 
@@ -68,18 +69,22 @@ def drawBlurredImageShadow(pdf, im, imgCropWidth_mcfunit,
     # Keep the fractional radius: rounding it would make several of CEWE's
     # small blur settings render identically at the configured image DPI.
     blurRadius_px = shadowBlur_mcfunit * pixelsPerMcfunit * 0.5
-    padding_px = spreadRadius_px + int(np.ceil(3 * blurRadius_px))
+    blurPadding_px = int(np.ceil(3 * blurRadius_px))
+    padding_px = spreadOutset_px + blurPadding_px
 
     alpha = im.getchannel('A')
     shadowAlpha = Image.new(
         'L', (im.width + 2 * padding_px, im.height + 2 * padding_px), 0
     )
-    shadowAlpha.paste(alpha, (padding_px, padding_px))
-
-    if spreadRadius_px > 0:
-        shadowAlpha = shadowAlpha.filter(
-            ImageFilter.MaxFilter(2 * spreadRadius_px + 1)
-        )
+    if spreadOutset_px > 0:
+        # Put a scaled copy of the alpha silhouette into the enlarged shadow
+        # bounds.  A morphological max filter would make an open SVG's thin
+        # strokes dramatically fatter, unlike CEWE's ``Utstikk`` control.
+        alpha = alpha.resize(
+            (im.width + 2 * spreadOutset_px,
+             im.height + 2 * spreadOutset_px),
+            Image.Resampling.LANCZOS)
+    shadowAlpha.paste(alpha, (blurPadding_px, blurPadding_px))
 
     if blurRadius_px > 0:
         shadowAlpha = shadowAlpha.filter(ImageFilter.GaussianBlur(blurRadius_px))
