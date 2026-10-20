@@ -25,7 +25,6 @@ from lxml import etree
 from decorations.borders import processDecorationBorders
 from decorations.shadows import processDecorationShadow
 from colorFrame import ColorFrame
-from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
 from fonts.manager import getAvailableFont
 from indexing.albumindex import AlbumIndex
@@ -34,6 +33,7 @@ from .markup import (AddAlbumText, AppendItemTextInStyle, AppendSpanEnd, AppendS
                      CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle,
                      Dequote, LeadingForExplicitLineHeight)
 from .art import processTextArt
+from .backgrounds import getTextBackground
 from .outlines import TextEffectsParagraph, getTextOutline
 from .tabs import getTabbedTextLine
 from .lists import processTextLists
@@ -351,25 +351,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         bottomPad = 0.0
         indentMargin = 0.0
 
-    # The same decoration stores the opacity used when drawing its background.
-    textAreaAlpha = 1.0
-    for decorationTag in area.findall('decoration'):
-        alphaText = decorationTag.get('alpha')
-        if alphaText is not None:
-            try:
-                textAreaAlpha = float(alphaText)
-            except ValueError:
-                logging.warning(f"Ignoring invalid text-area alpha setting {alphaText!r}")
-            else:
-                if not 0.0 <= textAreaAlpha <= 1.0:
-                    logging.warning(f"Clamping text-area alpha setting {alphaText!r} to 0..1")
-                    textAreaAlpha = max(0.0, min(1.0, textAreaAlpha))
-
-    # Get the background color. It is stored in an extra element.
-    backgroundColor = None
-    backgroundColorAttrib = area.get('backgroundcolor')
-    if backgroundColorAttrib is not None:
-        backgroundColor = ReorderColorBytesMcf2Rl(backgroundColorAttrib)
+    backgroundColor, textAreaAlpha = getTextBackground(area)
 
     # See the comment below in processTextCore about text wrapping issues. This seems to be
     # caused by cewe2pdf rendering fonts with a slightly thicker stroke than CEWE's Qt renderer.

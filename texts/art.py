@@ -10,6 +10,7 @@ from fonts.manager import getMissingFontSubstitute
 from conversionState import ConversionState
 from renderContext import RenderContext
 from .spacing import getLetterSpacing
+from .backgrounds import drawTextArtBackground
 
 # A CEWE 8.1 TextArt box has no stored radius.  A newly-created 490-unit
 # square box has the same arc as the 171-unit legacy wrapper-table margin.
@@ -279,9 +280,8 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
     """Render one TextArt area, including its border and arc geometry."""
     pdf.translate(transCx, transCy)
     pdf.rotate(-areaRot)
-    for decorationTag in area.findall('decoration'):
-        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, context)
     bodyhtml = etree.tostring(body, pretty_print=True, encoding="unicode")
+    _, maxfontsize = parse_html_text(bodyhtml)
 
     # CEWE 7 and earlier put a TextArt radius in the margin of the wrapper
     # table in the HTML text. CEWE 8.1 saves the same TextArt as a plain
@@ -313,11 +313,15 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
             ellipseRadiusY = max(1.0, baseEllipseRadiusY - topPad)
         else:
             baseEllipseRadiusY = baseRadius
-        _, maxfontsize = parse_html_text(bodyhtml)
         topOfEllipse = context.mcf_to_reportlab * (
             areaHeight * 0.5
             - maxfontsize * CEWE8_DEFAULT_TEXTART_TOP_INSET_MCF_PER_POINT)
         circleCenterY = topOfEllipse - baseEllipseRadiusY
+    if cwtextart[0].get('enabled', '1') == '1':
+        drawTextArtBackground(pdf, area, radius, ellipseRadiusY, circleCenterY,
+            context.mcf_to_reportlab * maxfontsize * CEWE8_DEFAULT_TEXTART_TOP_INSET_MCF_PER_POINT)
+    for decorationTag in area.findall('decoration'):
+        processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, context)
     handleTextArt(pdf, radius, bodyhtml, cwtextart, state, circleCenterY, ellipseRadiusY,
         getLetterSpacing(area.find('text/textFormat'), context.mcf_to_reportlab))
     pdf.rotate(areaRot)

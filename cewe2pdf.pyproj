@@ -476,6 +476,7 @@
     <Compile Include="tests\testShadows\test_shadows.py" />
     <Compile Include="tests\testTabs\test_tabs.py" />
     <Compile Include="tests\testTextArt\test_textart.py" />
+    <Compile Include="tests\testTextArt\test_textartBackground.py" />
     <Compile Include="tests\testTextArt\test_textartPlacement.py" />
     <Compile Include="tests\testTextArt\test_textartSpacing.py" />
     <Compile Include="tests\testTextBox\test_textBox.py" />
@@ -494,6 +495,7 @@
     </Compile>
     <Compile Include="texts\areas.py" />
     <Compile Include="texts\art.py" />
+    <Compile Include="texts\backgrounds.py" />
     <Compile Include="texts\lists.py" />
     <Compile Include="texts\markup.py" />
     <Compile Include="texts\outlines.py" />

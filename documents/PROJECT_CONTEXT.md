@@ -75,7 +75,7 @@ still obtain geometry differently. For current MCFs, the top inset scales with f
 size, not box size: the original 490-unit box / 18-point calibration otherwise lets
 large lettering rise above its area. Changing this anchor translates the curve;
 it must not change its radii, direction, or character angles. `IndentMargin` reduces
-the radii while retaining the centre. TextArt backgrounds and extra synthetic font effects require separate
+the radii while retaining the centre. Extra synthetic font effects require separate
 evidence and scope.
 
 TextArt tracking adds signed gaps between characters, without changing glyph widths
@@ -91,6 +91,14 @@ inset is separate from the area's `IndentMargin` setting.
 On an ellipse, measure and draw at the same starting angle: its local arc scale
 varies with angle, so an extent measured elsewhere cannot centre the result.
 Resolve font substitutions once before the centring calculation.
+
+The editor's TextArt background is a full ring, even for a short caption. The
+490-unit / 18-point fixture has an inner radius of 171 and an outer radius of
+245 MCF units: its band uses the same font-sized inset as the curve's top anchor.
+Paint it before the border and lettering, using an even-odd path so the centre
+shows underlying content rather than a white fill. Background colour and decoration
+opacity share the ordinary-text parser, and their alpha values multiply. Stretched
+or mixed-font background examples still need controlled editor comparisons.
 
 Per-user fonts and operating-system fonts are different sources. The test environment
 suppresses automatic per-user discovery; system font loading is opt-in.
