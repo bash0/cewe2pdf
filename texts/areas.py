@@ -7,25 +7,18 @@
 
 import logging
 import re
-import copy
-import tempfile
 from math import floor
 from typing import Any
 
-import pymupdf
 import reportlab.lib.colors
 import reportlab.lib.enums
 import reportlab.lib.pagesizes
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfgen import canvas
 from reportlab.platypus import Frame
-from PIL import Image
 from lxml import etree
 
 from decorations.borders import processDecorationBorders
-from decorations.shadows import processDecorationShadow
 from colorFrame import ColorFrame
-from colorUtils import ReorderColorBytesMcf2Rl
 from conversionState import ConversionState
 from fonts.manager import getAvailableFont
 from indexing.albumindex import AlbumIndex
@@ -34,79 +27,12 @@ from .markup import (AddAlbumText, AppendItemTextInStyle, AppendSpanEnd, AppendS
                      CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle,
                      Dequote, LeadingForExplicitLineHeight)
 from .art import processTextArt
+from .backgrounds import getTextBackground
 from .outlines import TextEffectsParagraph, getTextOutline
 from .tabs import getTabbedTextLine
 from .lists import processTextLists
 from .spacing import getLetterSpacing
-
-
-def _hasEnabledShadow(area):
-    """Return whether an area has a shadow which CEWE has not disabled."""
-    return any(
-        shadow.get('shadowEnabled') != '0'
-        for decoration in area.findall('decoration')
-        for shadow in decoration.findall('shadow')
-    )
-
-
-def _drawTextShadow(pdf_flowableList, frameWidth, frameHeight,
-                    leftPad, bottomPad, rightPad,
-                    topPad, area, areaHeight, areaWidth, areaRot, pdf,
-                    context: RenderContext, state: ConversionState):
-    """Render the actual laid-out text to an alpha silhouette and shadow it.
-
-    CEWE shadows the glyphs, not the rectangular text area.  Text flowables
-    already know how to reproduce CEWE's rich text: fonts, spans, tab stops,
-    outlines and line wrapping.  Rendering a copy of them into a transparent
-    one-page PDF therefore gives us the same alpha silhouette which image and
-    clip-art shadows use, without attempting to recreate the text in Pillow.
-    """
-    shadowPdf = tempfile.NamedTemporaryFile(suffix='.pdf', delete=False)
-    shadowPdf.close()
-    state.temporary_files.append(shadowPdf.name)
-
-    try:
-        shadowCanvas = canvas.Canvas(
-            shadowPdf.name, pagesize=(frameWidth, frameHeight)
-        )
-        shadowFrame = ColorFrame(
-            0, 0, frameWidth, frameHeight,
-            leftPadding=leftPad, bottomPadding=bottomPad,
-            rightPadding=rightPad, topPadding=topPad,
-            showBoundary=0
-        )
-        # ``Frame.addFromList`` consumes its input.  The ordinary rendering
-        # below must receive the original flowables, so render a deep copy.
-        Frame.addFromList(shadowFrame, copy.deepcopy(pdf_flowableList), shadowCanvas)
-        shadowCanvas.showPage()
-        shadowCanvas.save()
-
-        shadowDocument = pymupdf.open(shadowPdf.name)
-        try:
-            # Use the configured image DPI so shadow blur has the same scale
-            # as the alpha-silhouette shadows of photos and clip art.
-            renderScale = context.image_resolution / 72.0
-            shadowPixmap = shadowDocument[0].get_pixmap(
-                matrix=pymupdf.Matrix(renderScale, renderScale), alpha=True
-            )
-            textImage = Image.frombytes(
-                'RGBA', (shadowPixmap.width, shadowPixmap.height),
-                shadowPixmap.samples
-            )
-        finally:
-            shadowDocument.close()
-    except Exception:  # pylint: disable=broad-exception-caught
-        logging.exception('Could not create text shadow silhouette')
-        return
-
-    # The mask occupies the full text area, so it uses the same local origin
-    # as the real text.  The caller has already applied the area's transform.
-    for decorationTag in area.findall('decoration'):
-        processDecorationShadow(
-            decorationTag, areaHeight, areaWidth, pdf, context, state,
-            im=textImage, imgCropWidth_mcfunit=areaWidth,
-            imgCropHeight_mcfunit=areaHeight, areaRotation=areaRot
-        )
+from .shadows import hasEnabledTextShadow, drawTextShadow
 
 
 def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy,  # noqa: C901
@@ -351,25 +277,7 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
         bottomPad = 0.0
         indentMargin = 0.0
 
-    # The same decoration stores the opacity used when drawing its background.
-    textAreaAlpha = 1.0
-    for decorationTag in area.findall('decoration'):
-        alphaText = decorationTag.get('alpha')
-        if alphaText is not None:
-            try:
-                textAreaAlpha = float(alphaText)
-            except ValueError:
-                logging.warning(f"Ignoring invalid text-area alpha setting {alphaText!r}")
-            else:
-                if not 0.0 <= textAreaAlpha <= 1.0:
-                    logging.warning(f"Clamping text-area alpha setting {alphaText!r} to 0..1")
-                    textAreaAlpha = max(0.0, min(1.0, textAreaAlpha))
-
-    # Get the background color. It is stored in an extra element.
-    backgroundColor = None
-    backgroundColorAttrib = area.get('backgroundcolor')
-    if backgroundColorAttrib is not None:
-        backgroundColor = ReorderColorBytesMcf2Rl(backgroundColorAttrib)
+    backgroundColor, textAreaAlpha = getTextBackground(area)
 
     # See the comment below in processTextCore about text wrapping issues. This seems to be
     # caused by cewe2pdf rendering fonts with a slightly thicker stroke than CEWE's Qt renderer.
@@ -532,8 +440,8 @@ def processAreaTextTag(textTag, additional_fonts, area, areaWidth, areaHeight, a
     if newFrame.background:
         newFrame.drawBackground(pdf)
 
-    if _hasEnabledShadow(area):
-        _drawTextShadow(
+    if hasEnabledTextShadow(area, context):
+        drawTextShadow(
             pdf_flowableList, frameWidth, frameHeight,
             leftPad, bottomPad, rightPad, topPad,
             area, areaHeight, areaWidth, areaRot, pdf, context, state

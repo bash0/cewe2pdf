@@ -1,3 +1,9 @@
+# Earlier Windows fixture inspection notes
+
+> Historical instructions. The installed-font illustration was retained in April 2025.
+> These notes describe an older manual workflow and configuration names, not the
+> current portable regression setup. Use the [test guide](../../tests/README.md).
+
 On Windows the main Visual Studio project is normally set up to use runAllTests.py, which uses
 pytest to find tests, and thus runs the same tests as will be run in the github checkin action.
 

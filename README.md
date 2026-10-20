@@ -6,15 +6,32 @@ and compiling a pdf document which looks like the cewe photo book.
 
 There are many capabilities in the Cewe album editor which are not supported by `cewe2pdf`, so an exact conversion cannot be guaranteed. The script is mostly based on reverse-engineering and guessing. It is not meeting any official specifications, so don't be surprised if one or another feature doesn't work. However, improvements are always appreciated!
 
-The current tests run with albums created with the 8.0 version of the editor. We don't explicitly test that files from older versions of the editor still work (though code to handle them may still be there) so the safest bet to recreate a pdf from an old album file is surely to load it into the latest album editor and save it again.
+The regression fixtures cover multiple editor versions, but not every version or product.
+When an older album fails, try opening and saving a copy in the installed CEWE editor
+before converting it. Keep the original album as a backup.
 
 Python 3.12 is the supported development and test version. Newer Python versions may work, but are not part of the automated test baseline. Older versions will probably fail because of missing Python features. The code is expected to work on Windows, MacOS and Linux.
 
-You will need underlying Cairographics (<https://www.cairographics.org/>) support installed on your machine for the handling of clip art. How you get this will depend on your platform, but if you have the GTK+ toolkit installed (<https://www.gtk.org/docs/installations/>) that should do it.
-
-In August 2026 the code was significantly rearranged into smaller files, to isolate functionality and make maintenance a little easier. Several improvements were made at the same time. The suite of pixel comparison suites was also extended. The code from cewe2pdf.py is basically still there and should be recognizable once you find the file in which it now lives. The work was done with the aid of OpenAI's Codex AI engine, which turned out to be very effective. Codex downloaded its own copy of the source structure from GitHub to the local machine, complete with tests, so that it could make its suggested changes first and run the test suite before making a final change proposal for whatever modification had been suggested.  
 
 tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf exportieren, cewe Fotobuch pdf, mcf in pdf umwandeln, aus CEW-Fotobuch ein pdf machen, cewe Fotobuch pdf
+
+## Documentation
+
+Start with the installation and usage sections below. The following guides provide
+more detail for users, contributors, and coding assistants.
+
+| What you want to do | Where to look |
+| --- | --- |
+| Install, configure, and run the converter | [Installation](#install), [configuration](#configuration-files), and [usage](#using-the-program) in this README |
+| Understand supported features and products | [Feature implementations](#feature-implementations) and [acceptable products](#acceptable-products) |
+| Start development or understand the architecture | [Developer guide](documents/DEVELOPER_GUIDE.md) |
+| Understand implementation decisions and CEWE conventions | [Project context](documents/PROJECT_CONTEXT.md) |
+| Give a coding assistant the project programming conventions | [Programming guidance](AGENTS.md) |
+| Set up and test Linux using WSL | [Linux/WSL guide](documents/TestingOnWSL.md) |
+| Build or install a standalone executable | [Build and Windows integration guide](documents/build_a_compiled_version.md) |
+| Work with tests and approved PDFs | [Test workflow and cleanup](tests/README.md), and [compare-pdf interface](tests/compare-pdf/README.md) |
+| Understand or author clip art and passepartout resources | [CLP file format and authoring notes](clipart/CLP_FILE_FORMAT.md) |
+| Consult superseded setups and investigations | [Historical documentation](documents/history/README.md) |
 
 ## Install
 
@@ -50,9 +67,6 @@ conda activate cewe2pdf312
 python -m pip install --upgrade pip
 python -m pip install -r requirements-pinned.txt
 ```
-
-There is no need to mix Conda and Pip packages manually, or to apply the old
-Pillow/WebP workaround previously described here.
 
 On macOS or Linux, create and activate a virtual environment in the repository
 directory:
@@ -106,7 +120,8 @@ The program looks for files called ``cewe2pdf.ini``, first in the current direct
 
 For normal use (i.e. actually creating a pdf album, rather than testing the code) the most reasonable strategy is to place a ``cewe2pdf.ini`` file with the album file, setting everything you need there, out of the way of future updates to the program repository.
 
-For full CEWE resource support, specify the location of the CEWE installation folder in ``cewe2pdf.ini``. If you do not have CEWE installed on your machine you should specify an empty entry, `cewe_folder =`, but then the album itself must not have used resources which are supplied by CEWE - fonts, backgrounds, clip arts, etc.
+For full CEWE resource support, specify the location of the CEWE installation folder in ``cewe2pdf.ini``. Without an installation, set `cewe_folder =` to select reduced-resource conversion;
+missing delivered fonts may be substituted and missing decorations omitted.
 
 ``cewe2pdf.ini`` can also
 * provide a list of locations for additional background images, cliparts, passepartouts (frames)
@@ -114,7 +129,7 @@ For full CEWE resource support, specify the location of the CEWE installation fo
 * define non-standard line spacing (linescale) for any fonts that need it
 * define output resolution for the pdf
 * and more
-  
+
 The contents might, for example, look like this:
 ```
 [DEFAULT]
@@ -125,7 +140,7 @@ cewe_folder = C:\Program Files\Elkjop fotoservice_6.3\elkjop fotoservice
 fontFamilies =
  FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
 
-# Define the output resolutions, the default 300 is ok for printing, 150 for screen display only
+# Defaults are 150 dpi; use 300 for higher-resolution photo output
 pdfImageResolution = 150
 pdfBackgroundResolution = 150
 
@@ -133,11 +148,10 @@ pdfBackgroundResolution = 150
 # Disabled by default because system fonts vary between machines.
 #loadSystemFonts = True
 
-# specify default leading (1.1 = 10% of the font size as leading is standard in the code, where we leave
-# it unaltered for backward compatibility, but 1.15 works best when line spacing is used, see issue 182)
+# Default line scale: 1.15 means 15% leading relative to the font size
 defaultLineScale = 1.15
 
-# Define line scale (line spacing, essentially) for fonts where the default 1.1 (110%) is not acceptable
+# Override line scale for individual fonts when the default is unsuitable
 fontLineScales =
 	Crafty Girls: 1.43
 
@@ -151,7 +165,7 @@ singlePageNumberPosition = right
 #  This has no effect on a single page width run, where the inside cover pages are simply omitted
 insideCoverWhite = False
 
-# Shadows were implemented in May 2025 (except blur) but can be turned off
+# Disable shadows on images, clip art, and text
 # Default False, if True then no shadows are created on objects
 noShadows = False
 
@@ -222,15 +236,31 @@ Example for linux font file and directory paths:
 /usr/share/fonts/truetype/lato/Lato-Heavy.ttf
 /home/myusername/.local/share/fonts/
 ```
+#### Missing-font substitutions
+
+To choose a replacement when a requested font is unavailable, add name pairs to
+`cewe2pdf.ini`:
+
+```ini
+[DEFAULT]
+missingFontSubstitutions =
+    Courier PS: Courier
+    Times New Roman: Times-Roman
+```
+
+Each replacement must be a loaded font or a built-in ReportLab base font.
+Unavailable replacements are reported and ignored. Font metrics can differ, so
+substitution may change wrapping even when the requested appearance is similar.
+
 ## Album files
 ### .mcf
 `.mcf` is the format that Cewe has used for many years for albums, until the introduction of the newer `.mcfx` format around 2023. This is the format around which `cewe2pdf` has been developed; the file content is XML. There is always a folder `<album>_mcf-Dateien` associated with a `.mcf` file, containing the images used in the album.
 
 ### .mcfx
-If your CEWE software uses `.mcfx` files for your projects, you can specify the file name directly on the command line. The `.mcfx` file format is actually an sql database containing a single `.mcf` file and the related image files. `cewe2pdf` will create a temporary directory, unpack the the `.mcfx` there, process the result, and then delete the temporary directory again 
+If your CEWE software uses `.mcfx` files for your projects, you can specify the file name directly on the command line. The `.mcfx` file format is actually a SQLite database containing a single `.mcf` file and the related image files. `cewe2pdf` will create a temporary directory, unpack the `.mcfx` there, process the result, and then delete the temporary directory again
 
 ### .xmcf
-If your CEWE software uses `.xmcf` files for your projects, you can simply still use this. The `.xmcf` file format is just an archive of the `*.mcf` file, the `<album>_mcf-Dateien` folder and a few other files. Right click the `.xmcf` file and your os should give you an open to open the archive. Copy the relevant files out of it, and you should be all set for the next steps.
+If your CEWE software uses `.xmcf` files for your projects, you can simply still use this. The `.xmcf` file format is just an archive of the `*.mcf` file, the `<album>_mcf-Dateien` folder and a few other files. Right click the `.xmcf` file and your os should offer to open the archive. Copy the relevant files out of it, and you should be all set for the next steps.
 
 ## Feature implementations
 
@@ -242,7 +272,7 @@ gap and the four CEWE positions (`centered`, `insideWithGap`, `outside` and
 
 For ordinary rectangular areas the historic ReportLab `Table` rendering is
 retained, partly to preserve the established regression-test output. Borders
-on objects with supported convex and bevelled image corners instead use the same shaped
+on objects with supported image corners instead use the same shaped
 path as the image, so that the border follows the corner rather than the
 original rectangle.
 
@@ -255,9 +285,8 @@ so our shadows are a best-effort approximation.
 Image shadows use a transparent alpha silhouette of the rendered image. They
 therefore follow supported corner decorations and transparent image content.
 
-The legacy rectangular shadow renderer remains for non-image callers. Shadows
-on text areas are not implemented and produce a warning. Set `noShadows = True`
-in `cewe2pdf.ini` to suppress all shadows.
+Clip-art and text shadows also use their visible alpha silhouettes rather than a
+rectangle around the area. Set `noShadows = True` in `cewe2pdf.ini` to suppress shadows.
 
 ### Corner decorations
 
@@ -265,13 +294,17 @@ cewe2pdf renders the `default`, `convex`, `bevelled`, `notched`, and `concave`
 corner decorations used by the CEWE album editor. Unknown corner shapes remain
 square and the run logs a warning.
 
+### Transparency
+
+Opacity set in the editor is supported for photographs and clip art, including
+existing transparent pixels. A photograph's passepartout frame shares its opacity.
+For text panels, see [text backgrounds](#text-backgrounds).
+
 ### Text effects
 
 Most text settings are supported, including font family, size, bold, italic, colour.
 
 #### Line height
-
-Line height is supported. 
 
 CEWE's explicit CSS `line-height` percentage in the HTML stored in the text
 area is supported. The renderer bases the percentage on ReportLab's natural
@@ -283,7 +316,7 @@ settings, but is not the source of this line-height implementation.
 
 Text areas with a visible `<outline>` element are rendered with a fill and
 stroke. Colour and width are supported, including rotated and italic text. Outline
-is generally only useful on large text, for example banner headings. 
+is generally only useful on large text, for example banner headings.
 
 `textFormat.hasOutline` is only an editor flag; an outline is visible only when
 the MCF also supplies a positive width and a non-transparent colour.
@@ -306,6 +339,8 @@ with line breaks, nested markup, tables, lists, non-left alignment, or text
 which would run beyond the frame fall back to the older non-breaking-space
 approximation. Tabbed text does not wrap across tab stops.
 
+#### Text backgrounds
+
 The text-area background is drawn separately from the text itself. CEWE can
 store its opacity in the `#AARRGGBB` background colour and/or in a decoration
 `alpha` attribute; cewe2pdf combines both values. This preserves translucent
@@ -313,7 +348,13 @@ text panels over a page background while leaving the text opaque.
 
 #### Text Art
 
-Text art objects are supported, but combination with backgrounds and outlines has not been tested.
+Curved Text Art follows circular or elliptical geometry, including its inside margin.
+Area-wide positive and negative letter spacing is supported in both directions;
+the spacing is included when centring the lettering on the curve.
+Its background colour forms a complete ring with a transparent centre, as in the
+editor. Background opacity is supported. Shadows follow the curved lettering,
+including its letter spacing; they use the same settings as ordinary text shadows.
+Combinations with further effects need visual checking.
 
 #### Bullet and numbered lists
 
@@ -321,13 +362,11 @@ These are not something you can create in the album editor, but if you make them
 
 ### Indexing an album (not available in the CEWE editor)
 
-It is possible to ask cewe2pdf to generate an index for the album, where index terms are selected using a combination of of font and font size used in a text area. The index is initially generated as a separate pdf file with black text on white background. The index pdf is used to create an index image file, a png in which the background is transparent. That png image is then merged into the album pdf, being placed on any page containing an index marker identifier.
+It is possible to ask cewe2pdf to generate an index for the album, where index terms are selected using a combination of font and font size used in a text area. The index is initially generated as a separate pdf file with black text on white background. The index pdf is used to create an index image file, a png in which the background is transparent. That png image is then merged into the album pdf, being placed on any page containing an index marker identifier.
 
-This feature may be useful in, for example, an album which represents a day-by-day record of some period of time. The headings for each day in the album can be specified in a font/fontsize combination which is not used for any other purpose in the album, and the index will then present a short day-by-day summary with page number references. If there are too many entries for one index page, cewe2pdf creates multiple index images and places them on successive marked album pages. Every rendered index line is an invisible PDF link to its actual output page. PDF readers also receive CEWE-aware page labels: `Cover` for each cover, source content-page numbers for the usual single-page PDF, and labels such as `2-3` where `--keepdoublepages` retains a spread. The same headings are also written as a PDF outline headed `Contents`, so a reader which supports document navigation can jump directly to the actual output page. The links, outline and labels are invisible when printing and do not alter the visible index.
+This feature may be useful in, for example, an album which represents a day-by-day record of some period of time. The headings for each day in the album can be specified in a font/fontsize combination which is not used for any other purpose in the album, and the index will then present a short day-by-day summary with page number references. If there are too many entries for one index page, cewe2pdf creates multiple index images and places them on successive marked album pages. Index headings also provide bookmarks and clickable contents rows; see [PDF navigation](#pdf-navigation-and-links).
 
 It is normal to allow cewe2pdf to delete the index PDF but to retain the index PNGs. They are consistently named `album.idx.1.png`, `album.idx.2.png`, and so on, even if there is only one page. That allows you to manually insert the index PNG onto the index page in the album editor, and thus have it as part of the album which is sent for quality printing (if you do that!). If you rerun the album PDF generation, cewe2pdf recognises and omits any earlier generated index image saved into the CEWE album before merging the newly generated replacement.
-
-Literal `http://` and `https://` addresses in ordinary text areas are also emitted as invisible, clickable web links in the PDF. They retain the same visible typography as the surrounding CEWE text, including when an address wraps across lines.
 
 The page on which the index is to be placed is recognised by the presence of a text on the page. The text is identified with a regular expression defined in the .ini file, and would often be a visible text such as "Contents". If you don't want a visible text, you can always set the colour of the text to "None". Other things on the index page (photos, clip-art, text, etc) are left undisturbed and should be visible since the background of the index image is transparent.
 
@@ -359,7 +398,7 @@ rightMargin = 7
 deleteIndexPdf = True
 deleteIndexPng = False
 ```
-__indexEntryFonts__ specifies one or more font / font sizw combinations which will be used to recognise index terms in the album
+__indexEntryFonts__ specifies one or more font / font size combinations which will be used to recognise index terms in the album
 
 __indexFont, indexFontSize, lineSpacing, pageWidth, pageHeight__ determine how the index entries are formatted on the index pdf page. Increasing __indexFontSize__ or __lineSpacing__ makes fewer entries fit on each index page.
 
@@ -373,6 +412,20 @@ __deleteIndexPdf__ etc determine whether or not the generated files are deleted 
 
 #### Large index limitations
 The index may span multiple pages. Add one index-marker page to the album for each expected index image; images are placed on matching pages in PDF order. If there are too few or too many marker pages for the generated index images, cewe2pdf logs an error or warning respectively.
+
+### PDF navigation and links
+
+Page labels are available independently of indexing: readers can show `Cover`,
+editable content-page numbers, or spread labels such as `2-3` after a double-page
+selection. Indexing additionally supplies bookmarks under `Contents` and clickable
+index rows pointing to actual output pages.
+
+Literal `http://` and `https://` addresses in ordinary text become clickable links,
+retaining their editor colour and typography, including wrapped addresses.
+Optional photograph-location links and document title/author values are configured
+in [PDF_GEO_LINKS and PDF_METADATA](#cewe2pdfini).
+
+These features depend on reader support. They do not change printed appearance.
 
 ### Calendars
 
@@ -407,15 +460,15 @@ is absolutely **not** guaranteed to handle every other product from the same
 editor.  Calendars have the limited support described above; cards and
 invitations are still unlikely to create the right result and may fail.
 
-Despite the above warning, changes in Nov 2024 should allow mcf files for the Photo Pairs game to be handled correctly. The resulting 6x6cm pages can be printed using Acrobat, using multiple sheets to a page with, for example, 4 across and 6 down on an A4 sheet. Print two copies, glue them to carton, cut them out and you have your memory game.
+CEWE Photo Pairs (MEM3) is explicitly supported. The resulting 6x6cm pages can be printed using Acrobat, using multiple sheets to a page with, for example, 4 across and 6 down on an A4 sheet. Print two copies, glue them to carton, cut them out and you have your memory game.
 
 ## Using the program
-You should now have 
+You should now have
 
 * a program directory containing all the python code needed, the most important being `cewe2pdf.py`.
 * one or more album directories each containing
   - one or more `*.mcf` or `.mcfx` album files
-    * a directory named `<album>_mcf-Datein` for each album, if you are using `*.mcf`
+    * a directory named `<album>_mcf-Dateien` for each album, if you are using `*.mcf`
   - optionally, a `cewe2pdf.ini` configuration file
   - optionally, an `additional_fonts.txt` configuration file
 
@@ -429,287 +482,46 @@ Example:
 python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
 ```
 ### Command line options
-`cewe2pdf` supports the following options, shown if you run ```python cewe2pdf.py --help```
-```
-usage: cewe2pdf.py [-h] [--keepDoublePages] [--pages PAGES]
-                   [--tmp-dir MCFXTMP] [--appdata-dir APPDATA] [--version]
-                   [--outFile OUTFILE] [inputFile]
 
-Convert a photo-book from .mcf/.mcfx file format to .pdf
+Run `python cewe2pdf.py --help` for the current arguments. Common options are:
 
-positional arguments:
-  inputFile             Just one mcf(x) input file must be specified (default: None)
+| Option | Purpose |
+| --- | --- |
+| `--keepDoublePages` | Keep each album spread together rather than splitting it into individual PDF pages |
+| `--pages cover,1-12,15` | Render selected editable content pages and covers |
+| `--outFile output.pdf` | Choose the output filename |
+| `--tmp-dir directory` | Choose the MCFX extraction directory |
+| `--appdata-dir directory` | Choose persistent application data storage |
+| `--version` | Show program version and available Git build identification |
+| `--install`, `--uninstall` | Manage the Windows executable's Explorer command; see the [build/integration guide](documents/build_a_compiled_version.md#windows-explorer-installation-and-use) |
 
-options:
-  -h, --help            show this help message and exit
-  --keepDoublePages     Each page in the .pdf will be a double-sided page, instead of a normal single page. (default: False)
-  --pages PAGES         Content page numbers to render, e.g. cover,1-12,15. Numbers use the editor's editable-page numbering; cover selects the outer cover(s). In --keepDoublePages mode, selecting either content page selects its complete spread. (default: None)
-  --tmp-dir MCFXTMP     Directory for .mcfx file extraction (default: None)
-  --appdata-dir APPDATA
-                         Directory for persistent app data, eg ttf fonts converted from otf fonts (default: None)
-  --version             Show version and build identification, then exit
-  --outFile OUTFILE     The name of the output file, rather than the default
-                        <inputFile>.pdf (default: None)
+### Selecting pages
 
-Example:
-   python cewe2pdf.py c:\path\to\my\files\my_nice_fotobook.mcf
-```
+`--pages` accepts positive editable content-page numbers, inclusive ranges, and `cover`,
+for example `--pages cover,1-12,15`. CLI zero is rejected. For albums, `cover` selects
+both outer covers in single-page output or their complete spread in double-page output.
+
+With `--keepDoublePages`, selecting either member selects the complete physical spread.
+Page 1 includes its front endpaper; the final content page includes its back endpaper.
+Duplicate requests are rendered once, in natural album order.
+Calendar `cover` selects the front cover; Photo Pairs has no cover and rejects it.
 
 ## Development
 
-For a newcomer-oriented overview of the modules, data ownership and regression
-test structure, see the [Developer guide](DEVELOPER_GUIDE.md).
-
-### Python dependencies
-
-The project has three dependency files with distinct jobs:
-
-- `requirements.txt` is maintained by hand. It lists the direct runtime,
-  test and lint dependencies, with the ranges the project supports.
-- `requirements-pinned.txt` is the generated lock file for that normal Python
-  environment. It pins those packages and their dependencies to the exact
-  versions which have been tested. Do not edit it by hand.
-- `requirements-winexe.txt` is a small, exact Windows-only overlay on the
-  pinned file. It supplies PyInstaller and its dependencies for developers
-  building `cewe2pdf.exe`.
-
-For a new development or test environment, install the lock file:
-
-```
-python -m pip install -r requirements-pinned.txt
-```
-
-GitHub Actions uses `requirements-pinned.txt` for linting and tests, and
-`requirements-winexe.txt` for its separate Windows executable build. Therefore,
-when a direct dependency is added or its supported range is changed in
-`requirements.txt`, regenerate the pinned file, run the full tests and the
-Windows executable build, and commit the related files together:
-
-```
-pip-compile --output-file=requirements-pinned.txt requirements.txt
-```
-
-After regenerating `requirements-pinned.txt`, preserve its PyInstaller-free
-purpose: update `requirements-winexe.txt` only when a PyInstaller build
-dependency changes. `pip-tools` is used only to maintain the lock file, rather
-than to run or build cewe2pdf. The current lock was generated with Python 3.12,
-pip 24.3.1 and pip-tools 7.5.1; use that combination in a separate tool
-environment when regenerating it.
-
-### Overall program structure
-
-The conversion is deliberately split into a small orchestration layer and
-specialist rendering modules:
-
-1. `conversionSetup.py` opens the `.mcf` or `.mcfx` album, reads its
-   configuration, and resolves the fonts, clip art, backgrounds and
-   passepartouts needed for the run.
-2. `cewe2pdf.py` creates the ReportLab canvas and the `RenderContext`, which
-   contains shared rendering settings and resources. It then asks
-   `pages.py` to render the requested pages.
-3. `pages.py` understands CEWE's cover, inside-cover and paired-page layout.
-   For each output page it draws the background and calls back to
-   `processElements` for the page areas.
-4. The area handlers render the individual objects: `imageareas.py`,
-   `textareas.py` and `clipartareas.py`. Supporting modules handle details
-   such as borders, shadows, corners, page numbers and indexes.
-
-MCF positions and sizes are measured in tenths of a millimetre. ReportLab
-uses points, so the conversion factor is carried in `RenderContext` as
-`mcf_to_reportlab`. A page area's origin is translated to its centre before
-it is rotated, allowing the individual handlers to draw their contents around
-`(0, 0)`.
-
-The text stored in an MCF is HTML-like rather than a direct ReportLab format.
-`textareas.py` translates the useful CEWE formatting into ReportLab
-paragraphs. Small text-size adjustments may be made when ReportLab's font
-metrics would otherwise make the text overflow its CEWE frame.
-
-The project deliberately uses pixel-level regression tests. When a rendering
-change is intentional, visually verify the new PDF before replacing an
-approved PDF in a test's `previous_result_pdfs` directory.
-
-### Version numbering
-
-Each conversion logs a user-facing program version and Git build
-identification. The user-facing version is the manually maintained
-`PROGRAM_VERSION` constant in `programversion.py`, currently in `m.n` form.
-Incrementing `m` or `n` is intentionally a maintainer judgement, based on the
-significance of the changes being merged into `bash0/cewe2pdf` master.
-
-To display this information without converting an album, use:
-
-```
-python cewe2pdf.py --version
-```
-
-The same option is available from the standalone executable:
-
-```
-dist\cewe2pdf.exe --version
-```
-
-After the tests succeed for a commit pushed to canonical `bash0/cewe2pdf`
-master, the GitHub workflow creates a tag of the form
-`cewe2pdf-v<m.n>-build-<GitHub-run-number>`. Tags identify the exact tested
-commit without making an automatic commit to master. They can be seen in the GitHub web 
-interface on the code tab:
-
-<img width="382" height="420" alt="image" src="https://github.com/user-attachments/assets/a512c662-dc21-4ad1-99d2-229c25f71894" />
-
-Forks and branches run the
-same checks but do not create canonical tags; fetch upstream tags to make their
-nearest canonical build available locally.
-
-The log can therefore look like either:
-
-```
->>> cewe2pdf version 1.0; Git identification: cewe2pdf-v1.0-build-178-0-g844e6d0
->>> cewe2pdf version 1.0; Git identification: cewe2pdf-v1.0-build-178-3-g844e6d0-dirty
->>> cewe2pdf version 1.0; Git identification: a046aed-dirty
-```
-
-The first form means that the working tree is exactly at the specified build. 
-The second form means that the working tree is 3 builds later than the specified build. 
-The third means that no matching build tag is available locally;
-`a046aed` and `g844e6d0` is abbreviated commit IDs. 
-`dirty` is a diagnostic indication that
-the working tree has uncommitted changes, so it is not an approved reproducible
-build. A source archive without `.git` metadata logs that Git identification
-is unavailable. PyInstaller captures the Git description while building a
-standalone executable and bundles it, so a normally built executable retains
-the identification of its source build.
-
-To reproduce an approved canonical build, clone the canonical repository,
-fetch its tags, and check out the reported build tag:
-
-```
-git clone https://github.com/bash0/cewe2pdf.git
-cd cewe2pdf
-git fetch --tags
-git checkout cewe2pdf-v1.0-build-184
-```
-
-This gives the exact source commit which passed the canonical test workflow.
-Developers working in a fork can instead fetch the same tags from their
-`upstream` remote.
+Use the [developer guide](documents/DEVELOPER_GUIDE.md) for architecture, dependency
+maintenance, logging, linting, and version numbering.
+[Project context](documents/PROJECT_CONTEXT.md) explains non-obvious implementation choices;
+[AGENTS.md](AGENTS.md) gives coding assistants the working conventions.
+The [test guide](tests/README.md) owns test execution, fixture approval, comparison, and cleanup.
 
 ### Standalone executable
 
-The project does not publish executable releases. A Windows developer may build
-an executable privately for a friend after preparing the normal environment
-and then installing the Windows-only overlay:
+The project does not publish executable releases. For a private build, use the
+[Windows/Linux build guide](documents/build_a_compiled_version.md).
+It also explains [Windows Explorer installation and use](documents/build_a_compiled_version.md#windows-explorer-installation-and-use).
+Source environment setup remains in [Install](#install).
 
-```
-python -m pip install -r requirements-pinned.txt
-python -m pip install -r requirements-winexe.txt
-```
+### Cleaning up temporary files
 
-Cairo must be available on the build machine (the GTK+ toolkit/runtime is
-sufficient); the finished EXE bundles the required Cairo DLLs, so its recipient
-does not need GTK, Cairo, MSYS2 or Python.
-
-Build the checked-in specification file:
-```
-python -m PyInstaller cewe2pdf.spec --clean
-```
-The executable is written to `dist/cewe2pdf.exe`. The specification explicitly
-includes the dynamically imported OpenCV and NumPy components needed by the
-indexing code; do not replace it with a direct `--onefile` invocation. You can
-run pytest from the working directory, use `runalltests.py`, or run individual
-test files.
-
-#### Giving the Windows executable to a non-programmer
-
-The executable is intended to be shared privately by the developer who builds
-it; the project does not publish executable releases. Its recipient can simply
-double-click `cewe2pdf.exe` in Explorer. It offers to install itself for that Windows user:
-the EXE is copied from (for example) the USB stick to
-`%LOCALAPPDATA%\cewe2pdf`, and an Explorer menu item, **Create PDF with
-cewe2pdf**, is added for `.mcf` and `.mcfx` files. No administrator rights are
-required.
-
-The user can then right-click an album file and choose that menu item. This
-Windows-only automatic mode asks Windows which installed application normally
-opens `.mcf` or `.mcfx` files, and uses that application's folder as the CEWE
-installation when it contains the expected CEWE resources. It also enables
-shared Windows fonts. The recipient does not need to find the CEWE directory
-or create a `cewe2pdf.ini` file. The PDF is created beside the album and a
-confirmation message shows its name. The same folder receives a diagnostic
-log named `<album>.mcf.log` (or `<album>.mcfx.log`), retaining the conversion
-messages which would otherwise disappear when Explorer closes the console.
-
-Running the EXE with `--install` performs the same installation explicitly.
-An argument-free command-line invocation only shows help; it does not offer
-installation. A direct Explorer launch of this console executable receives a
-fresh console and is recognised separately so it can still offer installation.
-`--uninstall` removes the Explorer menu entries but deliberately leaves the
-copied EXE in place, so that no running program has to delete itself.
-### Test verification using pixel level result comparison with compare-pdf
-We have a local copy of the compare-pdf code from https://github.com/Formartha/compare-pdf. This code can be used from our automated unit test code to do pixel-by-pixel comparison of the pdf pages that have been generated with a previous (approved) version. This strategy has been implemented for several of the tests, and it is therefore important that each test has an "approved" result pdf with which any new version is compared (see below)
-
-In addition compare_pdf can be used from the command line to see details of the differences. Just change to our tests/compare-pdf directory and run the command
-```
-pip install .
-```
-Then you can call compare_pdf from the command line to show the two pdfs side by side, or as a diff image.
-```
-compare_pdf --pdf <path_to_pdf1> --pdf <path_to_pdf2> ... [--showdiffs={sidebyside|diffimage}]
-```
-_--showdiffs=sidebyside_ lets you do a visual comparison, but often the differences are subtle and difficult to see (a different font for text is a typical subtle difference!). In that case _diffimage_ will show you where the pixels differ and often give you a good enough hint to understand what has changed. 
-### Conventions for naming and retaining approved result pdfs
-In each test directory where pixel comparison forms part of the test, it is necessary to keep an approved version (maybe several) to compare against. These are kept in a folder conventionally named _previous_result_pdfs_, and are conventionally named as the original mcf name with a suffix containing the date (yyyymmdd) and a style letter ("S" for single side pdfs, "D" for double side pdfs). The test programs create output files using this naming convention in their own directory. If a new version is different from the latest version in _previous_result_pdfs_ __AND__ is deemed to be correct by the developer, then the new test output(s) can be moved to _previous_result_pdfs_ and checked in there, thus becoming the basis against which future test results will be compared.
-### Testing using programmed variations of the .mcf file
-The _testPageNumbers_ tests show how you can use python in your test code to modify the xml of the .mcf file. This allows you to make variations of your test without having specifically designed album files. When combined with pixel by pixel comparison this allows quite extensive regression tests to be created.
-### Hints
-Tests using compare-pdf originally used the modification time to sort result pdfs and choose the latest approved version. This doesn't work on github, and we now use the file naming convention to sort the files. For interest, however, there is no touch(1) command on Windows, and powershell must be used to change the timestamp for a file, like this:
-```
-(Get-ChildItem .\testalbum.mcf.20250326.pdf).LastWriteTime = New-object DateTime 2025,03,26,19,00,00
-```
-### Cleaning up temporary files 
-Running tests during development can leave temporary output files lying around. Cleaning these away is a bit tricky, because it's important not to delete the approved result pdfs. On Windows you can locate these files with a powershell command like this:
-```
-$pattern = '^(test|unittest|allblack)[A-Za-z0-9._-]*\.mcfx?\.\d{8}[DS](\.pdf|\.idx(\.\d+)?\.png)$|^(a4[pl]|a5l|sq21)\.mcf\.\d{8}\.pdf$'
-Get-ChildItem -Recurse -File |
-Where-Object {
-    $_.FullName -notmatch '\\previous_result_pdfs\\' -and
-    $_.FullName -notmatch '\\Dateien\\' -and
-    $_.Name -match $pattern
-}
-```
-The pattern covers the traditional dated single/double-page test PDFs, the
-portrait, landscape, A5 landscape, and square calendar PDFs (`a4p`, `a4l`,
-`a5l`, and `sq21`), and both the former
-unnumbered and current numbered index PNGs.  The PNG part is deliberately
-limited to names generated from a dated test MCF; the separate `Dateien`
-exclusion is an additional safeguard for the album's own image files.
-and then delete them (via the recycle bin) with
-```
-Add-Type -AssemblyName Microsoft.VisualBasic
-
-Get-ChildItem -Recurse -File |
-Where-Object {
-    $_.FullName -notmatch '\\previous_result_pdfs\\' -and
-    $_.FullName -notmatch '\\Dateien\\' -and
-    $_.Name -match $pattern
-} |
-ForEach-Object {
-    [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile(
-        $_.FullName,
-        'OnlyErrorDialogs',
-        'SendToRecycleBin'
-    )
-}
-```
-If you want a dry run first, just replace the DeleteFile section with:
-```
-Write-Output "Would delete: $($_.FullName)"
-```
-Finding the files on Linux is rather easier :-):
-```
-find . -type f \( -name "*.pdf" -o -name "*.png" \) \
-  ! -path "*/previous_result_pdfs/*" \
-  ! -path "*/Dateien/*" \
-  | grep -E '/((test|unittest|allblack)[A-Za-z0-9._-]*\.mcfx?\.[0-9]{8}[DS](\.pdf|\.idx(\.[0-9]+)?\.png)|(a4[pl]|a5l|sq21)\.mcf\.[0-9]{8}\.pdf)$'
-```
-You can of course make the pattern matching a little more cautious if you want to be absolutely sure you don't delete something important!
+Follow the [test-output cleanup procedure](tests/README.md#cleaning-up-temporary-files).
+It owns the current discovery patterns and reviewed removal steps.
