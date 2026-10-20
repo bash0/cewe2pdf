@@ -1,14 +1,42 @@
-------
+# PDF visual comparison helper
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Formartha/compare-pdf/blob/main/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/compare-pdf)](https://pypi.org/project/compare-pdf)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/compare-pdf)
+This is the project's modified local copy of
+[Formartha/compare-pdf](https://github.com/Formartha/compare-pdf), under its
+[MIT licence](LICENSE). It renders PDF pages with PyMuPDF at 150 dpi and compares
+their RGB pixels using OpenCV.
 
-## Page-specific tolerances when used from Python
+## Environment and local copy
 
-`ComparePDF` compares every rendered page exactly by default.  A test may
-declare a narrowly scoped exception for a known platform-dependent
-rasterisation difference:
+Use the converter's [supported environment](../../README.md#install).
+Its pinned dependencies supply PyMuPDF, OpenCV, and NumPy.
+Regression tests arrange imports through `configureTestImportPaths` in
+[testutils.py](../../testutils.py), so they use this local helper without a separate
+PyPI installation. An installed upstream version may not have this project's extensions.
+
+## Command-line comparison
+
+From the repository root:
+
+```bash
+python tests/compare-pdf/compare_pdf/compare_pdf.py \
+  --pdf path/to/new.pdf --pdf path/to/approved.pdf --showdiffs=diffimage
+```
+
+Use at least two `--pdf` arguments. `--showdiffs` accepts:
+- `nothing`, the default: report differences without opening windows;
+- `sidebyside`: show the differing pages beside one another;
+- `diffimage`: show differing pixels against a white background.
+
+A key press dismisses a displayed page. Display modes require a working desktop
+OpenCV window environment, which may be unavailable in a headless CI/WSL session.
+Command-line comparison is exact. The direct script prints its final result;
+it does not currently set an operating-system exit status from that result, so use
+the Python API/assertions for automated verification.
+
+## Python API and page tolerances
+
+`ComparePDF.compare()` returns a boolean. Existing callers remain exact by default.
+A test may declare a narrowly scoped exception with one-based PDF page numbers:
 
 ```python
 from compare_pdf import ComparePDF, PageTolerance, ShowDiffsStyle
@@ -25,90 +53,22 @@ comparison = ComparePDF(
         ),
     },
 )
+assert comparison.compare()
 ```
 
-Page numbers are one-based.  A tolerated page passes only if the number of
-changed pixels, the greatest individual RGB-channel difference, and the
-greatest combined RGB difference all meet their limits.  The comparator logs
-these diagnostics for every non-exact page, records when a tolerance was
-used, and reports when a configured tolerance was unnecessary because the
-page matched exactly.  Command-line comparison remains exact; tolerances are
-deliberately a test-code API for now.
+The numbers above illustrate the interface; measure the actual difference before
+choosing limits for a regression test. Platform selection belongs in that test,
+not in the comparator.
 
-PDF Visual Comparison Tool
-==========================
-This utility compares PDF files visually by converting each page into images and then comparing them using OpenCV.
-It is particularly useful for identifying differences between PDF files that may not be apparent through text comparison alone.
+A tolerated page must meet all three limits:
+- `max_different_pixels`: absolute number of changed pixels;
+- `max_channel_difference`: largest absolute difference in any one RGB channel of any
+  pixel, from 0 to 255;
+- `max_combined_rgb_difference`: largest sum of absolute red, green, and blue differences
+  at any one pixel, from 0 to 765.
 
-Features
---------
-*   Compares PDF files visually, page by page.
-*   Supports multi-page PDF files.
-*   Reports differences between PDF files, specifying the page number and source file.
-
-Requirements
-------------
-*   Python 3.x
-*   PyMuPDF (`fitz`) library
-*   OpenCV (`cv2`) library
-
-For detailed requirements, see below.
-
-Installation for local development
-------------
-1.  Clone the repository:
-    
-    `git clone https://github.com/Formartha/compare-pdf.git`
-    
-
-2.  Install the required dependencies:
-    
-    `pip install pymupdf opencv-python`
-    
-
-Installation for self usage
-------------
-`pip install compare-pdf`
-
-Usage
------
-```
-compare_pdf --pdf <path_to_pdf1> --pdf <path_to_pdf2> ... [--showdiffs={sidebyside|diffimage}]
-```
-
-* Replace `<path_to_pdf1>`, `<path_to_pdf2>`, etc. with the paths to the PDF files you want to compare. At least two PDF files are required for comparison.
-* The `--showdiffs` option requests the display of differing pages in a window as they are discovered. A diff window is dismissed by typing any character and the processing continues
-    * _sidebyside_ places the differing pdf pages horizontally next to each other in the diff window
-    * _diffimage_ places an OpenCV absdiff result in the diff window, a white background with non-white pixels showing where the images differed.
-
-The program returns a zero result code when there are no differences, otherwise -1
-
-Example
--------
-`compare_pdf --pdf file1.pdf --pdf file2.pdf`
-
-This will compare `full/path/to/file1.pdf` and `full/path/to/file2.pdf` visually, reporting any differences found.
-
-Requirements.txt
-----------------
-The _requirements.txt_ file specifying exactly which modules are needed in a virtual environenment was generated using the commands below
-```
-pip3 install pipreqs
-pip3 install pip-tools
-pipreqs --savepath=requirements.in && pip-compile
-```
-The result was not perfect, however, so that manual additions were needed:
-```
-PyMuPDF==1.25.5
-setuptools==75.8.0
-wheel==0.45.1
-```
-
-License
--------
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-Useful references
------------------
-* https://stackoverflow.com/questions/31684375/automatically-create-file-requirements-txt/65728461#65728461
-* https://codedeepai.com/finding-difference-between-multiple-images-using-opencv-and-python/
+Pages without a tolerance remain exact. Every non-exact comparison reports the
+measurements, including changed-pixel percentage. Accepted tolerances are logged with
+their reason; an exact match on a tolerated page reports that the allowance was
+unnecessary. See [test policy](../README.md#comparison-tolerances) for when an exception
+is appropriate.

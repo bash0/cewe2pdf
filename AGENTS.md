@@ -1,64 +1,48 @@
 # cewe2pdf programming guidance
 
-This file gives coding assistants the project's working conventions. Read it before editing. The [README documentation map](README.md#documentation) is the entry point to the other guides.
-[PROJECT_CONTEXT.md](documents/PROJECT_CONTEXT.md) explains important implementation decisions.
-[DEVELOPER_GUIDE.md](documents/DEVELOPER_GUIDE.md) describes the architecture and test workflow;
-[README.md](README.md) documents installation, configuration, supported features, and cleanup.
+Read this file before editing. Use the [README documentation map](README.md#documentation) to find the user guide, architecture, test workflow, and implementation rationale.
 
 ## Workspace and review
 
-- Work in the checkout or task worktree authorized by the programmer. Establish the intended workspace before editing or cleaning files.
-- Follow the programmer's review and version-control workflow. Do not stage, commit, push, merge, or publish without authorization.
-- When working in an isolated worktree, keep changes and generated output there. Do not synchronize another checkout automatically.
-- Report the resulting behaviour, verification performed, and any unresolved failures or limitations.
-- Keep personal paths, account details, conversation transcripts, and machine-specific setup out of shared guidance.
-
-## Platforms and file integrity
-
-- Support normal Python execution on Windows, Linux, and macOS. Windows Explorer integration is a separate, platform-specific feature.
-- Use Python 3.12 and an isolated environment installed from requirements-pinned.txt. Verify the selected interpreter rather than assuming a particular environment name or installation path.
-- Respect repository attributes and a programmer's explicit checkout conventions. Otherwise preserve each text file's existing line endings; avoid unrelated LF/CRLF changes.
-- CRLF may be a local Windows preference; it is not a requirement for Linux/macOS contributors. Keep shell scripts compatible with their target platform.
-- Preserve PDFs, images, fonts, databases, and other binary resources byte-for-byte unless intentionally changing them. Never apply text newline conversion to them.
-- Use platform-aware paths and resource discovery. Do not hard-code a contributor's home directory, CEWE installation, font folders, or temporary directory.
-- Keep Windows-only imports and operations guarded. Tests for Windows path handling must also work on Linux CI.
-- Close files and database connections before reopening, replacing, or cleaning them; Windows locking can expose mistakes hidden on other platforms.
+- Work only in the checkout or task worktree authorized by the programmer. Keep generated output there.
+- Follow the programmer's review workflow; do not stage, commit, push, merge, publish, or synchronize another checkout without authorization.
+- Report the resulting behaviour, verification performed, and unresolved failures or limitations. An incomplete test run is not a passing suite.
+- Keep private conversation transcripts, personal paths, and account details out of shared documentation.
 
 ## Coding conventions
 
-- Prefer f-strings, including log messages, and follow the existing naming style.
-- Prefer explicit conditions and product dispatch over clever shorthand. Avoid chained comparisons where separate conditions are clearer.
-- Use one indentation level for continuation lines rather than aligning them beneath an earlier expression.
-- Use descriptive domain names; retain familiar module names when moving code.
+- Prefer f-strings, including logging, and follow existing names.
+- Prefer explicit conditions and product dispatch; avoid chained comparisons where separate conditions are clearer.
+- Use one indent level for continuation lines rather than aligning beneath an earlier expression.
 - Explain undocumented CEWE conventions, empirical calibration, ownership, and non-obvious Python mechanisms in focused comments.
-- Use the existing flake8 and pylint configuration. Fix meaningful findings; use narrow, explained suppressions for deliberate boundaries rather than restructuring solely to satisfy a metric.
-- Avoid unrelated formatting changes, renaming for consistency, and architectural rewrites of working code.
+- Use descriptive domain names; avoid unrelated formatting, consistency renames, and architectural rewrites of working code.
+- Follow the repository's flake8/pylint configuration. Use narrow, explained suppressions rather than distorting a design to satisfy a metric.
 
-## Implementation approach
+## Platforms and file integrity
 
-- Make small, reviewable changes. Preserve the public convertMcf behaviour unless deliberately changing it.
-- Derive behaviour from MCF structure, installed CEWE resources, and controlled editor comparisons. Establish a general rule before introducing special cases or calibration factors.
-- Installed resources are the main real-user scenario. Portable test resources must exercise the same loading/rendering mechanisms.
-- Reuse shared rendering, font, and resource mechanisms before adding alternatives.
-- Keep prepared resources, rendering settings, per-conversion mutable state, and optional indexing distinct. Do not introduce conversion-time mutable globals.
-- Keep the developer and user documentation aligned with changes in behaviour.
+- Support normal Python execution on Windows, Linux, and macOS. Guard Windows-only imports and integration.
+- Verify the interpreter and use the [supported environment setup](README.md#install); do not assume a particular local environment name or path.
+- Write shared Markdown as UTF-8. Follow repository attributes and explicit local text-file conventions; otherwise preserve existing line endings.
+- CRLF is a local Windows preference, not a requirement for all contributors. Avoid unrelated newline changes and preserve binary resources byte-for-byte.
+- Use platform-aware paths and resource discovery. Close temporary files and database connections before reopening, replacing, or cleaning them.
 
-## Verification and approved results
+## Changes and verification
 
-- Run tests from the repository root using the intended environment.
-- For code changes, run focused tests and relevant flake8/pylint checks, then the full pytest suite to establish regression safety. Documentation-only changes need appropriate content/link checks.
-- Use python -m pytest -rs for a full run without the helper's stop-at-first-failure behaviour. Report incomplete runs as incomplete.
-- Add feature coverage to an existing relevant MCF when it strengthens the integrated regression; otherwise use a dedicated fixture directory.
-- Use portable fixture fonts/resources. New tests should run through pytest and directly as Python files, including from an IDE.
-- Inspect actual rendered PDFs. Add structural assertions for invisible features such as annotations, bookmarks, and page labels.
-- The programmer reviews and approves replacement PDFs after visual comparison. An assistant may generate candidates but must not promote them merely to make tests pass.
-- Keep pixel comparisons exact by default. Any necessary tolerance belongs in the individual test/page, with measured limits and an explanation.
-- Use the term "approved result" for accepted reference output.
+- Make small, reviewable changes. Preserve established `convertMcf` behaviour unless deliberately changing it.
+- Derive behaviour from MCF structure, resources, and controlled editor comparisons. Establish a general rule before adding special cases or calibration factors.
+- Reuse shared rendering, font, and resource mechanisms. Respect the [architecture and ownership boundaries](documents/DEVELOPER_GUIDE.md#conversion-model); avoid conversion-time mutable globals.
+- Follow the [test workflow](tests/README.md), including focused checks, linting, and full regression verification for code changes. Documentation-only changes need encoding, link, and content checks.
+- Generate candidate PDFs for review; the programmer approves replacement results. Never promote a candidate simply to make tests pass.
+- Follow the [cleanup procedure](tests/README.md#cleaning-up-temporary-files), protecting approved results and album resources. Preserve outputs requested for inspection.
 
-## Generated output and cleanup
+## Documentation ownership
 
-- Follow the current README cleanup procedure; review candidate paths before removal.
-- Protect previous_result_pdfs and album image/resource directories, including names containing Dateien.
-- Never clean with a broad recursive PDF or PNG deletion.
-- On Windows, use the documented Recycle Bin method. On other platforms, use the documented platform-specific discovery and agree on removal where a reversible method is unavailable.
-- Keep a candidate PDF when the programmer requests it for inspection.
+Keep detailed information in its authoritative home and link to it:
+- [README](README.md): installation, configuration, usage, and supported features.
+- [Developer guide](documents/DEVELOPER_GUIDE.md): architecture, dependency maintenance, diagnostics, and versioning.
+- [Tests](tests/README.md): execution, fixture conventions, approval, and cleanup.
+- [Build guide](documents/build_a_compiled_version.md): executable builds and Windows integration.
+- [Project context](documents/PROJECT_CONTEXT.md): rationale behind non-obvious implementation choices.
+- [History](documents/history/README.md): superseded notes, not current instructions.
+
+Update the relevant document when changing behaviour. Format-specific notes stay beside their implementation.

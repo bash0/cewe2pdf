@@ -1,39 +1,94 @@
-# Building a "compiled" cewe2pdf.exe
+# Standalone executables
 
-> Historical build notes (March 2024). For the current pinned dependencies,
-> Cairo bundling, and checked-in PyInstaller specification, follow the
-> [README standalone-executable instructions](../README.md#standalone-executable).
-> The older direct --onefile command below is retained for reference.
-Python calls this freezing instead of compiling. So the cewe2pdf is freezed.
+This guide owns executable build instructions and Windows installation behaviour.
+For source installation and Cairo setup, use the [README](../README.md#install).
+For source provenance, see [version numbering](DEVELOPER_GUIDE.md#version-numbering).
+The [March 2024 build notes](history/build_a_compiled_version-2024.md) are historical.
 
-## Method 1: using pyinstaller
+Run commands from the repository root in an activated Python environment.
+Build on the target operating system; these instructions are not a cross-compilation
+recipe. The project does not publish executable releases; a developer can build one
+for private distribution.
 
-Reference: https://pyinstaller.org/en/stable/
+## Windows build
 
-    conda install pyinstaller
+Prepare the [normal source environment](../README.md#install), then install the
+Windows-only build overlay:
 
-Then run
-    
-    pyinstaller --onefile --workpath "D:\\temp\\cewe2pdf\\build" --distpath "D:\\temp\\cewe2pdf\\dist" cewe2pdf.py
+```powershell
+python -m pip install -r requirements-winexe.txt
+python -m PyInstaller cewe2pdf.spec --noconfirm --clean
+./dist/cewe2pdf.exe --version
+```
 
-This creates quite a lot of output, but in the end it will generate the two specified directories (build and dist). The resulting single (large!) executable file, **cewe2pdf.exe**, is in the dist directory, you can use this file on other PCs.
-Remember that you will need a **cewe2pdf.ini** file next to your .mcf file. And maybe an **additional_fonts.txt** and a **loggerconfig.yaml** file.
+The output is `dist/cewe2pdf.exe`. The checked-in specification includes dynamic imports
+needed by indexing, captures build identification, and bundles Cairo with its required
+non-system DLLs. Do not replace it with a bare `--onefile cewe2pdf.py` invocation.
 
-NB, previous versions of this description describe at length what *pyinstaller* did not do correctly, and how to remedy the situation.
+Cairo must be available on the build machine. The specification can locate it through
+`CEWE2PDF_CAIRO_DLL`, `PATH`, or the standard GTK3 Runtime Win64 installation.
+The finished Windows executable does not require its recipient to install Python,
+Cairo, GTK, or MSYS2.
 
-As of Mar 2024, with the latest versions of everything installed, as shown below, then running pyinstaller as shown above collects everything it needs, all on its own 
-- Anaconda 2024.02
-    - conda version : 24.1.2
-    - python version : 3.11.7.final.0
-- all the latest versions of the packages mentioned in requirements.txt
-    - fonttools  4.1.0
-    - lxml 5.1.0
-    - pillow 10.2.0
-    - pdfrw 0.4
-    - cairosvg 2.7.1
-    - pyyaml 6.0.1
-- the latest pyinstaller
-    - pyinstaller 5.13.2
-- a Cairo installation for windows from github vcpkg (in the local PATH)
-    - no version, but dated 03/05/2020
+Smoke-test the executable itself, not only the Python source:
 
+```powershell
+./dist/cewe2pdf.exe --outFile tests/testEmptyPageOne/executable-smoke.pdf tests/testEmptyPageOne/test_emptyPageOne.mcf
+```
+
+Check the process result, confirm the output PDF exists, and inspect it.
+The undated smoke PDF is outside the dated regression cleanup pattern; remove it
+separately when finished.
+
+## Linux build
+
+Prepare the [Linux source environment](../README.md#install), or follow the
+[WSL setup](TestingOnWSL.md) when developing from Windows.
+The Linux build workflow currently uses this PyInstaller version:
+
+```bash
+python -m pip install pyinstaller==6.22.0
+python -m PyInstaller cewe2pdf.spec --noconfirm --clean
+./dist/cewe2pdf --version
+./dist/cewe2pdf --outFile tests/testEmptyPageOne/executable-smoke-linux.pdf \
+  tests/testEmptyPageOne/test_emptyPageOne.mcf
+```
+
+Check the output and process result. Review library availability on the intended target
+system; the Windows DLL-bundling rule is not a claim that Linux output runs on every
+distribution. Remove the undated smoke PDF separately when finished.
+The [Linux executable workflow](../.github/workflows/build_pyinstaller_release.yml)
+is manually triggered. This guide does not define a macOS frozen-build procedure.
+
+## Windows Explorer installation and use
+
+A recipient can double-click the Windows executable in Explorer to be offered a
+per-user installation. It copies the EXE to `%LOCALAPPDATA%/cewe2pdf` and adds
+**Create PDF with cewe2pdf** to the Explorer context menu for `.mcf` and `.mcfx`.
+Administrator rights are not required. The editor remains the normal double-click
+application for album files.
+
+Right-click an album and select the command. Automatic mode discovers the CEWE
+installation from Windows file associations where possible and enables system fonts.
+A valid explicit configuration still wins. The resulting PDF and a diagnostic
+`<album>.mcf.log` or `<album>.mcfx.log` are written beside the input.
+The log is overwritten each run.
+
+An argumentless terminal invocation shows help rather than offering installation.
+Use explicit commands when installing or removing the menu:
+
+```powershell
+./dist/cewe2pdf.exe --install
+./dist/cewe2pdf.exe --uninstall
+```
+
+Uninstalling removes the menu entries and leaves the copied executable in place.
+The console may appear briefly during an Explorer launch.
+Locked output files must be closed before conversion can replace them.
+
+## Build validation in CI
+
+The [main workflow](../.github/workflows/pythonapp.yml) runs Linux source tests and
+builds/smoke-tests the Windows executable. Canonical build tags are created only after
+both jobs succeed. Changes to the dependency files or packaging must continue to pass
+both paths.

@@ -9,29 +9,12 @@ important implementation choices, see [project context](PROJECT_CONTEXT.md).
 
 ## First steps
 
-Python 3.12 is the supported development and CI version. Create an isolated environment and install the pinned dependencies:
+Prepare the [source environment](../README.md#install), then follow the
+[test workflow](../tests/README.md#running-tests). Run commands from the repository root.
 
-```bash
-python -m pip install -r requirements-pinned.txt
-python runAllTests.py
-```
-
-`requirements.txt` lists direct dependencies; `requirements-pinned.txt` is the reproducible development/CI environment generated with `pip-compile`; and `requirements-winexe.txt` is the additional Windows-only PyInstaller overlay. See the README's development section before changing a dependency.
-
-The public Python entry point is `convertMcf(...)` in [cewe2pdf.py](../cewe2pdf.py). The command-line entry point is in the same file:
-
-```bash
-python cewe2pdf.py --version
-python cewe2pdf.py album.mcf
-```
-
-For a first reading of the code, use this order:
-
-1. [cewe2pdf.py](../cewe2pdf.py) — command line and public conversion API.
-2. [albumConversionSession.py](../albumConversionSession.py) — ownership and lifetime of one conversion.
-3. [conversionSetup.py](../conversionSetup.py) — input, configuration, and resource discovery.
-4. [ceweInfo.py](../ceweInfo.py) and [cewePageResolver.py](../cewePageResolver.py) — product/PDF style and CEWE page interpretation.
-5. [pages.py](../pages.py), [backgrounds.py](../backgrounds.py), and [pageElements.py](../pageElements.py) — the PDF page-rendering path.
+The public entry point is `convertMcf(...)` in [cewe2pdf.py](../cewe2pdf.py).
+For an initial code reading, follow `albumConversionSession.py`, `conversionSetup.py`,
+`ceweInfo.py`, `cewePageResolver.py`, then `pages.py`, `backgrounds.py`, and `pageElements.py`.
 
 ## Conversion model
 
@@ -109,22 +92,16 @@ Package `__init__.py` files deliberately contain no public façade. Import the s
 
 ## Calendars
 
-Calendar support is data-driven from the MCF and CEWE resources:
-
-- Calendar detection comes from `calendarcoverfront` / `calendariumarea` structure, with CAL product IDs as compatibility fallbacks.
-- `calendar_schema.xml` supplies cell colours/styles and `calendar_layout.xml` supplies named layout geometry.
-- Language resources supply month names, weekday labels, and holiday/event definitions. Do not add a Python list of national holidays or month names as a general fallback when the relevant CEWE resource can be located.
-- Portable test fixtures under `tests/Resources/calendar*` provide minimum data for self-contained calendar tests. A real configured CEWE installation provides delivered resources instead.
-
-New calendar behaviour should begin with a small MCF fixture and an editor screenshot. Use layout/schema data or MCF attributes rather than product-ID or month-specific adjustments.
+The `calendars` package loads schemas, layouts, and locale resources during setup
+only for calendar products. See [calendar rationale](PROJECT_CONTEXT.md#calendars)
+for interpretation rules and [user configuration](../README.md#calendars) for local substitutions.
 
 ## Configuration and resources
 
-`prepareConversion(...)` reads `cewe2pdf.ini` from the current directory, then from the album directory; later settings override earlier ones. The album-specific file is normally the least surprising place for user settings. `additional_fonts.txt` is searched in album directory, current directory, and program directory, using the first one found.
-
-The converter can render simple albums without CEWE installed. It warns about unavailable CEWE fonts, backgrounds, clip art, and passepartouts rather than inventing a separate no-CEWE code path. Tests use fixture resources and set `IGNORELOCALFONTS=1` so a developer's local fonts do not alter approved PDFs.
-
-Keep resource lookup data-driven. Add a configurable or fixture location before hard-coding a machine-specific AppData or installation path.
+`prepareConversion(...)` owns resource setup. The [user configuration guide](../README.md#configuration-files)
+defines INI merge order, additional-font lookup, and system-font options.
+Use the same loading mechanisms for installed and portable test resources; missing
+CEWE resources should generate ordinary lookup diagnostics rather than a second rendering pipeline.
 
 ## Logging and diagnostics
 
@@ -142,63 +119,19 @@ Use `mustsee` for important conversion facts, ordinary `logging` for general dia
 
 ## Tests and approved output
 
-Run all tests:
+The [test guide](../tests/README.md) owns test commands, fixtures, reference naming,
+visual approval, comparison policy, and cleanup. The [comparison helper](../tests/compare-pdf/README.md)
+owns its API and diagnostic measurements.
 
-```bash
-python runAllTests.py
-# Or, without the helper's stop-at-first-failure behaviour:
-python -m pytest -rs
-```
+### Page selection API
 
-Useful focused runs:
+The [user guide](../README.md#selecting-pages) defines CLI selection semantics.
+The parser creates `PageSelection`; the public `convertMcf` argument retains its
+historical `pageNumbers` name and also accepts an iterable of integers. Legacy zero
+maps to `cover`. Keep that compatibility at the boundary rather than inside renderers.
+Extend resolver tests when changing CEWE page interpretation.
 
-```bash
-python -m pytest tests/testCewePageResolver/test_cewePageResolver.py -q
-python -m pytest tests/testCalendar -q
-python -m pytest -rs --ignore=tests/testCalendar
-```
-
-Most rendering tests have this form:
-
-```text
-tests/testFeature/
-  example.mcf
-  example_mcf-Dateien/             album pictures, where needed
-  cewe2pdf.ini                     fixture resource configuration, where needed
-  test_feature.py
-  previous_result_pdfs/            approved PDF/PNG results
-```
-
-Tests create date-stamped PDFs and compare them pixel-for-pixel with the newest approved result. This makes visual inspection mandatory before updating a golden result: a passing comparison proves only that output matches the approved rendering, not that it matches CEWE. Keep editor screenshots or notes for fixtures which demonstrate reverse-engineered behaviour.
-
-`tests/testPageNumbers` demonstrates controlled programmatic edits to an MCF for several related cases. Prefer a compact dedicated fixture when isolating a new CEWE feature.
-
-### Selecting pages
-
-`--pages` accepts a comma-separated mixture of positive editable content-page
-numbers, inclusive ranges, and the `cover` keyword:
-
-```text
---pages cover,1-12,15
-```
-
-`cover` selects both outer covers for a single-page album PDF and the complete
-outer-cover spread for a double-page album PDF. Zero is not a page number and
-is rejected by the command line; it was a former front-cover shorthand that
-could not express the back cover. Calendar `cover` selects its front cover;
-Photo Pairs has no cover and rejects that keyword.
-
-In `--keepDoublePages` mode, selecting either member of an ordinary spread
-selects both content pages. Page 1 includes its front endpaper and page 26 (or
-the final content page) includes its back endpaper, because those are the
-physical opening and closing spreads. A selection is de-duplicated and is
-always emitted in natural album order.
-
-The command line parses a `PageSelection` object. The public `convertMcf`
-argument retains its historical `pageNumbers` name and accepts either that
-object or the old iterable of integers; legacy zero maps to `cover`.
-
-### Linting
+## Linting
 
 The GitHub workflow treats Python syntax/undefined-name flake8 findings as errors and reports broader style/complexity findings as warnings. Run:
 
@@ -209,19 +142,112 @@ python -m pylint --rcfile=.pylintrc *.py calendars clipart decorations fonts ind
 
 Use a local pylint suppression only when the parameter-rich rendering boundary is genuinely clearer than an artificial wrapper; explain the reason in a nearby comment.
 
-### Cleaning generated test output
+## Working conventions
 
-Do not delete approved PDFs under `previous_result_pdfs`, or album images under a `Dateien` directory. The canonical PowerShell discovery pattern and Recycle Bin cleanup command are maintained in the [README cleanup section](../README.md#cleaning-up-temporary-files). Review listed files before sending them to the Recycle Bin, especially when extending the pattern for a new fixture naming convention.
-
-## Change discipline
-
-- Preserve the public `convertMcf(...)` API unless making an explicit compatibility decision.
-- Derive rendering from MCF tags and installed/fixture resources before adding product-ID, language, or layout-specific code.
-- Keep page selection in `cewePageResolver.py`, page-level canvas policy in `pages.py`/`backgrounds.py`, and area-specific drawing in a specialist module.
-- Add focused tests before updating a golden PDF. Run the focused test, then the full suite.
-- Follow repository attributes and explicit local checkout conventions for text line endings; otherwise preserve existing endings and avoid unrelated LF/CRLF changes. CRLF is a Windows preference, not a requirement for all platforms. Preserve binary resources byte-for-byte.
-- Treat messages as part of the user interface: state the useful fact, include dimensions or recovery advice where applicable, and avoid speculative claims of pixel-identical CEWE compatibility.
+Use [AGENTS.md](../AGENTS.md) for coding/review conventions and the
+[test guide](../tests/README.md#cleaning-up-temporary-files) for safe cleanup.
+Treat diagnostics as user interface: state the useful fact in appropriate units,
+include recovery advice when available, and avoid unsupported claims of pixel-perfect CEWE compatibility.
 
 ## Support boundary
 
 The primary target is CEWE albums. Calendar pages and the Photo Pairs memory-card product have explicit support. CEWE-only or third-party features can be approximated, omitted with a warning, or unsupported. Keep that distinction visible in both code and documentation.
+
+## Python dependencies
+
+The project has three dependency files with distinct jobs:
+
+- `requirements.txt` is maintained by hand. It lists the direct runtime,
+  test and lint dependencies, with the ranges the project supports.
+- `requirements-pinned.txt` is the generated lock file for that normal Python
+  environment. It pins those packages and their dependencies to the exact
+  versions which have been tested. Do not edit it by hand.
+- `requirements-winexe.txt` is a small, exact Windows-only overlay on the
+  pinned file. It supplies PyInstaller and its dependencies for developers
+  building `cewe2pdf.exe`.
+
+Create new environments using the [README installation procedure](../README.md#install).
+
+GitHub Actions uses `requirements-pinned.txt` for linting and tests, and
+`requirements-winexe.txt` for its separate Windows executable build. Therefore,
+when a direct dependency is added or its supported range is changed in
+`requirements.txt`, regenerate the pinned file, run the full tests and the
+Windows executable build, and commit the related files together:
+
+```
+pip-compile --output-file=requirements-pinned.txt requirements.txt
+```
+
+After regenerating `requirements-pinned.txt`, preserve its PyInstaller-free
+purpose: update `requirements-winexe.txt` only when a PyInstaller build
+dependency changes. `pip-tools` is used only to maintain the lock file, rather
+than to run or build cewe2pdf. Generate the lock with Python 3.12 in a separate
+dependency-maintenance environment.
+Record the pip/pip-tools versions used when updating the lock, and validate the
+result rather than treating an old local tool version as a permanent requirement.
+
+## Version numbering
+
+Each conversion logs a user-facing program version and Git build
+identification. The user-facing version is the manually maintained
+`PROGRAM_VERSION` constant in [infrastructure/programversion.py](../infrastructure/programversion.py), currently in `m.n` form.
+Incrementing `m` or `n` is intentionally a maintainer judgement, based on the
+significance of the changes being merged into `bash0/cewe2pdf` master.
+
+To display this information without converting an album, use:
+
+```
+python cewe2pdf.py --version
+```
+
+The same option is available from the standalone executable:
+
+```
+dist\cewe2pdf.exe --version
+```
+
+After the tests succeed for a commit pushed to canonical `bash0/cewe2pdf`
+master, the GitHub workflow creates a tag of the form
+`cewe2pdf-v<m.n>-build-<GitHub-run-number>`. Tags identify the exact tested
+commit without making an automatic commit to master. They can be seen in the GitHub web
+interface on the code tab:
+
+<img width="382" height="420" alt="image" src="https://github.com/user-attachments/assets/a512c662-dc21-4ad1-99d2-229c25f71894" />
+
+Forks and branches run the
+same checks but do not create canonical tags; fetch upstream tags to make their
+nearest canonical build available locally.
+
+Example log forms (the version and build numbers are illustrative):
+
+```
+>>> cewe2pdf version 1.0; Git identification: cewe2pdf-v1.0-build-178-0-g844e6d0
+>>> cewe2pdf version 1.0; Git identification: cewe2pdf-v1.0-build-178-3-g844e6d0-dirty
+>>> cewe2pdf version 1.0; Git identification: a046aed-dirty
+```
+
+The first form means that the working tree is exactly at the specified build.
+The second form means that the working tree is 3 commits later than the specified build.
+The third means that no matching build tag is available locally;
+`a046aed` and the `g`-prefixed suffix identify abbreviated commit IDs.
+`dirty` is a diagnostic indication that
+the working tree has uncommitted changes, so it is not an approved reproducible
+build. A source archive without `.git` metadata logs that Git identification
+is unavailable. PyInstaller captures the Git description while building a
+standalone executable and bundles it, so a normally built executable retains
+the identification of its source build.
+
+To reproduce an approved canonical build, clone the canonical repository,
+fetch its tags, and check out the reported build tag:
+
+```
+git clone https://github.com/bash0/cewe2pdf.git
+cd cewe2pdf
+git fetch --tags
+git checkout cewe2pdf-v1.0-build-184
+```
+
+This gives the exact source commit which passed the canonical test workflow.
+Developers working in a fork can instead fetch the same tags from their
+`upstream` remote.
+

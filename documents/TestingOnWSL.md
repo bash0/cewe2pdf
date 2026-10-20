@@ -81,29 +81,16 @@ instead:
 source ~/venvs/cewe2pdf312/bin/activate
 ```
 
-Check the interpreter and run the two platform-sensitive smoke tests first:
+Check `python --version` after activation, then use the [test workflow](../tests/README.md#running-tests).
+For a quick platform-sensitive check:
 
 ```bash
-python --version
 python -m pytest -q tests/testImageExtractor/test_imageFormats.py tests/testShadows/test_shadows.py
 ```
 
-The interpreter should report Python 3.12. Once that succeeds, run the full
-suite exactly as GitHub does:
-
-```bash
-python -m pytest -q
-```
-
-The pinned Python packages make the test environment reproducible, but the
-native Cairo library comes from the Linux distribution. Therefore SVG
-rasterisation may differ by a few antialiased boundary pixels between Windows
-and Linux. The only currently documented example is the tennis-ball
-passepartout on page 11 of `testShadows`; that test has a tightly scoped,
-Linux-only tolerance. All other pages remain exact comparisons.
-
-`conda deactivate` leaves the test environment when required. None of these
-commands changes the Windows Python or Conda environment.
+The [comparison policy](../tests/README.md#comparison-tolerances) explains the native
+Cairo variation on Linux. `conda deactivate` leaves the Conda environment without
+changing the Windows environment.
 
 ## Using the Windows CEWE resources and fonts
 
@@ -112,31 +99,22 @@ installation is needed for the test suite. To make a PDF from a real album
 using the locally installed Windows CEWE resources and fonts, configure their
 WSL paths in an album-local `cewe2pdf.ini` file. For example:
 
-- `cewe_folder = /mnt/c/Program Files/Elkjop fotoservice_6.3/elkjop fotoservice`  
+- `cewe_folder = /mnt/c/Program Files/Elkjop fotoservice_6.3/elkjop fotoservice`
   (from `C:\Program Files\Elkjop fotoservice_6.3\elkjop fotoservice`)
-- `hps_folder = /mnt/c/Users/pete/AppData/Local/CEWE/hps`  
+- `hpsFolder = /mnt/c/Users/<your-Windows-user-name>/AppData/Local/CEWE/hps`
   (previously found through the Windows `LOCALAPPDATA` variable)
 
 For extra fonts, use WSL paths in `additional_fonts.txt`, for example:
 
 - `/mnt/c/Windows/Fonts/`
-- `/mnt/c/Users/pete/AppData/Local/Microsoft/Windows/Fonts/`
+- `/mnt/c/Users/<your-Windows-user-name>/AppData/Local/Microsoft/Windows/Fonts/`
 
 Then, from the repository directory, run for example:
 
 ```bash
-python cewe2pdf.py tests/unittest_fotobook.mcf
+python cewe2pdf.py /path/to/album.mcf
 ```
 
 ## Building a Linux executable version of cewe2pdf
 
-After activating the environment and running the tests, build the Linux
-executable with:
-
-```bash
-python -m pip install pyinstaller==6.22.0
-python -m PyInstaller cewe2pdf.spec --noconfirm --clean
-./dist/cewe2pdf --version
-./dist/cewe2pdf --outFile tests/testEmptyPageOne/executable-smoke-linux.pdf \
-  tests/testEmptyPageOne/test_emptyPageOne.mcf
-```
+Follow the [Linux build instructions](build_a_compiled_version.md#linux-build) after setting up this environment.
