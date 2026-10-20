@@ -1,4 +1,9 @@
 # Building a "compiled" cewe2pdf.exe
+
+> Historical build notes (March 2024). For the current pinned dependencies,
+> Cairo bundling, and checked-in PyInstaller specification, follow the
+> [README standalone-executable instructions](../README.md#standalone-executable).
+> The older direct --onefile command below is retained for reference.
 Python calls this freezing instead of compiling. So the cewe2pdf is freezed.
 
 ## Method 1: using pyinstaller

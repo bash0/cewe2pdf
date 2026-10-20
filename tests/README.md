@@ -1,3 +1,16 @@
+# Test-local notes
+
+For the standard portable regression workflow, approved results, and fixture layout,
+see the [developer guide](../documents/DEVELOPER_GUIDE.md#tests-and-approved-output).
+The [compare-pdf README](compare-pdf/README.md) documents the comparison helper.
+
+## Manual Visual Studio inspection with installed resources
+
+The older notes below describe an optional Windows inspection of unittest_fotobook
+using installed resources. These are not the settings for the portable approved-result
+regression run. Substitute actual installation paths and keep local experiments out
+of the shared fixture configuration.
+
 On Windows the main Visual Studio project is normally set up to use runAllTests.py, which uses
 pytest to find tests, and thus runs the same tests as will be run in the github checkin action.
 

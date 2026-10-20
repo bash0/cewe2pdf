@@ -1,8 +1,11 @@
 # Developer guide
 
-This guide is for contributors working on the converter. It describes the current source layout, rendering model, and test workflow. User installation, command-line options, CEWE-resource configuration, and the standalone executable are documented in [README.md](README.md).
+This guide is for contributors working on the converter. It describes the current source layout, rendering model, and test workflow. User installation, command-line options, CEWE-resource configuration, and the standalone executable are documented in [README.md](../README.md).
 
 The converter is a careful interpretation of an undocumented CEWE format. A small, well-tested change based on an MCF fixture is usually preferable to a large theoretical rewrite.
+
+For working conventions, see [AGENTS.md](../AGENTS.md). For the reasons behind
+important implementation choices, see [project context](PROJECT_CONTEXT.md).
 
 ## First steps
 
@@ -15,7 +18,7 @@ python runAllTests.py
 
 `requirements.txt` lists direct dependencies; `requirements-pinned.txt` is the reproducible development/CI environment generated with `pip-compile`; and `requirements-winexe.txt` is the additional Windows-only PyInstaller overlay. See the README's development section before changing a dependency.
 
-The public Python entry point is `convertMcf(...)` in [cewe2pdf.py](cewe2pdf.py). The command-line entry point is in the same file:
+The public Python entry point is `convertMcf(...)` in [cewe2pdf.py](../cewe2pdf.py). The command-line entry point is in the same file:
 
 ```bash
 python cewe2pdf.py --version
@@ -24,11 +27,11 @@ python cewe2pdf.py album.mcf
 
 For a first reading of the code, use this order:
 
-1. [cewe2pdf.py](cewe2pdf.py) — command line and public conversion API.
-2. [albumConversionSession.py](albumConversionSession.py) — ownership and lifetime of one conversion.
-3. [conversionSetup.py](conversionSetup.py) — input, configuration, and resource discovery.
-4. [ceweInfo.py](ceweInfo.py) and [cewePageResolver.py](cewePageResolver.py) — product/PDF style and CEWE page interpretation.
-5. [pages.py](pages.py), [backgrounds.py](backgrounds.py), and [pageElements.py](pageElements.py) — the PDF page-rendering path.
+1. [cewe2pdf.py](../cewe2pdf.py) — command line and public conversion API.
+2. [albumConversionSession.py](../albumConversionSession.py) — ownership and lifetime of one conversion.
+3. [conversionSetup.py](../conversionSetup.py) — input, configuration, and resource discovery.
+4. [ceweInfo.py](../ceweInfo.py) and [cewePageResolver.py](../cewePageResolver.py) — product/PDF style and CEWE page interpretation.
+5. [pages.py](../pages.py), [backgrounds.py](../backgrounds.py), and [pageElements.py](../pageElements.py) — the PDF page-rendering path.
 
 ## Conversion model
 
@@ -208,7 +211,7 @@ Use a local pylint suppression only when the parameter-rich rendering boundary i
 
 ### Cleaning generated test output
 
-Do not delete approved PDFs under `previous_result_pdfs`, or album images under a `Dateien` directory. The canonical PowerShell discovery pattern and Recycle Bin cleanup command are maintained in the [README cleanup section](README.md#cleaning-up-temporary-files). Review listed files before sending them to the Recycle Bin, especially when extending the pattern for a new fixture naming convention.
+Do not delete approved PDFs under `previous_result_pdfs`, or album images under a `Dateien` directory. The canonical PowerShell discovery pattern and Recycle Bin cleanup command are maintained in the [README cleanup section](../README.md#cleaning-up-temporary-files). Review listed files before sending them to the Recycle Bin, especially when extending the pattern for a new fixture naming convention.
 
 ## Change discipline
 
@@ -216,7 +219,7 @@ Do not delete approved PDFs under `previous_result_pdfs`, or album images under 
 - Derive rendering from MCF tags and installed/fixture resources before adding product-ID, language, or layout-specific code.
 - Keep page selection in `cewePageResolver.py`, page-level canvas policy in `pages.py`/`backgrounds.py`, and area-specific drawing in a specialist module.
 - Add focused tests before updating a golden PDF. Run the focused test, then the full suite.
-- Keep CRLF line endings in touched Python and text files.
+- Follow repository attributes and explicit local checkout conventions for text line endings; otherwise preserve existing endings and avoid unrelated LF/CRLF changes. CRLF is a Windows preference, not a requirement for all platforms. Preserve binary resources byte-for-byte.
 - Treat messages as part of the user interface: state the useful fact, include dimensions or recovery advice where applicable, and avoid speculative claims of pixel-identical CEWE compatibility.
 
 ## Support boundary

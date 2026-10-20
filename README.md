@@ -16,6 +16,25 @@ In August 2026 the code was significantly rearranged into smaller files, to isol
 
 tags: mcf2pdf, mcf_to_pdf, CEWE Fotobuch als pdf speichern, Fotobuch nach pdf exportieren, cewe Fotobuch pdf, mcf in pdf umwandeln, aus CEW-Fotobuch ein pdf machen, cewe Fotobuch pdf
 
+## Documentation
+
+Start with the installation and usage sections below. The following guides provide
+more detail for users, contributors, and coding assistants.
+
+| What you want to do | Where to look |
+| --- | --- |
+| Install, configure, and run the converter | [Installation](#install), [configuration](#configuration-files), and [usage](#using-the-program) in this README |
+| Understand supported features and products | [Feature implementations](#feature-implementations) and [acceptable products](#acceptable-products) |
+| Start development or understand the architecture | [Developer guide](documents/DEVELOPER_GUIDE.md) |
+| Understand implementation decisions and CEWE conventions | [Project context](documents/PROJECT_CONTEXT.md) |
+| Give a coding assistant the project programming conventions | [Programming guidance](AGENTS.md) |
+| Set up and test Linux using WSL | [Linux/WSL guide](documents/TestingOnWSL.md) |
+| Build a standalone executable | [Current build instructions](#standalone-executable); [earlier build notes](documents/build_a_compiled_version.md) are historical |
+| Work with tests and approved PDFs | [Developer test workflow](documents/DEVELOPER_GUIDE.md#tests-and-approved-output), [test-local notes](tests/README.md), and [compare-pdf documentation](tests/compare-pdf/README.md) |
+| Understand or author clip art and passepartout resources | [CLP file format and authoring notes](clipart/CLP_FILE_FORMAT.md) |
+| Review the alternative environment definitions | [Environment notes](environments/environments.md) |
+| Consult the earlier MCF feature audit | [August 2026 audit](documents/history/mcf_feature_classification.md), a historical snapshot rather than a current support list |
+
 ## Install
 
 ### 1. Obtain the repository
@@ -458,7 +477,9 @@ Example:
 ## Development
 
 For a newcomer-oriented overview of the modules, data ownership and regression
-test structure, see the [Developer guide](DEVELOPER_GUIDE.md).
+test structure, see the [Developer guide](documents/DEVELOPER_GUIDE.md).
+The [programming guidance](AGENTS.md) sets out the working conventions, and
+[project context](documents/PROJECT_CONTEXT.md) explains the implementation decisions.
 
 ### Python dependencies
 
@@ -596,6 +617,12 @@ Developers working in a fork can instead fetch the same tags from their
 
 ### Standalone executable
 
+For Linux/WSL setup and an executable smoke test, see the
+[Linux/WSL guide](documents/TestingOnWSL.md#building-a-linux-executable-version-of-cewe2pdf).
+
+The separate [earlier build notes](documents/build_a_compiled_version.md) are
+retained as historical reference; use the current instructions here.
+
 The project does not publish executable releases. A Windows developer may build
 an executable privately for a friend after preparing the normal environment
 and then installing the Windows-only overlay:
@@ -646,6 +673,11 @@ fresh console and is recognised separately so it can still offer installation.
 `--uninstall` removes the Explorer menu entries but deliberately leaves the
 copied EXE in place, so that no running program has to delete itself.
 ### Test verification using pixel level result comparison with compare-pdf
+
+See the [developer test workflow](documents/DEVELOPER_GUIDE.md#tests-and-approved-output),
+[test-local notes](tests/README.md), and [compare-pdf interface documentation](tests/compare-pdf/README.md)
+for the related setup and comparison details.
+
 We have a local copy of the compare-pdf code from https://github.com/Formartha/compare-pdf. This code can be used from our automated unit test code to do pixel-by-pixel comparison of the pdf pages that have been generated with a previous (approved) version. This strategy has been implemented for several of the tests, and it is therefore important that each test has an "approved" result pdf with which any new version is compared (see below)
 
 In addition compare_pdf can be used from the command line to see details of the differences. Just change to our tests/compare-pdf directory and run the command

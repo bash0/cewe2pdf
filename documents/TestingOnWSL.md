@@ -1,5 +1,8 @@
 # Testing cewe2pdf on Linux using a Windows PC
 
+See the [README documentation map](../README.md#documentation) for the other guides
+and the [developer guide](DEVELOPER_GUIDE.md) for the general test workflow.
+
 Testing on Linux is useful both as an additional supported platform and as a
 reasonably close reproduction of the Ubuntu environment used by GitHub
 Actions. Microsoft provides Linux on a Windows machine through the

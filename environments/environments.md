@@ -1,8 +1,16 @@
+# Environment definition notes
+
+These notes accompany the alternative Conda YAML definitions in this directory.
+For the current supported Python version and pinned dependency setup, start with
+the [README installation instructions](../README.md#install).
+For a separate Linux environment on a Windows machine, see the
+[Linux/WSL guide](../documents/TestingOnWSL.md).
+
 The yml files here are used to create the environments for the different platforms. The windows one is the original, the linux version is tidied by copilot.
 
 Installing on Ubuntu (under WSL, though I think it should work on a native install too):
 
-- Install Miniconda in your WSL Ubuntu instance (if you haven’t already):
+- Install Miniconda in your WSL Ubuntu instance (if you havenâ€™t already):
 ```
 	wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 	bash Miniconda3-latest-Linux-x86_64.sh

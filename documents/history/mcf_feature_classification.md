@@ -1,4 +1,16 @@
-# MCF feature classification
+# MCF feature classification (August 2026 audit)
+
+> Historical snapshot: the support classifications and source locations below
+> describe the audit at that time. Later implementations and package moves
+> have superseded some entries. This is not the current feature support list.
+
+This audit was produced with OpenAI Codex in August 2026 by examining the
+existing MCF fixtures, including MCF data extracted from SQLite MCFX containers.
+It was used to improve code documentation and identify further feature work.
+This provenance was originally recorded separately in documents/readme.txt.
+
+For current behaviour, use the [README feature descriptions](../../README.md#feature-implementations)
+and [developer guide](../DEVELOPER_GUIDE.md).
 
 This is a conservative code-reading pass over the 22 audited album documents.
 “Implemented” means the current parser has an identifiable handler; it does not
