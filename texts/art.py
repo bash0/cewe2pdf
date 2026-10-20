@@ -13,6 +13,10 @@ from renderContext import RenderContext
 # A CEWE 8.1 TextArt box has no stored radius.  A newly-created 490-unit
 # square box has the same arc as the 171-unit legacy wrapper-table margin.
 CEWE8_DEFAULT_TEXTART_RADIUS_RATIO = 171 / 490
+# The same default box leaves 74 MCF units above the arc for 18-point text.
+# This is a font inset, not a fraction of a resized box: otherwise large
+# lettering can rise above its area even when its curve has the right shape.
+CEWE8_DEFAULT_TEXTART_TOP_INSET_MCF_PER_POINT = (490 / 2 - 171) / 18
 
 def parse_html_text(html):
     """Parses an HTML string, applying default styles from <body> while handling <p>, <span>, <i>, and <b>."""
@@ -242,11 +246,12 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
     #
     # The CEWE 8 rectangle behaviour is an ellipse: its horizontal and
     # vertical radii scale independently with the area's width and height.
-    # The top inset is based on the shorter box side. This leaves a tall
-    # TextArt box in its established position, but moves a wide ellipse up so
-    # that its text stays equally close to the top edge. The radius ratio is
-    # calibrated from CEWE's 490 x 490 MCF-unit default TextArt area, whose
-    # legacy representation held a 171-unit radius.
+    # The top inset follows the font size rather than the shorter box side.
+    # Scaling the inset with the box happened to work for the original
+    # 490-unit / 18-point examples, but puts 72-point lettering above its box.
+    # Keep the established radii (and therefore curvature and direction),
+    # translating their centre to retain the font-sized space above the arc.
+    # Both calibrations come from the same legacy 490-unit default box.
     #
     # CEWE's TextArt "inside margin" is textFormat.IndentMargin. The parser
     # has already converted it to leftPad/topPad. It reduces the radii while
@@ -262,11 +267,13 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
             baseEllipseRadiusY = (context.mcf_to_reportlab * areaHeight
                                   * CEWE8_DEFAULT_TEXTART_RADIUS_RATIO)
             ellipseRadiusY = max(1.0, baseEllipseRadiusY - topPad)
-            shorterSide = min(areaWidth, areaHeight)
-            topOfEllipse = context.mcf_to_reportlab * (
-                areaHeight * 0.5
-                - shorterSide * (0.5 - CEWE8_DEFAULT_TEXTART_RADIUS_RATIO))
-            circleCenterY = topOfEllipse - baseEllipseRadiusY
+        else:
+            baseEllipseRadiusY = baseRadius
+        _, maxfontsize = parse_html_text(bodyhtml)
+        topOfEllipse = context.mcf_to_reportlab * (
+            areaHeight * 0.5
+            - maxfontsize * CEWE8_DEFAULT_TEXTART_TOP_INSET_MCF_PER_POINT)
+        circleCenterY = topOfEllipse - baseEllipseRadiusY
     handleTextArt(pdf, radius, bodyhtml, cwtextart, state, circleCenterY, ellipseRadiusY)
     pdf.rotate(areaRot)
     pdf.translate(-transCx, -transCy)

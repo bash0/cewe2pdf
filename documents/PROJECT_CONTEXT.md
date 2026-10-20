@@ -71,8 +71,11 @@ its nonbreaking spaces do not mean the simple-tab renderer is unused.
 Imported lists provide useful basic support without claiming exact editor indentation.
 
 TextArt uses one ellipse renderer: a circle is the equal-axis case. Old and new MCFs
-still obtain geometry differently. `IndentMargin` reduces the radii while retaining
-the centre. TextArt backgrounds and extra synthetic font effects require separate
+still obtain geometry differently. For current MCFs, the top inset scales with font
+size, not box size: the original 490-unit box / 18-point calibration otherwise lets
+large lettering rise above its area. Changing this anchor translates the curve;
+it must not change its radii, direction, or character angles. `IndentMargin` reduces
+the radii while retaining the centre. TextArt backgrounds and extra synthetic font effects require separate
 evidence and scope.
 
 Per-user fonts and operating-system fonts are different sources. The test environment
