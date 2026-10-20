@@ -349,7 +349,9 @@ text panels over a page background while leaving the text opaque.
 #### Text Art
 
 Curved Text Art follows circular or elliptical geometry, including its inside margin.
-TextArt backgrounds are not implemented; combinations with further effects need visual checking.
+Area-wide positive and negative letter spacing is supported in both directions;
+the spacing is included when centring the lettering on the curve.
+TextArt backgrounds and shadows are not implemented; combinations with further effects need visual checking.
 
 #### Bullet and numbered lists
 

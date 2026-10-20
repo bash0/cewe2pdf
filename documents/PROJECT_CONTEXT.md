@@ -78,6 +78,20 @@ it must not change its radii, direction, or character angles. `IndentMargin` red
 the radii while retaining the centre. TextArt backgrounds and extra synthetic font effects require separate
 evidence and scope.
 
+TextArt tracking adds signed gaps between characters, without changing glyph widths
+or adding a trailing gap. Reuse the area's MCF letter-spacing value rather than
+converting the Qt HTML pixel value. Preserve the original advance radius separately
+from the inset painted baseline. Editor comparisons confirm that its crowded letters
+are intentional: measuring on a smaller curve expands the text's angular span.
+Offset clockwise glyph baselines perpendicular to the original curve, keeping its
+tangent for rotation. Subtracting the same inset from both ellipse axes crowds
+wide, shallow examples; a constant normal offset preserves the circular results
+and matches the controlled large-text examples more closely. This glyph-baseline
+inset is separate from the area's `IndentMargin` setting.
+On an ellipse, measure and draw at the same starting angle: its local arc scale
+varies with angle, so an extent measured elsewhere cannot centre the result.
+Resolve font substitutions once before the centring calculation.
+
 Per-user fonts and operating-system fonts are different sources. The test environment
 suppresses automatic per-user discovery; system font loading is opt-in.
 Missing-font substitution is shared by calendars and albums. An active repository-root

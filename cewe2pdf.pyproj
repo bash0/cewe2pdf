@@ -477,6 +477,7 @@
     <Compile Include="tests\testTabs\test_tabs.py" />
     <Compile Include="tests\testTextArt\test_textart.py" />
     <Compile Include="tests\testTextArt\test_textartPlacement.py" />
+    <Compile Include="tests\testTextArt\test_textartSpacing.py" />
     <Compile Include="tests\testTextBox\test_textBox.py" />
     <Compile Include="tests\testTextLinks\test_links.py" />
     <Compile Include="tests\testTextLinks\test_textLinks.py" />
