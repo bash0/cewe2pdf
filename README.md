@@ -238,6 +238,10 @@ Example for linux font file and directory paths:
 ```
 #### Missing-font substitutions
 
+Family names are resolved to their loaded faces before missing-font substitution.
+If a family has no regular face, an available italic, bold, or bold italic face
+is used, in that order. No manual substitution is needed for such a family.
+
 To choose a replacement when a requested font is unavailable, add name pairs to
 `cewe2pdf.ini`:
 
@@ -323,9 +327,9 @@ the MCF also supplies a positive width and a non-transparent colour.
 
 #### Letter spacing
 
-The area-wide `textFormat.letterSpacing` setting is supported. Per-span letter
-spacing and wrapping-aware measurement are not implemented, so heavily spaced
-text near the edge of a narrow frame deserves visual checking.
+The area-wide `textFormat.letterSpacing` setting is supported, including line
+breaking and horizontal alignment. Positive spacing can move words to the next
+line; negative spacing can let more text fit. Per-span letter spacing is not implemented.
 
 #### Tabs
 

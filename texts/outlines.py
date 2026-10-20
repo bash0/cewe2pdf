@@ -6,6 +6,7 @@ import logging
 from reportlab.platypus import Paragraph
 
 from colorUtils import ReorderColorBytesMcf2Rl
+from texts.spacing import breakSpacedLines
 
 
 @dataclass(frozen=True)
@@ -64,6 +65,16 @@ def getTextOutline(text_tag, mcf_to_reportlab):
 
 class TextEffectsParagraph(Paragraph):
     """A ReportLab paragraph which applies CEWE text effects when requested."""
+
+    def breakLines(self, width):
+        letter_spacing = getattr(self.style, 'letterSpacing', 0.0)
+        if letter_spacing:
+            lines = breakSpacedLines(self, width, letter_spacing)
+            # ReportLab uses this measured width when sizing/splitting the
+            # finished paragraph, alongside the normal FragLine structures.
+            self._width_max = max((line.maxWidth - line.extraSpace for line in lines.lines), default=0)  # pylint: disable=attribute-defined-outside-init
+            return lines
+        return super().breakLines(width)
 
     def beginText(self, x, y):
         text_object = super().beginText(x, y)
