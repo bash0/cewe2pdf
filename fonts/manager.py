@@ -2,6 +2,7 @@ import logging
 import os
 
 from fontTools import ttLib
+from reportlab.lib.fonts import tt2ps
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
@@ -397,11 +398,21 @@ def noteFontSubstitution(family, replacement, state: ConversionState):
 
 def getAvailableFont(family, pdf, additional_fonts, state: ConversionState):
     reportlabFonts = pdf.getAvailableFonts()
-    if family in reportlabFonts:
-        bodyfont = family
-    elif family in additional_fonts:
-        bodyfont = family
-    else:
-        bodyfont = getMissingFontSubstitute(family, state)
-        noteFontSubstitution(family, bodyfont, state)
+    if family in reportlabFonts or family in additional_fonts:
+        return family
+
+    # CEWE names families, whereas the available-font lists contain faces.
+    # A family with only an italic/bold face still has a usable normal mapping
+    # from registerFontFamilies. Resolve it before declaring the font missing.
+    try:
+        normalFace = tt2ps(family, 0, 0)
+    except ValueError:
+        normalFace = None
+    # ReportLab keeps family mappings across conversions; accept this alias
+    # only when its face was loaded for the current album.
+    if normalFace in additional_fonts:
+        return normalFace
+
+    bodyfont = getMissingFontSubstitute(family, state)
+    noteFontSubstitution(family, bodyfont, state)
     return bodyfont
