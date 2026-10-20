@@ -91,15 +91,19 @@ def test_background_is_painted_before_border_and_letters():
         '<border/><cwtextart enabled="1"/></decoration></area>')
     body = etree.fromstring('<body style="font-family:Helvetica; font-size:18pt;"><p>AB</p></body>')
     order = Mock()
+    drawing = Mock()
     with patch('texts.art.drawTextArtBackground') as background, \
+            patch('texts.art.drawTextArtShadow') as shadow, \
             patch('texts.art.processDecorationBorders') as border, \
-            patch('texts.art.handleTextArt') as text:
+            patch('texts.art.handleTextArt', return_value=drawing) as prepare:
+        order.attach_mock(prepare, 'prepare')
         order.attach_mock(background, 'background')
+        order.attach_mock(shadow, 'shadow')
         order.attach_mock(border, 'border')
-        order.attach_mock(text, 'text')
+        order.attach_mock(drawing, 'text')
         processTextArt(area, 490, 490, 0, Mock(), 200, 200, body, 0, 0,
             area.findall('decoration/cwtextart'), Mock(mcf_to_reportlab=72 / 254), Mock())
-    assert [call[0] for call in order.mock_calls] == ['background', 'border', 'text']
+    assert [call[0] for call in order.mock_calls] == ['prepare', 'background', 'shadow', 'border', 'text']
     # The editor's default ring has radii 171 and 245 MCF units.
     assert background.call_args.args[2] == pytest.approx(171 * 72 / 254)
     assert background.call_args.args[5] == pytest.approx(74 * 72 / 254)

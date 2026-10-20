@@ -352,8 +352,9 @@ Curved Text Art follows circular or elliptical geometry, including its inside ma
 Area-wide positive and negative letter spacing is supported in both directions;
 the spacing is included when centring the lettering on the curve.
 Its background colour forms a complete ring with a transparent centre, as in the
-editor. Background opacity is supported. TextArt shadows are not implemented;
-combinations with further effects need visual checking.
+editor. Background opacity is supported. Shadows follow the curved lettering,
+including its letter spacing; they use the same settings as ordinary text shadows.
+Combinations with further effects need visual checking.
 
 #### Bullet and numbered lists
 

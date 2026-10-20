@@ -148,7 +148,12 @@ geometry.
 
 Text shadows use alpha from the actual laid-out ReportLab text, rendered through a
 temporary transparent PDF and PyMuPDF. This preserves wrapping, fonts, spans, outlines,
-and rotation without a simplified Pillow text implementation.
+and rotation without a simplified Pillow text implementation. WordArt prepares its
+curved glyph drawing once and uses it for both the silhouette and foreground; its
+ring and border are excluded from the mask. Expand the temporary page to actual
+glyph bounds when curved letters protrude beyond their area, and retain that
+coordinate offset when positioning the shared image-shadow renderer. Both text
+paths use the same in-memory PDF rasteriser and configured image resolution.
 Minor accepted softness/darkness differences are specific visual judgments, not a
 blanket permission to replace approved output.
 

@@ -1,5 +1,6 @@
 import logging
 import math
+from functools import partial
 from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
 from lxml import etree
 from reportlab.lib import colors
@@ -11,6 +12,7 @@ from conversionState import ConversionState
 from renderContext import RenderContext
 from .spacing import getLetterSpacing
 from .backgrounds import drawTextArtBackground
+from .shadows import drawTextArtShadow
 
 # A CEWE 8.1 TextArt box has no stored radius.  A newly-created 490-unit
 # square box has the same arc as the 171-unit legacy wrapper-table margin.
@@ -212,7 +214,7 @@ def drawTextArtGlyphs(glyphs, angles, pdf, radiusX, radiusY, clockwise, circleCe
 def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, state: ConversionState,
                             clockwise=True, circleCenterY=0, ellipseRadiusY=None, letterSpacing=0):
     """
-    Draws styled text along a circular arc, applying bold and italic styles dynamically.
+    Draw styled text on its curve, or return the prepared drawing when pdf is None.
     Parameters:
       c               : ReportLab canvas object.
       bodyhtml        : HTML string containing styled text.
@@ -249,8 +251,15 @@ def draw_styled_text_on_arc(pdf, bodyhtml, radius, start_angle_deg, state: Conve
         glyphs, effectiveRadius, givenStartAngle, effectiveEllipseRadiusY, letterSpacing)
     angles = getTextArtGlyphAngles(
         glyphs, effectiveRadius, centredStartAngle, effectiveEllipseRadiusY, letterSpacing)[0]
-    drawTextArtGlyphs(glyphs, angles, pdf, effectiveRadius, effectiveEllipseRadiusY,
-        clockwise, circleCenterY, glyphHeight if clockwise else 0)
+    drawing = partial(drawTextArtGlyphs, glyphs, angles,
+        radiusX=effectiveRadius, radiusY=effectiveEllipseRadiusY, clockwise=clockwise,
+        circleCenterY=circleCenterY, baselineInset=glyphHeight if clockwise else 0)
+    # A deferred drawing shares this exact layout between the shadow mask and
+    # foreground. Resolve fonts once, avoiding duplicated substitution messages.
+    if pdf is None:
+        return drawing
+    drawing(pdf)
+    return None
 
 
 def handleTextArt(pdf, radius, bodyhtml, cwtextart, state: ConversionState, circleCenterY=0,
@@ -258,7 +267,7 @@ def handleTextArt(pdf, radius, bodyhtml, cwtextart, state: ConversionState, circ
     if "enabled" in cwtextart[0].attrib:
         enabledAttrib = cwtextart[0].get('enabled')
         if enabledAttrib != '1':
-            return
+            return None
 
     widthAngle = 0
     if "widthAngle" in cwtextart[0].attrib:
@@ -270,7 +279,7 @@ def handleTextArt(pdf, radius, bodyhtml, cwtextart, state: ConversionState, circ
         directionAttrib = cwtextart[0].get('direction')
         direction = directionAttrib == '1'
 
-    draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, state,
+    return draw_styled_text_on_arc(pdf, bodyhtml, radius, widthAngle, state,
                             clockwise=direction, circleCenterY=circleCenterY,
                             ellipseRadiusY=ellipseRadiusY, letterSpacing=letterSpacing)
 
@@ -317,12 +326,15 @@ def processTextArt(area, areaWidth, areaHeight, areaRot, pdf, transCx, transCy, 
             areaHeight * 0.5
             - maxfontsize * CEWE8_DEFAULT_TEXTART_TOP_INSET_MCF_PER_POINT)
         circleCenterY = topOfEllipse - baseEllipseRadiusY
-    if cwtextart[0].get('enabled', '1') == '1':
+    drawing = handleTextArt(None, radius, bodyhtml, cwtextart, state, circleCenterY, ellipseRadiusY,
+        getLetterSpacing(area.find('text/textFormat'), context.mcf_to_reportlab))
+    if drawing is not None:
         drawTextArtBackground(pdf, area, radius, ellipseRadiusY, circleCenterY,
             context.mcf_to_reportlab * maxfontsize * CEWE8_DEFAULT_TEXTART_TOP_INSET_MCF_PER_POINT)
+        drawTextArtShadow(pdf, area, areaWidth, areaHeight, areaRot, drawing, context, state)
     for decorationTag in area.findall('decoration'):
         processDecorationBorders(decorationTag, areaHeight, areaWidth, pdf, context)
-    handleTextArt(pdf, radius, bodyhtml, cwtextart, state, circleCenterY, ellipseRadiusY,
-        getLetterSpacing(area.find('text/textFormat'), context.mcf_to_reportlab))
+    if drawing is not None:
+        drawing(pdf)
     pdf.rotate(areaRot)
     pdf.translate(-transCx, -transCy)
