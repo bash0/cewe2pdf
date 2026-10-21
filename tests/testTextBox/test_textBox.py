@@ -68,9 +68,7 @@ def test_testfontsubstitution(main=False):
 
 
 if __name__ == '__main__':
-    # When running this test directly we will normally not have IGNORELOCALFONTS set, so the system
-    # fonts will be registered and could be accessed. When the tests are run by a full pytest
-    # discovery, IGNORELOCALFONTS is set to 1, so that the system fonts are not registered (not
-    # on the developer machine nor on the github servers) so the direct run result and the full 
-    # pytest run result will not be the same.
+    # Match conftest.py and GitHub Actions.  In particular, installed Poppins
+    # Regular would conceal this fixture's supplied-italic-only regression.
+    os.environ['IGNORELOCALFONTS'] = '1'
     test_testfontsubstitution(main=True)
