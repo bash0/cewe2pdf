@@ -75,7 +75,7 @@ def test_log_version_information_without_git_build_identification():
         f"cewe2pdf version {PROGRAM_VERSION}; Git identification is unavailable")
 
 
-def testall():
+def runallversiontests():
     test_version_information_uses_program_version_source()
     test_get_git_build_identification_returns_description()
     test_get_git_build_identification_handles_missing_git()
@@ -87,4 +87,4 @@ def testall():
 
 
 if __name__ == '__main__':
-    testall()
+    runallversiontests()

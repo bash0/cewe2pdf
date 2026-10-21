@@ -5,6 +5,9 @@ and generated-output cleanup. For source installation, use the [README](../READM
 for architecture and linting, use the [developer guide](../documents/DEVELOPER_GUIDE.md).
 Commands below run from the repository root in the intended Python environment.
 
+For the purpose of the different test types, an assessment of existing coverage,
+and priorities for future tests, see [Testing strategy and overview](../documents/TESTING_STRATEGY.md).
+
 ## Running tests
 
 ```bash
