@@ -18,7 +18,7 @@ Windows-only build overlay:
 ```powershell
 python -m pip install -r requirements-winexe.txt
 python -m PyInstaller cewe2pdf.spec --noconfirm --clean
-./dist/cewe2pdf.exe --version
+.\dist\cewe2pdf.exe --version
 ```
 
 The output is `dist/cewe2pdf.exe`. The checked-in specification includes dynamic imports
@@ -33,7 +33,7 @@ Cairo, GTK, or MSYS2.
 Smoke-test the executable itself, not only the Python source:
 
 ```powershell
-./dist/cewe2pdf.exe --outFile tests/testEmptyPageOne/executable-smoke.pdf tests/testEmptyPageOne/test_emptyPageOne.mcf
+.\dist\cewe2pdf.exe --outFile tests/testEmptyPageOne/executable-smoke.pdf tests\testEmptyPageOne\test_emptyPageOne.mcf
 ```
 
 Check the process result, confirm the output PDF exists, and inspect it.
@@ -78,8 +78,8 @@ An argumentless terminal invocation shows help rather than offering installation
 Use explicit commands when installing or removing the menu:
 
 ```powershell
-./dist/cewe2pdf.exe --install
-./dist/cewe2pdf.exe --uninstall
+.\dist\cewe2pdf.exe --install
+.\dist\cewe2pdf.exe --uninstall
 ```
 
 Uninstalling removes the menu entries and leaves the copied executable in place.
