@@ -52,6 +52,7 @@
     <Content Include="documents\history\mcf_feature_classification.md" />
     <Content Include="documents\history\environments\cewe2pdfenvlinux.yml" />
     <Content Include="documents\history\environments\cewe2pdfenvwindows.yml" />
+    <Content Include="documents\TESTING_STRATEGY.md" />
     <Content Include="LICENSE" />
     <Content Include="pytest.ini" />
     <Content Include="requirements-pinned.txt" />
