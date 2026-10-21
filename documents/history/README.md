@@ -6,8 +6,6 @@ Use the [main documentation map](../../README.md#documentation) for current inst
 
 | Record | What it preserves |
 | --- | --- |
-| [March 2024 executable build](build_a_compiled_version-2024.md) | The former direct PyInstaller build and tool versions |
-| [Legacy Conda exports](environments/README.md) | Older Python 3.13 environment snapshots, superseded by the supported pinned setup |
 | [August 2026 MCF audit](mcf_feature_classification.md) | Feature discovery at that time, not the current support matrix |
 | [Original CLP investigation](clp-decoding-notes-2020.md) | How the SVG encoding was identified, including obsolete catalogue-file evidence |
 | [Earlier Windows fixture inspection](unittest_fotobook-windows-notes.md) | Manual installed-font instructions and an older illustrative PDF |

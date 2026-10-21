@@ -37,21 +37,13 @@
     <Content Include="documents\history\source-reorganization-2026.md" />
     <Content Include="documents\history\clp-decoding-notes-2020.md" />
     <Content Include="documents\history\unittest_fotobook-windows-notes.md" />
-    <Content Include="documents\history\build_a_compiled_version-2024.md" />
-    <Content Include="documents\history\environments\README.md" />
     <Content Include="documents\history\README.md" />
     <Content Include="assets\cewe2pdf-icon.ico" />
     <Content Include="assets\cewe2pdf-icon.png" />
     <Content Include="cewe2pdf.spec" />
     <Content Include="clipart\CLP_FILE_FORMAT.md" />
-    <Content Include="clipart\__pycache__\areas.cpython-312.pyc" />
-    <Content Include="clipart\__pycache__\catalog.cpython-312.pyc" />
-    <Content Include="clipart\__pycache__\clpfile.cpython-312.pyc" />
-    <Content Include="clipart\__pycache__\__init__.cpython-312.pyc" />
     <Content Include="documents\DEVELOPER_GUIDE.md" />
     <Content Include="documents\history\mcf_feature_classification.md" />
-    <Content Include="documents\history\environments\cewe2pdfenvlinux.yml" />
-    <Content Include="documents\history\environments\cewe2pdfenvwindows.yml" />
     <Content Include="documents\TESTING_STRATEGY.md" />
     <Content Include="LICENSE" />
     <Content Include="pytest.ini" />
@@ -268,7 +260,6 @@
     <Content Include="tests\testNoCewe\testNoCewe.mcf" />
     <Content Include="tests\testNoCewe\testNoCewe_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testNoCewe\testNoCewe_mcf-Dateien\folderid.xml~" />
-    <Content Include="tests\testNoCewe\__pycache__\test_noCewe.cpython-312-pytest-9.1.1.pyc" />
     <Content Include="tests\testPageNumbers\cewe2pdf.ini" />
     <Content Include="tests\testPageNumbers\test_pagenumbers.mcf" />
     <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml" />
@@ -442,7 +433,6 @@
     <Compile Include="pageNumbering.py" />
     <Compile Include="pages.py" />
     <Compile Include="pageTypes.py" />
-    <Compile Include="processManyMcfs.py" />
     <Compile Include="renderContext.py" />
     <Compile Include="runAllTests.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\compare_pdf.py" />
@@ -512,11 +502,9 @@
     <Folder Include="assets\" />
     <Folder Include="calendars\" />
     <Folder Include="clipart\" />
-    <Folder Include="clipart\__pycache__\" />
     <Folder Include="decorations\" />
     <Folder Include="documents\" />
     <Folder Include="documents\history\" />
-    <Folder Include="documents\history\environments\" />
     <Folder Include="fonts\" />
     <Folder Include="indexing\" />
     <Folder Include="infrastructure\" />
@@ -620,7 +608,6 @@
     <Folder Include="tests\testNoCewe\" />
     <Folder Include="tests\testNoCewe\previous_result_pdfs\" />
     <Folder Include="tests\testNoCewe\testNoCewe_mcf-Dateien\" />
-    <Folder Include="tests\testNoCewe\__pycache__\" />
     <Folder Include="tests\testPageNumbers\" />
     <Folder Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\" />
     <Folder Include="tests\testShadows\" />

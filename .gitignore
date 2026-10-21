@@ -47,7 +47,6 @@ nosetests.xml
 /cewe_folder.txt
 /cewe2pdf.iss
 /cewe2pdf.pyproj.user
-/cewe2pdf.spec
 /examples.xml
 /Output/cewe2pdfsetup.exe
 /pageperimage.pdf
