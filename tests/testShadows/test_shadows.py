@@ -1,4 +1,4 @@
-# This test needs to be in its own directory, so it can have it's own cwew2pdf.ini.
+# This test needs its own directory so it can have its own cewe2pdf.ini.
 # Also we can store the asset files here.
 
 # Test of various object shadows
