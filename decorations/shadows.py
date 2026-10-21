@@ -1,7 +1,6 @@
 """Shadow geometry and alpha-silhouette rendering helpers."""
 
 import tempfile
-import logging
 from math import floor
 
 import numpy as np
@@ -203,12 +202,3 @@ def processDecorationShadow(decoration, areaHeight, areaWidth, pdf,
                 ])
             shadowTable.wrapOn(pdf, frameWidth + shadowWidth, frameHeight + shadowWidth)
             shadowTable.drawOn(pdf, shadowBottomLeftX, shadowBottomLeftY)
-
-
-def warnAndIgnoreEnabledDecorationShadow(decoration, context: RenderContext):
-    """Explain the known limitation for shadow decorations on text areas."""
-    if getConfigurationBool(context.default_config_section, "noShadows", "False"):
-        return
-    for shadow in decoration.findall('shadow'):
-        if shadow.get('shadowEnabled') == '1':
-            logging.warning("Ignoring shadow specified on text, that is not implemented!")

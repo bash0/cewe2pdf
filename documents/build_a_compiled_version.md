@@ -3,7 +3,6 @@
 This guide owns executable build instructions and Windows installation behaviour.
 For source installation and Cairo setup, use the [README](../README.md#install).
 For source provenance, see [version numbering](DEVELOPER_GUIDE.md#version-numbering).
-The [March 2024 build notes](history/build_a_compiled_version-2024.md) are historical.
 
 Run commands from the repository root in an activated Python environment.
 Build on the target operating system; these instructions are not a cross-compilation
