@@ -378,6 +378,7 @@
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img4.png" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img5.png" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img6.png" />
+    <Content Include="utilities\contenttocenter\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="albumConversionSession.py" />
@@ -496,6 +497,7 @@
     <Compile Include="texts\shadows.py" />
     <Compile Include="texts\tabs.py" />
     <Compile Include="texts\__init__.py" />
+    <Compile Include="utilities\contenttocenter\contenttocenter.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />
@@ -662,6 +664,8 @@
     <Folder Include="tests\unittest_fotobook\previous_result_pdfs\" />
     <Folder Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\" />
     <Folder Include="texts\" />
+    <Folder Include="utilities\" />
+    <Folder Include="utilities\contenttocenter\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf312" />

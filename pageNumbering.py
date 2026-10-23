@@ -55,6 +55,7 @@ class PageNumberFormat(Enum):
 class PageNumberingInfo:
     def __init__(self, pageNumberElement, pdf, availableFonts, state: ConversionState):
         """
+
         Constructor that initializes the page numbering info from the given lxml element.
         """
         # Extract relevant attributes or sub-elements from lxml_element
@@ -63,8 +64,8 @@ class PageNumberingInfo:
             logging.error(f"Unrecognised pagenumbering position value {self.position}, reset to 1")
             self.position = 1
         self.format = PageNumberFormat.ToEnum(pageNumberElement.get('format','0'))
-        self.horizontalMargin = int(pageNumberElement.get('margin','50')) * mcf2rl # * 0.1 mm
-        self.verticalMargin = int(pageNumberElement.get('verticalMargin','50')) * mcf2rl # * 0.1 mm
+        self.horizontalMargin = float(pageNumberElement.get('margin','50')) * mcf2rl # * 0.1 mm
+        self.verticalMargin = float(pageNumberElement.get('verticalMargin','50')) * mcf2rl # * 0.1 mm
         fontfamily = pageNumberElement.get('fontfamily','Liberation Sans')
         self.fontfamily = getAvailableFont(fontfamily, pdf, availableFonts, state)
         self.fontsize = int(pageNumberElement.get('fontsize','12'))
