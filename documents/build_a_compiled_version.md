@@ -68,8 +68,11 @@ Administrator rights are not required. The editor remains the normal double-clic
 application for album files.
 
 Right-click an album and select the command. Automatic mode discovers the CEWE
-installation from Windows file associations where possible and enables system fonts.
-A valid explicit configuration still wins. The resulting PDF and a diagnostic
+installation from Windows file associations where possible and enables shared
+Windows system-font discovery. This deliberately overrides
+`loadSystemFonts = False` in either INI file. An explicit, valid `cewe_folder`
+still takes precedence over automatic CEWE-folder discovery. Per-user fonts are
+also searched unless `IGNORELOCALFONTS` is set. The resulting PDF and a diagnostic
 `<album>.mcf.log` or `<album>.mcfx.log` are written beside the input.
 The log is overwritten each run.
 

@@ -30,6 +30,7 @@ more detail for users, contributors, and coding assistants.
 | Set up and test Linux using WSL | [Linux/WSL guide](documents/TestingOnWSL.md) |
 | Build or install a standalone executable | [Build and Windows integration guide](documents/build_a_compiled_version.md) |
 | Work with tests and approved PDFs | [Test workflow and cleanup](tests/README.md), and [compare-pdf interface](tests/compare-pdf/README.md) |
+| Reposition layouts after changing album page sides | [MCF/MCFX page layout utility](utilities/fixleftrightchanges/README.md) |
 | Understand or author clip art and passepartout resources | [CLP file format and authoring notes](clipart/CLP_FILE_FORMAT.md) |
 | Consult superseded setups and investigations | [Historical documentation](documents/history/README.md) |
 
@@ -221,6 +222,13 @@ Alternatively, set ``loadSystemFonts = True`` in ``cewe2pdf.ini`` to search the
 shared operating-system font folders (for example ``C:\\Windows\\Fonts``).
 This is disabled by default because the available fonts differ between
 machines.
+
+**Windows executable exception:** when the executable converts an album from
+the Explorer context menu, automatic mode enables shared system-font discovery
+even if an album or program ``cewe2pdf.ini`` sets ``loadSystemFonts = False``.
+See the [Windows Explorer guide](documents/build_a_compiled_version.md#windows-explorer-installation-and-use).
+This setting is separate from per-user fonts: those are still searched unless
+the ``IGNORELOCALFONTS`` environment variable is set.
 
 To find a potential ``additional_fonts.txt`` the code searches, in order, the album directory, the current directory and the location of the program itself; it uses only the **first** such file found.
 
