@@ -1,4 +1,4 @@
-"""Reposition page layouts after CEWE pages change spread sides."""
+"""Center selected page content in CEWE albums."""
 
 import argparse
 from importlib import import_module
@@ -13,65 +13,53 @@ import time
 from lxml import etree
 
 
-def parse_page_map(specification: str) -> list[tuple[int, int]]:
-    """Expand comma-separated one-based old:new page pairs and ranges."""
-    page_pairs = []
+def parse_pages(specification: str) -> list[int]:
+    """Expand comma-separated one-based page numbers and inclusive ranges."""
+    pages = []
     for segment in specification.split(','):
-        sides = segment.strip().split(':')
-        if len(sides) != 2:
-            raise ValueError(f'Invalid page map segment: {segment!r}')
-        old_pages = _parse_page_range(sides[0])
-        new_pages = _parse_page_range(sides[1])
-        if len(old_pages) != len(new_pages):
-            raise ValueError(
-                f'Page map ranges must have equal lengths: {segment!r}')
-        page_pairs.extend(zip(old_pages, new_pages))
+        parts = segment.strip().split('-', maxsplit=1)
+        try:
+            start = int(parts[0])
+            end = int(parts[1]) if len(parts) == 2 else start
+        except ValueError as error:
+            raise ValueError(f'Invalid page selection: {segment!r}') from error
+        if start < 1 or end < start:
+            raise ValueError(f'Invalid one-based page range: {segment!r}')
+        pages.extend(range(start, end + 1))
 
-    if not page_pairs:
-        raise ValueError('Page map must contain at least one pair')
-    if (len({pair[0] for pair in page_pairs}) != len(page_pairs)
-            or len({pair[1] for pair in page_pairs}) != len(page_pairs)):
-        raise ValueError('Each page may appear only once in a page map')
-    return page_pairs
-
-
-def _parse_page_range(value: str) -> range:
-    parts = value.strip().split('-', maxsplit=1)
-    try:
-        start = int(parts[0])
-        end = int(parts[1]) if len(parts) == 2 else start
-    except ValueError as error:
-        raise ValueError(f'Invalid page range: {value!r}') from error
-    if start < 1 or end < start:
-        raise ValueError(f'Invalid one-based page range: {value!r}')
-    return range(start, end + 1)
+    if not pages:
+        raise ValueError('Page selection must contain at least one page')
+    if len(set(pages)) != len(pages):
+        raise ValueError('Each page may appear only once in the selection')
+    return pages
 
 
-def reposition_mcf(input_path: Path, page_map: list[tuple[int, int]],
-                   output_path: Path | None = None, dry_run: bool = False):
-    """Translate layouts on pages whose left/right side changed.
-
-    ``page_map`` maps old editor page numbers to the corresponding page numbers
-    in the already-edited MCF. Source MCF content is not required.
-    """
+def center_content_mcf(input_path: Path, pages: list[int],
+                       output_path: Path | None = None, dry_run: bool = False):
+    """Center content on the selected pages of an edited MCF."""
     tree = etree.parse(str(input_path))
     root = tree.getroot()
     _validate_album(root)
-    changed_pages = [
-        (old_page, new_page)
-        for old_page, new_page in page_map
-        if old_page % 2 != new_page % 2]
-    reports = []
-    for old_page, new_page in changed_pages:
-        report = _reposition_page(root, old_page, new_page)
-        reports.append(report)
+    page_geometry = []
+    for page_number in pages:
+        page_element, page_origin, page_width = _get_page_record(
+            root, page_number)
+        areas = _areas_on_physical_page(
+            page_element, page_origin, page_width)
+        page_geometry.append((page_number, page_origin, page_width, areas))
+
+    # Resolve each page's areas before moving any of them. Pages in the same
+    # spread share an MCF record, so a centered area could cross the gutter.
+    reports = [
+        _center_page_content(page_number, page_origin, page_width, areas)
+        for page_number, page_origin, page_width, areas in page_geometry]
 
     if dry_run:
         return reports, None
 
     if output_path is None:
         output_path = input_path.with_name(
-            f'{input_path.stem}.repositioned{input_path.suffix}')
+            f'{input_path.stem}.centered{input_path.suffix}')
     if output_path.resolve() == input_path.resolve():
         raise ValueError('Output path must not overwrite the input MCF')
     if output_path.exists():
@@ -85,9 +73,9 @@ def reposition_mcf(input_path: Path, page_map: list[tuple[int, int]],
     return reports, output_path
 
 
-def reposition_album(input_path: Path, page_map: list[tuple[int, int]],
-                     output_path: Path | None = None, dry_run: bool = False):
-    """Reposition an MCF or MCFX album without modifying the input file."""
+def center_content_album(input_path: Path, pages: list[int],
+                         output_path: Path | None = None, dry_run: bool = False):
+    """Center content in an MCF or MCFX album without modifying the input."""
     input_path = Path(input_path)
     suffix = input_path.suffix.casefold()
     if suffix not in ('.mcf', '.mcfx'):
@@ -95,7 +83,7 @@ def reposition_album(input_path: Path, page_map: list[tuple[int, int]],
 
     if output_path is None:
         output_path = input_path.with_name(
-            f'{input_path.stem}.repositioned{input_path.suffix}')
+            f'{input_path.stem}.centered{input_path.suffix}')
     else:
         output_path = Path(output_path)
     if output_path.suffix.casefold() != suffix:
@@ -106,18 +94,18 @@ def reposition_album(input_path: Path, page_map: list[tuple[int, int]],
         raise FileExistsError(f'Output file already exists: {output_path}')
 
     if suffix == '.mcf':
-        return reposition_mcf(input_path, page_map, output_path, dry_run)
+        return center_content_mcf(input_path, pages, output_path, dry_run)
 
-    with tempfile.TemporaryDirectory(prefix='fixleftrightchanges-') as temporary_path:
+    with tempfile.TemporaryDirectory(prefix='contenttocenter-') as temporary_path:
         extracted_directory = Path(temporary_path) / 'extracted'
         extracted_directory.mkdir()
         _, extracted_mcf = _unpack_mcfx(input_path, extracted_directory)
         if dry_run:
-            return reposition_mcf(extracted_mcf, page_map, dry_run=True)
+            return center_content_mcf(extracted_mcf, pages, dry_run=True)
 
-        modified_mcf = extracted_directory / 'repositioned.mcf'
-        reports, _ = reposition_mcf(
-            extracted_mcf, page_map, output_path=modified_mcf)
+        modified_mcf = extracted_directory / 'centered.mcf'
+        reports, _ = center_content_mcf(
+            extracted_mcf, pages, output_path=modified_mcf)
         _replace_mcfx_mcf(
             input_path, output_path, extracted_mcf.name, modified_mcf)
         return reports, output_path
@@ -169,15 +157,13 @@ def _validate_album(root):
 
 
 # pylint: disable=too-many-locals
-# Keep the geometry intermediates named here so reported anchor bounds and the
-# applied translation use the same explicit values.
-def _reposition_page(root, old_page: int, new_page: int) -> dict:
-    page_element, page_origin, page_width = _get_page_record(root, new_page)
-    areas = _areas_on_physical_page(page_element, page_origin, page_width)
+# Keep geometry intermediates named so reported content bounds and the applied
+# translation use the same explicit values.
+def _center_page_content(page_number: int, page_origin: float,
+                         page_width: float, areas: list) -> dict:
     if not areas:
         return {
-            'old_page': old_page,
-            'new_page': new_page,
+            'page': page_number,
             'status': 'no areas'}
 
     page_left = page_origin
@@ -185,19 +171,8 @@ def _reposition_page(root, old_page: int, new_page: int) -> dict:
     all_bounds = [bounds for _, bounds in areas]
     content_left = min(bounds[0] for bounds in all_bounds)
     content_right = max(bounds[1] for bounds in all_bounds)
-    photos = [
-        (area, bounds)
-        for area, bounds in areas
-        if area.get('areatype', '').casefold() in ('imagearea', 'imagebackgroundarea')
-        and (area.find('image') is not None or area.find('imagebackground') is not None)]
-    if not photos:
-        return {
-            'old_page': old_page,
-            'new_page': new_page,
-            'status': 'no photo anchor'}
-
-    old_anchor, new_anchor, old_margin_gap, displacement = (
-        _anchor_translation(photos, new_page, page_left, page_right))
+    displacement = (
+        (page_left + page_right - content_left - content_right) / 2)
 
     for area, _ in areas:
         position = area.find('position')
@@ -207,15 +182,11 @@ def _reposition_page(root, old_page: int, new_page: int) -> dict:
     moved_left = content_left + displacement
     moved_right = content_right + displacement
     return {
-        'old_page': old_page,
-        'new_page': new_page,
+        'page': page_number,
         'status': (
             'moved'
             if not math.isclose(displacement, 0, abs_tol=0.01)
             else 'already aligned'),
-        'old_anchor': _photo_name(old_anchor[0]),
-        'new_anchor': _photo_name(new_anchor[0]),
-        'margin_gap': old_margin_gap,
         'horizontal_shift': displacement,
         'content_bounds_after': (moved_left, moved_right),
         'page_bounds': (page_left, page_right),
@@ -236,7 +207,7 @@ def _get_page_record(root, page_number: int):
             f"./page[@pagenr='{record_number}'][@type='normalpage']")
         if record is None:
             raise ValueError(
-                f'Cannot find the spread record for new page {page_number}')
+                f'Cannot find the spread record for page {page_number}')
         right_side = page_number % 2 == 1
 
     bundle_size = record.find('bundlesize')
@@ -249,27 +220,6 @@ def _get_page_record(root, page_number: int):
     page_width = spread_width / 2
     page_origin = page_width if right_side else 0.0
     return record, page_origin, page_width
-
-
-def _anchor_translation(photos, new_page, page_left, page_right):
-    """Return outer/inner photo anchors and the required horizontal shift."""
-    # Once a page changes sides, its old inner edge becomes its outer edge.
-    # The outermost photo preserves the old photo-to-margin gap; the photo at
-    # the opposite edge becomes the new inner-margin anchor.
-    new_page_is_right = new_page % 2 == 1
-    if new_page_is_right:
-        old_anchor = max(photos, key=lambda item: item[1][1])
-        new_anchor = min(photos, key=lambda item: item[1][0])
-        margin_gap = page_right - old_anchor[1][1]
-        desired_new_edge = page_left + margin_gap
-        displacement = desired_new_edge - new_anchor[1][0]
-    else:
-        old_anchor = min(photos, key=lambda item: item[1][0])
-        new_anchor = max(photos, key=lambda item: item[1][1])
-        margin_gap = old_anchor[1][0] - page_left
-        desired_new_edge = page_right - margin_gap
-        displacement = desired_new_edge - new_anchor[1][1]
-    return old_anchor, new_anchor, margin_gap, displacement
 
 
 def _areas_on_physical_page(page_element, page_origin, page_width):
@@ -309,56 +259,53 @@ def _format_number(value: float) -> str:
     return f'{value:.6f}'.rstrip('0').rstrip('.')
 
 
-def _photo_name(area) -> str:
-    image = area.find('image')
-    if image is None:
-        image = area.find('imagebackground')
-    return Path(image.get('filename', '(unnamed photo)')).name
-
-
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
-        description='Reposition layouts on CEWE album pages moved to the other spread side.')
+        description='Center content on selected CEWE album pages.')
     parser.add_argument(
         'album', type=Path,
-        help='Edited MCF or MCFX after page insertion, deletion or reorder')
+        help='Edited MCF or MCFX album')
     parser.add_argument(
-        '--page-map', required=True,
-        help='One-based old:new editor-page pairs or equal-length ranges, e.g. 1-25:2-26')
+        '--pages', required=True,
+        help='One-based pages to center, as comma-separated numbers or ranges, e.g. 2-65')
     parser.add_argument(
         '--output', type=Path,
-        help='Output album (default: <input>.repositioned.<extension>); input is never overwritten')
+        help='Output album (default: <input>.centered.<extension>); input is never overwritten')
     parser.add_argument(
         '--dry-run', action='store_true',
-        help='Report anchor photos and horizontal offsets without writing an MCF')
+        help='Report content bounds and horizontal offsets without writing an MCF')
     args = parser.parse_args(argv)
 
     try:
-        page_map = parse_page_map(args.page_map)
-        reports, output_path = reposition_album(
-            args.album, page_map, args.output, dry_run=args.dry_run)
+        pages = parse_pages(args.pages)
+        reports, output_path = center_content_album(
+            args.album, pages, args.output, dry_run=args.dry_run)
     except (OSError, ValueError, sqlite3.Error, etree.XMLSyntaxError) as error:
         parser.error(str(error))
 
-    changed_pages = 0
+    moved_pages = 0
     for report in reports:
         status = report['status']
         if status == 'moved':
-            changed_pages += 1
+            moved_pages += 1
             print(
-                f"Old page {report['old_page']} -> new page {report['new_page']}: "
-                f"{report['old_anchor']} to {report['new_anchor']}, "
-                f"{report['horizontal_shift']:.2f} MCF units horizontally "
-                f"(old margin gap {report['margin_gap']:.2f}).")
+                f"Page {report['page']}: "
+                f"content centered with {report['horizontal_shift']:.2f} "
+                'MCF units horizontal shift; '
+                f"content bounds {report['content_bounds_after']}.")
         else:
             print(
-                f"Old page {report['old_page']} -> new page {report['new_page']}: "
+                f"Page {report['page']}: "
                 f"{status}; no movement applied.")
 
     if args.dry_run:
-        print(f'Dry run: {changed_pages} page(s) would move.')
+        print(
+            f'Dry run: {len(reports)} page(s) selected; '
+            f'{moved_pages} would move.')
     else:
-        print(f'Wrote {output_path}; {changed_pages} page(s) moved.')
+        print(
+            f'Wrote {output_path}; {len(reports)} page(s) selected, '
+            f'{moved_pages} moved.')
     return 0
 
 

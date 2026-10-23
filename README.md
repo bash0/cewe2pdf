@@ -30,7 +30,7 @@ more detail for users, contributors, and coding assistants.
 | Set up and test Linux using WSL | [Linux/WSL guide](documents/TestingOnWSL.md) |
 | Build or install a standalone executable | [Build and Windows integration guide](documents/build_a_compiled_version.md) |
 | Work with tests and approved PDFs | [Test workflow and cleanup](tests/README.md), and [compare-pdf interface](tests/compare-pdf/README.md) |
-| Reposition layouts after changing album page sides | [MCF/MCFX page layout utility](utilities/fixleftrightchanges/README.md) |
+| Center selected album page content | [MCF/MCFX content centering utility](utilities/contenttocenter/README.md) |
 | Understand or author clip art and passepartout resources | [CLP file format and authoring notes](clipart/CLP_FILE_FORMAT.md) |
 | Consult superseded setups and investigations | [Historical documentation](documents/history/README.md) |
 
