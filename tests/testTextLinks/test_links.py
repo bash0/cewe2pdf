@@ -3,8 +3,10 @@
 from pathlib import Path
 import sys
 
+from lxml import etree
 import pymupdf
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Frame
 
@@ -16,7 +18,7 @@ from testutils import configureTestImportPaths
 
 configureTestImportPaths(__file__)
 
-from texts.links import _urlsInText, addWebLinksToPdf
+from texts.links import _urlsInText, addWebLinksToPdf, getAlbumTextUrls
 from texts.markup import AddAlbumText
 from texts.outlines import TextEffectsParagraph
 
@@ -60,6 +62,38 @@ def test_wrappedHttpUrlCreatesOneExternalPdfLink(tmp_path):
     assert {link['uri'] for link in links} == {url}
 
 
+def test_urlFragmentsAcrossPdfTextRunsBecomeExternalLink(tmp_path):
+    outputFile = tmp_path / 'split-web-link.pdf'
+    url = 'https://storysontheroad2023.blogspot.com/'
+    pdf = canvas.Canvas(str(outputFile))
+    font = 'Helvetica'
+    fontSize = 14
+    xPosition = 40
+    fragments = (
+        ('https:/', fontSize),
+        (' ', 0.01),
+        ('/', fontSize),
+        (' ', 0.01),
+        ('storysontheroad2023.blogspot.com/', fontSize),
+        (' ', 0.01),
+    )
+    for text, textSize in fragments:
+        pdf.setFont(font, textSize)
+        pdf.drawString(xPosition, 650, text)
+        xPosition += pdfmetrics.stringWidth(text, font, textSize)
+    pdf.save()
+
+    addWebLinksToPdf(outputFile, {url})
+
+    with pymupdf.open(outputFile) as renderedPdf:
+        extractedText = renderedPdf[0].get_text()
+        links = renderedPdf[0].get_links()
+
+    assert 'https:/ / storysontheroad2023.blogspot.com/' in extractedText
+    assert len(links) == 1
+    assert links[0]['uri'] == url
+
+
 def test_albumTextEscapesUrlAndAddsInvisibleSlashBreaks():
     assert AddAlbumText('', 'See https://example.com/a?x=1&y=2, please.') == (
         'See https:/<font size="0.01"> </font>/<font size="0.01"> </font>'
@@ -73,3 +107,13 @@ def test_albumTextEscapesOrdinaryTextWithoutSubstitution():
 def test_urlInParenthesesExcludesTheClosingParenthesis():
     assert _urlsInText('(https://www.youtube.com/watch?v=zvB0jZKRKrk)') == {
         'https://www.youtube.com/watch?v=zvB0jZKRKrk'}
+
+
+def test_urlAtParagraphEndDoesNotAbsorbNextParagraphStart():
+    album = etree.fromstring(
+        '<album><text><![CDATA[<html><body>'
+        '<p>Visit https://example.com/</p>'
+        '<p>A second paragraph</p>'
+        '</body></html>]]></text></album>')
+
+    assert getAlbumTextUrls(album) == {'https://example.com/'}
