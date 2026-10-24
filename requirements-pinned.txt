@@ -56,7 +56,7 @@ packaging==24.2
     #   pytest
 pikepdf==10.11.0
     # via -r requirements.txt
-pillow==12.3.0
+pillow==13.0.0
     # via
     #   -r requirements.txt
     #   cairosvg

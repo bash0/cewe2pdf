@@ -28,8 +28,22 @@ def getAlbumTextUrls(fotobook):
             continue
         body = document.find('body')
         if body is not None:
-            urls.update(_urlsInText(''.join(body.itertext())))
+            paragraphs = body.xpath('.//p') or [body]
+            for paragraph in paragraphs:
+                urls.update(_urlsInText(_textWithBreaks(paragraph)))
     return urls
+
+
+def _textWithBreaks(element):
+    """Join inline text while retaining explicit HTML line breaks."""
+    textParts = [element.text or '']
+    for child in element:
+        if child.tag.lower() == 'br':
+            textParts.append('\n')
+        else:
+            textParts.append(_textWithBreaks(child))
+        textParts.append(child.tail or '')
+    return ''.join(textParts)
 
 
 def addWebLinksToPdf(pdfFileName, urls):
@@ -43,7 +57,7 @@ def addWebLinksToPdf(pdfFileName, urls):
         for page in renderedPdf:
             words = page.get_text('words', sort=True)
             for url in urls:
-                for rects in _rectanglesForUrl(words, url):
+                for rects in _findUrlRectangles(words, url):
                     # A PDF link annotation has one rectangular hit area.
                     # Keeping one annotation per wrapped URL makes link lists
                     # in readers such as MJ PDF show duplicate destinations.
@@ -89,49 +103,40 @@ def _enclosingRectangle(rectangles):
     return enclosingRectangle
 
 
-def _rectanglesForUrl(words, url):
-    """Yield visible word rectangles which together spell ``url``."""
-    # Text from separate areas can share a visual line.  ``sort=True`` puts
-    # those words beside one another, which would interrupt a URL wrapped in
-    # a single text area.  Follow only the words in each PDF text block.
-    blocks = {}
-    for word in words:
-        blocks.setdefault(word[5], []).append(word)
-
-    for blockWords in blocks.values():
-        orderedWords = sorted(blockWords, key=lambda word: (word[6], word[7]))
-        yield from _rectanglesWithinBlock(orderedWords, url)
-
-
-def _rectanglesWithinBlock(words, url):
-    """Yield URL rectangles from one continuous PDF text block."""
+def _findUrlRectangles(words, url):
+    """Yield groups of PDF word rectangles spelling visible occurrences of ``url``."""
+    # PDF readers can report the tiny slash-break spaces as separate words or
+    # text blocks. Match the exact URL in the page's reading order across those
+    # boundaries; any unrelated word interrupts the match.
     for startIndex, word in enumerate(words):
         # A styled URL can touch its preceding opening parenthesis. PyMuPDF
         # then returns one word such as ``(https:/``. Start matching at the
         # scheme rather than requiring the PDF word to start with it.
-        schemeStart = word[4].lower().find('http')
+        wordText = word[4]
+        schemeStart = wordText.lower().find('http')
         if schemeStart < 0:
             continue
-        wordText = word[4][schemeStart:]
-        if wordText.startswith(url):
+        firstFragment = wordText[schemeStart:]
+        if firstFragment.startswith(url):
             yield [pymupdf.Rect(*word[:4])]
             continue
-        if not url.startswith(wordText):
+        if not url.startswith(firstFragment):
             continue
 
-        matchedText = wordText
-        rectangles = [pymupdf.Rect(*word[:4])]
+        matchedText = firstFragment
+        fragmentRectangles = [pymupdf.Rect(*word[:4])]
         for nextWord in words[startIndex + 1:]:
-            extendedText = matchedText + nextWord[4]
-            if not url.startswith(extendedText):
+            nextWordText = nextWord[4]
+            candidateText = matchedText + nextWordText
+            if not url.startswith(candidateText):
                 # The last visible fragment can include sentence punctuation.
                 # It remains part of the clickable rectangle, but not the URL.
-                if _stripTrailingPunctuation(extendedText) == url:
-                    rectangles.append(pymupdf.Rect(*nextWord[:4]))
-                    yield rectangles
+                if _stripTrailingPunctuation(candidateText) == url:
+                    fragmentRectangles.append(pymupdf.Rect(*nextWord[:4]))
+                    yield fragmentRectangles
                 break
-            rectangles.append(pymupdf.Rect(*nextWord[:4]))
-            matchedText = extendedText
+            fragmentRectangles.append(pymupdf.Rect(*nextWord[:4]))
+            matchedText = candidateText
             if matchedText == url:
-                yield rectangles
+                yield fragmentRectangles
                 break

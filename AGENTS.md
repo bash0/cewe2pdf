@@ -16,6 +16,7 @@ Read this file before editing. Use the [README documentation map](README.md#docu
 - Use one indent level for continuation lines rather than aligning beneath an earlier expression.
 - Explain undocumented CEWE conventions, empirical calibration, ownership, and non-obvious Python mechanisms in focused comments.
 - Use descriptive domain names; avoid unrelated formatting, consistency renames, and architectural rewrites of working code.
+- Write for contributors who may be new to Python or this project, including coding assistants. Prefer straightforward code and descriptive names over clever or cryptic abstractions.
 - Follow the repository's flake8/pylint configuration. Use narrow, explained suppressions rather than distorting a design to satisfy a metric.
 
 ## Platforms and file integrity
