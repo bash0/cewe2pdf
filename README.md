@@ -412,7 +412,7 @@ deleteIndexPng = False
 ```
 __indexEntryFonts__ specifies one or more font / font size combinations which will be used to recognise index terms in the album
 
-__indexFont, indexFontSize, lineSpacing, pageWidth, pageHeight__ determine how the index entries are formatted on the index pdf page. Increasing __indexFontSize__ or __lineSpacing__ makes fewer entries fit on each index page.
+__indexFont, indexFontSize, lineSpacing, pageWidth, pageHeight__ determine how the index entries are formatted on the index pdf page. __indexFontSize__ may be a fractional point value such as `12.5`; increasing it or __lineSpacing__ makes fewer entries fit on each index page.
 
 __indexMarkerRegex__ specifies the regular expression against which all text items in the album are tested. Any page with a matching text will be used for insertion of the index png
 
@@ -423,7 +423,7 @@ __topMargin__ etc determine the placement of the completed index PNG on the albu
 __deleteIndexPdf__ etc determine whether or not the generated files are deleted after the album pdf has been updated.
 
 #### Large index limitations
-The index may span multiple pages. Add one index-marker page to the album for each expected index image; images are placed on matching pages in PDF order. If there are too few or too many marker pages for the generated index images, cewe2pdf logs an error or warning respectively.
+The index may span multiple pages. Add one index-marker page to the album for each expected index image; images are placed on matching pages in PDF order. If there are too few or too many marker pages for the generated index images, cewe2pdf logs an error or warning respectively. For a genuine overflow, the error also states the one-page row capacity and, where the supported configuration limits allow it, the font-size, line-spacing, or combined top/bottom margin reduction needed to fit all entries on one page.
 
 ### PDF navigation and links
 

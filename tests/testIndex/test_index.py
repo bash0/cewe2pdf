@@ -6,6 +6,8 @@
 # Bootstrap the project root so this test can also run directly.
 import os, os.path
 import sys
+from configparser import ConfigParser
+from io import BytesIO
 from pathlib import Path
 
 from numpy import test
@@ -22,12 +24,14 @@ from pikepdf import Pdf
 import pymupdf
 from lxml import etree
 from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfgen import canvas
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
 from conversionState import ConversionState # type: ignore
 from fonts.line_scales import LineScales # type: ignore
 from infrastructure.extraLoggers import mustsee # type: ignore
+from indexing.albumindex import AlbumIndex # type: ignore
 from texts.areas import processTextParas # type: ignore
 
 from testutils import getLatestResultFile, getOutFileBasename, runModifications
@@ -66,6 +70,57 @@ def test_scaled_span_uses_authored_size_for_index_matching():
 
     assert index.fontSizes == [('Index heading', 14.0)]
     assert indexText == 'Shrunk heading'
+
+
+def createIndexWithRows(rowCount, topMargin=1, bottomMargin=1, fontSize='13'):
+    """Create a compact index whose row capacity is easy to control."""
+    config = ConfigParser()
+    config.read_dict({'INDEX': {
+        'indexing': 'True', 'indexFont': 'Helvetica', 'indexFontSize': fontSize,
+        'lineSpacing': '1.1', 'pageWidth': '210', 'pageHeight': '100',
+        'pdfTopMargin': str(topMargin), 'pdfBottomMargin': str(bottomMargin)}})
+    index = AlbumIndex(config['INDEX'])
+    for page in range(1, rowCount + 1):
+        index.AddIndexEntry(page, f'Heading {page}', page)
+    return index
+
+
+def renderedIndexPageCount(index):
+    """Return the number of generated PDF pages without creating a file."""
+    output = BytesIO()
+    renderedIndex = canvas.Canvas(output)
+    index.GenerateIndexPage(renderedIndex)
+    renderedIndex.save()
+    with pymupdf.open(stream=output.getvalue(), filetype='pdf') as document:
+        return len(document)
+
+
+def test_index_last_fitting_row_does_not_create_blank_page():
+    """The final row may use the last baseline without starting an empty page."""
+    index = createIndexWithRows(19)
+
+    assert index._singlePageCapacity() == 19
+    assert renderedIndexPageCount(index) == 1
+
+
+def test_index_supports_fractional_font_size():
+    """A decimal index font size is retained for ReportLab rendering."""
+    index = createIndexWithRows(1, fontSize='12.5')
+
+    assert index.indexFontSize == 12.5
+    assert renderedIndexPageCount(index) == 1
+
+
+def test_index_overflow_advice_reports_supported_font_and_margin_options():
+    """A real overflow says what reductions would fit its rows on one page."""
+    index = createIndexWithRows(16, topMargin=10, bottomMargin=10)
+
+    advice = index._singlePageFitAdvice()
+
+    assert renderedIndexPageCount(index) == 2
+    assert '16 index rows need one page, but the current settings fit 15' in advice
+    assert 'reduce indexFontSize to 12.9 pt or less' in advice
+    assert 'reduce combined pdfTopMargin and pdfBottomMargin by at least 1 mm' in advice
 
 
 def assertPdfOutline(outFile):
