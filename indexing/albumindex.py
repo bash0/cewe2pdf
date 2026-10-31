@@ -1,6 +1,7 @@
 import logging
 import re
 from dataclasses import dataclass
+from math import ceil, floor
 # pylint: disable=no-member
 import cv2 # the no_member warning is a false positive, cv2 is imported correctly and used in the code
 import pymupdf
@@ -46,7 +47,7 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
                 self.indexEntryDefs.append((font, size))
 
         self.indexFont = configSection.get("indexFont", "Helvetica").strip()
-        self.indexFontSize = getConfigurationInt(configSection, "indexFontSize", 12, 10)
+        self.indexFontSize = getConfigurationFloat(configSection, "indexFontSize", 12, 10)
         self.lineSpacing = getConfigurationFloat(configSection, "lineSpacing", 1.15, 1.1)
         self.pageWidth = getConfigurationInt(configSection, "pageWidth", 210, 100)
         self.pageHeight = getConfigurationInt(configSection, "pageHeight", 291, 100) # A4 is 297. 291 is the size of the paper in a 30x30 album
@@ -91,6 +92,58 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
             for text in entries:
                 print(f"{text} ... {page}")
 
+    def _indexRows(self):
+        """Return the index rows in the same order as their rendered pages."""
+        return [(page, text) for page, texts in sorted(self.indexEntries.items())
+                for text in texts]
+
+    def _singlePageCapacity(self):
+        """Return how many rows fit on one generated index page."""
+        pageHeight = self.pageHeight * mm
+        topMargin = self.pdfTopMarginMm * mm
+        bottomMargin = self.pdfBottomMarginMm * mm
+        lineSpacing = self.indexFontSize * self.lineSpacing
+        firstBaseline = pageHeight - topMargin - self.indexFontSize
+        if firstBaseline < bottomMargin:
+            return 0
+        return floor((firstBaseline - bottomMargin) / lineSpacing) + 1
+
+    def _singlePageFitAdvice(self):
+        """Explain how a genuinely overflowing index could fit one page."""
+        rowCount = len(self._indexRows())
+        capacity = self._singlePageCapacity()
+        if rowCount <= capacity or rowCount < 2:
+            return ''
+
+        pageHeight = self.pageHeight * mm
+        currentMargins = self.pdfTopMarginMm + self.pdfBottomMarginMm
+        availableHeight = pageHeight - currentMargins * mm
+        requiredLineSpacing = availableHeight / (self.indexFontSize * (rowCount - 1))
+        maximumFontSize = availableHeight / (1 + (rowCount - 1) * self.lineSpacing)
+        maximumCombinedMargins = (
+            pageHeight - self.indexFontSize * (1 + (rowCount - 1) * self.lineSpacing)) / mm
+
+        suggestions = []
+        if requiredLineSpacing >= 1.1:
+            suggestions.append(f'reduce lineSpacing to {requiredLineSpacing:.3f} or less')
+        else:
+            suggestions.append(
+                f'lineSpacing would need to be {requiredLineSpacing:.3f}, below its supported minimum of 1.1')
+        if maximumFontSize >= 10:
+            suggestedFontSize = floor(maximumFontSize * 10) / 10
+            suggestions.append(f'reduce indexFontSize to {suggestedFontSize:g} pt or less')
+        else:
+            suggestions.append(
+                f'indexFontSize would need to be {maximumFontSize:.1f} pt, below its supported minimum of 10 pt')
+        if maximumCombinedMargins >= 0:
+            marginReduction = ceil(currentMargins - maximumCombinedMargins)
+            if marginReduction > 0:
+                suggestions.append(
+                    f'reduce combined pdfTopMargin and pdfBottomMargin by at least {marginReduction} mm')
+
+        return (f' {rowCount} index rows need one page, but the current settings fit {capacity}. '
+                f'To fit one page, ' + '; or '.join(suggestions) + '.')
+
     def GenerateIndexPage(self, pdf):
         if not self.indexing:
             return
@@ -114,28 +167,31 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
         y_position = pageSetup()
         index_page_number = 0
 
-        for page, texts in sorted(self.indexEntries.items()):
-            for text in texts:
-                text_width = pdf.stringWidth(text, self.indexFont, self.indexFontSize)
-                page_number_str = f"{page}"
-                page_number_width = pdf.stringWidth(page_number_str, self.indexFont, self.indexFontSize)
+        for rowNumber, (page, text) in enumerate(self._indexRows()):
+            # Start a new page immediately before its first row.  The old
+            # after-row check opened a blank trailing page when the final row
+            # happened to use the last available baseline.
+            if rowNumber > 0 and y_position < bottom_margin:
+                pdf.showPage()
+                index_page_number += 1
+                y_position = pageSetup()
 
-                dot_spacing = right_margin - (left_margin + text_width + page_number_width)
-                dots = '.' * int(dot_spacing / pdf.stringWidth('.', self.indexFont, self.indexFontSize))
+            text_width = pdf.stringWidth(text, self.indexFont, self.indexFontSize)
+            page_number_str = f"{page}"
+            page_number_width = pdf.stringWidth(page_number_str, self.indexFont, self.indexFontSize)
 
-                pdf.drawString(left_margin, y_position, text)
-                pdf.drawString(left_margin + text_width, y_position, dots)
-                pdf.drawString(right_margin - page_number_width, y_position, page_number_str)
-                self.indexLinks.append(IndexLink(
-                    index_page_number, left_margin, y_position - self.indexFontSize * 0.25,
-                    right_margin, y_position + self.indexFontSize * 0.9,
-                    self.outputPageNumbers[page]))
+            dot_spacing = right_margin - (left_margin + text_width + page_number_width)
+            dots = '.' * int(dot_spacing / pdf.stringWidth('.', self.indexFont, self.indexFontSize))
 
-                y_position -= line_spacing
-                if y_position < bottom_margin:
-                    pdf.showPage()
-                    index_page_number += 1
-                    y_position = pageSetup()
+            pdf.drawString(left_margin, y_position, text)
+            pdf.drawString(left_margin + text_width, y_position, dots)
+            pdf.drawString(right_margin - page_number_width, y_position, page_number_str)
+            self.indexLinks.append(IndexLink(
+                index_page_number, left_margin, y_position - self.indexFontSize * 0.25,
+                right_margin, y_position + self.indexFontSize * 0.9,
+                self.outputPageNumbers[page]))
+
+            y_position -= line_spacing
 
         pdf.showPage()
 
@@ -303,9 +359,10 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
             albumDoc.close()
             return
         if len(markerPages) < len(indexPngFileNames):
+            fitAdvice = self._singlePageFitAdvice()
             logging.error(
                 f'Generated {len(indexPngFileNames)} index pages but found only '
-                f'{len(markerPages)} reserved index pages matching {self.indexMarkerRegex!r}.')
+                f'{len(markerPages)} reserved index pages matching {self.indexMarkerRegex!r}.{fitAdvice}')
         if len(markerPages) > len(indexPngFileNames):
             logging.warning(
                 f'Found {len(markerPages)} reserved index pages but generated only '

@@ -87,6 +87,17 @@ def Dequote(s):
     # we can not delete now, because file is opened by pdf library
 
 
+def GetUnscaledFontSize(style, defaultSize):
+    """Return the font size written in CEWE markup before layout adjustments."""
+    if 'font-size' not in style:
+        return float(defaultSize)
+
+    try:
+        return float(style['font-size'].strip("pt"))
+    except Exception: # pylint: disable=broad-except
+        return float(defaultSize)
+
+
 def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight,
                     fontScaleFactor, state: ConversionState):
     if item is None:
@@ -106,12 +117,8 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight,
         except: # noqa: E722 # pylint: disable=bare-except
             spanweight = 400
 
-    if 'font-size' in spanstyle:
-        # preserve fractional point sizes and apply the global adjustment
-        try:
-            spanfs = float(spanstyle['font-size'].strip("pt"))
-        except Exception: # pylint: disable=broad-except
-            spanfs = float(dfltfs)
+    # Preserve fractional point sizes before applying the global adjustment.
+    spanfs = GetUnscaledFontSize(spanstyle, dfltfs)
     # apply the small adjustment multiplier
     spanfs = spanfs * fontScaleFactor
     return spanfont, spanfs, spanweight, spanstyle
