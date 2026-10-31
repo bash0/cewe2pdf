@@ -25,7 +25,7 @@ from indexing.albumindex import AlbumIndex
 from renderContext import RenderContext
 from .markup import (AddAlbumText, AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart,
                      CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle,
-                     Dequote, LeadingForExplicitLineHeight)
+                     Dequote, GetUnscaledFontSize, LeadingForExplicitLineHeight)
 from .art import processTextArt
 from .backgrounds import getTextBackground
 from .outlines import TextEffectsParagraph, getTextOutline
@@ -580,7 +580,11 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                     if span.text is not None:
                         paragraphText = AddAlbumText(paragraphText, span.text)
                         originalFont = CollectItemFontFamily(span, family)
-                        if albumIndex.CheckForIndexEntry(originalFont, spanfs):
+                        # Index eligibility is an authoring convention.  A small
+                        # automatic shrink to make text fit must not make an
+                        # otherwise matching heading disappear from the index.
+                        sourceFontSize = GetUnscaledFontSize(spanstyle, bodyfs)
+                        if albumIndex.CheckForIndexEntry(originalFont, sourceFontSize):
                             indexEntryText = AlbumIndex.AppendIndexText(indexEntryText, span.text)
 
                     # there might be (one or more, or only one?) line break within the span.

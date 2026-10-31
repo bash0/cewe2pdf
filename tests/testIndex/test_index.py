@@ -20,12 +20,52 @@ from xml.dom.minidom import parse, Document
 from datetime import datetime
 from pikepdf import Pdf
 import pymupdf
+from lxml import etree
+from reportlab.lib.styles import ParagraphStyle
 
 from compare_pdf import ComparePDF, ShowDiffsStyle # type: ignore
 from cewe2pdf import convertMcf # type: ignore
+from conversionState import ConversionState # type: ignore
+from fonts.line_scales import LineScales # type: ignore
 from infrastructure.extraLoggers import mustsee # type: ignore
+from texts.areas import processTextParas # type: ignore
 
 from testutils import getLatestResultFile, getOutFileBasename, runModifications
+
+
+class IndexEntryRecorder:
+    """Small index double which records the size supplied for matching."""
+
+    def __init__(self):
+        self.fontSizes = []
+
+    def CheckForIndexEntry(self, font, fontSize):
+        self.fontSizes.append((font, fontSize))
+        return font == 'Index heading' and fontSize == 14
+
+    @staticmethod
+    def AppendIndexText(existingText, newText):
+        return newText if existingText is None else f'{existingText} {newText}'
+
+
+def test_scaled_span_uses_authored_size_for_index_matching():
+    """A fit-to-box shrink must not remove a configured index heading."""
+    body = etree.fromstring('''
+        <body><p><span style="font-size:14pt; color:#000000;">Shrunk heading</span></p></body>
+    ''')
+    index = IndexEntryRecorder()
+    flowables = []
+    style = ParagraphStyle('index-test', fontName='Helvetica', fontSize=14)
+    style.textOutline = None
+    style.letterSpacing = 0.0
+
+    indexText, _ = processTextParas(
+        flowables, None, '', [], body, 'Index heading', 14, {}, 400,
+        'Index heading', None, None, style, 0.99, set(body), LineScales(None),
+        ConversionState(), index, 500)
+
+    assert index.fontSizes == [('Index heading', 14.0)]
+    assert indexText == 'Shrunk heading'
 
 
 def assertPdfOutline(outFile):
@@ -34,6 +74,7 @@ def assertPdfOutline(outFile):
         assert renderedPdf.get_toc() == [
             [1, 'Contents', 2],
             [2, '2 June 2025. A heading text', 3],
+            [2, '3 June 2025. A second heading text', 3],
             [2, '28-29 April 2025 A second heading paragraph', 4],
             [2, '4 June 2025. A longer heading text', 4],
             [2, '5 June 2025. A different font heading', 4],
@@ -45,8 +86,8 @@ def assertPdfIndexLinks(outFile):
     """The visible index lines also link to their final PDF destinations."""
     with pymupdf.open(outFile) as renderedPdf:
         links = renderedPdf[1].get_links()
-        assert [link['kind'] for link in links] == [pymupdf.LINK_GOTO] * 5
-        assert [link['page'] for link in links] == [2, 3, 3, 3, 6]
+        assert [link['kind'] for link in links] == [pymupdf.LINK_GOTO] * 6
+        assert [link['page'] for link in links] == [2, 2, 3, 3, 3, 6]
 
 
 def assertPdfPageLabels(outFile):
