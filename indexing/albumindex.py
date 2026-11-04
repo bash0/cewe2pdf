@@ -35,16 +35,21 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
             self.indexing = False
             return
         self.indexing = getConfigurationBool(configSection, "indexing", "False")
+        self.visibleIndex = getConfigurationBool(configSection, "visibleIndex", "True")
         self.outputPageNumbers = {}
         self.indexEntryDefs = [] # font names and sizes used to recognise index terms
         lines = configSection.get('indexEntryFonts', '').splitlines()  # newline separated list
         indexDefs = filter(lambda bg: (len(bg) != 0), lines)
         for indexDef in indexDefs:
             members = indexDef.split(",")
-            if len(members) == 2:
+            if len(members) >= 2:
                 font = members[0].strip()
                 size = int(members[1].strip())
-                self.indexEntryDefs.append((font, size))
+                if len(members) == 3:
+                    color = "#" + members[2].strip()
+                else:
+                    color = None
+                self.indexEntryDefs.append((font, size, color))
 
         self.indexFont = configSection.get("indexFont", "Helvetica").strip()
         self.indexFontSize = getConfigurationFloat(configSection, "indexFontSize", 12, 10)
@@ -69,12 +74,16 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
         self.deleteIndexPdf = getConfigurationBool(configSection, "deleteIndexPdf", "True")
         self.deleteIndexPng = getConfigurationBool(configSection, "deleteIndexPng", "False")
 
-    def CheckForIndexEntry(self, font, fontsize):
+    def CheckForIndexEntry(self, font, fontsize, style):
         if not self.indexing:
             return False
         for indexEntry in self.indexEntryDefs:
-            if font == indexEntry[0] and fontsize == indexEntry[1]:
-                return True
+            if indexEntry[2] is None:
+                if font == indexEntry[0] and fontsize == indexEntry[1]:
+                    return True
+            elif font == indexEntry[0] and fontsize == indexEntry[1]:
+                if 'color' in style and style['color'] == indexEntry[2]:
+                    return True
         return False
 
     def AddIndexEntry(self, pageNumber, text, outputPageNumber):
@@ -349,6 +358,8 @@ class AlbumIndex(): # pylint: disable=too-many-instance-attributes
     def MergeAlbumAndIndexPngs(self, albumPdfFileName, indexPngFileNames):
         """Merge every index image onto the matching reserved album page in order."""
         if not self.indexing:
+            return
+        if not self.visibleIndex:
             return
         if not indexPngFileNames:
             return
