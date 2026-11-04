@@ -1,4 +1,5 @@
 import PIL
+import warnings
 
 
 _GPS_INFO_TAG = 34853
@@ -44,16 +45,22 @@ def getMapUrlFromExif(image, urlTemplate=DEFAULT_GEO_LINK_URL_TEMPLATE):
     decimal places are about 10 cm precision, adequate for phone GPS without
     preserving needless EXIF rational-number detail.
     """
-    try:
-        gpsInfo = image.getexif().get_ifd(_GPS_INFO_TAG)
-        latitude = _gpsDegrees(
-            gpsInfo[_GPS_LATITUDE_TAG], gpsInfo[_GPS_LATITUDE_REF_TAG], 'N', 'S')
-        longitude = _gpsDegrees(
-            gpsInfo[_GPS_LONGITUDE_TAG], gpsInfo[_GPS_LONGITUDE_REF_TAG], 'E', 'W')
-        return urlTemplate.format(
-            latitude=round(latitude, 6), longitude=round(longitude, 6))
-    except (AttributeError, IndexError, KeyError, TypeError, ValueError, ZeroDivisionError):
-        return None
+    with warnings.catch_warnings():
+        # Suppress the "Corrupt EXIF data" warning that PIL.Image.getexif() emits for some images, 
+        # for example, some "cleaned" images provided by newspapers. We don't need to know about 
+        # the corruption, we just want to know if there is GPS data or not, and the catches on
+        # accessing the gpsInfo dictionary will handle that properly.
+        warnings.filterwarnings("ignore", category=UserWarning, message=".*Corrupt EXIF data.*")
+        try:
+            gpsInfo = image.getexif().get_ifd(_GPS_INFO_TAG)
+            latitude = _gpsDegrees(
+                gpsInfo[_GPS_LATITUDE_TAG], gpsInfo[_GPS_LATITUDE_REF_TAG], 'N', 'S')
+            longitude = _gpsDegrees(
+                gpsInfo[_GPS_LONGITUDE_TAG], gpsInfo[_GPS_LONGITUDE_REF_TAG], 'E', 'W')
+            return urlTemplate.format(
+                latitude=round(latitude, 6), longitude=round(longitude, 6))
+        except (AttributeError, IndexError, KeyError, TypeError, ValueError, ZeroDivisionError) as ex:
+            return None
 
 
 def _gpsDegrees(dms, reference, positiveReference, negativeReference):
