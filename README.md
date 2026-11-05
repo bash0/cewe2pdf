@@ -385,8 +385,11 @@ There are a host of index configuration options which can be specified in a sepa
 ```
 [INDEX]
 indexing = False
+visibleIndex = False
 indexEntryFonts =
 	Arial Rounded MT Bold, 15
+	Arial Rounded MT Bold, 13, 000001
+# Specify the generated index page layout
 indexFont = Helvetica
 indexFontSize = 12
 lineSpacing = 1.1
@@ -409,7 +412,9 @@ rightMargin = 7
 deleteIndexPdf = True
 deleteIndexPng = False
 ```
-__indexEntryFonts__ specifies one or more font / font size combinations which will be used to recognise index terms in the album
+__visibleIndex__ specifies whether generated index page(s) are actually inserted into the album pdf. The default is `True`. If `False`, then the index terms are still added as pdf bookmarks, but the index pages are not generated and, obviously, not merged into the album pdf. When `False`, none of the index configuration options below __indexEntryFonts__ are relevant.
+
+__indexEntryFonts__ specifies one or more font / font size / colour combinations which will be used to recognise index terms in the album. If a text area contains text in one of the specified combinations, that text will be used as an index entry. The font name is case-insensitive and the font size is a floating point number. An optional identifying text colour for an index entry can be specified as a 6-digit hex value. The idea is to allow you to use the same font/font size combination as for other text in the album, but to have a very slightly different colour for index entries. A change of just 1 in the RGB value from the main text is sufficient to identify the index term without a noticeable visual difference. A good choice is 000001 when you normally use black text (000000). If you don't want to use colour as a distinguishing feature, just leave it out - if no colour is specified, then any colour is accepted. 
 
 __indexFont, indexFontSize, lineSpacing, pageWidth, pageHeight__ determine how the index entries are formatted on the index pdf page. __indexFontSize__ may be a fractional point value such as `12.5`; increasing it or __lineSpacing__ makes fewer entries fit on each index page.
 
