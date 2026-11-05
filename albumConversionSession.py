@@ -278,11 +278,13 @@ class AlbumConversionSession:
     def _createIndexOutput(self, albumIndex, pageSize):
         if not albumIndex.indexing:
             return
+        albumIndex.AddPdfOutline(self.output_file_name)
+        if not albumIndex.visibleIndex:
+            return
         indexPdfFileName = albumIndex.SaveIndexPdf(
             self.output_file_name, self.setup.album_title, pageSize)
         indexPngFileNames = albumIndex.SaveIndexPngs(indexPdfFileName)
         albumIndex.MergeAlbumAndIndexPngs(self.output_file_name, indexPngFileNames)
-        albumIndex.AddPdfOutline(self.output_file_name)
         if albumIndex.deleteIndexPdf and os.path.exists(indexPdfFileName):
             os.remove(indexPdfFileName)
         if albumIndex.deleteIndexPng:

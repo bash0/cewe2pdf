@@ -43,7 +43,7 @@ class IndexEntryRecorder:
     def __init__(self):
         self.fontSizes = []
 
-    def CheckForIndexEntry(self, font, fontSize):
+    def CheckForIndexEntry(self, font, fontSize, style = None):
         self.fontSizes.append((font, fontSize))
         return font == 'Index heading' and fontSize == 14
 

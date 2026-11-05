@@ -538,7 +538,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
             pdf_styleN.leading = paragraphLeading(usefs) # line spacing (text + leading)
             pdf_flowableList.append(TextEffectsParagraph(paragraphText, pdf_styleN))
             originalFont = CollectItemFontFamily(p, family)
-            if albumIndex.CheckForIndexEntry(originalFont, bodyfs):
+            if albumIndex.CheckForIndexEntry(originalFont, bodyfs, bstyle):
                 indexEntryText = AlbumIndex.AppendIndexText(indexEntryText, p.text)
 
         else:
@@ -584,7 +584,7 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                         # automatic shrink to make text fit must not make an
                         # otherwise matching heading disappear from the index.
                         sourceFontSize = GetUnscaledFontSize(spanstyle, bodyfs)
-                        if albumIndex.CheckForIndexEntry(originalFont, sourceFontSize):
+                        if albumIndex.CheckForIndexEntry(originalFont, sourceFontSize, spanstyle):
                             indexEntryText = AlbumIndex.AppendIndexText(indexEntryText, span.text)
 
                     # there might be (one or more, or only one?) line break within the span.
