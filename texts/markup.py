@@ -105,8 +105,14 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight,
     spanfont = dfltfont
     spanfs = dfltfs
     spanweight = bweight
-    spanstyle = dict([kv.split(':') for kv in
-                    item.get('style').lstrip(' ').rstrip(';').split('; ')])
+    # Qt rich text can put overrides on a paragraph, leaving its spans with
+    # only a colour. Resolve the CSS cascade before selecting a PDF font.
+    spanstyle = {}
+    ancestors = list(item.iterancestors())
+    for element in reversed(ancestors):
+        if element.tag in ('body', 'p', 'span'):
+            spanstyle.update(ParseInlineStyle(element.get('style', '')))
+    spanstyle.update(ParseInlineStyle(item.get('style', '')))
     if 'font-family' in spanstyle:
         spanfamily = spanstyle['font-family'].strip("'")
         spanfont = getAvailableFont(spanfamily, pdf, additional_fonts, state)
@@ -122,6 +128,12 @@ def CollectFontInfo(item, pdf, additional_fonts, dfltfont, dfltfs, bweight,
     # apply the small adjustment multiplier
     spanfs = spanfs * fontScaleFactor
     return spanfont, spanfs, spanweight, spanstyle
+
+
+def ParseInlineStyle(style):
+    return {key.strip(): value.strip()
+            for declaration in style.split(';') if ':' in declaration
+            for key, value in [declaration.split(':', 1)]}
 
 
 def CollectItemFontFamily(item, dfltfont):

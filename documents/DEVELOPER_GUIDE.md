@@ -18,6 +18,10 @@ For an initial code reading, follow `albumConversionSession.py`, `conversionSetu
 
 ## Conversion model
 
+Ordinary text spans inherit inline font and colour properties from their
+paragraph and body before their own overrides are applied. Qt rich text may
+store a subtitle's font only on its paragraph, with colour on the child span.
+
 ```mermaid
 flowchart TD
     Input[MCF or MCFX] --> Setup[prepareConversion]
