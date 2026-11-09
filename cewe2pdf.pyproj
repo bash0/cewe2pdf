@@ -485,6 +485,7 @@
     <Compile Include="tests\testTransparency\test_transparency.py" />
     <Compile Include="tests\testVersionInfo\test_versionInfo.py" />
     <Compile Include="tests\testWindowsIntegration\test_windowsIntegration.py" />
+    <Compile Include="tests\test_paragraph_font_inheritance.py" />
     <Compile Include="tests\unittest_fotobook\test_simpleBook.py" />
     <Compile Include="tests\test_webp_loading\test_webp_loading.py" />
     <Compile Include="testutils.py">
