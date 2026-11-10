@@ -157,6 +157,37 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
                        if configuration.has_section('PDF_METADATA') else None)
     geoLinksSection = (configuration['PDF_GEO_LINKS']
                        if configuration.has_section('PDF_GEO_LINKS') else None)
+    
+    # Character support diagnostics.
+    characterSupportSection = (
+        configuration['CharacterSupport']
+        if configuration.has_section('CharacterSupport') else None)
+
+    if characterSupportSection is not None:
+        state.show_all_unsupported_characters = (
+            characterSupportSection.getboolean(
+                'ShowAllUnsupportedCharacters', fallback=True))
+
+    characterSuggestionsSection = (
+        configuration['CharacterFontSuggestions']
+        if configuration.has_section('CharacterFontSuggestions') else None)
+
+    if characterSuggestionsSection is not None:
+        for characterCode, fontName in characterSuggestionsSection.items():
+            try:
+                # Use U+ notation so uppercase and lowercase characters
+                # are both represented reliably by ConfigParser.
+                if not characterCode.upper().startswith('U+'):
+                    raise ValueError('Expected a U+XXXX character code')
+
+                character = chr(int(characterCode[2:], 16))
+                state.character_font_suggestions[character] = fontName.strip()
+
+            except ValueError:
+                logging.warning(
+                    "Ignoring invalid character font suggestion '%s = %s'",
+                    characterCode, fontName)
+    
     if automaticWindows:
         # Explorer's context menu is designed for non-programmers: do not
         # require manual INI editing. Local system fonts are also useful in

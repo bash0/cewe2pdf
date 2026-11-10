@@ -8,8 +8,8 @@ from reportlab.pdfbase import pdfmetrics
 
 from fonts.manager import getAvailableFont
 from fonts.line_scales import LineScales
+from fonts.character_support import checkCharacterSupport
 from conversionState import ConversionState
-
 
 _WEB_ADDRESS = re.compile(r'https?://[^\s<]+', re.IGNORECASE)
 # ReportLab's zero-size spans have invalid leading.  0.01 pt is below any
@@ -231,6 +231,17 @@ def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, body
         bweight, bstyle, fontScaleFactor, state: ConversionState): # pylint: disable= too-many-arguments
     pfont, pfs, pweight, pstyle = CollectFontInfo(
         item, pdf, additional_fonts, bodyfont, bodyfs, bweight, fontScaleFactor, state)
+
+    if text is not None:
+        checkCharacterSupport(
+            text,
+            pfont,
+            IsBold(pweight),
+            IsItalic(pstyle, bstyle),
+            additional_fonts,
+            state
+        )
+
     paragraphText = AppendSpanStart(paragraphText, pfont, pfs, pweight, pstyle, bstyle)
     if text is None:
         paragraphText = AddBasicText(paragraphText, "")

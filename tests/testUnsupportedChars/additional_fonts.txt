@@ -1,0 +1,13 @@
+# Run from the repository root, as described in tests/README.md.
+# Poppins Italic is deliberately the only Poppins face.  The converter must
+# register it as the Normal face of the Poppins family before page 4 uses that
+# family with a normal CEWE text format.
+tests/Resources/photofun/fonts/Poppins-Italic.ttf
+
+# The other text in this fixture uses these portable faces.
+tests/Resources/photofun/fonts/EBGaramond-Regular.ttf
+tests/Resources/photofun/fonts/EBGaramond-Bold.ttf
+tests/Resources/photofun/fonts/EBGaramond-Italic.ttf
+tests/Resources/photofun/fonts/EBGaramond-BoldItalic.ttf
+tests/Resources/photofun/fonts/LiberationSans-BaDn.ttf
+tests/Resources/photofun/fonts/Stafford Regular.ttf

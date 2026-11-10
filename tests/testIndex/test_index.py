@@ -64,7 +64,7 @@ def test_scaled_span_uses_authored_size_for_index_matching():
     style.letterSpacing = 0.0
 
     indexText, _ = processTextParas(
-        flowables, None, '', [], body, 'Index heading', 14, {}, 400,
+        flowables, None, '', {}, body, 'Index heading', 14, {}, 400,
         'Index heading', None, None, style, 0.99, set(body), LineScales(None),
         ConversionState(), index, 500)
 

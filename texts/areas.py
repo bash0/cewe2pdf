@@ -21,11 +21,12 @@ from decorations.borders import processDecorationBorders
 from colorFrame import ColorFrame
 from conversionState import ConversionState
 from fonts.manager import getAvailableFont
+from fonts.character_support import checkCharacterSupport
 from indexing.albumindex import AlbumIndex
 from renderContext import RenderContext
 from .markup import (AddAlbumText, AppendItemTextInStyle, AppendSpanEnd, AppendSpanStart,
                      CollectFontInfo, CollectItemFontFamily, CreateParagraphStyle,
-                     Dequote, GetUnscaledFontSize, LeadingForExplicitLineHeight)
+                     Dequote, GetUnscaledFontSize, IsBold, IsItalic, LeadingForExplicitLineHeight)
 from .art import processTextArt
 from .backgrounds import getTextBackground
 from .outlines import TextEffectsParagraph, getTextOutline
@@ -572,8 +573,18 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                     span = item
                     spanfont, spanfs, spanweight, spanstyle = CollectFontInfo(span, pdf, additional_fonts, bodyfont,
                         bodyfs, bweight, fontScaleFactor, state)
-
-                    maxfs = max(maxfs, spanfs)
+                    
+                    if span.text is not None:
+                        checkCharacterSupport(
+                            span.text,
+                            spanfont,
+                            IsBold(spanweight),
+                            IsItalic(spanstyle, bstyle),
+                            additional_fonts,
+                            state
+                        )
+                    
+                        maxfs = max(maxfs, spanfs)
 
                     paragraphText = AppendSpanStart(paragraphText, spanfont, spanfs, spanweight, spanstyle, bstyle)
 
@@ -608,8 +619,18 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
                     if span.tail is not None:
+                        tailfont, _, tailweight, tailstyle = CollectFontInfo(
+                            p, pdf, additional_fonts, bodyfont, bodyfs,
+                            bweight, fontScaleFactor, state)
+                        checkCharacterSupport(
+                            span.tail,
+                            tailfont,
+                            IsBold(tailweight),
+                            IsItalic(tailstyle, bstyle),
+                            additional_fonts,
+                            state
+                        )
                         paragraphText = AddAlbumText(paragraphText, span.tail)
-
                 else:
                     logging.warning(
                         f"Ignoring unhandled tag {item.tag} in text area (tag content: {etree.tostring(item, encoding='unicode')[:100]}...)")
