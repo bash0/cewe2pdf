@@ -145,6 +145,9 @@
     <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\License%282%29-f555.txt" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\License-8eb1.txt" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\README-75f0" />
+    <Content Include="tests\Resources\photofun\fonts\Noto\OFL_NotoSans.txt" />
+    <Content Include="tests\Resources\photofun\fonts\Noto\OFL_NotoSansSymbols2.txt" />
+    <Content Include="tests\Resources\photofun\fonts\Noto\OFL_NotoSerif.txt" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-Black.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-BlackItalic.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-Bold.ttf" />
@@ -560,6 +563,7 @@
     <Folder Include="tests\Resources\photofun\fonts\liberation-narrow-fonts-ttf-1.07.6\" />
     <Folder Include="tests\Resources\photofun\fonts\LiberationSans\" />
     <Folder Include="tests\Resources\photofun\fonts\LiberationSans\misc\" />
+    <Folder Include="tests\Resources\photofun\fonts\Noto\" />
     <Folder Include="tests\Resources\photofun\fonts\Poppins\" />
     <Folder Include="tests\Resources\photofun\fonts\Stafford\" />
     <Folder Include="tests\testBackgroundAlignment\" />

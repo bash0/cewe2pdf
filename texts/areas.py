@@ -575,14 +575,15 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                         bodyfs, bweight, fontScaleFactor, state)
                     
                     if span.text is not None:
-                        checkCharacterSupport(
-                            span.text,
-                            spanfont,
-                            IsBold(spanweight),
-                            IsItalic(spanstyle, bstyle),
-                            additional_fonts,
-                            state
-                        )
+                        if (not fontScaleFactor < 1.0):
+                            checkCharacterSupport(
+                                span.text,
+                                spanfont,
+                                IsBold(spanweight),
+                                IsItalic(spanstyle, bstyle),
+                                additional_fonts,
+                                state
+                            )
                     
                         maxfs = max(maxfs, spanfs)
 
@@ -619,17 +620,18 @@ def processTextParas(pdf_flowableList, forceLeading, paragraphText: str, additio
                         paragraphText = AppendSpanEnd(paragraphText, spanweight, spanstyle, bstyle)
 
                     if span.tail is not None:
-                        tailfont, _, tailweight, tailstyle = CollectFontInfo(
-                            p, pdf, additional_fonts, bodyfont, bodyfs,
-                            bweight, fontScaleFactor, state)
-                        checkCharacterSupport(
-                            span.tail,
-                            tailfont,
-                            IsBold(tailweight),
-                            IsItalic(tailstyle, bstyle),
-                            additional_fonts,
-                            state
-                        )
+                        if not fontScaleFactor < 1.0:
+                            tailfont, _, tailweight, tailstyle = CollectFontInfo(
+                                p, pdf, additional_fonts, bodyfont, bodyfs,
+                                bweight, fontScaleFactor, state)
+                            checkCharacterSupport(
+                                span.tail,
+                                tailfont,
+                                IsBold(tailweight),
+                                IsItalic(tailstyle, bstyle),
+                                additional_fonts,
+                                state
+                            )
                         paragraphText = AddAlbumText(paragraphText, span.tail)
                 else:
                     logging.warning(

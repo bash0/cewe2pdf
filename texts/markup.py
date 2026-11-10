@@ -232,7 +232,7 @@ def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, body
     pfont, pfs, pweight, pstyle = CollectFontInfo(
         item, pdf, additional_fonts, bodyfont, bodyfs, bweight, fontScaleFactor, state)
 
-    if text is not None:
+    if (not fontScaleFactor < 1.0) and text is not None:
         checkCharacterSupport(
             text,
             pfont,
