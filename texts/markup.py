@@ -6,15 +6,40 @@ import reportlab.lib.enums
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 
+from dataclasses import dataclass
+
 from fonts.manager import getAvailableFont
 from fonts.line_scales import LineScales
-from fonts.character_support import checkCharacterSupport
+from fonts.character_support import checkCharacterSupport, resolveCharacterFontOverride
 from conversionState import ConversionState
 
 _WEB_ADDRESS = re.compile(r'https?://[^\s<]+', re.IGNORECASE)
 # ReportLab's zero-size spans have invalid leading.  0.01 pt is below any
 # visible PDF resolution while still producing a genuine word boundary.
 _ZERO_WIDTH_SPACE = '<font size="0.01"> </font>'
+
+@dataclass
+class TextRunContext:
+    """Describe the effective formatting of one run of CEWE text.
+
+    This short-lived context is used when processing individual text runs
+    that may contain characters requiring a font-family override. It carries
+    the original run's font and styling, together with the registered fonts
+    and per-conversion state needed to resolve those overrides.
+
+    It is deliberately separate from RenderContext: it describes the
+    formatting of a particular piece of text, not the shared drawing
+    environment for an album.
+    """
+
+    font_name: str
+    font_size: float
+    bold: bool
+    italic: bool
+    underline: bool
+    color: str | None
+    available_fonts: dict
+    state: ConversionState
 
 
 def CreateParagraphStyle(textcolor, font, fontsize, font_size_adjust, line_scales: LineScales):
@@ -72,6 +97,26 @@ def IsUnderline(itemstyle, outerstyle):
     if 'text-decoration' in outerstyle:
         return outerstyle['text-decoration'].strip(" ") == "underline"
     return False
+
+
+def createTextRunContext(fontName, fontSize, fontWeight, fontStyle,
+                         outerStyle, availableFonts, state):
+    """Create the formatting context for one run of CEWE text.
+
+    The supplied font and style values must be those resolved by
+    CollectFontInfo(), so that inherited paragraph formatting is
+    preserved as well as explicit span formatting.
+    """
+    return TextRunContext(
+        font_name=fontName,
+        font_size=fontSize,
+        bold=IsBold(fontWeight),
+        italic=IsItalic(fontStyle, outerStyle),
+        underline=IsUnderline(fontStyle, outerStyle),
+        color=fontStyle.get('color'),
+        available_fonts=availableFonts,
+        state=state
+    )
 
 
 def Dequote(s):
@@ -177,6 +222,69 @@ def AddAlbumText(paragraphText, text):
     return AddBasicText(paragraphText, escapedText)
 
 
+def AddAlbumTextWithFontOverrides(paragraphText, text, textRunContext):
+    """Append CEWE text, applying configured per-character font overrides.
+
+    Ordinary characters retain the surrounding paragraph/span formatting.
+    Characters with a valid configured override are wrapped in a nested
+    ReportLab font tag. The override resolver selects the face matching
+    the original run's bold and italic settings.
+
+    Text escaping and URL break opportunities are still handled by
+    AddAlbumText().
+    """
+    if text is None:
+        return paragraphText
+
+    state = textRunContext.state
+
+    # Cache resolutions locally so repeated characters in this run only
+    # require one font lookup and character-support check.
+    resolvedFaces = {}
+
+    segments = []
+    currentFace = None
+    currentCharacters = []
+
+    for character in text:
+        if character not in resolvedFaces:
+            if character in state.character_font_overrides:
+                resolvedFaces[character] = resolveCharacterFontOverride(
+                    character,
+                    textRunContext.bold,
+                    textRunContext.italic,
+                    textRunContext.available_fonts,
+                    state
+                )
+            else:
+                resolvedFaces[character] = None
+
+        fontFace = resolvedFaces[character]
+
+        if currentCharacters and fontFace != currentFace:
+            segments.append((currentFace, ''.join(currentCharacters)))
+            currentCharacters = []
+
+        currentFace = fontFace
+        currentCharacters.append(character)
+
+    if currentCharacters:
+        segments.append((currentFace, ''.join(currentCharacters)))
+
+    # Append each segment, retaining the surrounding ReportLab formatting.
+    for fontFace, segmentText in segments:
+        if fontFace is None:
+            paragraphText = AddAlbumText(paragraphText, segmentText)
+        else:
+            safeFontName = html.escape(fontFace, quote=True)
+            paragraphText = AddBasicText(
+                paragraphText, f'<font name="{safeFontName}">')
+            paragraphText = AddAlbumText(paragraphText, segmentText)
+            paragraphText = AddBasicText(paragraphText, '</font>')
+
+    return paragraphText
+
+
 def _addUrlBreakOpportunities(match):
     """Return a URL with invisible optional breaks after its slashes."""
     return match.group().replace('/', f'/{_ZERO_WIDTH_SPACE}')
@@ -246,6 +354,9 @@ def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, body
     if text is None:
         paragraphText = AddBasicText(paragraphText, "")
     else:
-        paragraphText = AddAlbumText(paragraphText, text)
+        textRunContext = createTextRunContext(
+            pfont, pfs, pweight, pstyle, bstyle, additional_fonts, state)
+        paragraphText = AddAlbumTextWithFontOverrides(
+            paragraphText, text, textRunContext)
     paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle, bstyle)
     return paragraphText, pfs

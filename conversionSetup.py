@@ -158,16 +158,36 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
     geoLinksSection = (configuration['PDF_GEO_LINKS']
                        if configuration.has_section('PDF_GEO_LINKS') else None)
     
-    # Character support diagnostics.
-    characterSupportSection = (
-        configuration['CharacterSupport']
-        if configuration.has_section('CharacterSupport') else None)
+    # Missing character support diagnostics.
+    missingCharacterSupportSection = (
+        configuration['MissingCharacterSupport']
+        if configuration.has_section('MissingCharacterSupport') else None)
 
-    if characterSupportSection is not None:
+    if missingCharacterSupportSection is not None:
         state.show_all_unsupported_characters = (
-            characterSupportSection.getboolean(
+            missingCharacterSupportSection.getboolean(
                 'ShowAllUnsupportedCharacters', fallback=True))
 
+    # Explicit font-family overrides for unsupported characters.
+    characterFontOverridesSection = (
+        configuration['MissingCharacterFontOverrides']
+        if configuration.has_section('MissingCharacterFontOverrides') else None)
+
+    if characterFontOverridesSection is not None:
+        for characterCode, fontFamily in characterFontOverridesSection.items():
+            try:
+                if not characterCode.upper().startswith('U+'):
+                    raise ValueError('Expected a U+XXXX character code')
+
+                character = chr(int(characterCode[2:], 16))
+                state.character_font_overrides[character] = fontFamily.strip()
+
+            except ValueError:
+                logging.warning(
+                    "Ignoring invalid character font override '%s = %s'",
+                    characterCode, fontFamily)
+
+    # Diagnostic suggestions (not applied automatically).
     characterSuggestionsSection = (
         configuration['CharacterFontSuggestions']
         if configuration.has_section('CharacterFontSuggestions') else None)
@@ -175,8 +195,6 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
     if characterSuggestionsSection is not None:
         for characterCode, fontName in characterSuggestionsSection.items():
             try:
-                # Use U+ notation so uppercase and lowercase characters
-                # are both represented reliably by ConfigParser.
                 if not characterCode.upper().startswith('U+'):
                     raise ValueError('Expected a U+XXXX character code')
 
@@ -187,7 +205,7 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
                 logging.warning(
                     "Ignoring invalid character font suggestion '%s = %s'",
                     characterCode, fontName)
-    
+
     if automaticWindows:
         # Explorer's context menu is designed for non-programmers: do not
         # require manual INI editing. Local system fonts are also useful in

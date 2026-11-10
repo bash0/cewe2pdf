@@ -62,6 +62,40 @@ def supportsCharacter(character, fontFile, state, fontName=None):
     return ord(character) in characterMap
 
 
+def resolveCharacterFontOverride(character, bold, italic, fonts, state):
+    """Return the registered font face configured for this character.
+
+    The requested bold/italic style is resolved through ReportLab's
+    registered font-family mapping. Return None if the override family
+    is not registered, the requested face is unavailable, or that face
+    does not support the character.
+    """
+
+    overrideFamily = state.character_font_overrides.get(character)
+
+    if not overrideFamily:
+        return None
+
+    # Resolve the appropriate face within the override family.
+    try:
+        fontFace = tt2ps(
+            overrideFamily, int(bold), int(italic))
+    except (KeyError, ValueError):
+        return None
+
+    # Only use faces that were successfully registered for this conversion.
+    fontFile = fonts.get(fontFace)
+
+    if fontFile is None:
+        return None
+
+    # An override is usable only when support is positively confirmed.
+    if supportsCharacter(character, fontFile, state) is not True:
+        return None
+
+    return fontFace
+
+
 def findFontsSupportingCharacter(character, fonts, state, excludedFont=None):
     """Return registered font faces which support the given character."""
 
@@ -97,6 +131,10 @@ def checkCharacterSupport(text, fontName, bold, italic, fonts, state):
             continue
 
         if supportsCharacter(character, fontFile, state, fontFace) is not False:
+            continue
+
+        # A successfully resolved explicit override handles this character.
+        if resolveCharacterFontOverride(character, bold, italic, fonts, state) is not None:
             continue
 
         warningKey = (fontFace, character)

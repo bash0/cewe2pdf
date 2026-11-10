@@ -199,7 +199,37 @@ urlTemplate = https://www.google.com/maps?q={latitude},{longitude}
 #expectedLoggingMessageCounts =
 #	cewe2pdf.config: WARNING[32], INFO[669]
 #	root:            ERROR[2], WARNING[4], INFO[38]
+
+# Character support diagnostics.
+# Check whether characters used in text are supported by the selected font.
+# Unsupported characters generate a warning, with a suggested alternative
+# font where one can be found.
+[MissingCharacterSupport]
+# True: report every occurrence of an unsupported character.
+# False: report each distinct character/font combination only once during a conversion.
+# Default: True.
+ShowAllUnsupportedCharacters = True
+
+# Character-specific font suggestions.
+# These suggestions take priority over automatically discovered alternatives.
+# Specify the Unicode code point of the character using U+ notation.
+# The suggested font name is used in the warning message.
+# Only one suggestion can currently be specified per character.
+[MissingCharacterFontSuggestions]
+#   Welsh letter y with circumflex.
+U+0177 = Arial
+#   Latin small letter o with stroke.
+U+00F8 = Arial
+#   Euro sign.
+U+20AC = DejaVu Sans
+
+[MissingCharacterFontOverrides]
+U+0177 = Arial
 ```
+#### Missing character font substitution
+1. Why U+ notation? ConfigParser converts option names to lowercase. Using Unicode code points avoids problems with uppercase and lowercase characters being treated as different keys.
+1. Font names: The suggested font should be available to the conversion and should actually support the character.
+
 #### Advanced CEWE resource lookup
 
 During development when we don't want to use resources from the local CEWE installation, you can set some related values in cewe2pdf.ini
