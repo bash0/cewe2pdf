@@ -200,32 +200,78 @@ urlTemplate = https://www.google.com/maps?q={latitude},{longitude}
 #	cewe2pdf.config: WARNING[32], INFO[669]
 #	root:            ERROR[2], WARNING[4], INFO[38]
 
-# Character support diagnostics.
-# Check whether characters used in text are supported by the selected font.
-# Unsupported characters generate a warning, with a suggested alternative
-# font where one can be found.
-[MissingCharacterSupport]
+```
+
+### Missing character handling
+
+cewe2pdf checks whether the selected font supports the characters used in text areas. If a character is missing, it logs a warning identifying the character, its Unicode code point and the font.
+
+Where possible, the warning also lists up to three alternative registered font families which support the character. These suggestions are discovered automatically from the fonts available to the conversion. They are advisory only: cewe2pdf does not change the selected font automatically.
+
+You can configure character replacements and font overrides in the `[MissingCharacterHandling]` section of `cewe2pdf.ini`.
+
+```ini
+[MissingCharacterHandling]
+
 # True: report every occurrence of an unsupported character.
-# False: report each distinct character/font combination only once during a conversion.
+# False: report each distinct character/font combination only once per conversion.
 # Default: True.
 ShowAllUnsupportedCharacters = True
 
-# Character-specific font suggestions.
-# These suggestions take priority over automatically discovered alternatives.
-# Specify the Unicode code point of the character using U+ notation.
-# The suggested font name is used in the warning message.
-# Only one suggestion can currently be specified per character.
-[MissingCharacterFontSuggestions]
-#   Welsh letter y with circumflex.
-U+0177 = Arial
-#   Latin small letter o with stroke.
-U+00F8 = Arial
-#   Euro sign.
-U+20AC = DejaVu Sans
+# Replace an unsupported character with other text, using the original font.
+Replacements =
+    Crafty Girls, U+0177 = y
 
-[MissingCharacterFontOverrides]
-U+0177 = Arial
+# Render an unsupported character using another font family.
+FontOverrides =
+    Poppins, U+263B = Arial
+    Poppins, U+263A = Courier New, ☻
 ```
+
+#### Replacements
+
+A replacement rule identifies a font family and a character. If that font does not support the character, cewe2pdf substitutes the specified text, rendered using the original font.
+
+For example:
+
+```ini
+Replacements =
+    Crafty Girls, U+0177 = y
+    Some Font, ☺ = smile
+```
+
+The replacement can be any text, not just a single character.
+
+#### Font overrides
+
+A font override identifies a font family and a character, and specifies another font family to use when the original font does not support that character.
+
+For example:
+
+```ini
+FontOverrides =
+    Poppins, U+263B = Arial
+    Poppins, U+263A = Courier New, ☻
+```
+
+The target character is optional. If omitted, the original character is used. This allows you to use a different font without changing the character itself, or to use a different character from the target font if necessary.
+
+The target font must be registered and must support the target character. If the override cannot be resolved, it is not applied.
+
+#### Character notation and rule precedence
+
+Characters can be specified either literally or by Unicode code point using `U+` notation. For example, `U+0177` and `ŷ` refer to the same character.
+
+A replacement or font override is applied only when the originally selected font does not support the character. If the original font supports it, the configured rule has no effect.
+
+A font/character pair cannot have both a replacement and a font override. If both are configured, both rules are ignored and a warning is logged.
+
+#### Alternative font suggestions
+
+When an unsupported character has no applicable replacement or font override, cewe2pdf searches the registered font families for alternatives. It considers the requested bold and italic styles when ranking the results and lists up to three possible alternatives in the warning.
+
+The suggestions do not guarantee an identical appearance. Different fonts can have different glyph designs, sizes and metrics. Use a `FontOverrides` rule if you want cewe2pdf to use a particular alternative consistently.
+
 #### Missing character font substitution
 1. Why U+ notation? ConfigParser converts option names to lowercase. Using Unicode code points avoids problems with uppercase and lowercase characters being treated as different keys.
 1. Font names: The suggested font should be available to the conversion and should actually support the character.

@@ -114,7 +114,9 @@ def findFontsSupportingCharacter(character, fonts, state, excludedFont=None):
     return sorted(alternatives, key=str.casefold)
 
 
-def checkCharacterSupport(text, fontName, bold, italic, fonts, state):
+def checkCharacterSupport(
+        text, fontName, bold, italic, fonts, state,
+        suggestionProvider=None):
     """Log unsupported characters in text for the actual ReportLab font face."""
 
     if not text:
@@ -156,27 +158,23 @@ def checkCharacterSupport(text, fontName, bold, italic, fonts, state):
                 continue
             state.unsupported_character_warnings.add(warningKey)
 
-        # A configured suggestion takes priority over automatic discovery.
-        suggestion = state.character_font_suggestions.get(character)
+        message = (
+            "Character '%s' (U+%04X) is not supported by font '%s'."
+        )
 
-        if suggestion is None:
-            alternatives = findFontsSupportingCharacter(
-                character, fonts, state, excludedFont=fontFace)
+        if state.font_suggestion_provider is not None:
+            alternatives = state.font_suggestion_provider.findAlternatives(
+                character, fontName, bold, italic
+            )
             if alternatives:
-                suggestion = alternatives[0]
+                message += " Possible alternatives: %s."
+                logger.warning(
+                    message, character, ord(character), fontFace,
+                    ", ".join(alternatives)
+                )
+                continue
 
-        if suggestion:
-            logger.warning(
-                "Character '%s' (U+%04X) is not supported by font '%s'. "
-                "Consider using '%s' instead.",
-                character, ord(character), fontFace, suggestion
-            )
-        else:
-            logger.warning(
-                "Character '%s' (U+%04X) is not supported by font '%s'. "
-                "No alternative registered font was found.",
-                character, ord(character), fontFace
-            )
+        logger.warning(message, character, ord(character), fontFace)
 
 
 def supportsBuiltInCharacter(character, fontName):

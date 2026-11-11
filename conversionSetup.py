@@ -90,6 +90,9 @@ def loadMissingCharacterRules(configuration, state):
 
     section = configuration['MissingCharacterHandling']
 
+    state.show_all_unsupported_characters = section.getboolean(
+        'ShowAllUnsupportedCharacters', fallback=True)
+
     def parseCharacterCode(characterCode):
         characterCode = characterCode.strip()
 
@@ -305,33 +308,6 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
     geoLinksSection = (configuration['PDF_GEO_LINKS']
                        if configuration.has_section('PDF_GEO_LINKS') else None)
     
-    # Missing character support diagnostics.
-    missingCharacterSupportSection = (
-        configuration['MissingCharacterSupport']
-        if configuration.has_section('MissingCharacterSupport') else None)
-
-    if missingCharacterSupportSection is not None:
-        state.show_all_unsupported_characters = (
-            missingCharacterSupportSection.getboolean(
-                'ShowAllUnsupportedCharacters', fallback=True))
-    
-    # Diagnostic suggestions (not applied automatically).
-    characterSuggestionsSection = (
-        configuration['CharacterFontSuggestions']
-        if configuration.has_section('CharacterFontSuggestions') else None)
-
-    if characterSuggestionsSection is not None:
-        for characterCode, fontName in characterSuggestionsSection.items():
-            try:
-                if not characterCode.upper().startswith('U+'):
-                    raise ValueError('Expected a U+XXXX character code')
-                character = chr(int(characterCode[2:], 16))
-                state.character_font_suggestions[character] = fontName.strip()
-            except ValueError:
-                logging.warning(
-                    "Ignoring invalid character font suggestion '%s = %s'",
-                    characterCode, fontName)
-
     loadMissingCharacterRules(configuration, state)
 
     if automaticWindows:
