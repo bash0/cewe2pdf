@@ -13,6 +13,7 @@ from infrastructure.extraLoggers import mustsee, configlogger
 from .otf import getTtfsFromOtfs
 from infrastructure.pathutils import (localfont_dir, systemfont_dirs,
                                       findFileInDirs, findFilesInDir)
+from fonts.font_suggestions import FontSuggestionProvider
 
 
 def addAdditionalFontsFromFile(configFontFileName, ttfFiles, fontDirs):
@@ -108,11 +109,30 @@ def findAndRegisterFonts(configSection, appDataDir, albumBaseFolder, cewe_folder
     #  the normal heuristic family setup above  - the "fixed" FranklinGothic being a good example:
     #   fontFamilies =
     #      FranklinGothic,FranklinGothic,FranklinGothic Medium,Franklin Gothic Book Italic,FranklinGothic Medium Italic
-    explicitlyRegisteredFamilyNames = getExplicitlyRegisteredFamilyNames(configSection, fontsToRegister)
+    explicitlyRegisteredFamilies = {}
+    explicitlyRegisteredFamilyNames = getExplicitlyRegisteredFamilyNames(
+        configSection, fontsToRegister, explicitlyRegisteredFamilies)
 
     # Now we can register the families we have "observed" and built up as we read the font files,
     #  but ignoring any family name which was registered explicitly from configuration
     registerFontFamilies(familiesToRegister, explicitlyRegisteredFamilyNames)
+
+    # Collect the final registered family mappings for optional suggestions.
+    suggestionFontFamilies = dict(explicitlyRegisteredFamilies)
+    for familyName, fontFamily in familiesToRegister.items():
+        if familyName not in explicitlyRegisteredFamilyNames:
+            suggestionFontFamilies[familyName] = {
+                style: face
+                for style, face in fontFamily.items()
+                if face in fontsToRegister
+            }
+    
+    # Enable optional font suggestions for unsupported characters.
+    state.font_suggestion_provider = FontSuggestionProvider(
+        fontsToRegister,
+        suggestionFontFamilies,
+        state
+    )
 
     loadMissingFontSubstitutions(configSection, fontsToRegister, state)
 
@@ -222,7 +242,7 @@ def verifyFontNameConventions(m_familyname, normal=None, bold=None, italic=None,
     if nonConventional:
         configlogger.info(f"Unconventional font names in family '{m_familyname}': n='{normal}' b='{bold}' i='{italic}' bi='{boldItalic}'")
 
-def getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontList):
+def getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontList, registeredFamilies=None):
     if defaultConfigSection is None:
         return []
     explicitFamilyNames = []
@@ -253,6 +273,13 @@ def getExplicitlyRegisteredFamilyNames(defaultConfigSection, fontList):
                 explicitFamilyNames.append(m_familyname)
                 configlogger.warning(f"Using configured font family '{m_familyname}': '{m_n}','{m_b}','{m_i}','{m_bi}'")
                 verifyFontNameConventions(m_familyname, normal=m_n, bold=m_b, italic=m_i, boldItalic=m_bi)
+                if registeredFamilies is not None:
+                    registeredFamilies[m_familyname] = {
+                        'normal': m_n,
+                        'bold': m_b,
+                        'italic': m_i,
+                        'boldItalic': m_bi
+                    }
         else:
             configlogger.error(f'Invalid FontFamilies line ignored (!= 5 comma-separated strings): {explicitFontFamily}')
     return explicitFamilyNames
