@@ -145,6 +145,9 @@
     <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\License%282%29-f555.txt" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\License-8eb1.txt" />
     <Content Include="tests\Resources\photofun\fonts\LiberationSans\misc\README-75f0" />
+    <Content Include="tests\Resources\photofun\fonts\Noto\OFL_NotoSans.txt" />
+    <Content Include="tests\Resources\photofun\fonts\Noto\OFL_NotoSansSymbols2.txt" />
+    <Content Include="tests\Resources\photofun\fonts\Noto\OFL_NotoSerif.txt" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-Black.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-BlackItalic.ttf" />
     <Content Include="tests\Resources\photofun\fonts\Poppins-Bold.ttf" />
@@ -296,6 +299,9 @@
     <Content Include="tests\testTransparency\testTransparency_mcf-Dateien\20200306_111748.jpg" />
     <Content Include="tests\testTransparency\testTransparency_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testTransparency\testTransparency_mcf-Dateien\folderid.xml~" />
+    <Content Include="tests\testUnsupportedChars\additional_fonts.txt" />
+    <Content Include="tests\testUnsupportedChars\cewe2pdf.ini" />
+    <Content Include="tests\testUnsupportedChars\testUnsupportedChars.mcf" />
     <Content Include="tests\unittest_fotobook\cewe2pdf.ini" />
     <Content Include="tests\hps\5026\.gitkeep" />
     <Content Include="tests\hps\5026\addons\121285\cliparts\v1\decorations\12089-CLIP-GOLD-GD.clp" />
@@ -411,6 +417,7 @@
     <Compile Include="decorations\__init__.py" />
     <Compile Include="cewe2pdf.py" />
     <Compile Include="colorUtils.py" />
+    <Compile Include="fonts\character_support.py" />
     <Compile Include="fonts\line_scales.py" />
     <Compile Include="fonts\manager.py" />
     <Compile Include="fonts\otf.py" />
@@ -453,7 +460,10 @@
     <Compile Include="tests\testDecorations\test_decorations.py" />
     <Compile Include="tests\testEmptyPageOne\test_emptyPageOne.py" />
     <Compile Include="tests\testFontDoesNotExist\test_fontDoesNotExist.py" />
+    <Compile Include="tests\testfontsubstitution\test_character_support.py" />
+    <Compile Include="tests\testFontSubstitution\test_fontFamilyResolution.py" />
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
+    <Compile Include="tests\testfontsubstitution\test_missing_character_rules.py" />
     <Compile Include="tests\testGeoLinks\test_geoLinks.py" />
     <Compile Include="tests\testImageExtractor\test_imageExtractor.py" />
     <Compile Include="tests\testImageExtractor\test_imageFormats.py" />
@@ -483,6 +493,7 @@
     <Compile Include="tests\testTextShrinkVAlign\test_textShrinkVAlign.py" />
     <Compile Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder.py" />
     <Compile Include="tests\testTransparency\test_transparency.py" />
+    <Compile Include="tests\testUnsupportedChars\testUnsupportedChars.py" />
     <Compile Include="tests\testVersionInfo\test_versionInfo.py" />
     <Compile Include="tests\testWindowsIntegration\test_windowsIntegration.py" />
     <Compile Include="tests\test_paragraph_font_inheritance.py" />
@@ -555,6 +566,7 @@
     <Folder Include="tests\Resources\photofun\fonts\liberation-narrow-fonts-ttf-1.07.6\" />
     <Folder Include="tests\Resources\photofun\fonts\LiberationSans\" />
     <Folder Include="tests\Resources\photofun\fonts\LiberationSans\misc\" />
+    <Folder Include="tests\Resources\photofun\fonts\Noto\" />
     <Folder Include="tests\Resources\photofun\fonts\Poppins\" />
     <Folder Include="tests\Resources\photofun\fonts\Stafford\" />
     <Folder Include="tests\testBackgroundAlignment\" />
@@ -641,6 +653,8 @@
     <Folder Include="tests\testTransparency\" />
     <Folder Include="tests\testTransparency\previous_result_pdfs\" />
     <Folder Include="tests\testTransparency\testTransparency_mcf-Dateien\" />
+    <Folder Include="tests\testUnsupportedChars\" />
+    <Folder Include="tests\testUnsupportedChars\previous_result_pdfs\" />
     <Folder Include="tests\testVersionInfo\" />
     <Folder Include="tests\testWindowsIntegration\" />
     <Folder Include="tests\test_webp_loading\" />

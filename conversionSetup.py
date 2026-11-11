@@ -82,6 +82,153 @@ class ConversionSetup:
     background_resolution: int  # Target DPI for page-background images.
 
 
+def loadMissingCharacterRules(configuration, state):
+    """Load font-specific missing-character replacements and font overrides."""
+
+    if not configuration.has_section('MissingCharacterHandling'):
+        return
+
+    section = configuration['MissingCharacterHandling']
+
+    def parseCharacterCode(characterCode):
+        characterCode = characterCode.strip()
+
+        if characterCode.upper().startswith('U+'):
+            try:
+                codePoint = int(characterCode[2:], 16)
+            except ValueError:
+                raise ValueError('Invalid Unicode character code')
+
+            if (codePoint > 0x10FFFF
+                    or 0xD800 <= codePoint <= 0xDFFF):
+                raise ValueError('Invalid Unicode character code')
+
+            return chr(codePoint)
+
+        if len(characterCode) != 1:
+            raise ValueError(
+                'Expected U+XXXX notation or a single character')
+
+        return characterCode
+
+
+    def parseRules(optionName, isFontOverride=False):
+        rules = {}
+        invalidKeys = set()
+
+        rawRules = section.get(optionName, fallback='', raw=True)
+
+        for lineNumber, line in enumerate(rawRules.splitlines(), start=1):
+            line = line.strip()
+
+            if not line or line.startswith('#'):
+                continue
+
+            key = None
+
+            try:
+                left, right = line.split('=', 1)
+                fontFamily, characterCode = left.rsplit(',', 1)
+
+                fontFamily = fontFamily.strip()
+                character = parseCharacterCode(characterCode)
+
+                if not fontFamily:
+                    raise ValueError('Missing font family')
+
+                if isFontOverride:
+                    targetFont = right.strip()
+                    targetCharacter = character
+
+                    if ',' in right:
+                        targetFont, characterCode = right.rsplit(',', 1)
+                        targetFont = targetFont.strip()
+                        targetCharacter = parseCharacterCode(characterCode)
+
+                    if not targetFont:
+                        raise ValueError('Missing target font family')
+
+                    value = (targetFont, targetCharacter)
+                else:
+                    value = right.strip()
+
+                    if not value:
+                        raise ValueError('Missing replacement value')
+
+                key = (fontFamily, character)
+
+                if key in rules or key in invalidKeys:
+                    rules.pop(key, None)
+                    invalidKeys.add(key)
+
+                    logging.warning(
+                        "Ignoring duplicate %s rule for font '%s', "
+                        "character U+%04X",
+                        optionName, fontFamily, ord(character))
+                    continue
+
+                rules[key] = value
+
+            except ValueError as error:
+                if key is not None:
+                    rules.pop(key, None)
+                    invalidKeys.add(key)
+
+                logging.warning(
+                    "Ignoring invalid %s rule on line %d: '%s' (%s)",
+                    optionName, lineNumber, line, error)
+
+        return rules
+
+    replacements = parseRules('Replacements')
+    fontOverrides = parseRules('FontOverrides', isFontOverride=True)
+
+    # A font/character pair cannot use both mechanisms.
+    conflicts = replacements.keys() & fontOverrides.keys()
+
+    for fontFamily, character in conflicts:
+        logging.warning(
+            "Conflicting missing-character rules for font '%s', "
+            "character U+%04X. Ignoring both rules.",
+            fontFamily, ord(character))
+
+        del replacements[(fontFamily, character)]
+        del fontOverrides[(fontFamily, character)]
+
+    state.character_replacements = replacements
+    state.character_font_overrides = fontOverrides
+
+ 
+def readConfigurationFiles(configuration, filenames):
+    """Read configuration files, supporting UTF-8 and legacy Windows-1252."""
+
+    filesRead = []
+
+    for filename in filenames:
+        try:
+            configBytes = Path(filename).read_bytes()
+        except OSError:
+            # Match ConfigParser.read(): silently skip inaccessible files.
+            continue
+
+        try:
+            configText = configBytes.decode('utf-8-sig')
+            encoding = 'UTF-8'
+        except UnicodeDecodeError:
+            configText = configBytes.decode('cp1252')
+            encoding = 'Windows-1252'
+
+        configuration.read_string(configText, source=filename)
+        filesRead.append(filename)
+
+        logging.debug(
+            "Read configuration file '%s' using %s",
+            filename, encoding
+        )
+
+    return filesRead
+
+
 def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
                       automaticWindows: bool = False) -> ConversionSetup: # noqa: C901
     """Read an album and resolve the configuration and resources it requires."""
@@ -151,12 +298,42 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
 
     logging.info('Trying cewe2pdf.ini from current directory and from the album directory.')
     configuration = configparser.ConfigParser()
-    filesread = configuration.read(['cewe2pdf.ini', os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
+    filesread = readConfigurationFiles(configuration,['cewe2pdf.ini',os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
     defaultConfigSection = configuration['DEFAULT']
     metadataSection = (configuration['PDF_METADATA']
                        if configuration.has_section('PDF_METADATA') else None)
     geoLinksSection = (configuration['PDF_GEO_LINKS']
                        if configuration.has_section('PDF_GEO_LINKS') else None)
+    
+    # Missing character support diagnostics.
+    missingCharacterSupportSection = (
+        configuration['MissingCharacterSupport']
+        if configuration.has_section('MissingCharacterSupport') else None)
+
+    if missingCharacterSupportSection is not None:
+        state.show_all_unsupported_characters = (
+            missingCharacterSupportSection.getboolean(
+                'ShowAllUnsupportedCharacters', fallback=True))
+    
+    # Diagnostic suggestions (not applied automatically).
+    characterSuggestionsSection = (
+        configuration['CharacterFontSuggestions']
+        if configuration.has_section('CharacterFontSuggestions') else None)
+
+    if characterSuggestionsSection is not None:
+        for characterCode, fontName in characterSuggestionsSection.items():
+            try:
+                if not characterCode.upper().startswith('U+'):
+                    raise ValueError('Expected a U+XXXX character code')
+                character = chr(int(characterCode[2:], 16))
+                state.character_font_suggestions[character] = fontName.strip()
+            except ValueError:
+                logging.warning(
+                    "Ignoring invalid character font suggestion '%s = %s'",
+                    characterCode, fontName)
+
+    loadMissingCharacterRules(configuration, state)
+
     if automaticWindows:
         # Explorer's context menu is designed for non-programmers: do not
         # require manual INI editing. Local system fonts are also useful in
