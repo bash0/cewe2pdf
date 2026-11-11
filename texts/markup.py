@@ -10,7 +10,8 @@ from dataclasses import dataclass
 
 from fonts.manager import getAvailableFont
 from fonts.line_scales import LineScales
-from fonts.character_support import checkCharacterSupport, resolveCharacterFontOverride
+from reportlab.lib.fonts import tt2ps
+from fonts.character_support import (checkCharacterSupport,resolveCharacterFontOverride,supportsCharacter,)
 from conversionState import ConversionState
 
 _WEB_ADDRESS = re.compile(r'https?://[^\s<]+', re.IGNORECASE)
@@ -222,61 +223,101 @@ def AddAlbumText(paragraphText, text):
     return AddBasicText(paragraphText, escapedText)
 
 
+
+
 def AddAlbumTextWithFontOverrides(paragraphText, text, textRunContext):
-    """Append CEWE text, applying configured per-character font overrides.
+    """Append CEWE text, applying configured font overrides and replacements.
 
-    Ordinary characters retain the surrounding paragraph/span formatting.
-    Characters with a valid configured override are wrapped in a nested
-    ReportLab font tag. The override resolver selects the face matching
-    the original run's bold and italic settings.
-
-    Text escaping and URL break opportunities are still handled by
-    AddAlbumText().
+    A font override takes priority over a character replacement, but only
+    when the original font does not support the character.
     """
+
     if text is None:
         return paragraphText
 
     state = textRunContext.state
 
-    # Cache resolutions locally so repeated characters in this run only
-    # require one font lookup and character-support check.
-    resolvedFaces = {}
+    # Resolve the actual face used by the original text run.
+    try:
+        originalFace = tt2ps(
+            textRunContext.font_name,
+            int(textRunContext.bold),
+            int(textRunContext.italic)
+        )
+    except (KeyError, ValueError):
+        originalFace = textRunContext.font_name
+
+    originalFontFile = textRunContext.available_fonts.get(originalFace)
+
+    # Cache the selected action for each character in this run.
+    resolvedActions = {}
 
     segments = []
-    currentFace = None
-    currentCharacters = []
+    currentAction = None
+    currentText = []
 
     for character in text:
-        if character not in resolvedFaces:
-            if character in state.character_font_overrides:
-                resolvedFaces[character] = resolveCharacterFontOverride(
-                    character,
-                    textRunContext.bold,
-                    textRunContext.italic,
-                    textRunContext.available_fonts,
-                    state
-                )
+        if character not in resolvedActions:
+            # Only intervene when the original font is confirmed not to
+            # support the character. Unknown support is treated cautiously.
+            supported = supportsCharacter(
+                character,
+                originalFontFile,
+                state,
+                originalFace
+            )
+
+            if supported is not False:
+                resolvedActions[character] = (
+                    'original', None, character)
+
             else:
-                resolvedFaces[character] = None
+                fontFace = None
 
-        fontFace = resolvedFaces[character]
+                if character in state.character_font_overrides:
+                    fontFace = resolveCharacterFontOverride(
+                        character,
+                        textRunContext.bold,
+                        textRunContext.italic,
+                        textRunContext.available_fonts,
+                        state
+                    )
 
-        if currentCharacters and fontFace != currentFace:
-            segments.append((currentFace, ''.join(currentCharacters)))
-            currentCharacters = []
+                if fontFace is not None:
+                    resolvedActions[character] = (
+                        'font', fontFace, character)
 
-        currentFace = fontFace
-        currentCharacters.append(character)
+                elif character in state.character_replacements:
+                    resolvedActions[character] = (
+                        'replacement',
+                        None,
+                        state.character_replacements[character]
+                    )
 
-    if currentCharacters:
-        segments.append((currentFace, ''.join(currentCharacters)))
+                else:
+                    resolvedActions[character] = (
+                        'original', None, character)
+
+        action, value, renderedText = resolvedActions[character]
+        segmentAction = (action, value)
+
+        if currentText and segmentAction != currentAction:
+            segments.append((currentAction, ''.join(currentText)))
+            currentText = []
+
+        currentAction = segmentAction
+        currentText.append(renderedText)
+
+    if currentText:
+        segments.append((currentAction, ''.join(currentText)))
 
     # Append each segment, retaining the surrounding ReportLab formatting.
-    for fontFace, segmentText in segments:
-        if fontFace is None:
+    for (action, value), segmentText in segments:
+        if action in ('original', 'replacement'):
             paragraphText = AddAlbumText(paragraphText, segmentText)
-        else:
-            safeFontName = html.escape(fontFace, quote=True)
+
+        elif action == 'font':
+            safeFontName = html.escape(value, quote=True)
             paragraphText = AddBasicText(
                 paragraphText, f'<font name="{safeFontName}">')
             paragraphText = AddAlbumText(paragraphText, segmentText)

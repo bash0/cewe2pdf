@@ -153,6 +153,11 @@ def test_AddAlbumTextWithFontOverridesAppliesOnlyConfiguredCharacters(
         lambda character, bold, italic, fonts, state:
             'Arial Bold Italic' if character == 'ŷ' else None
     )
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original Font')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda character, *args:
+            False if character == 'ŷ' else True)
 
     result = markup.AddAlbumTextWithFontOverrides(
         '', 'the garden at Tŷ Hanes', context)
@@ -236,7 +241,8 @@ def test_AddAlbumTextWithFontOverridesPreservesParagraphFormatting(
 
     availableFonts = {
         face: str(fontDirectory / fontFiles[style])
-        for style, face in overrideFaces.items()
+        for faces in (originalFaces, overrideFaces)
+        for style, face in faces.items()
     }
 
     state = ConversionState()
@@ -252,6 +258,11 @@ def test_AddAlbumTextWithFontOverridesPreservesParagraphFormatting(
         available_fonts=availableFonts,
         state=state
     )
+
+    # Simulate the original font lacking ŷ. The override font is still
+    # checked using its real character map by resolveCharacterFontOverride.
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: False)
 
     # The ordinary text uses the original family. The overridden character
     # should use the bold-italic face of the configured override family.
@@ -300,3 +311,121 @@ def test_AddAlbumTextWithFontOverridesPreservesParagraphFormatting(
     assert width > 0
     assert height > 0
     assert output.getvalue().startswith(b'%PDF')
+
+
+
+def _makeCharacterReplacementContext():
+    """Create a minimal context for character replacement tests."""
+
+    state = ConversionState()
+
+    context = markup.TextRunContext(
+        font_name='Original family',
+        font_size=14,
+        bold=False,
+        italic=False,
+        underline=False,
+        color='#123456',
+        available_fonts={},
+        state=state
+    )
+
+    return context
+
+
+def test_characterReplacementUsedWhenNoFontOverride(
+        monkeypatch):
+    """Use the configured replacement when the original font lacks a glyph."""
+
+    context = _makeCharacterReplacementContext()
+    context.state.character_replacements['ŷ'] = 'y'
+
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original face')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: False)
+
+    result = markup.AddAlbumTextWithFontOverrides(
+        '', 'Tŷ', context)
+
+    assert result == 'Ty'
+
+
+def test_fontOverrideTakesPriorityOverCharacterReplacement(
+        monkeypatch):
+    """A valid font override takes priority over a replacement."""
+
+    context = _makeCharacterReplacementContext()
+    context.state.character_font_overrides['ŷ'] = 'Override family'
+    context.state.character_replacements['ŷ'] = 'y'
+
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original face')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: False)
+    monkeypatch.setattr(
+        markup, 'resolveCharacterFontOverride',
+        lambda *args: 'Override face')
+
+    result = markup.AddAlbumTextWithFontOverrides(
+        '', 'Tŷ', context)
+
+    assert result == (
+        'T<font name="Override face">ŷ</font>')
+
+
+def test_unavailableFontOverrideFallsBackToReplacement(
+        monkeypatch):
+    """Use the replacement if the configured font override cannot resolve."""
+
+    context = _makeCharacterReplacementContext()
+    context.state.character_font_overrides['ŷ'] = 'Missing family'
+    context.state.character_replacements['ŷ'] = 'y'
+
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original face')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: False)
+    monkeypatch.setattr(
+        markup, 'resolveCharacterFontOverride',
+        lambda *args: None)
+
+    result = markup.AddAlbumTextWithFontOverrides(
+        '', 'Tŷ', context)
+
+    assert result == 'Ty'
+
+
+def test_characterReplacementIsHtmlEscaped(monkeypatch):
+    """Replacement text is escaped like ordinary CEWE text."""
+
+    context = _makeCharacterReplacementContext()
+    context.state.character_replacements['ŷ'] = '&<'
+
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original face')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: False)
+
+    result = markup.AddAlbumTextWithFontOverrides(
+        '', 'Tŷ', context)
+
+    assert result == 'T&amp;&lt;'
+
+    
+def test_supportedCharacterIsNotReplaced(monkeypatch):
+    """Leave a character alone when the original font supports it."""
+
+    context = _makeCharacterReplacementContext()
+    context.state.character_font_overrides['ŷ'] = 'Override family'
+    context.state.character_replacements['ŷ'] = 'y'
+
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original face')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: True)
+
+    result = markup.AddAlbumTextWithFontOverrides(
+        '', 'Tŷ', context)
+
+    assert result == 'Tŷ'

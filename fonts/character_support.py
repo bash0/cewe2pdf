@@ -136,6 +136,10 @@ def checkCharacterSupport(text, fontName, bold, italic, fonts, state):
         # A successfully resolved explicit override handles this character.
         if resolveCharacterFontOverride(character, bold, italic, fonts, state) is not None:
             continue
+        
+        # A configured replacement also handles this character.
+        if character in state.character_replacements:
+            continue
 
         warningKey = (fontFace, character)
 

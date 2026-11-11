@@ -178,15 +178,30 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
             try:
                 if not characterCode.upper().startswith('U+'):
                     raise ValueError('Expected a U+XXXX character code')
-
                 character = chr(int(characterCode[2:], 16))
                 state.character_font_overrides[character] = fontFamily.strip()
-
             except ValueError:
                 logging.warning(
                     "Ignoring invalid character font override '%s = %s'",
                     characterCode, fontFamily)
+    
+    # Text replacements for characters unsupported by the selected font.
+    characterReplacementsSection = (
+        configuration['MissingCharacterReplacements']
+        if configuration.has_section('MissingCharacterReplacements') else None)
 
+    if characterReplacementsSection is not None:
+        for characterCode, replacement in characterReplacementsSection.items():
+            try:
+                if not characterCode.upper().startswith('U+'):
+                    raise ValueError('Expected a U+XXXX character code')
+                character = chr(int(characterCode[2:], 16))
+                state.character_replacements[character] = replacement
+            except ValueError:
+                logging.warning(
+                    "Ignoring invalid character replacement '%s = %s'",
+                    characterCode, replacement)
+                
     # Diagnostic suggestions (not applied automatically).
     characterSuggestionsSection = (
         configuration['CharacterFontSuggestions']
@@ -197,10 +212,8 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
             try:
                 if not characterCode.upper().startswith('U+'):
                     raise ValueError('Expected a U+XXXX character code')
-
                 character = chr(int(characterCode[2:], 16))
                 state.character_font_suggestions[character] = fontName.strip()
-
             except ValueError:
                 logging.warning(
                     "Ignoring invalid character font suggestion '%s = %s'",
