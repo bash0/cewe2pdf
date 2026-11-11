@@ -463,6 +463,7 @@
     <Compile Include="tests\testfontsubstitution\test_character_support.py" />
     <Compile Include="tests\testFontSubstitution\test_fontFamilyResolution.py" />
     <Compile Include="tests\testFontSubstitution\test_fontSubstitution.py" />
+    <Compile Include="tests\testfontsubstitution\test_missing_character_rules.py" />
     <Compile Include="tests\testGeoLinks\test_geoLinks.py" />
     <Compile Include="tests\testImageExtractor\test_imageExtractor.py" />
     <Compile Include="tests\testImageExtractor\test_imageFormats.py" />
