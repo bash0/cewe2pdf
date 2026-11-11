@@ -90,7 +90,29 @@ def loadMissingCharacterRules(configuration, state):
 
     section = configuration['MissingCharacterHandling']
 
-    def parseRules(optionName):
+    def parseCharacterCode(characterCode):
+        characterCode = characterCode.strip()
+
+        if characterCode.upper().startswith('U+'):
+            try:
+                codePoint = int(characterCode[2:], 16)
+            except ValueError:
+                raise ValueError('Invalid Unicode character code')
+
+            if (codePoint > 0x10FFFF
+                    or 0xD800 <= codePoint <= 0xDFFF):
+                raise ValueError('Invalid Unicode character code')
+
+            return chr(codePoint)
+
+        if len(characterCode) != 1:
+            raise ValueError(
+                'Expected U+XXXX notation or a single character')
+
+        return characterCode
+
+
+    def parseRules(optionName, isFontOverride=False):
         rules = {}
         invalidKeys = set()
 
@@ -102,43 +124,56 @@ def loadMissingCharacterRules(configuration, state):
             if not line or line.startswith('#'):
                 continue
 
+            key = None
+
             try:
-                left, value = line.split('=', 1)
+                left, right = line.split('=', 1)
                 fontFamily, characterCode = left.rsplit(',', 1)
 
                 fontFamily = fontFamily.strip()
-                characterCode = characterCode.strip()
-                value = value.strip()
+                character = parseCharacterCode(characterCode)
 
                 if not fontFamily:
                     raise ValueError('Missing font family')
 
-                if not characterCode.upper().startswith('U+'):
-                    raise ValueError('Expected a U+XXXX character code')
+                if isFontOverride:
+                    targetFont = right.strip()
+                    targetCharacter = character
 
-                codePoint = int(characterCode[2:], 16)
+                    if ',' in right:
+                        targetFont, characterCode = right.rsplit(',', 1)
+                        targetFont = targetFont.strip()
+                        targetCharacter = parseCharacterCode(characterCode)
 
-                if codePoint > 0x10FFFF or 0xD800 <= codePoint <= 0xDFFF:
-                    raise ValueError('Invalid Unicode character code')
+                    if not targetFont:
+                        raise ValueError('Missing target font family')
 
-                if not value:
-                    raise ValueError('Missing rule value')
+                    value = (targetFont, targetCharacter)
+                else:
+                    value = right.strip()
 
-                character = chr(codePoint)
+                    if not value:
+                        raise ValueError('Missing replacement value')
+
                 key = (fontFamily, character)
 
                 if key in rules or key in invalidKeys:
                     rules.pop(key, None)
                     invalidKeys.add(key)
+
                     logging.warning(
                         "Ignoring duplicate %s rule for font '%s', "
                         "character U+%04X",
-                        optionName, fontFamily, codePoint)
+                        optionName, fontFamily, ord(character))
                     continue
 
                 rules[key] = value
 
             except ValueError as error:
+                if key is not None:
+                    rules.pop(key, None)
+                    invalidKeys.add(key)
+
                 logging.warning(
                     "Ignoring invalid %s rule on line %d: '%s' (%s)",
                     optionName, lineNumber, line, error)
@@ -146,7 +181,7 @@ def loadMissingCharacterRules(configuration, state):
         return rules
 
     replacements = parseRules('Replacements')
-    fontOverrides = parseRules('FontOverrides')
+    fontOverrides = parseRules('FontOverrides', isFontOverride=True)
 
     # A font/character pair cannot use both mechanisms.
     conflicts = replacements.keys() & fontOverrides.keys()
@@ -162,6 +197,36 @@ def loadMissingCharacterRules(configuration, state):
 
     state.character_replacements = replacements
     state.character_font_overrides = fontOverrides
+
+ 
+def readConfigurationFiles(configuration, filenames):
+    """Read configuration files, supporting UTF-8 and legacy Windows-1252."""
+
+    filesRead = []
+
+    for filename in filenames:
+        try:
+            configBytes = Path(filename).read_bytes()
+        except OSError:
+            # Match ConfigParser.read(): silently skip inaccessible files.
+            continue
+
+        try:
+            configText = configBytes.decode('utf-8-sig')
+            encoding = 'UTF-8'
+        except UnicodeDecodeError:
+            configText = configBytes.decode('cp1252')
+            encoding = 'Windows-1252'
+
+        configuration.read_string(configText, source=filename)
+        filesRead.append(filename)
+
+        logging.debug(
+            "Read configuration file '%s' using %s",
+            filename, encoding
+        )
+
+    return filesRead
 
 
 def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
@@ -233,7 +298,7 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
 
     logging.info('Trying cewe2pdf.ini from current directory and from the album directory.')
     configuration = configparser.ConfigParser()
-    filesread = configuration.read(['cewe2pdf.ini', os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
+    filesread = readConfigurationFiles(configuration,['cewe2pdf.ini',os.path.join(albumBaseFolder, 'cewe2pdf.ini')])
     defaultConfigSection = configuration['DEFAULT']
     metadataSection = (configuration['PDF_METADATA']
                        if configuration.has_section('PDF_METADATA') else None)

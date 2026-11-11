@@ -37,7 +37,20 @@ FontOverrides =
     }
 
     assert state.character_font_overrides == {
-        ('Arial Rounded MT Bold', 'ŷ'): 'Archivo Narrow',
+        ('Arial Rounded MT Bold', 'ŷ'): ('Archivo Narrow', 'ŷ'),
+    }
+
+
+def test_loadsReplacementsAndFontOverridesDifferent():
+    """Load both types of font-specific rules."""
+    state = _loadRules("""
+[MissingCharacterHandling]
+FontOverrides =
+    Arial Rounded MT Bold, U+0177 = Archivo Narrow, U+00e6
+""")
+
+    assert state.character_font_overrides == {
+        ('Arial Rounded MT Bold', 'ŷ'): ('Archivo Narrow', 'æ'),
     }
 
 
@@ -129,7 +142,7 @@ FontOverrides =
     }
 
     assert state.character_font_overrides == {
-        ('SomeFont', 'ø'): 'Arial',
+        ('SomeFont', 'ø'): ('Arial', 'ø'),
     }
 
     assert 'conflicting' in caplog.text.lower()
@@ -158,3 +171,49 @@ SomeOption = some value
 
     assert state.character_replacements == {}
     assert state.character_font_overrides == {}
+
+
+def test_loadsLiteralCharacters():
+    """Accept literal characters in both rule types."""
+    state = _loadRules("""
+[MissingCharacterHandling]
+Replacements =
+    Crafty Girls, ŷ = y
+
+FontOverrides =
+    Poppins, ☺ = Courier New, ☻
+""")
+
+    assert state.character_replacements == {
+        ('Crafty Girls', 'ŷ'): 'y',
+    }
+
+    assert state.character_font_overrides == {
+        ('Poppins', '☺'): ('Courier New', '☻'),
+    }
+
+
+def test_loadsLiteralFontOverrideWithoutTargetCharacter():
+    """A missing target character defaults to the original character."""
+    state = _loadRules("""
+[MissingCharacterHandling]
+FontOverrides =
+    Poppins, ☺ = Courier New
+""")
+
+    assert state.character_font_overrides == {
+        ('Poppins', '☺'): ('Courier New', '☺'),
+    }
+
+
+def testLoadsLiteralReplacementText():
+    """A replacement may contain multiple characters."""
+    state = _loadRules("""
+[MissingCharacterHandling]
+Replacements =
+    Some Font, ☺ = smile
+""")
+
+    assert state.character_replacements == {
+        ('Some Font', '☺'): 'smile',
+    }

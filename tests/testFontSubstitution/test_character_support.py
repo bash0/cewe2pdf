@@ -26,10 +26,11 @@ from texts.markup import createTextRunContext
 def test_resolveCharacterFontOverrideSelectsCorrectStyle(
         monkeypatch, bold, italic, expectedFace):
     """An override must preserve the original bold/italic styling."""
+
     state = ConversionState()
     state.character_font_overrides[
         ('Original Family', 'ŷ')
-    ] = 'Override Family'
+    ] = ('Override Family', 'ŷ')
 
     availableFonts = {
         'Override Regular': 'regular.ttf',
@@ -46,11 +47,41 @@ def test_resolveCharacterFontOverrideSelectsCorrectStyle(
     result = character_support.resolveCharacterFontOverride(
         'Original Family', 'ŷ', bold, italic, availableFonts, state)
 
-    assert result == expectedFace
+    assert result == (expectedFace, 'ŷ')
+
+
+def test_resolveCharacterFontOverrideUsesReplacementCharacter(monkeypatch):
+    """The resolver must check and return the configured target character."""
+
+    state = ConversionState()
+    state.character_font_overrides[
+        ('Original Family', 'ŷ')
+    ] = ('Override Family', 'æ')
+
+    availableFonts = {'Override Regular': 'override.ttf'}
+    checkedCharacters = []
+
+    monkeypatch.setattr(
+        character_support, 'tt2ps',
+        lambda family, bold, italic: 'Override Regular')
+
+    def supportsCharacter(character, fontFile, state, fontName=None):
+        checkedCharacters.append(character)
+        return character == 'æ'
+
+    monkeypatch.setattr(
+        character_support, 'supportsCharacter', supportsCharacter)
+
+    result = character_support.resolveCharacterFontOverride(
+        'Original Family', 'ŷ', False, False, availableFonts, state)
+
+    assert result == ('Override Regular', 'æ')
+    assert checkedCharacters == ['æ']
 
 
 def test_resolveCharacterFontOverrideWithoutConfiguration():
     """Characters without an explicit override are left unchanged."""
+
     state = ConversionState()
 
     assert character_support.resolveCharacterFontOverride(
@@ -59,10 +90,11 @@ def test_resolveCharacterFontOverrideWithoutConfiguration():
 
 def test_resolveCharacterFontOverrideWithUnknownFamily(monkeypatch):
     """An unregistered family must not be used."""
+
     state = ConversionState()
     state.character_font_overrides[
         ('Original Family', 'ŷ')
-    ] = 'Unknown Family'
+    ] = ('Unknown Family', 'ŷ')
 
     def unknownFamily(family, bold, italic):
         raise KeyError(family)
@@ -75,10 +107,11 @@ def test_resolveCharacterFontOverrideWithUnknownFamily(monkeypatch):
 
 def test_resolveCharacterFontOverrideWithMissingFace(monkeypatch):
     """A family mapping is not enough if its selected face is unavailable."""
+
     state = ConversionState()
     state.character_font_overrides[
         ('Original Family', 'ŷ')
-    ] = 'Override Family'
+    ] = ('Override Family', 'ŷ')
 
     monkeypatch.setattr(
         character_support, 'tt2ps',
@@ -92,27 +125,37 @@ def test_resolveCharacterFontOverrideWithMissingFace(monkeypatch):
 def test_resolveCharacterFontOverrideRequiresConfirmedSupport(
         monkeypatch, supportResult):
     """An unsupported or uninspectable font must not be selected."""
+
     state = ConversionState()
     state.character_font_overrides[
         ('Original Family', 'ŷ')
-    ] = 'Override Family'
+    ] = ('Override Family', 'æ')
 
     availableFonts = {'Override Regular': 'override.ttf'}
 
     monkeypatch.setattr(
         character_support, 'tt2ps',
         lambda family, bold, italic: 'Override Regular')
+
+    checkedCharacters = []
+
+    def supportsCharacter(character, *args):
+        checkedCharacters.append(character)
+        return supportResult
+
     monkeypatch.setattr(
-        character_support, 'supportsCharacter',
-        lambda *args: supportResult)
+        character_support, 'supportsCharacter', supportsCharacter)
 
     assert character_support.resolveCharacterFontOverride(
         'Original Family', 'ŷ', False, False, availableFonts, state
     ) is None
 
+    assert checkedCharacters == ['æ']
+
 
 def test_createTextRunContextPreservesEffectiveFormatting():
     """The context must capture all effective formatting for a text run."""
+
     state = ConversionState()
     availableFonts = {'Arial': 'arial.ttf'}
 
@@ -140,10 +183,11 @@ def test_createTextRunContextPreservesEffectiveFormatting():
 def test_AddAlbumTextWithFontOverridesAppliesOnlyConfiguredCharacters(
         monkeypatch):
     """An override changes the font only for the configured character."""
+
     state = ConversionState()
     state.character_font_overrides[
         ('Original Font', 'ŷ')
-    ] = 'Arial'
+    ] = ('Arial', 'ŷ')
 
     context = markup.TextRunContext(
         font_name='Original Font',
@@ -160,7 +204,7 @@ def test_AddAlbumTextWithFontOverridesAppliesOnlyConfiguredCharacters(
         markup,
         'resolveCharacterFontOverride',
         lambda fontFamily, character, bold, italic, fonts, state:
-            'Arial Bold Italic' if character == 'ŷ' else None
+            ('Arial Bold Italic', 'ŷ') if character == 'ŷ' else None
     )
     monkeypatch.setattr(
         markup, 'tt2ps', lambda *args: 'Original Font')
@@ -253,7 +297,7 @@ def test_AddAlbumTextWithFontOverridesPreservesParagraphFormatting(
     state = ConversionState()
     state.character_font_overrides[
         (originalFamily, 'ŷ')
-    ] = overrideFamily
+    ] = (overrideFamily, 'ŷ')
 
     textRunContext = markup.TextRunContext(
         font_name=originalFamily,
@@ -362,7 +406,7 @@ def test_fontOverrideIsUsedForConfiguredFontOnly(monkeypatch):
     context = _makeCharacterReplacementContext()
     context.state.character_font_overrides[
         ('Another family', 'ŷ')
-    ] = 'Override family'
+    ] = ('Override family', 'ŷ')
 
     monkeypatch.setattr(
         markup, 'tt2ps', lambda *args: 'Original face')
@@ -373,6 +417,31 @@ def test_fontOverrideIsUsedForConfiguredFontOnly(monkeypatch):
         '', 'Tŷ', context)
 
     assert result == 'Tŷ'
+
+
+def test_fontOverrideCanSubstituteDifferentCharacter(monkeypatch):
+    """An override can replace the original character with another one."""
+
+    context = _makeCharacterReplacementContext()
+    context.state.character_font_overrides[
+        ('Original family', 'ŷ')
+    ] = ('Override family', 'æ')
+
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original face')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: False)
+    monkeypatch.setattr(
+        markup,
+        'resolveCharacterFontOverride',
+        lambda *args: ('Override Regular', 'æ'))
+
+    result = markup.AddAlbumTextWithFontOverrides(
+        '', 'Tŷ', context)
+
+    assert result == (
+        'T<font name="Override Regular">æ</font>'
+    )
 
 
 def test_replacementIsUsedForConfiguredFontOnly(monkeypatch):
@@ -400,7 +469,7 @@ def test_unavailableFontOverrideLeavesOriginalCharacter(monkeypatch):
     context = _makeCharacterReplacementContext()
     context.state.character_font_overrides[
         ('Original family', 'ŷ')
-    ] = 'Missing family'
+    ] = ('Missing family', 'ŷ')
 
     monkeypatch.setattr(
         markup, 'tt2ps', lambda *args: 'Original face')
@@ -440,7 +509,7 @@ def test_supportedCharacterIsNotReplaced(monkeypatch):
     context = _makeCharacterReplacementContext()
     context.state.character_font_overrides[
         ('Original family', 'ŷ')
-    ] = 'Override family'
+    ] = ('Override family', 'ŷ')
     context.state.character_replacements[
         ('Original family', 'ŷ')
     ] = 'y'

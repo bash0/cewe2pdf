@@ -38,7 +38,7 @@ class ConversionState:
     character_font_suggestions: dict[str, str] = field(default_factory=dict)
     
     # Character handling rules, keyed by (font family, character).
-    character_font_overrides: dict[tuple[str, str], str] = field(default_factory=dict)
+    character_font_overrides: dict[tuple[str, str], tuple[str, str]] = field(default_factory=dict)
     character_replacements: dict[tuple[str, str], str] = field(default_factory=dict)
 
     # The output PDF is known before the album areas are rendered.  Image

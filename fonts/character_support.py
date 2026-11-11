@@ -65,18 +65,19 @@ def supportsCharacter(character, fontFile, state, fontName=None):
 
 def resolveCharacterFontOverride(
         fontFamily, character, bold, italic, fonts, state):
-    """Return the registered override face for a font/character pair.
+    """Return the registered override face and replacement character.
 
     Return None if the override family is not registered, the requested
     face is unavailable, or that face does not support the character.
     """
 
-    overrideFamily = state.character_font_overrides.get(
+    override = state.character_font_overrides.get(
         (fontFamily, character))
 
-    if not overrideFamily:
+    if not override:
         return None
 
+    overrideFamily, overrideCharacter = override
     # Resolve the appropriate face within the override family.
     try:
         fontFace = tt2ps(
@@ -90,11 +91,12 @@ def resolveCharacterFontOverride(
     if fontFile is None:
         return None
 
-    # An override is usable only when support is positively confirmed.
-    if supportsCharacter(character, fontFile, state) is not True:
+    # The replacement face must support the replacement character.
+    if supportsCharacter(
+            overrideCharacter, fontFile, state) is not True:
         return None
 
-    return fontFace
+    return fontFace, overrideCharacter
 
 
 def findFontsSupportingCharacter(character, fonts, state, excludedFont=None):

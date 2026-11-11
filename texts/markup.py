@@ -275,9 +275,8 @@ def AddAlbumTextWithFontOverrides(paragraphText, text, textRunContext):
                         None,
                         state.character_replacements[ruleKey]
                     )
-
                 elif ruleKey in state.character_font_overrides:
-                    fontFace = resolveCharacterFontOverride(
+                    override = resolveCharacterFontOverride(
                         fontFamily,
                         character,
                         textRunContext.bold,
@@ -285,14 +284,13 @@ def AddAlbumTextWithFontOverrides(paragraphText, text, textRunContext):
                         textRunContext.available_fonts,
                         state
                     )
-
-                    if fontFace is not None:
+                    if override is not None:
+                        fontFace, replacementCharacter = override
                         resolvedActions[character] = (
-                            'font', fontFace, character)
+                            'font', fontFace, replacementCharacter)
                     else:
                         resolvedActions[character] = (
                             'original', None, character)
-
                 else:
                     resolvedActions[character] = (
                         'original', None, character)
