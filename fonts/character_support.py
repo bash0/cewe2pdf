@@ -1,3 +1,4 @@
+
 """Utilities for checking Unicode character support in registered fonts."""
 
 import logging
@@ -62,16 +63,16 @@ def supportsCharacter(character, fontFile, state, fontName=None):
     return ord(character) in characterMap
 
 
-def resolveCharacterFontOverride(character, bold, italic, fonts, state):
-    """Return the registered font face configured for this character.
+def resolveCharacterFontOverride(
+        fontFamily, character, bold, italic, fonts, state):
+    """Return the registered override face for a font/character pair.
 
-    The requested bold/italic style is resolved through ReportLab's
-    registered font-family mapping. Return None if the override family
-    is not registered, the requested face is unavailable, or that face
-    does not support the character.
+    Return None if the override family is not registered, the requested
+    face is unavailable, or that face does not support the character.
     """
 
-    overrideFamily = state.character_font_overrides.get(character)
+    overrideFamily = state.character_font_overrides.get(
+        (fontFamily, character))
 
     if not overrideFamily:
         return None
@@ -133,12 +134,17 @@ def checkCharacterSupport(text, fontName, bold, italic, fonts, state):
         if supportsCharacter(character, fontFile, state, fontFace) is not False:
             continue
 
+        ruleKey = (fontName, character)
+
         # A successfully resolved explicit override handles this character.
-        if resolveCharacterFontOverride(character, bold, italic, fonts, state) is not None:
-            continue
-        
+        if ruleKey in state.character_font_overrides:
+            if resolveCharacterFontOverride(
+                    fontName, character, bold, italic, fonts, state
+            ) is not None:
+                continue
+
         # A configured replacement also handles this character.
-        if character in state.character_replacements:
+        if ruleKey in state.character_replacements:
             continue
 
         warningKey = (fontFace, character)

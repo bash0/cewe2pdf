@@ -82,6 +82,88 @@ class ConversionSetup:
     background_resolution: int  # Target DPI for page-background images.
 
 
+def loadMissingCharacterRules(configuration, state):
+    """Load font-specific missing-character replacements and font overrides."""
+
+    if not configuration.has_section('MissingCharacterHandling'):
+        return
+
+    section = configuration['MissingCharacterHandling']
+
+    def parseRules(optionName):
+        rules = {}
+        invalidKeys = set()
+
+        rawRules = section.get(optionName, fallback='', raw=True)
+
+        for lineNumber, line in enumerate(rawRules.splitlines(), start=1):
+            line = line.strip()
+
+            if not line or line.startswith('#'):
+                continue
+
+            try:
+                left, value = line.split('=', 1)
+                fontFamily, characterCode = left.rsplit(',', 1)
+
+                fontFamily = fontFamily.strip()
+                characterCode = characterCode.strip()
+                value = value.strip()
+
+                if not fontFamily:
+                    raise ValueError('Missing font family')
+
+                if not characterCode.upper().startswith('U+'):
+                    raise ValueError('Expected a U+XXXX character code')
+
+                codePoint = int(characterCode[2:], 16)
+
+                if codePoint > 0x10FFFF or 0xD800 <= codePoint <= 0xDFFF:
+                    raise ValueError('Invalid Unicode character code')
+
+                if not value:
+                    raise ValueError('Missing rule value')
+
+                character = chr(codePoint)
+                key = (fontFamily, character)
+
+                if key in rules or key in invalidKeys:
+                    rules.pop(key, None)
+                    invalidKeys.add(key)
+                    logging.warning(
+                        "Ignoring duplicate %s rule for font '%s', "
+                        "character U+%04X",
+                        optionName, fontFamily, codePoint)
+                    continue
+
+                rules[key] = value
+
+            except ValueError as error:
+                logging.warning(
+                    "Ignoring invalid %s rule on line %d: '%s' (%s)",
+                    optionName, lineNumber, line, error)
+
+        return rules
+
+    replacements = parseRules('Replacements')
+    fontOverrides = parseRules('FontOverrides')
+
+    # A font/character pair cannot use both mechanisms.
+    conflicts = replacements.keys() & fontOverrides.keys()
+
+    for fontFamily, character in conflicts:
+        logging.warning(
+            "Conflicting missing-character rules for font '%s', "
+            "character U+%04X. Ignoring both rules.",
+            fontFamily, ord(character))
+
+        del replacements[(fontFamily, character)]
+        del fontOverrides[(fontFamily, character)]
+
+    state.character_replacements = replacements
+    state.character_font_overrides = fontOverrides
+
+
 def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
                       automaticWindows: bool = False) -> ConversionSetup: # noqa: C901
     """Read an album and resolve the configuration and resources it requires."""
@@ -167,41 +249,7 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
         state.show_all_unsupported_characters = (
             missingCharacterSupportSection.getboolean(
                 'ShowAllUnsupportedCharacters', fallback=True))
-
-    # Explicit font-family overrides for unsupported characters.
-    characterFontOverridesSection = (
-        configuration['MissingCharacterFontOverrides']
-        if configuration.has_section('MissingCharacterFontOverrides') else None)
-
-    if characterFontOverridesSection is not None:
-        for characterCode, fontFamily in characterFontOverridesSection.items():
-            try:
-                if not characterCode.upper().startswith('U+'):
-                    raise ValueError('Expected a U+XXXX character code')
-                character = chr(int(characterCode[2:], 16))
-                state.character_font_overrides[character] = fontFamily.strip()
-            except ValueError:
-                logging.warning(
-                    "Ignoring invalid character font override '%s = %s'",
-                    characterCode, fontFamily)
     
-    # Text replacements for characters unsupported by the selected font.
-    characterReplacementsSection = (
-        configuration['MissingCharacterReplacements']
-        if configuration.has_section('MissingCharacterReplacements') else None)
-
-    if characterReplacementsSection is not None:
-        for characterCode, replacement in characterReplacementsSection.items():
-            try:
-                if not characterCode.upper().startswith('U+'):
-                    raise ValueError('Expected a U+XXXX character code')
-                character = chr(int(characterCode[2:], 16))
-                state.character_replacements[character] = replacement
-            except ValueError:
-                logging.warning(
-                    "Ignoring invalid character replacement '%s = %s'",
-                    characterCode, replacement)
-                
     # Diagnostic suggestions (not applied automatically).
     characterSuggestionsSection = (
         configuration['CharacterFontSuggestions']
@@ -218,6 +266,8 @@ def prepareConversion(albumname, mcfxTmpDir, appDataDir, state: ConversionState,
                 logging.warning(
                     "Ignoring invalid character font suggestion '%s = %s'",
                     characterCode, fontName)
+
+    loadMissingCharacterRules(configuration, state)
 
     if automaticWindows:
         # Explorer's context menu is designed for non-programmers: do not

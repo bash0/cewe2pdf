@@ -223,29 +223,24 @@ def AddAlbumText(paragraphText, text):
     return AddBasicText(paragraphText, escapedText)
 
 
-
-
 def AddAlbumTextWithFontOverrides(paragraphText, text, textRunContext):
-    """Append CEWE text, applying configured font overrides and replacements.
-
-    A font override takes priority over a character replacement, but only
-    when the original font does not support the character.
-    """
+    """Append CEWE text, applying configured missing-character handling."""
 
     if text is None:
         return paragraphText
 
     state = textRunContext.state
+    fontFamily = textRunContext.font_name
 
     # Resolve the actual face used by the original text run.
     try:
         originalFace = tt2ps(
-            textRunContext.font_name,
+            fontFamily,
             int(textRunContext.bold),
             int(textRunContext.italic)
         )
     except (KeyError, ValueError):
-        originalFace = textRunContext.font_name
+        originalFace = fontFamily
 
     originalFontFile = textRunContext.available_fonts.get(originalFace)
 
@@ -272,10 +267,18 @@ def AddAlbumTextWithFontOverrides(paragraphText, text, textRunContext):
                     'original', None, character)
 
             else:
-                fontFace = None
+                ruleKey = (fontFamily, character)
 
-                if character in state.character_font_overrides:
+                if ruleKey in state.character_replacements:
+                    resolvedActions[character] = (
+                        'replacement',
+                        None,
+                        state.character_replacements[ruleKey]
+                    )
+
+                elif ruleKey in state.character_font_overrides:
                     fontFace = resolveCharacterFontOverride(
+                        fontFamily,
                         character,
                         textRunContext.bold,
                         textRunContext.italic,
@@ -283,16 +286,12 @@ def AddAlbumTextWithFontOverrides(paragraphText, text, textRunContext):
                         state
                     )
 
-                if fontFace is not None:
-                    resolvedActions[character] = (
-                        'font', fontFace, character)
-
-                elif character in state.character_replacements:
-                    resolvedActions[character] = (
-                        'replacement',
-                        None,
-                        state.character_replacements[character]
-                    )
+                    if fontFace is not None:
+                        resolvedActions[character] = (
+                            'font', fontFace, character)
+                    else:
+                        resolvedActions[character] = (
+                            'original', None, character)
 
                 else:
                     resolvedActions[character] = (

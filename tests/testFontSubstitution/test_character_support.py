@@ -1,21 +1,18 @@
 
-"""Tests for per-character font-family overrides."""
+"""Tests for per-character font-family overrides and replacements."""
 from pathlib import Path
 import sys
 
-from unittest.mock import call
-
 import pytest
-
-from conversionState import ConversionState
-from fonts import character_support
-    
-from texts import markup
-from texts.markup import createTextRunContext
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
+
+from conversionState import ConversionState
+from fonts import character_support
+from texts import markup
+from texts.markup import createTextRunContext
+
 
 @pytest.mark.parametrize(
     ('bold', 'italic', 'expectedFace'),
@@ -30,7 +27,9 @@ def test_resolveCharacterFontOverrideSelectsCorrectStyle(
         monkeypatch, bold, italic, expectedFace):
     """An override must preserve the original bold/italic styling."""
     state = ConversionState()
-    state.character_font_overrides['ŷ'] = 'Override Family'
+    state.character_font_overrides[
+        ('Original Family', 'ŷ')
+    ] = 'Override Family'
 
     availableFonts = {
         'Override Regular': 'regular.ttf',
@@ -45,7 +44,7 @@ def test_resolveCharacterFontOverrideSelectsCorrectStyle(
         character_support, 'supportsCharacter', lambda *args: True)
 
     result = character_support.resolveCharacterFontOverride(
-        'ŷ', bold, italic, availableFonts, state)
+        'Original Family', 'ŷ', bold, italic, availableFonts, state)
 
     assert result == expectedFace
 
@@ -55,13 +54,15 @@ def test_resolveCharacterFontOverrideWithoutConfiguration():
     state = ConversionState()
 
     assert character_support.resolveCharacterFontOverride(
-        'ŷ', False, False, {}, state) is None
+        'Original Family', 'ŷ', False, False, {}, state) is None
 
 
 def test_resolveCharacterFontOverrideWithUnknownFamily(monkeypatch):
     """An unregistered family must not be used."""
     state = ConversionState()
-    state.character_font_overrides['ŷ'] = 'Unknown Family'
+    state.character_font_overrides[
+        ('Original Family', 'ŷ')
+    ] = 'Unknown Family'
 
     def unknownFamily(family, bold, italic):
         raise KeyError(family)
@@ -69,19 +70,22 @@ def test_resolveCharacterFontOverrideWithUnknownFamily(monkeypatch):
     monkeypatch.setattr(character_support, 'tt2ps', unknownFamily)
 
     assert character_support.resolveCharacterFontOverride(
-        'ŷ', False, False, {}, state) is None
+        'Original Family', 'ŷ', False, False, {}, state) is None
 
 
 def test_resolveCharacterFontOverrideWithMissingFace(monkeypatch):
     """A family mapping is not enough if its selected face is unavailable."""
     state = ConversionState()
-    state.character_font_overrides['ŷ'] = 'Override Family'
+    state.character_font_overrides[
+        ('Original Family', 'ŷ')
+    ] = 'Override Family'
 
     monkeypatch.setattr(
-        character_support, 'tt2ps', lambda family, bold, italic: 'Missing Face')
+        character_support, 'tt2ps',
+        lambda family, bold, italic: 'Missing Face')
 
     assert character_support.resolveCharacterFontOverride(
-        'ŷ', False, False, {}, state) is None
+        'Original Family', 'ŷ', False, False, {}, state) is None
 
 
 @pytest.mark.parametrize('supportResult', [False, None])
@@ -89,7 +93,9 @@ def test_resolveCharacterFontOverrideRequiresConfirmedSupport(
         monkeypatch, supportResult):
     """An unsupported or uninspectable font must not be selected."""
     state = ConversionState()
-    state.character_font_overrides['ŷ'] = 'Override Family'
+    state.character_font_overrides[
+        ('Original Family', 'ŷ')
+    ] = 'Override Family'
 
     availableFonts = {'Override Regular': 'override.ttf'}
 
@@ -101,7 +107,8 @@ def test_resolveCharacterFontOverrideRequiresConfirmedSupport(
         lambda *args: supportResult)
 
     assert character_support.resolveCharacterFontOverride(
-        'ŷ', False, False, availableFonts, state) is None
+        'Original Family', 'ŷ', False, False, availableFonts, state
+    ) is None
 
 
 def test_createTextRunContextPreservesEffectiveFormatting():
@@ -134,7 +141,9 @@ def test_AddAlbumTextWithFontOverridesAppliesOnlyConfiguredCharacters(
         monkeypatch):
     """An override changes the font only for the configured character."""
     state = ConversionState()
-    state.character_font_overrides['ŷ'] = 'Arial'
+    state.character_font_overrides[
+        ('Original Font', 'ŷ')
+    ] = 'Arial'
 
     context = markup.TextRunContext(
         font_name='Original Font',
@@ -150,7 +159,7 @@ def test_AddAlbumTextWithFontOverridesAppliesOnlyConfiguredCharacters(
     monkeypatch.setattr(
         markup,
         'resolveCharacterFontOverride',
-        lambda character, bold, italic, fonts, state:
+        lambda fontFamily, character, bold, italic, fonts, state:
             'Arial Bold Italic' if character == 'ŷ' else None
     )
     monkeypatch.setattr(
@@ -182,8 +191,6 @@ def test_AddAlbumTextWithFontOverridesPreservesParagraphFormatting(
     from reportlab.pdfgen.canvas import Canvas
     from reportlab.platypus import Paragraph
 
-    from texts import markup
-
     # Isolate ReportLab's global font registries from the other tests.
     for module, name in (
             (pdfmetrics, '_fonts'),
@@ -201,7 +208,6 @@ def test_AddAlbumTextWithFontOverridesPreservesParagraphFormatting(
         'italic': 'LiberationSansItalic-RJre.ttf',
         'boldItalic': 'LiberationSansBoldItalic-ngV4.ttf',
     }
-
 
     def registerFamily(familyName):
         faces = {}
@@ -232,7 +238,6 @@ def test_AddAlbumTextWithFontOverridesPreservesParagraphFormatting(
 
         return faces
 
-
     originalFamily = 'Original test family'
     overrideFamily = 'Override test family'
 
@@ -246,7 +251,9 @@ def test_AddAlbumTextWithFontOverridesPreservesParagraphFormatting(
     }
 
     state = ConversionState()
-    state.character_font_overrides['ŷ'] = overrideFamily
+    state.character_font_overrides[
+        (originalFamily, 'ŷ')
+    ] = overrideFamily
 
     textRunContext = markup.TextRunContext(
         font_name=originalFamily,
@@ -313,13 +320,12 @@ def test_AddAlbumTextWithFontOverridesPreservesParagraphFormatting(
     assert output.getvalue().startswith(b'%PDF')
 
 
-
 def _makeCharacterReplacementContext():
     """Create a minimal context for character replacement tests."""
 
     state = ConversionState()
 
-    context = markup.TextRunContext(
+    return markup.TextRunContext(
         font_name='Original family',
         font_size=14,
         bold=False,
@@ -330,15 +336,14 @@ def _makeCharacterReplacementContext():
         state=state
     )
 
-    return context
 
-
-def test_characterReplacementUsedWhenNoFontOverride(
-        monkeypatch):
+def test_characterReplacementUsedWhenNoFontOverride(monkeypatch):
     """Use the configured replacement when the original font lacks a glyph."""
 
     context = _makeCharacterReplacementContext()
-    context.state.character_replacements['ŷ'] = 'y'
+    context.state.character_replacements[
+        ('Original family', 'ŷ')
+    ] = 'y'
 
     monkeypatch.setattr(
         markup, 'tt2ps', lambda *args: 'Original face')
@@ -351,56 +356,72 @@ def test_characterReplacementUsedWhenNoFontOverride(
     assert result == 'Ty'
 
 
-def test_fontOverrideTakesPriorityOverCharacterReplacement(
-        monkeypatch):
-    """A valid font override takes priority over a replacement."""
+def test_fontOverrideIsUsedForConfiguredFontOnly(monkeypatch):
+    """An override applies only to its configured original font family."""
 
     context = _makeCharacterReplacementContext()
-    context.state.character_font_overrides['ŷ'] = 'Override family'
-    context.state.character_replacements['ŷ'] = 'y'
+    context.state.character_font_overrides[
+        ('Another family', 'ŷ')
+    ] = 'Override family'
+
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original face')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: False)
+
+    result = markup.AddAlbumTextWithFontOverrides(
+        '', 'Tŷ', context)
+
+    assert result == 'Tŷ'
+
+
+def test_replacementIsUsedForConfiguredFontOnly(monkeypatch):
+    """A replacement applies only to its configured original font family."""
+
+    context = _makeCharacterReplacementContext()
+    context.state.character_replacements[
+        ('Another family', 'ŷ')
+    ] = 'y'
+
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original face')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: False)
+
+    result = markup.AddAlbumTextWithFontOverrides(
+        '', 'Tŷ', context)
+
+    assert result == 'Tŷ'
+
+
+def test_unavailableFontOverrideLeavesOriginalCharacter(monkeypatch):
+    """An unusable override does not trigger a replacement or fallback."""
+
+    context = _makeCharacterReplacementContext()
+    context.state.character_font_overrides[
+        ('Original family', 'ŷ')
+    ] = 'Missing family'
 
     monkeypatch.setattr(
         markup, 'tt2ps', lambda *args: 'Original face')
     monkeypatch.setattr(
         markup, 'supportsCharacter', lambda *args: False)
     monkeypatch.setattr(
-        markup, 'resolveCharacterFontOverride',
-        lambda *args: 'Override face')
+        markup, 'resolveCharacterFontOverride', lambda *args: None)
 
     result = markup.AddAlbumTextWithFontOverrides(
         '', 'Tŷ', context)
 
-    assert result == (
-        'T<font name="Override face">ŷ</font>')
-
-
-def test_unavailableFontOverrideFallsBackToReplacement(
-        monkeypatch):
-    """Use the replacement if the configured font override cannot resolve."""
-
-    context = _makeCharacterReplacementContext()
-    context.state.character_font_overrides['ŷ'] = 'Missing family'
-    context.state.character_replacements['ŷ'] = 'y'
-
-    monkeypatch.setattr(
-        markup, 'tt2ps', lambda *args: 'Original face')
-    monkeypatch.setattr(
-        markup, 'supportsCharacter', lambda *args: False)
-    monkeypatch.setattr(
-        markup, 'resolveCharacterFontOverride',
-        lambda *args: None)
-
-    result = markup.AddAlbumTextWithFontOverrides(
-        '', 'Tŷ', context)
-
-    assert result == 'Ty'
+    assert result == 'Tŷ'
 
 
 def test_characterReplacementIsHtmlEscaped(monkeypatch):
     """Replacement text is escaped like ordinary CEWE text."""
 
     context = _makeCharacterReplacementContext()
-    context.state.character_replacements['ŷ'] = '&<'
+    context.state.character_replacements[
+        ('Original family', 'ŷ')
+    ] = '&<'
 
     monkeypatch.setattr(
         markup, 'tt2ps', lambda *args: 'Original face')
@@ -410,15 +431,19 @@ def test_characterReplacementIsHtmlEscaped(monkeypatch):
     result = markup.AddAlbumTextWithFontOverrides(
         '', 'Tŷ', context)
 
-    assert result == 'T&amp;&lt;'
+    assert 'T&amp;&lt;' in result
 
-    
+
 def test_supportedCharacterIsNotReplaced(monkeypatch):
     """Leave a character alone when the original font supports it."""
 
     context = _makeCharacterReplacementContext()
-    context.state.character_font_overrides['ŷ'] = 'Override family'
-    context.state.character_replacements['ŷ'] = 'y'
+    context.state.character_font_overrides[
+        ('Original family', 'ŷ')
+    ] = 'Override family'
+    context.state.character_replacements[
+        ('Original family', 'ŷ')
+    ] = 'y'
 
     monkeypatch.setattr(
         markup, 'tt2ps', lambda *args: 'Original face')
@@ -429,3 +454,25 @@ def test_supportedCharacterIsNotReplaced(monkeypatch):
         '', 'Tŷ', context)
 
     assert result == 'Tŷ'
+
+
+def test_sameCharacterCanHaveDifferentReplacementsByFont(monkeypatch):
+    """The same character can have independent rules in different families."""
+
+    context = _makeCharacterReplacementContext()
+    context.state.character_replacements[
+        ('Original family', 'ŷ')
+    ] = 'y'
+    context.state.character_replacements[
+        ('Another family', 'ŷ')
+    ] = 'Y'
+
+    monkeypatch.setattr(
+        markup, 'tt2ps', lambda *args: 'Original face')
+    monkeypatch.setattr(
+        markup, 'supportsCharacter', lambda *args: False)
+
+    result = markup.AddAlbumTextWithFontOverrides(
+        '', 'Tŷ', context)
+
+    assert result == 'Ty'

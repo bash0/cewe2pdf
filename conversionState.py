@@ -36,10 +36,10 @@ class ConversionState:
     # Character support diagnostic and override settings.
     show_all_unsupported_characters: bool = True
     character_font_suggestions: dict[str, str] = field(default_factory=dict)
-    character_font_overrides: dict[str, str] = field(default_factory=dict)
-
-    # Character replacements can be used to replace unsupported characters with one or more characters.
-    character_replacements: dict[str, str] = field(default_factory=dict)
+    
+    # Character handling rules, keyed by (font family, character).
+    character_font_overrides: dict[tuple[str, str], str] = field(default_factory=dict)
+    character_replacements: dict[tuple[str, str], str] = field(default_factory=dict)
 
     # The output PDF is known before the album areas are rendered.  Image
     # handling uses it to recognise old, CEWE-saved copies of our generated
