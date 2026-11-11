@@ -417,6 +417,7 @@
     <Compile Include="decorations\__init__.py" />
     <Compile Include="cewe2pdf.py" />
     <Compile Include="colorUtils.py" />
+    <Compile Include="fontcheck.py" />
     <Compile Include="fonts\character_support.py" />
     <Compile Include="fonts\font_suggestions.py" />
     <Compile Include="fonts\line_scales.py" />
