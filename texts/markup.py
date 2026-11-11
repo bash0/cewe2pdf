@@ -6,15 +6,41 @@ import reportlab.lib.enums
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 
+from dataclasses import dataclass
+
 from fonts.manager import getAvailableFont
 from fonts.line_scales import LineScales
+from reportlab.lib.fonts import tt2ps
+from fonts.character_support import (checkCharacterSupport,resolveCharacterFontOverride,supportsCharacter,)
 from conversionState import ConversionState
-
 
 _WEB_ADDRESS = re.compile(r'https?://[^\s<]+', re.IGNORECASE)
 # ReportLab's zero-size spans have invalid leading.  0.01 pt is below any
 # visible PDF resolution while still producing a genuine word boundary.
 _ZERO_WIDTH_SPACE = '<font size="0.01"> </font>'
+
+@dataclass
+class TextRunContext:
+    """Describe the effective formatting of one run of CEWE text.
+
+    This short-lived context is used when processing individual text runs
+    that may contain characters requiring a font-family override. It carries
+    the original run's font and styling, together with the registered fonts
+    and per-conversion state needed to resolve those overrides.
+
+    It is deliberately separate from RenderContext: it describes the
+    formatting of a particular piece of text, not the shared drawing
+    environment for an album.
+    """
+
+    font_name: str
+    font_size: float
+    bold: bool
+    italic: bool
+    underline: bool
+    color: str | None
+    available_fonts: dict
+    state: ConversionState
 
 
 def CreateParagraphStyle(textcolor, font, fontsize, font_size_adjust, line_scales: LineScales):
@@ -72,6 +98,26 @@ def IsUnderline(itemstyle, outerstyle):
     if 'text-decoration' in outerstyle:
         return outerstyle['text-decoration'].strip(" ") == "underline"
     return False
+
+
+def createTextRunContext(fontName, fontSize, fontWeight, fontStyle,
+                         outerStyle, availableFonts, state):
+    """Create the formatting context for one run of CEWE text.
+
+    The supplied font and style values must be those resolved by
+    CollectFontInfo(), so that inherited paragraph formatting is
+    preserved as well as explicit span formatting.
+    """
+    return TextRunContext(
+        font_name=fontName,
+        font_size=fontSize,
+        bold=IsBold(fontWeight),
+        italic=IsItalic(fontStyle, outerStyle),
+        underline=IsUnderline(fontStyle, outerStyle),
+        color=fontStyle.get('color'),
+        available_fonts=availableFonts,
+        state=state
+    )
 
 
 def Dequote(s):
@@ -177,6 +223,106 @@ def AddAlbumText(paragraphText, text):
     return AddBasicText(paragraphText, escapedText)
 
 
+def AddAlbumTextWithFontOverrides(paragraphText, text, textRunContext):
+    """Append CEWE text, applying configured missing-character handling."""
+
+    if text is None:
+        return paragraphText
+
+    state = textRunContext.state
+    fontFamily = textRunContext.font_name
+
+    # Resolve the actual face used by the original text run.
+    try:
+        originalFace = tt2ps(
+            fontFamily,
+            int(textRunContext.bold),
+            int(textRunContext.italic)
+        )
+    except (KeyError, ValueError):
+        originalFace = fontFamily
+
+    originalFontFile = textRunContext.available_fonts.get(originalFace)
+
+    # Cache the selected action for each character in this run.
+    resolvedActions = {}
+
+    segments = []
+    currentAction = None
+    currentText = []
+
+    for character in text:
+        if character not in resolvedActions:
+            # Only intervene when the original font is confirmed not to
+            # support the character. Unknown support is treated cautiously.
+            supported = supportsCharacter(
+                character,
+                originalFontFile,
+                state,
+                originalFace
+            )
+
+            if supported is not False:
+                resolvedActions[character] = (
+                    'original', None, character)
+
+            else:
+                ruleKey = (fontFamily, character)
+
+                if ruleKey in state.character_replacements:
+                    resolvedActions[character] = (
+                        'replacement',
+                        None,
+                        state.character_replacements[ruleKey]
+                    )
+                elif ruleKey in state.character_font_overrides:
+                    override = resolveCharacterFontOverride(
+                        fontFamily,
+                        character,
+                        textRunContext.bold,
+                        textRunContext.italic,
+                        textRunContext.available_fonts,
+                        state
+                    )
+                    if override is not None:
+                        fontFace, replacementCharacter = override
+                        resolvedActions[character] = (
+                            'font', fontFace, replacementCharacter)
+                    else:
+                        resolvedActions[character] = (
+                            'original', None, character)
+                else:
+                    resolvedActions[character] = (
+                        'original', None, character)
+
+        action, value, renderedText = resolvedActions[character]
+        segmentAction = (action, value)
+
+        if currentText and segmentAction != currentAction:
+            segments.append((currentAction, ''.join(currentText)))
+            currentText = []
+
+        currentAction = segmentAction
+        currentText.append(renderedText)
+
+    if currentText:
+        segments.append((currentAction, ''.join(currentText)))
+
+    # Append each segment, retaining the surrounding ReportLab formatting.
+    for (action, value), segmentText in segments:
+        if action in ('original', 'replacement'):
+            paragraphText = AddAlbumText(paragraphText, segmentText)
+
+        elif action == 'font':
+            safeFontName = html.escape(value, quote=True)
+            paragraphText = AddBasicText(
+                paragraphText, f'<font name="{safeFontName}">')
+            paragraphText = AddAlbumText(paragraphText, segmentText)
+            paragraphText = AddBasicText(paragraphText, '</font>')
+
+    return paragraphText
+
+
 def _addUrlBreakOpportunities(match):
     """Return a URL with invisible optional breaks after its slashes."""
     return match.group().replace('/', f'/{_ZERO_WIDTH_SPACE}')
@@ -231,10 +377,24 @@ def AppendItemTextInStyle(paragraphText, text, item, pdf, additional_fonts, body
         bweight, bstyle, fontScaleFactor, state: ConversionState): # pylint: disable= too-many-arguments
     pfont, pfs, pweight, pstyle = CollectFontInfo(
         item, pdf, additional_fonts, bodyfont, bodyfs, bweight, fontScaleFactor, state)
+
+    if (not fontScaleFactor < 1.0) and text is not None:
+        checkCharacterSupport(
+            text,
+            pfont,
+            IsBold(pweight),
+            IsItalic(pstyle, bstyle),
+            additional_fonts,
+            state
+        )
+
     paragraphText = AppendSpanStart(paragraphText, pfont, pfs, pweight, pstyle, bstyle)
     if text is None:
         paragraphText = AddBasicText(paragraphText, "")
     else:
-        paragraphText = AddAlbumText(paragraphText, text)
+        textRunContext = createTextRunContext(
+            pfont, pfs, pweight, pstyle, bstyle, additional_fonts, state)
+        paragraphText = AddAlbumTextWithFontOverrides(
+            paragraphText, text, textRunContext)
     paragraphText = AppendSpanEnd(paragraphText, pweight, pstyle, bstyle)
     return paragraphText, pfs
