@@ -46,7 +46,7 @@ flowchart TD
 | --- | --- |
 | `ConversionSetup` | Parsed MCF, merged configuration, resolved resource locations, registered fonts, line scales, and calendar data. These are normally fixed after setup. |
 | `RenderContext` | Drawing settings and shared resources passed to renderers: unit scale, resolutions, image settings, clip art/passepartout locations, and line scales. |
-| `ConversionState` | Mutable per-run caches, missing-resource reports, font substitutions, temporary files, and diagnostic counters. |
+| `ConversionState` | Mutable per-run caches, missing-resource reports, font and character substitutions, font character maps, unsupported-character diagnostics, temporary files, and diagnostic counters. |
 | `AlbumIndex` | Optional mutable index data, deliberately separate from general state. |
 
 MCF geometry is in tenths of a millimetre; ReportLab geometry is in points. `RenderContext.mcf_to_reportlab` is the conversion factor. Area renderers translate to the area centre, rotate, then draw around `(0, 0)`.
@@ -83,7 +83,7 @@ The top level retains the conversion spine and cross-cutting modules. Specialist
 | `texts/` | CEWE HTML-like text, markup, lists, tabs, spacing, outlines, and text art. |
 | `decorations/` | Borders, corners, passepartouts, and shadows used by image/text/clip-art areas. |
 | `clipart/` | Clip-art catalogue lookup, area rendering, and CEWE `.clp` parsing. |
-| `fonts/` | Font discovery/registration, OTF handling, and line-scale rules. |
+| `fonts/` | Font discovery and registration, OTF handling, line-scale rules, Unicode character-support checks, missing-character handling, and optional alternative-font suggestions. |
 | `indexing/` | The optional cewe2pdf-only album index. |
 | `infrastructure/` | Configuration helpers, paths, version/build information, logging, and Windows Explorer integration. |
 | `imageareas.py`, `imageUtils.py`, `imageExtractor.py` | Image-area rendering, shared image helpers, and image extraction. Image rendering remains top-level because it is tightly coupled to page-area traversal. |
@@ -93,6 +93,13 @@ The top level retains the conversion spine and cross-cutting modules. Specialist
 Package `__init__.py` files deliberately contain no public façade. Import the specific module which provides the operation you need.
 
 `pageElements.py` paints areas in CEWE z-order and delegates to the specialist modules. Keep it a coordinator: put feature-specific interpretation and drawing in the appropriate package whenever possible.
+
+`fonts/character_support.py` checks whether the actual registered font face
+supports each character in a text span. It handles configured character
+replacements and font overrides, and reports unsupported characters.
+`fonts/font_suggestions.py` provides alternative-font suggestions for those
+diagnostics. Suggestions are advisory only; they do not change font selection
+or rendering.
 
 ## Calendars
 
@@ -106,6 +113,28 @@ for interpretation rules and [user configuration](../README.md#calendars) for lo
 defines INI merge order, additional-font lookup, and system-font options.
 Use the same loading mechanisms for installed and portable test resources; missing
 CEWE resources should generate ordinary lookup diagnostics rather than a second rendering pipeline.
+
+### Missing-character handling
+
+The `[MissingCharacterHandling]` section is loaded during conversion setup.
+It supports three settings:
+
+- `ShowAllUnsupportedCharacters` controls whether every occurrence is
+  reported or each distinct font/character combination is reported only once
+  per conversion.
+- `Replacements` maps an unsupported character to replacement text rendered
+  in the original font.
+- `FontOverrides` maps an unsupported character to a character rendered
+  using another registered font family. The replacement character is
+  optional and defaults to the original character.
+
+Rules are applied only when the selected font does not support the character.
+If a replacement and an override are both configured for the same
+font/character pair, neither is applied and a warning is issued.
+
+Alternative-font suggestions are diagnostic information only. They do not
+register fonts or affect rendering. See the user configuration guide for
+the INI syntax and examples.
 
 ## Logging and diagnostics
 
