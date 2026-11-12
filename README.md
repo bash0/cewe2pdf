@@ -31,6 +31,7 @@ more detail for users, contributors, and coding assistants.
 | Work with tests and approved PDFs | [Test workflow and cleanup](tests/README.md), and [compare-pdf interface](tests/compare-pdf/README.md) |
 | Center selected album page content | [MCF/MCFX content centering utility](utilities/contenttocenter/README.md) |
 | Understand or author clip art and passepartout resources | [CLP file format and authoring notes](clipart/CLP_FILE_FORMAT.md) |
+| Check the contents of fonts | [fontcheck utility](utilities/fontcheck/README.md) |
 | Consult superseded setups and investigations | [Historical documentation](documents/history/README.md) |
 
 ## Install
