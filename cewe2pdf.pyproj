@@ -417,7 +417,7 @@
     <Compile Include="decorations\__init__.py" />
     <Compile Include="cewe2pdf.py" />
     <Compile Include="colorUtils.py" />
-    <Compile Include="fontcheck.py" />
+    <Compile Include="utilities\fontcheck\fontcheck.py" />
     <Compile Include="fonts\character_support.py" />
     <Compile Include="fonts\font_suggestions.py" />
     <Compile Include="fonts\line_scales.py" />
@@ -516,6 +516,7 @@
     <Compile Include="texts\tabs.py" />
     <Compile Include="texts\__init__.py" />
     <Compile Include="utilities\contenttocenter\contenttocenter.py" />
+    <Compile Include="utilities\fontcheck\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />
@@ -689,6 +690,7 @@
     <Folder Include="texts\" />
     <Folder Include="utilities\" />
     <Folder Include="utilities\contenttocenter\" />
+    <Folder Include="utilities\fontcheck\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf312" />
