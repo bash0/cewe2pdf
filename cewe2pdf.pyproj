@@ -387,6 +387,7 @@
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img5.png" />
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img6.png" />
     <Content Include="utilities\contenttocenter\README.md" />
+    <Content Include="utilities\fontcheck\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="albumConversionSession.py" />
