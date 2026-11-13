@@ -77,7 +77,7 @@ pyflakes==3.4.0
     # via flake8
 pygments==2.20.0
     # via pytest
-pylint==4.0.7
+pylint==4.0.9
     # via -r requirements.txt
 pymupdf==1.28.2
     # via -r requirements.txt
