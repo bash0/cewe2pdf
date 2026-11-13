@@ -87,7 +87,7 @@ pyyaml==6.0.3
     # via -r requirements.txt
 reportlab==5.0.0
     # via -r requirements.txt
-soupsieve==2.9.2
+soupsieve==4.0
     # via beautifulsoup4
 tinycss2==1.5.1
     # via
