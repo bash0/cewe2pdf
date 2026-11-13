@@ -14,4 +14,3 @@ pytest>=8.0.0
 flake8>=7.0.0
 pymupdf>=1.25.5
 opencv-python>=4.11.0
-beautifulsoup4>=4.13.4

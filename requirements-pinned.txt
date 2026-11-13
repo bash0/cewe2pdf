@@ -9,8 +9,6 @@
 #
 astroid==4.0.4
     # via pylint
-beautifulsoup4==4.15.0
-    # via -r requirements.txt
 cairocffi==1.7.1
     # via cairosvg
 cairosvg==2.9.1
@@ -87,8 +85,6 @@ pyyaml==6.0.3
     # via -r requirements.txt
 reportlab==5.0.0
     # via -r requirements.txt
-soupsieve==2.9.2
-    # via beautifulsoup4
 tinycss2==1.5.1
     # via
     #   cairosvg

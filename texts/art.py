@@ -1,7 +1,7 @@
 import logging
 import math
 from functools import partial
-from bs4 import BeautifulSoup  # Import BeautifulSoup for HTML parsing
+from lxml import html as lxml_html
 from lxml import etree
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
@@ -22,9 +22,12 @@ CEWE8_DEFAULT_TEXTART_RADIUS_RATIO = 171 / 490
 # lettering can rise above its area even when its curve has the right shape.
 CEWE8_DEFAULT_TEXTART_TOP_INSET_MCF_PER_POINT = (490 / 2 - 171) / 18
 
-def parse_html_text(html):
-    """Parses an HTML string, applying default styles from <body> while handling <p>, <span>, <i>, and <b>."""
-    soup = BeautifulSoup(html, "html.parser")
+
+def parse_html_text(html_text):
+    """Parses HTML, applying default styles from <body> while handling
+    <p>, <span>, <i>, and <b>.
+    """
+    root = lxml_html.document_fromstring(html_text)
     parsed_data = []
 
     # Default values (override if <body> specifies styles)
@@ -33,9 +36,13 @@ def parse_html_text(html):
     default_color = colors.black
 
     # Extract global styles from <body> if present
-    body_elem = soup.find("body")
-    if body_elem and body_elem.get("style"):
-        styles = {s.split(":")[0].strip(): s.split(":")[1].strip() for s in body_elem.get("style").split(";") if ":" in s}
+    body_elem = root.find(".//body")
+    if body_elem is not None and body_elem.get("style"):
+        styles = {
+            s.split(":")[0].strip(): s.split(":")[1].strip()
+            for s in body_elem.get("style").split(";")
+            if ":" in s
+        }
 
         if "font-family" in styles:
             default_font = styles["font-family"].split(",")[0].replace('"', '').replace("'", '')
@@ -45,8 +52,8 @@ def parse_html_text(html):
         if "color" in styles:
             default_color = colors.HexColor(styles["color"])
 
-    # Scan for supported elements
-    for elem in soup.find_all(["span", "p", "i", "b"]):  # Include <p>, <i>, <b>
+    # Scan for supported elements, in document order
+    for elem in root.xpath(".//span | .//p | .//i | .//b"):
         style = elem.get("style", "")
         font_name = default_font
         font_size = default_size
@@ -55,7 +62,11 @@ def parse_html_text(html):
         is_italic = False
 
         # Process element-specific styles
-        styles = {s.split(":")[0].strip(): s.split(":")[1].strip() for s in style.split(";") if ":" in s}
+        styles = {
+            s.split(":")[0].strip(): s.split(":")[1].strip()
+            for s in style.split(";")
+            if ":" in s
+        }
 
         if "font-family" in styles:
             font_name = styles["font-family"].split(",")[0].replace('"', '').replace("'", '')
@@ -65,25 +76,32 @@ def parse_html_text(html):
         if "font-weight" in styles:
             is_bold = int(styles["font-weight"].strip()) > 400
         if "font-style" in styles:
-            is_italic = styles["font-style"].strip() == 'italic'
+            is_italic = styles["font-style"].strip() == "italic"
         if "color" in styles:
             font_color = colors.HexColor(styles["color"])
 
         # Handle <b> and <i> tags
-        if elem.name == "b":
+        if elem.tag == "b":
             is_bold = True
-        if elem.name == "i":
+        if elem.tag == "i":
             is_italic = True
 
-        if elem.name == "p":
-            # Extract only direct text from <p>, excluding nested elements and ignoring newlines
-            paragraph_text = ''.join(t.strip() for t in elem.contents if isinstance(t, str))
+        if elem.tag == "p":
+            # Extract direct text only, excluding nested elements
+            # but including text following those elements.
+            direct_text = [elem.text] + [child.tail for child in elem]
+            paragraph_text = "".join(
+                text.strip() for text in direct_text if text is not None
+            )
         else:
-            paragraph_text = elem.text # .strip()
+            # BeautifulSoup's .text included all descendant text.
+            paragraph_text = "".join(elem.itertext())
 
         # Format text representation
         for char in paragraph_text:
-            parsed_data.append((char, font_name, font_size, font_color, is_bold, is_italic))
+            parsed_data.append(
+                (char, font_name, font_size, font_color, is_bold, is_italic)
+            )
 
     return parsed_data, maxfontsize
 
