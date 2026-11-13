@@ -44,6 +44,8 @@ jobs:
         python -c "import cairocffi; print(cairocffi.cairo_version_string())"
         echo "---- CairoSVG ----"
         python -c "import cairosvg; print(cairosvg.__version__)"
+        echo "---- Installed Python packages ----"
+        python -m pip freeze
         echo "---- Fontconfig ----"
         fc-match sans
         fc-list | head -20
