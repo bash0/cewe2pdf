@@ -28,6 +28,25 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings.
         flake8 . --count --exit-zero --max-complexity=20 --max-line-length=160 --statistics
+    - name: Show Cairo and Python environment
+      run: |
+        echo "---- OS ----"
+        cat /etc/os-release
+        echo "---- Cairo ----"
+        pkg-config --modversion cairo || true
+        dpkg-query -W libcairo2 libcairo2-dev || true
+        echo "---- Python ----"
+        which python
+        python --version
+        python -c "import sys; print(sys.executable); print(sys.version)"
+        python -m pip show pycairo cairocffi cairosvg
+        echo "---- Cairo as seen by cairocffi ----"
+        python -c "import cairocffi; print(cairocffi.cairo_version_string())"
+        echo "---- CairoSVG ----"
+        python -c "import cairosvg; print(cairosvg.__version__)"
+        echo "---- Fontconfig ----"
+        fc-match sans
+        fc-list | head -20
     - name: Test with pytest
       run: |
         # find and run tests, capturing stdout and stderr for the log
