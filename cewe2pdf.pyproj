@@ -48,6 +48,7 @@
     <Content Include="LICENSE" />
     <Content Include="pytest.ini" />
     <Content Include="requirements-pinned.txt" />
+    <Content Include="requirements-winexe.in" />
     <Content Include="requirements-winexe.txt" />
     <Content Include="tests\compare-pdf\LICENSE" />
     <Content Include="tests\compare-pdf\README.md" />
