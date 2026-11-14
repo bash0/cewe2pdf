@@ -1,3 +1,13 @@
+# This file is used by pip-compile to generate requirements-winexe.txt
+#	python -m piptools compile --allow-unsafe --output-file=requirements-winexe.txt requirements-winexe.in
+# which is then used by 
+#	pip install -r requirements-winexe.txt 
+# to install the exact versions of the packages needed to build the Windows standalone executable.
+
+# first include the basic requirements from requirements-pinned.txt
+-r requirements-pinned.txt
+
+# Additional requirements for building the Windows standalone executable
 altgraph
 pefile
 pyinstaller
