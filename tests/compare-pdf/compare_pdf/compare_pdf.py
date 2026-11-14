@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from enum import Enum
 from typing import Mapping
+from pdf_structure_comparator import PDFStructureComparator
 
 import pymupdf
 import cv2
@@ -48,7 +49,7 @@ class PageTolerance:
 
 
 class ComparePDF:
-    def __init__(self, pdf_paths, showdiffs, page_tolerances: Mapping[int, PageTolerance] | None = None):
+    def __init__(self, pdf_paths, showdiffs, page_tolerances: Mapping[int, PageTolerance] | None = None, compare_structure=True):
         """Compare PDF files rendered at a fixed resolution.
 
         ``page_tolerances`` is an optional mapping of one-based page numbers
@@ -66,6 +67,7 @@ class ComparePDF:
         if any(page_number < 1 for page_number in self.page_tolerances):
             raise ValueError('Page tolerance page numbers are one-based')
         self.logger = logging.getLogger('cewe2pdf.test')
+        self.compare_structure = compare_structure
 
     def __del__(self):
         # Destructor to clean up resources
@@ -92,6 +94,15 @@ class ComparePDF:
         for page_num, images in enumerate(images_per_page, start=1):
             compareOneResult = self._compare_images(images, page_num)
             compareAllResult = compareAllResult and compareOneResult
+
+        if self.compare_structure:
+            structure_comparator = PDFStructureComparator(
+                self.pdf_documents,
+                self.pdf_paths,
+                self.logger
+            )
+            structure_result = structure_comparator.compare()
+            compareAllResult = compareAllResult and structure_result
 
         self.logger.info("PDF comparison completed")
         return compareAllResult
@@ -153,6 +164,14 @@ class ComparePDF:
                 if np.array_equal(images[i], images[j]):
                     continue
 
+                if images[i].shape != images[j].shape:
+                    self.logger.warning(
+                        f"Page {page_num} images have different dimensions: "
+                        f"{images[i].shape} vs {images[j].shape}"
+                    )
+                    comparison_result = False
+                    continue
+
                 diff_image = cv2.absdiff(images[i], images[j])
                 different_pixel_mask = np.any(diff_image != 0, axis=2)
                 different_pixels = np.count_nonzero(different_pixel_mask)
@@ -202,6 +221,7 @@ def main():
     parser.add_argument('--pdf', action='append', required=True, help='Path to the PDF file')
     parser.add_argument('--showdiffs', choices=['nothing', 'diffimage', 'sidebyside'], action='store', required=False,
                         help='Show different pages in windows as they are found, eiher diffimage or sidebyside')
+    parser.add_argument('--no-structure',action='store_true',help='Disable PDF structural comparison')
     args = parser.parse_args()
     if not args.showdiffs:
         showdiffs = ShowDiffsStyle.Nothing
@@ -213,7 +233,7 @@ def main():
         else:
             showdiffs = ShowDiffsStyle.Nothing
 
-    compare = ComparePDF(args.pdf,showdiffs)
+    compare = ComparePDF(args.pdf,showdiffs, compare_structure=not args.no_structure)
     result = compare.compare()
     return result
 

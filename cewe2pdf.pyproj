@@ -419,6 +419,7 @@
     <Compile Include="decorations\__init__.py" />
     <Compile Include="cewe2pdf.py" />
     <Compile Include="colorUtils.py" />
+    <Compile Include="tests\compare-pdf\compare_pdf\pdf_structure_comparator.py" />
     <Compile Include="utilities\fontcheck\fontcheck.py" />
     <Compile Include="fonts\character_support.py" />
     <Compile Include="fonts\font_suggestions.py" />
