@@ -92,16 +92,7 @@ from infrastructure.windowsIntegration import (
 from pageElements import processElements
 from pageSelection import parse_page_selection
 
-
-# work around a breaking change in pil 10.0.0, see
-#   https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
-if parse_version(PIL.__version__) >= parse_version('9.1.0'):
-    # PIL.Image.LANCZOS was claimed closer to the old ANTIALIAS than PIL.Image.Resampling.LANCZOS
-    # although you can find text which claims the latter is best (and also that the two LANCZOS
-    # definitions are in fact identical!)
-    pil_antialias = PIL.Image.LANCZOS  # pylint: disable=no-member
-else:
-    pil_antialias = PIL.Image.ANTIALIAS  # pylint: disable=no-member
+pil_antialias = PIL.Image.Resampling.LANCZOS
 
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
     # Running in a PyInstaller bundle, ref https://pyinstaller.org/en/stable/runtime-information.html#run-time-information
