@@ -10,6 +10,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from conversionState import ConversionState
 from fonts import character_support
+from fonts.font_suggestions import FontSuggestionProvider
 from texts import markup
 from texts.markup import createTextRunContext
 
@@ -545,3 +546,19 @@ def test_sameCharacterCanHaveDifferentReplacementsByFont(monkeypatch):
         '', 'Tŷ', context)
 
     assert result == 'Ty'
+
+
+@pytest.mark.parametrize(
+    ('original', 'candidate', 'expected'),
+    [
+        ('Arial Narrow', 'Arial', 0),
+        ('Arial Narrow', 'Arial Black', 0),
+        ('Liberation Sans Narrow', 'Liberation Sans', 0),
+        ('Arial Rounded MT Bold', 'Arial', 1),
+        ('Arial Narrow', 'Calibri', 3),
+    ]
+)
+def test_family_distance(original, candidate, expected):
+    assert FontSuggestionProvider._familyDistance(
+        original, candidate
+    ) == expected

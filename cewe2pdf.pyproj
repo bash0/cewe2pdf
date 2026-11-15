@@ -420,6 +420,7 @@
     <Compile Include="cewe2pdf.py" />
     <Compile Include="colorUtils.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\pdf_structure_comparator.py" />
+    <Compile Include="tests\testUnsupportedChars\test_UnsupportedChars.py" />
     <Compile Include="utilities\fontcheck\fontcheck.py" />
     <Compile Include="fonts\character_support.py" />
     <Compile Include="fonts\font_suggestions.py" />
@@ -499,7 +500,6 @@
     <Compile Include="tests\testTextShrinkVAlign\test_textShrinkVAlign.py" />
     <Compile Include="tests\testTextWrapVAlignBorder\test_textwrapvalignborder.py" />
     <Compile Include="tests\testTransparency\test_transparency.py" />
-    <Compile Include="tests\testUnsupportedChars\testUnsupportedChars.py" />
     <Compile Include="tests\testVersionInfo\test_versionInfo.py" />
     <Compile Include="tests\testWindowsIntegration\test_windowsIntegration.py" />
     <Compile Include="tests\test_paragraph_font_inheritance.py" />
