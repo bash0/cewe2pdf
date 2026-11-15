@@ -32,6 +32,7 @@
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.example.txt" />
     <Content Include="documents\build_a_compiled_version.md" />
+    <Content Include="documents\CeweEditorTips.md" />
     <Content Include="documents\PROJECT_CONTEXT.md" />
     <Content Include="AGENTS.md" />
     <Content Include="documents\history\source-reorganization-2026.md" />
