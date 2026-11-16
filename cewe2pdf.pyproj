@@ -32,6 +32,7 @@
     <Content Include=".pylintrc" />
     <Content Include="additional_fonts.example.txt" />
     <Content Include="documents\build_a_compiled_version.md" />
+    <Content Include="documents\CeweEditorTips.md" />
     <Content Include="documents\PROJECT_CONTEXT.md" />
     <Content Include="AGENTS.md" />
     <Content Include="documents\history\source-reorganization-2026.md" />
@@ -230,6 +231,10 @@
     <Content Include="tests\testImageOperations\test_imageOperations_mcf-Dateien\20200306_111749_vu6237ko_1.jpg" />
     <Content Include="tests\testImageOperations\test_imageOperations_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testImageOperations\test_imageOperations_mcf-Dateien\vu6237ko_1_20200306_111748.jpg" />
+    <Content Include="tests\testImages\cewe2pdf.ini" />
+    <Content Include="tests\testImages\testImages.mcf" />
+    <Content Include="tests\testImages\testImages_mcf-Dateien\folderid.xml" />
+    <Content Include="tests\testImages\testImages_mcf-Dateien\llefkmel_1_1f600.svg" />
     <Content Include="tests\testIndexLarge\cewe2pdf.ini" />
     <Content Include="tests\testIndexLarge\test_indexLarge.mcf" />
     <Content Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\6ds3xtbb_1_20200306_111748.jpg" />
@@ -420,6 +425,7 @@
     <Compile Include="cewe2pdf.py" />
     <Compile Include="colorUtils.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\pdf_structure_comparator.py" />
+    <Compile Include="tests\testImages\test_images.py" />
     <Compile Include="tests\testUnsupportedChars\test_UnsupportedChars.py" />
     <Compile Include="utilities\fontcheck\fontcheck.py" />
     <Compile Include="fonts\character_support.py" />
@@ -612,6 +618,9 @@
     <Folder Include="tests\testImageExtractor\previous_result_pdfs\" />
     <Folder Include="tests\testImageOperations\" />
     <Folder Include="tests\testImageOperations\test_imageOperations_mcf-Dateien\" />
+    <Folder Include="tests\testImages\" />
+    <Folder Include="tests\testImages\previous_result_pdfs\" />
+    <Folder Include="tests\testImages\testImages_mcf-Dateien\" />
     <Folder Include="tests\testIndexLarge\" />
     <Folder Include="tests\testIndexLarge\previous_result_pdfs\" />
     <Folder Include="tests\testIndexLarge\test_indexLarge_mcf-Dateien\" />

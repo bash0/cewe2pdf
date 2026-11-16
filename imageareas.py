@@ -8,6 +8,8 @@ from math import sqrt
 
 import PIL
 from reportlab.lib.utils import ImageReader
+import cairosvg
+from io import BytesIO
 
 from ceweInfo import ProductInfo
 from clipart.catalog import getClipConfig, loadClipart
@@ -101,7 +103,14 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
         # rendering; the missing image is reported for ordinary photos too.
         logging.warning(f'Could not find image file {imagePath}; image omitted.')
         return
-    image = PIL.Image.open(imagePath)
+    if imagePath.lower().endswith('.svg'):
+        with open(imagePath, 'rb') as svgFile:
+            pngData = cairosvg.svg2png(bytestring=svgFile.read())
+        image = PIL.Image.open(BytesIO(pngData))
+        image.load()
+    else:
+        image = PIL.Image.open(imagePath)
+    
     geoLinkUrl = (getMapUrlFromExif(image, context.geo_link_url_template)
                   if context.geo_links_enabled else None)
 
