@@ -427,6 +427,8 @@
     <Compile Include="tests\compare-pdf\compare_pdf\pdf_structure_comparator.py" />
     <Compile Include="tests\testImages\test_images.py" />
     <Compile Include="tests\testUnsupportedChars\test_UnsupportedChars.py" />
+    <Compile Include="utilities\clp2svg\clp2svg.py" />
+    <Compile Include="utilities\clp2svg\__init__.py" />
     <Compile Include="utilities\fontcheck\fontcheck.py" />
     <Compile Include="fonts\character_support.py" />
     <Compile Include="fonts\font_suggestions.py" />
@@ -703,6 +705,7 @@
     <Folder Include="utilities\" />
     <Folder Include="utilities\contenttocenter\" />
     <Folder Include="utilities\fontcheck\" />
+    <Folder Include="utilities\clp2svg\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf312" />

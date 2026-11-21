@@ -83,3 +83,4 @@ nosetests.xml
 /tests/testCalendar/a4p/*.pdf
 /tests/testIndexLarge/*.mcf.*.idx.*.png
 /utilities/fixleftrightchanges/tests
+/7907-DECO-SF-*.svg
