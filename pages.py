@@ -51,7 +51,9 @@ def parseInputPage(fotobook, mcfBaseFolder, backgroundLocations, imageDirectory,
             f"./page[@pagenr='{pageNumber}'][@type='normalpage']")
         if physicalPage is not None:
             backgroundPage = physicalPage
-        if ProductInfo.isAlbumDoubleSide(productStyle) and not lastPage:
+        if not lastPage:
+            # Single-page PDFs use the same spread crop anchor as double-page
+            # PDFs when matching left/right background records form a pair.
             facingPageNumber = pageNumber - 1 if oddPage else pageNumber + 1
             facingPage = fotobook.find(
                 f"./page[@pagenr='{facingPageNumber}'][@type='normalpage']")

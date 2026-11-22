@@ -21,9 +21,10 @@ The MCF contains 26 content pages:
 
 The [485 texture](../Resources/photofun/backgrounds/485.jpg) and
 [synthetic 6480 image](../Resources/photofun/backgrounds/6480.jpg) are bundled
-under the shared test resources. The fixture INI uses the ordinary resource
-lookup with `cewe_folder = tests`; it does not depend on an installed CEWE
-background or the modified downloaded resource used for the experiment.
+under the shared test resources. The fixture uses the ordinary resource lookup
+with `cewe_folder = tests` and `hpsFolder = tests/hps`. Exploratory pages can
+also use installed CEWE resources with a local configuration, but those resources
+must be bundled before including such pages in portable regression runs.
 
 ## Running the tests
 
@@ -40,11 +41,20 @@ hue wrapping, alpha preservation, missing versus explicit zero settings,
 distinct invalid-input classes, and original-image fallback. There is no
 hue-by-fading or background-ID-by-fading matrix.
 
-Two complete conversions check both background designs and their integration
-with single-page and double-page output. They create 28-page and 15-page dated
-candidate PDFs beside the MCF, retaining them for review. There are no approved
-result PDFs for this fixture yet; colour assertions are not visual approval.
-Follow the [test workflow](../README.md) for approval and cleanup.
+Two complete conversions render the MCF in single-page and double-page output,
+then compare with the newest approved PDFs in `previous_result_pdfs`. They do
+not restrict background IDs, hue/fading combinations, alignment or overlaid
+content. The expected output page count follows the MCF's content-page count.
+Colour calibration is checked by the independent tests rather than by a fixed
+table of settings on particular album pages. Both approved PDFs include the
+reviewed spread-first fitting, so comparisons protect complete page appearance,
+including geometry and overlaid content, as well as colour.
+
+Candidate PDFs are written beside the MCF before comparison (currently 28 and
+15 pages). Extending the album can therefore produce an expected comparison
+failure while leaving both candidates available for inspection. Missing resources
+and unsupported recolouring are still reported after rendering. Follow the
+[test workflow](../README.md) for visual approval, reference updates and cleanup.
 
 ## Manual utilities
 
@@ -96,12 +106,15 @@ measured colour samples without parsing the preview PDF. The exploratory
 
 ## Background fitting
 
-Normal double-page backgrounds using the same image are cropped to the complete
-spread while preserving proportions. Different colours on the facing pages use
-the corresponding halves of that same crop. This keeps the ramp and strip
-boundaries consistent across the 6480 colour variants. Single-page output and
-the separate cover/inside-cover passes retain their existing behaviour.
+Regular album backgrounds are cropped to the complete spread while preserving
+proportions, then the renderer selects the left, centre or right page window.
+Both PDF styles use this rule even beside a different design. Matching left/right records share
+a crop anchor, and differing colours use the corresponding halves. This keeps
+the ramp and strip boundaries consistent across the 6480 variants in single-page
+and double-page output. The separate cover/inside-cover passes are unchanged.
 
 The CEWE preview remains a curved, shaded mockup; its precise crop is not an
-exact flat-page pixel reference. The controlled strips support the fitting
-rule, while the retained candidate PDFs provide the visual review material.
+exact flat-page pixel reference. Visual comparison of the controlled strips
+supports the fitting rule, including the corrected vertical fit in single-page
+output. The approved cewe2pdf PDFs preserve that reviewed appearance; agreement
+with them alone does not establish a match with CEWE.

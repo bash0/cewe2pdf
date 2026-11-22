@@ -9,7 +9,7 @@ from xml.etree import ElementTree
 
 import pymupdf
 import pytest
-from PIL import Image, ImageStat
+from PIL import Image
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -21,22 +21,16 @@ configureTestImportPaths(__file__)
 
 from backgroundColouring import getBackgroundRecolouring, recolourBackground
 from backgrounds import processBackground
+from compare_pdf import ComparePDF, ShowDiffsStyle
 from cewe2pdf import convertMcf
 from ceweInfo import PdfProductStyle
 from conversionState import ConversionState
 from pageTypes import PageProcessingType
 from renderContext import RenderContext
+from testutils import getLatestResultFile
 
 
 ALBUM_FOLDER = Path(__file__).resolve().parent
-# Confirmed against the normalpage background records, not preview PDF indices.
-PAGE_COLOURS = {
-    1: (0, 3), 2: (240, 3), 3: (60, 3), 4: (120, 3),
-    5: (300, 3), 6: (330, 3), 8: (0, 5), 9: (60, 5),
-    10: (210, 5), 11: (300, 5), 13: (0, 3), 14: (0, 4), 15: (0, 5),
-    16: (0, 0), 17: (0, 0), 18: (60, 1), 19: (60, 2), 20: (210, 3), 21: (210, 3),
-    22: (330, 5), 23: (330, 5),
-}
 
 
 def backgroundTag(**attributes):
@@ -167,86 +161,29 @@ def test_fallbackDrawsOriginalImage(attributes):
     assert pdf.images == originalPdf.images
 
 
-def assertRecolouredPixel(actual, source, hue, fading):
-    """Compare decoded JPEG colour against the original pixel's saturation/value."""
-    _, sourceSaturation, sourceValue = colorsys.rgb_to_hsv(*(channel / 255 for channel in source))
-    actualHue, actualSaturation, actualValue = colorsys.rgb_to_hsv(*(channel / 255 for channel in actual))
-    saturationScale = {0: 1.0, 1: 0.5, 2: 0.25, 3: 180 / 255, 4: 90 / 255, 5: 45 / 255}[fading]
-    assert abs(actualSaturation - sourceSaturation * saturationScale) < 0.03
-    assert abs(actualValue - sourceValue) <= 4 / 255
-    if sourceSaturation == 0:
-        return
-    hueDifference = abs(actualHue * 360 - hue % 360)
-    assert min(hueDifference, 360 - hueDifference) < 6
-
-
-def assertRecolouredBackgroundPage(page, background, pageNumber, keepDoublePages):
-    """Select the physical page's background, including independent spread halves."""
-    horizontalFraction = (0.75 if pageNumber % 2 else 0.25) if keepDoublePages else 0.5
-    midpoint = pymupdf.Point(page.rect.width * horizontalFraction, page.rect.height / 2)
-    imageReferences = [image[0] for image in page.get_images()
-        if any(rect.contains(midpoint) for rect in page.get_image_rects(image[0]))]
-    assert len(imageReferences) == 1
-    embedded = pymupdf.Pixmap(page.parent, imageReferences[0])
-    resource = PROJECT_ROOT / 'tests/Resources/photofun/backgrounds' / f"{background.get('designElementId')}.jpg"
-    with Image.open(resource) as source:
-        rectangle = next(rect for rect in page.get_image_rects(imageReferences[0]) if rect.contains(midpoint))
-        # Page 1 uses the existing front-inside-cover background pass, which
-        # retains the full image even in single-page output.
-        if pageNumber != 1:
-            assert abs(embedded.width - embedded.height * rectangle.width / rectangle.height) <= 1
-        sourceLeft = source.width - embedded.width if background.get('alignment') == '3' else 0
-        sourceTop = (source.height - embedded.height) // 2
-        left, top = embedded.width // 2, embedded.height // 2
-        # Average one JPEG block: an individual textured pixel changed by six
-        # brightness levels in the measured output, although the pure transform
-        # preserves V exactly. Block means avoid JPEG ringing at that pixel.
-        actualImage = Image.frombytes('RGB', (embedded.width, embedded.height), embedded.samples)
-        actualColour = ImageStat.Stat(actualImage.crop((left - 4, top - 4, left + 4, top + 4))).mean
-        sourceColour = ImageStat.Stat(source.crop((sourceLeft + left - 4, sourceTop + top - 4,
-            sourceLeft + left + 4, sourceTop + top + 4))).mean
-        assertRecolouredPixel(actualColour, sourceColour,
-            float(background.get('hue')), int(background.get('fading')))
-
-
 @pytest.mark.parametrize('keepDoublePages', [False, True])
 def test_colourBackgroundAlbum(keepDoublePages, caplog):
+    """Render any fixture backgrounds before comparing with the approved appearance."""
     album = ALBUM_FOLDER / 'testColourBackgrounds.mcf'
     pages = ElementTree.parse(album).getroot().findall('page')
-    actualColours = {}
-    for page in pages:
-        if page.get('type') != 'normalpage':
-            continue
-        tag = page.find('background')
-        if tag.get('hue') is not None and tag.get('fading') is not None:
-            actualColours[int(page.get('pagenr'))] = (int(tag.get('hue')), int(tag.get('fading')))
-    assert actualColours == PAGE_COLOURS
-    for number in range(16, 24):
-        page = next(page for page in pages if page.get('type') == 'normalpage' and page.get('pagenr') == str(number))
-        tag = page.find('background')
-        assert tag.get('designElementId') == '6480'
-        assert tag.get('alignment') == ('3' if number % 2 else '1')
-        if number in (16, 17):
-            assert tag.get('hue') == '0' and tag.get('fading') == '0'
+    contentPageCount = max(int(page.get('pagenr')) for page in pages if page.get('type') == 'normalpage')
     style = 'D' if keepDoublePages else 'S'
     output = ALBUM_FOLDER / f'testColourBackgrounds.mcf.{datetime.today():%Y%m%d}{style}.pdf'
     convertMcf(str(album), keepDoublePages=keepDoublePages, outputFileName=str(output))
     with pymupdf.open(output) as pdf:
-        assert len(pdf) == (15 if keepDoublePages else 28)
-        for number in range(1, 27):
-            index = 1 + number // 2 if keepDoublePages else number
-            page = pdf[index]
-            if number in PAGE_COLOURS:
-                background = next(tag.find('background') for tag in pages
-                    if tag.get('type') == 'normalpage' and tag.get('pagenr') == str(number))
-                assertRecolouredBackgroundPage(page, background, number, keepDoublePages)
-                continue
-            pixmap = page.get_pixmap(matrix=pymupdf.Matrix(0.5, 0.5), alpha=False)
-            horizontalFraction = (0.75 if number % 2 else 0.25) if keepDoublePages else 0.5
-            red, green, blue = pixmap.pixel(int(pixmap.width * horizontalFraction), pixmap.height // 2)
-            assert (red, green, blue) == (255, 255, 255)
+        assert len(pdf) == (contentPageCount // 2 + 2 if keepDoublePages else contentPageCount + 2)
     assert 'Unsupported background recolouring' not in caplog.text
     assert 'Could not find background' not in caplog.text
+    # Colour calibration is tested independently above. Keep this album free
+    # to explore new images, settings and overlaid content; compare the result
+    # only after writing the complete candidate PDF for visual inspection.
+    approved = getLatestResultFile(ALBUM_FOLDER.name, f'*{style}.pdf')
+    if approved is not None:
+        comparison = ComparePDF([output, approved], ShowDiffsStyle.Nothing)
+        try:
+            assert comparison.compare(), 'PDF differs from the approved result; inspect the candidate before approval'
+        finally:
+            comparison.cleanup()
 
 
 if __name__ == '__main__':

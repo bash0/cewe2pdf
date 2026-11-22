@@ -84,9 +84,10 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
 
     spreadAlignment = None
     if (pagetype == PageProcessingType.RegularPage
-            and ProductInfo.isAlbumDoubleSide(productstyle)):
+            and ProductInfo.isAlbumProduct(productstyle)):
         spreadAlignment = _spreadBackgroundAlignment(backgroundTag, facingBackgroundTags, oddPage)
-    isSpreadBackground = (spreadAlignment is not None
+    isSpreadBackground = (ProductInfo.isAlbumDoubleSide(productstyle)
+                          and spreadAlignment is not None
                           and _sameBackground(backgroundTag, facingBackgroundTags))
     if isSpreadBackground and oddPage:
         # The even-page operation has already painted this one CEWE spread
@@ -116,11 +117,17 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
         with PIL.Image.open(bgPath) as sourceImage:
             image = sourceImage.convert('RGB')
         if pagetype == PageProcessingType.RegularPage:
-            if spreadAlignment is not None and not isSpreadBackground:
-                # Different colours still use the same source window across
-                # the spread. Fit the image first, then take this page's half.
+            if (ProductInfo.isAlbumSingleSide(productstyle)
+                    or (ProductInfo.isAlbumDoubleSide(productstyle)
+                        and not isSpreadBackground and not lastPage)):
+                # Fit every ordinary album background to the complete spread
+                # before selecting its page window, including beside a
+                # different design. Matching records share the left crop
+                # anchor so wide images remain continuous in both PDF styles.
                 image = _cropSpreadBackgroundToHalf(
-                    image, areaWidth * 2, areaHeight, spreadAlignment, oddPage)
+                    image, areaWidth * 2, areaHeight,
+                    spreadAlignment if spreadAlignment is not None else backgroundTag.get('alignment'),
+                    backgroundTag.get('alignment'))
             else:
                 image = _cropBackgroundToArea(
                     image, areaWidth, areaHeight, backgroundTag.get('alignment'))
@@ -153,27 +160,36 @@ def _sameBackground(backgroundTag, facingBackgroundTags):
 
 
 def _spreadBackgroundAlignment(backgroundTag, facingBackgroundTags, oddPage):
-    """Return the left page's alignment for a shared image, regardless of colour."""
+    """Return a common crop anchor for complementary records of the same image."""
     facingBackgroundTag = next((tag for tag in facingBackgroundTags or []
         if tag.get('alignment') is not None), None)
     if (facingBackgroundTag is None
             or backgroundTag.get('designElementId') != facingBackgroundTag.get('designElementId')):
+        return None
+    left = facingBackgroundTag if oddPage else backgroundTag
+    right = backgroundTag if oddPage else facingBackgroundTag
+    if left.get('alignment') != '1' or right.get('alignment') != '3':
+        # Centre-aligned or independently positioned records need their own
+        # page windows even when they happen to use the same design/colour.
         return None
     # Both passes must use the left record's crop, including when the source
     # is wide enough to need horizontal cropping within the complete spread.
     return facingBackgroundTag.get('alignment') if oddPage else backgroundTag.get('alignment')
 
 
-def _cropSpreadBackgroundToHalf(image, spreadWidth, areaHeight, alignment, oddPage):
-    """Fit one source to the spread before selecting an independently coloured half."""
+def _cropSpreadBackgroundToHalf(image, spreadWidth, areaHeight, alignment, pageAlignment):
+    """Fit one source to the spread, then select its left, centre or right page window."""
     image = _cropBackgroundToArea(image, spreadWidth, areaHeight, alignment)
     middle = image.width // 2
     if middle == 0:
         # A one-column texture has no horizontal detail to split.
         return image
-    if oddPage:
+    if pageAlignment == '3':
         return image.crop((middle, 0, image.width, image.height))
-    return image.crop((0, 0, middle, image.height))
+    if pageAlignment == '1':
+        return image.crop((0, 0, middle, image.height))
+    left = round((image.width - middle) / 2)
+    return image.crop((left, 0, left + middle, image.height))
 
 
 def _cropBackgroundToArea(image, areaWidth, areaHeight, alignment):
@@ -186,14 +202,15 @@ def _cropBackgroundToArea(image, areaWidth, areaHeight, alignment):
     """
     targetRatio = areaWidth / areaHeight
     sourceRatio = image.width / image.height
+    # Tiny textures must retain a pixel even when a crop dimension rounds to zero.
     if sourceRatio > targetRatio:
-        cropWidth = int(round(image.height * targetRatio))
+        cropWidth = max(1, int(round(image.height * targetRatio)))
         availableWidth = image.width - cropWidth
         horizontalPosition = {'1': 0, '2': 0.5, '3': 1}.get(alignment, 0.5)
         left = int(round(availableWidth * horizontalPosition))
         return image.crop((left, 0, left + cropWidth, image.height))
     if sourceRatio < targetRatio:
-        cropHeight = int(round(image.width / targetRatio))
+        cropHeight = max(1, int(round(image.width / targetRatio)))
         top = (image.height - cropHeight) // 2
         return image.crop((0, top, image.width, top + cropHeight))
     return image

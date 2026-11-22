@@ -135,10 +135,30 @@ settings, but that does not establish exact compatibility with every CEWE
 resource family or editor version.
 
 The diagnostic strips exposed a stretched shared-spread path. Regular
-double-page backgrounds now use aspect-preserving fitting. Matching image IDs
-share a crop to the complete spread even when their colour settings differ;
-the separately coloured halves therefore retain the same source geometry.
-Single-page output and the separate cover/inside-cover passes are unchanged.
+album backgrounds now fit to the complete spread before selecting a page window.
+Both PDF styles use this rule even when the facing page has a different design.
+Complementary records for the same image share a crop anchor, including when
+their colour settings differ. The separate cover/inside-cover passes are unchanged.
 The book mockup's precise crop can still differ slightly; it does not establish
 an exact flat-page geometry reference. Changed approved PDF results require
 separate visual review rather than automatic replacement.
+
+An exploratory editor comparison used 6564 with hue 330/fading 2 on album
+page 24, opposite white background 201. The colours looked close, but CEWE
+showed a tighter crop of the canyon than the earlier individual-page fitting.
+For its 1024 x 731 source, that fitting selected 555 x 731 pixels. A diagnostic
+using the same colour transform but fitting to the complete spread first, then
+taking its left half (512 x 674), aligned the background landmarks much more
+closely with the preview.
+
+That comparison motivated the current spread-first fitting rule, including
+pages with different neighbouring designs. Visual review of the portable 485
+and controlled 6480 examples supported adopting it and corrected the previous
+single-page vertical fit. Updated cewe2pdf results were approved for both PDF
+styles; full-page pixel comparisons now protect the recolouring fixture's
+reviewed geometry as well as its colours. The colour model is unchanged.
+
+The fitting rule remains an empirical interpretation rather than an official
+CEWE specification. The portable MCF does not include the exploratory 6564
+page, and a fresh editor comparison of that example with the implemented
+renderer remains outstanding.
