@@ -353,6 +353,20 @@ If your CEWE software uses `.xmcf` files for your projects, you can simply still
 
 ## Feature implementations
 
+### Background recolouring
+
+Image backgrounds with explicit MCF hue and fading settings use an HSV
+approximation: replace the hue, multiply each pixel's original saturation by
+the selected fading factor, and retain its brightness. Grey pixels stay grey.
+Fading 0, 1, 2, 3, 4 and 5 use approximate saturation multipliers of 100%, 50%,
+25%, 70.6%, 35.3% and 17.6%, respectively; the values are preset identifiers, not
+a steadily increasing amount of fading. Unsupported combinations produce a
+warning and use the original background image. The approximation was
+calibrated against CEWE previews of background 485 and the controlled 6480
+test image. Backgrounds without colour settings retain their original image.
+Explicit `hue="0" fading="0"` selects red at the original saturation; zero
+values must be distinguished from absent attributes.
+
 ### Border decorations
 
 Borders are supported for image, text and clip-art areas. The colour, width,

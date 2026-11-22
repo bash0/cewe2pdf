@@ -84,3 +84,4 @@ nosetests.xml
 /tests/testIndexLarge/*.mcf.*.idx.*.png
 /utilities/fixleftrightchanges/tests
 /7907-DECO-SF-*.svg
+/tests/testColourBackgrounds/485variations

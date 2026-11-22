@@ -10,6 +10,7 @@ import logging
 import PIL
 from reportlab.lib.utils import ImageReader
 
+from backgroundColouring import getBackgroundRecolouring, recolourBackground
 from ceweInfo import ProductInfo
 from infrastructure.configUtils import getConfigurationBool
 from infrastructure.extraLoggers import page_rendering
@@ -68,6 +69,9 @@ def processBackground(backgroundTags, state: ConversionState, backgroundLocation
                     facingBackgroundTags)
 
 
+# Keep the page geometry explicit at this rendering boundary. The source-image
+# context manager and validated recolouring settings also need local ownership.
+# pylint: disable-next=too-many-locals
 def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
                     productstyle, pagetype, pdf, areaHeight, areaWidth,
                     areaXOffset, pageNumber, oddPage, lastPage,
@@ -101,14 +105,18 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
 
     bg = backgroundTag.get('designElementId')
     _reportUnsupportedBackgroundAttributes(backgroundTag)
+    recolouring = getBackgroundRecolouring(backgroundTag)
     try:
         bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'],
                                 backgroundLocations)
         logging.debug(f"Reading background file: {bgPath}")
-        image = PIL.Image.open(bgPath).convert('RGB')
+        with PIL.Image.open(bgPath) as sourceImage:
+            image = sourceImage.convert('RGB')
         if pagetype == PageProcessingType.RegularPage and not isSpreadBackground:
             image = _cropBackgroundToArea(
                 image, areaWidth, areaHeight, backgroundTag.get('alignment'))
+        if recolouring is not None:
+            image = recolourBackground(image, *recolouring)
         memFileHandle = BytesIO()
         image.save(memFileHandle, 'jpeg')
         memFileHandle.seek(0)
@@ -128,9 +136,11 @@ def _sameBackground(backgroundTag, facingBackgroundTags):
     """Return whether two regular album pages use one CEWE spread background."""
     facingBackgroundTag = next((tag for tag in facingBackgroundTags or []
                                 if tag.get('alignment') is not None), None)
+    # One design can have different colours on facing pages. Only matching
+    # colour settings may share the single image painted across a spread.
     return (facingBackgroundTag is not None
-            and backgroundTag.get('designElementId') ==
-            facingBackgroundTag.get('designElementId'))
+            and all(backgroundTag.get(attribute) == facingBackgroundTag.get(attribute)
+                for attribute in ('designElementId', 'hue', 'fading')))
 
 
 def _cropBackgroundToArea(image, areaWidth, areaHeight, alignment):
@@ -158,7 +168,7 @@ def _cropBackgroundToArea(image, areaWidth, areaHeight, alignment):
 
 def _reportUnsupportedBackgroundAttributes(backgroundTag):
     """Warn for background effects which the PDF renderer cannot reproduce."""
-    for attribute, expected in [('fading', 0.0), ('hue', 0.0), ('rotation', 0.0)]:
+    for attribute, expected in [('rotation', 0.0)]:
         if attribute in backgroundTag.attrib and float(backgroundTag.get(attribute)) != expected:
             logging.warning(
                 f"value of background attribute not supported: {attribute} = "
