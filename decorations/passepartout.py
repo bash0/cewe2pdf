@@ -14,7 +14,9 @@ import os.path
 import logging
 from dataclasses import dataclass
 from lxml import etree
+from PIL import Image
 
+from clipart.areas import rasteriseClipart
 from infrastructure.extraLoggers import configlogger
 
 class Passepartout():
@@ -154,6 +156,36 @@ class Passepartout():
     @staticmethod
     def getMaskFullName(xmlInfo:decorationXmlInfo) -> str:
         return Passepartout.getPassepartoutFileFullName(xmlInfo, xmlInfo.maskFile)
+
+    @staticmethod
+    def createShadowImage(photo, xmlInfo, areaWidth, areaHeight, alpha,
+                          colorReplacements, context):
+        """Composite photo and frame alpha in the complete passepartout's coordinates."""
+        frame = rasteriseClipart(Passepartout.getClipartFullName(xmlInfo),
+            colorReplacements, areaWidth, areaHeight, alpha, context)
+        if frame is None:
+            return None
+        with Image.open(frame.pngMemFile) as raster:
+            frameImage = raster.convert('RGBA')
+
+        # The frame canvas covers the whole area; the mask/photo canvas covers
+        # only fotoarea. Paste without a mask: using the photo's alpha as a
+        # paste mask would multiply it twice and weaken transparent shadows.
+        if xmlInfo.fotoarea_x is None:
+            photoRectangle = (0, 0, frameImage.width, frameImage.height)
+        else:
+            photoRectangle = (
+                round(xmlInfo.fotoarea_x * frameImage.width),
+                round(xmlInfo.fotoarea_y * frameImage.height),
+                round(xmlInfo.fotoarea_width * frameImage.width),
+                round(xmlInfo.fotoarea_height * frameImage.height))
+        left, top, width, height = photoRectangle
+        photo = photo.convert('RGBA').resize((width, height), context.image_resampling_filter)
+        silhouette = Image.new('RGBA', frameImage.size, (0, 0, 0, 0))
+        silhouette.paste(photo, (left, top))
+        # Keep genuine holes in the artwork. Filling the outer bounding box
+        # would wrongly cast a solid rectangular shadow through those gaps.
+        return Image.alpha_composite(silhouette, frameImage)
 
 
 if __name__ == '__main__':

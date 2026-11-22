@@ -10,7 +10,7 @@ from conversionState import ConversionState
 from renderContext import RenderContext
 
 
-def _hasEnabledShadow(decoration):
+def hasEnabledShadow(decoration):
     """Return whether ``decoration`` contains a CEWE-enabled shadow."""
     return (decoration is not None
             and any(shadow.get('shadowEnabled') in (None, '1')
@@ -42,25 +42,35 @@ def processAreaClipartTag(clipartElement, areaHeight, areaRot, areaWidth, pdf, t
                       shadowProcessor, borderProcessor)
 
 
-def insertClipartFile(fileName, colorReplacements, transx, areaWidth, areaHeight, alpha, pdf,
-                      transy, areaRot, flipX, flipY, decoration, context: RenderContext,
-                      state: ConversionState | None = None, shadowProcessor=None,
-                      borderProcessor=None):
-    """Rasterise a clipart file and draw it at the supplied area geometry."""
+def rasteriseClipart(fileName, colorReplacements, areaWidth, areaHeight, alpha,
+                     context: RenderContext, flipX=False, flipY=False):
+    """Prepare the same SVG pixels for foreground drawing and shadow silhouettes."""
     newWidth = int(0.5 + areaWidth * context.image_resolution / 254.0)
     newHeight = int(0.5 + areaHeight * context.image_resolution / 254.0)
 
     clipart = loadClipart(fileName, context.clipart_paths)
     if len(clipart.svgData) <= 0:
         logging.error(f"Clipart file could not be loaded: {fileName}")
-        return
+        return None
 
     if len(colorReplacements) > 0:
         clipart.replaceColors(colorReplacements)
 
     clipart.convertToPngInBuffer(newWidth, newHeight, alpha, flipX, flipY)
+    return clipart
+
+
+def insertClipartFile(fileName, colorReplacements, transx, areaWidth, areaHeight, alpha, pdf,
+                      transy, areaRot, flipX, flipY, decoration, context: RenderContext,
+                      state: ConversionState | None = None, shadowProcessor=None,
+                      borderProcessor=None):
+    """Rasterise a clipart file and draw it at the supplied area geometry."""
+    clipart = rasteriseClipart(fileName, colorReplacements, areaWidth, areaHeight,
+        alpha, context, flipX, flipY)
+    if clipart is None:
+        return
     clipartImage = None
-    if _hasEnabledShadow(decoration) and shadowProcessor is not None and state is not None:
+    if hasEnabledShadow(decoration) and shadowProcessor is not None and state is not None:
         # Use the rasterised SVG's alpha silhouette.  In particular, open
         # artwork (for example an arrow) must not cast a rectangular shadow.
         clipartImage = Image.open(clipart.pngMemFile).convert('RGBA')

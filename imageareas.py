@@ -13,11 +13,12 @@ from io import BytesIO
 
 from ceweInfo import ProductInfo
 from clipart.catalog import getClipConfig, loadClipart
-from clipart.areas import insertClipartFile
+from clipart.areas import hasEnabledShadow, insertClipartFile
 from conversionState import ConversionState
 from decorations.corners import applyCornerMask, getCornersInfo
 from imageUtils import autorot, getMapUrlFromExif
 from decorations.passepartout import Passepartout
+from infrastructure.configUtils import getConfigurationBool
 from renderContext import RenderContext
 
 
@@ -79,6 +80,27 @@ def _isSavedIndexImage(imageFileName, outputFileName):
     return False
 
 
+def _drawPassepartoutShadow(photo, imageTag, area, xmlInfo, pdf, context, state, drawShadow):
+    """Paint the combined silhouette while the canvas is at the full frame centre."""
+    if (xmlInfo is None or xmlInfo.clipartFile is None
+            or not any(hasEnabledShadow(tag) for tag in area.findall('decoration'))
+            or getConfigurationBool(context.default_config_section, 'noShadows', 'False')):
+        return False
+    position = area.find('position')
+    areaWidth = float(position.get('width').replace(',', '.'))
+    areaHeight = float(position.get('height').replace(',', '.'))
+    areaRotation = float(position.get('rotation'))
+    colorReplacements, _flipX, _flipY = getClipConfig(imageTag)
+    shadowImage = Passepartout.createShadowImage(photo, xmlInfo, areaWidth, areaHeight,
+        int(_getDecorationOpacity(area) * 255), colorReplacements, context)
+    if shadowImage is None:
+        return False
+    for decorationTag in area.findall('decoration'):
+        drawShadow(decorationTag, areaHeight, areaWidth, pdf, context, state,
+            shadowImage, areaWidth, areaHeight, areaRotation=areaRotation)
+    return True
+
+
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDirectory,
                         productStyle, mcfBaseFolder, pageType, pdf, pageWidth,
                         transx, transy, context: RenderContext, state: ConversionState,
@@ -131,6 +153,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     imageScale = float(imageTag.find('cutout').get('scale'))
 
     passepartoutId = imageTag.get('passepartoutDesignElementId')
+    passepartoutInfo = None
     frameClipartFileName = None
     maskClipartFileName = None
     frameDeltaX_mcfunit = 0
@@ -209,12 +232,18 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
         ((areaWidth - imageCropWidth_mcfunit) - frameDeltaX_mcfunit)) / 2
     frameShiftY_mcf = (frameDeltaY_mcfunit -
         ((areaHeight - imageCropHeight_mcfunit) - frameDeltaY_mcfunit)) / 2
+
+    # Paint one shadow behind both foreground components before applying the
+    # photo's fotoarea offset. Mask-only passepartouts retain the photo path.
+    hasFrameShadow = _drawPassepartoutShadow(
+        image, imageTag, area, passepartoutInfo, pdf, context, state, drawShadow)
     pdf.translate(-frameShiftX_mcf * mcf2rl, -frameShiftY_mcf * mcf2rl)
 
-    for decorationTag in area.findall('decoration'):
-        drawShadow(decorationTag, areaHeight, areaWidth, pdf, context, state,
-                   image, imageCropWidth_mcfunit, imageCropHeight_mcfunit,
-                   areaRotation=areaRot)
+    if not hasFrameShadow:
+        for decorationTag in area.findall('decoration'):
+            drawShadow(decorationTag, areaHeight, areaWidth, pdf, context, state,
+                image, imageCropWidth_mcfunit, imageCropHeight_mcfunit,
+                areaRotation=areaRot)
 
     pdf.drawImage(ImageReader(temporaryImage.name),
                   mcf2rl * -0.5 * imageCropWidth_mcfunit,
