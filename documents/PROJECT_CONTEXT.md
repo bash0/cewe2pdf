@@ -48,13 +48,14 @@ for a continuous PDF presentation. `insideCoverWhite` exists for readers wanting
 printed product's white endpapers. These are deliberate alternative presentations.
 
 A visual background and an editor layout-template reference are different meanings of
-"background"; only the former is a paint layer. On regular double-page album
-spreads, matching design IDs share an aspect-preserving source crop. Identical
-colour settings allow that crop to be painted once; differing settings paint
-its corresponding halves separately. The geometry is selected by the image ID,
-so a colour change cannot switch between stretched and cropped source windows.
-Different design IDs retain independent physical-page fitting. Single-page,
-cover and inside-cover interpretation remains separate.
+"background"; only the former is a paint layer. Regular album backgrounds first
+fit to the complete spread, then use their MCF left/centre/right alignment to
+select a physical page window. Different neighbouring designs follow the same
+spread-first rule. Complementary left/right records for one image share a crop
+anchor, including in single-page PDFs, so wide sources stay continuous. Identical
+colour settings can paint that crop once in double-page output; differing colours
+paint its halves separately. Centre-aligned copies retain independent windows.
+Cover, inside-cover and calendar interpretation remains separate.
 Image-background offsets must be applied once, not once for the spread and again for
 its right-hand page. Aspect-preserving crops are preferred to copying the editor's
 slightly softer or distorted resampling.

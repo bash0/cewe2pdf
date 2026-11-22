@@ -355,12 +355,13 @@ If your CEWE software uses `.xmcf` files for your projects, you can simply still
 
 ### Background fitting
 
-Regular double-page album backgrounds preserve the image's proportions by
-cropping it to fit the destination. When facing pages use the same background
-image, it is fitted to the complete spread; different hue or fading choices
-then use the corresponding halves of that same crop. Different background
-images are fitted independently to their physical pages. Single-page output,
-covers and inside-cover handling retain their existing behaviour.
+Regular album backgrounds preserve proportions by fitting the source to the
+complete spread, then selecting a left, centre or right page window according
+to the MCF alignment. This applies to single-page and double-page PDFs, including
+when the facing page uses a different background. Complementary left/right
+records for the same image share a crop; different colours use its halves
+separately. Covers, inside-cover handling and calendars retain their existing
+behaviour.
 
 ### Background recolouring
 
