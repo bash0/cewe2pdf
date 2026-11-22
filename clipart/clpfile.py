@@ -254,11 +254,12 @@ class ClpFile():
                 self.svgData = replacement.encode(encoding="utf-8")
                 subsmade += subcount
 
-            # handle: <path fill="#5E0B23" d="M218.23,..."/>
-            attributes = ("fill") # pylint: disable=superfluous-parens
-            for attribute in attributes:
+            # Presentation attributes carry the same paints as inline styles,
+            # for example <path fill="#5E0B23" d="M218.23,..."/>.
+            for attribute in colorkeys:
                 replacement, subcount = re.subn(
-                    attribute+"=\""+curReplacement[0]+"\"", r""+attribute+"=\""+curReplacement[1]+"\"", self.svgData.decode(),flags=re.MULTILINE)
+                    attribute+"=\""+curReplacement[0]+"\"", r""+attribute+"=\""+curReplacement[1]+"\"", self.svgData.decode(),
+                    flags=re.MULTILINE | re.IGNORECASE)
                 self.svgData = replacement.encode(encoding="utf-8")
                 subsmade += subcount
 

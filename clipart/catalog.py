@@ -54,7 +54,15 @@ def getClipConfig(Element):
         for clipcolors in clipconfig.findall('colors'):
             for clipcolor in clipcolors.findall('color'):
                 source = '#'+clipcolor.get('source').upper()[1:7]
-                target = '#'+clipcolor.get('target').upper()[1:7]
+                target, alphaSeparator, alpha = clipcolor.get('target').partition(',')
+                target = '#' + target.upper()[1:7]
+                if alphaSeparator:
+                    # CEWE appends alpha to an RGB replacement, for example
+                    # '#000000,0'. Keep it as SVG paint alpha so that only the
+                    # selected colour disappears, including its strokes.
+                    red, green, blue = (int(target[index:index + 2], 16)
+                        for index in (1, 3, 5))
+                    target = f'rgba({red},{green},{blue},{alpha})'
                 replacement = (source, target)
                 colorreplacements.append(replacement)
         mirror = clipconfig.get('mirror')

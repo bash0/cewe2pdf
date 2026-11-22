@@ -412,6 +412,8 @@ square and the run logs a warning.
 
 Opacity set in the editor is supported for photographs and clip art, including
 existing transparent pixels. A photograph's passepartout frame shares its opacity.
+Clip-art colour replacements also retain colour-specific transparency, so selected
+fills and strokes can disappear while other colours remain visible.
 For text panels, see [text backgrounds](#text-backgrounds).
 
 ### Text effects
