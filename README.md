@@ -396,6 +396,8 @@ measurements from the album editor, rather than an official CEWE specification,
 so our shadows are a best-effort approximation.
 Image shadows use a transparent alpha silhouette of the rendered image. They
 therefore follow supported corner decorations and transparent image content.
+For passepartouts with a separate decorative frame, one combined silhouette
+includes both the masked photograph and the frame, preserving holes in the artwork.
 
 Clip-art and text shadows also use their visible alpha silhouettes rather than a
 rectangle around the area. Set `noShadows = True` in `cewe2pdf.ini` to suppress shadows.

@@ -162,6 +162,16 @@ processing. Replacing alpha would discard transparency already in the image.
 A passepartout's frame shares the photograph's opacity rather than becoming a
 separately opaque overlay.
 
+Passepartout shadows combine the masked photo and the decorative frame in the
+full frame canvas, positioning the photo using the resource XML's `fotoarea`.
+The frame uses the same clip-art rasterisation and colour/opacity handling as
+its foreground. Paint one combined shadow at the frame centre before either
+foreground component, preserving transparent gaps rather than filling a bounding
+rectangle. Mask-only designs retain the existing photo-shadow path.
+The same design ID can have revised resource geometry. Keep its XML, mask and
+frame artwork from one version: an old `fotoarea` combined with a new editor's
+cutout can request pixels outside the source photograph and produce black padding.
+
 Images, clip art, and text use a common silhouette-shadow model.
 Stored angles are page-relative; compensate for area rotation rather than inventing
 different direction rules for masks, corners, and clip art.
