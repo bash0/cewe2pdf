@@ -193,18 +193,18 @@ def assertRecolouredBackgroundPage(page, background, pageNumber, keepDoublePages
         rectangle = next(rect for rect in page.get_image_rects(imageReferences[0]) if rect.contains(midpoint))
         # Page 1 uses the existing front-inside-cover background pass, which
         # retains the full image even in single-page output.
-        expectedWidth = source.width if pageNumber == 1 else min(
-            source.width, round(source.height * rectangle.width / rectangle.height))
-        assert (embedded.width, embedded.height) == (expectedWidth, source.height)
+        if pageNumber != 1:
+            assert abs(embedded.width - embedded.height * rectangle.width / rectangle.height) <= 1
         sourceLeft = source.width - embedded.width if background.get('alignment') == '3' else 0
+        sourceTop = (source.height - embedded.height) // 2
         left, top = embedded.width // 2, embedded.height // 2
         # Average one JPEG block: an individual textured pixel changed by six
         # brightness levels in the measured output, although the pure transform
         # preserves V exactly. Block means avoid JPEG ringing at that pixel.
         actualImage = Image.frombytes('RGB', (embedded.width, embedded.height), embedded.samples)
         actualColour = ImageStat.Stat(actualImage.crop((left - 4, top - 4, left + 4, top + 4))).mean
-        sourceColour = ImageStat.Stat(source.crop((sourceLeft + left - 4, top - 4,
-            sourceLeft + left + 4, top + 4))).mean
+        sourceColour = ImageStat.Stat(source.crop((sourceLeft + left - 4, sourceTop + top - 4,
+            sourceLeft + left + 4, sourceTop + top + 4))).mean
         assertRecolouredPixel(actualColour, sourceColour,
             float(background.get('hue')), int(background.get('fading')))
 

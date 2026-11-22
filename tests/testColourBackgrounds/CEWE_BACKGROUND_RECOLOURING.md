@@ -134,7 +134,11 @@ same transform is applied to other image-background designs with supported MCF
 settings, but that does not establish exact compatibility with every CEWE
 resource family or editor version.
 
-The diagnostic strips also reveal a vertical-fitting difference between the
-CEWE mockup and the current flat-spread PDF. Fitting is a separate, deferred
-investigation. This colour implementation preserves the existing geometry;
-approved PDF regressions protect that established behaviour.
+The diagnostic strips exposed a stretched shared-spread path. Regular
+double-page backgrounds now use aspect-preserving fitting. Matching image IDs
+share a crop to the complete spread even when their colour settings differ;
+the separately coloured halves therefore retain the same source geometry.
+Single-page output and the separate cover/inside-cover passes are unchanged.
+The book mockup's precise crop can still differ slightly; it does not establish
+an exact flat-page geometry reference. Changed approved PDF results require
+separate visual review rather than automatic replacement.

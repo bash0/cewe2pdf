@@ -94,9 +94,14 @@ fixture material to retain in version control. Automated tests use the
 measured colour samples without parsing the preview PDF. The exploratory
 `485variations/` directory remains ignored and should stay out of the commit.
 
-## Deferred fitting investigation
+## Background fitting
 
-The diagnostic strips expose a vertical-fitting difference: the CEWE mockup
-trims more of the grey ramp than the current flat-spread PDF. No fitting change
-is included in this colour work. The tests protect the current placement and
-colour behaviour; they do not establish an exact CEWE geometry match.
+Normal double-page backgrounds using the same image are cropped to the complete
+spread while preserving proportions. Different colours on the facing pages use
+the corresponding halves of that same crop. This keeps the ramp and strip
+boundaries consistent across the 6480 colour variants. Single-page output and
+the separate cover/inside-cover passes retain their existing behaviour.
+
+The CEWE preview remains a curved, shaded mockup; its precise crop is not an
+exact flat-page pixel reference. The controlled strips support the fitting
+rule, while the retained candidate PDFs provide the visual review material.
