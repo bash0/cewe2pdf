@@ -13,6 +13,19 @@ Delivered files can intersperse extra lowercase letters outside the hexadecimal 
 The reader checks the prefix, discards `g` through `z`, and decodes the remaining hex.
 Use [ClpFile](clpfile.py) rather than maintaining a second parser.
 
+## Replacement colours
+
+MCF `ClipartConfiguration` records can attach alpha to a replacement RGB colour:
+`target="#000000,0"` means transparent black. The catalogue parser converts this
+to SVG `rgba(0,0,0,0)` paint. Ordinary RGB replacements retain the established
+six-digit colour representation.
+
+Replacements apply to `fill`, `stroke` and gradient `stop-color` in inline styles
+and SVG presentation attributes. Paint alpha combines with existing SVG opacity
+and the area's decoration opacity; changing one colour does not change the whole
+object's opacity. Transparent paint reveals underlying artwork or page content.
+It does not cut a hole through other shapes already painted underneath it.
+
 ## Using custom clip-art files
 
 You can use your own .clp files in the CEWE software, but it is not known if

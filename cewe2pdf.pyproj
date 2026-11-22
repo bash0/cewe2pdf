@@ -206,6 +206,7 @@
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250319S.pdf" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250326S.pdf" />
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250412S.pdf" />
+    <Content Include="tests\testClipartColorReplacement\README.md" />
     <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250326S.pdf" />
     <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250412S.pdf" />
     <Content Include="tests\testColourBackgrounds\cewe2pdf.ini" />
@@ -280,6 +281,12 @@
     <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\folderid.xml~" />
     <Content Include="tests\testShadows\cewe2pdf.ini" />
+    <Content Include="tests\testShadows\previous_result_pdfs\test_shadows.mcf.20260806S.pdf" />
+    <Content Include="tests\testShadows\previous_result_pdfs\test_shadows.mcf.20261019S.pdf" />
+    <Content Include="tests\testShadows\previous_result_pdfs\test_shadows.mcf.20261020S.pdf" />
+    <Content Include="tests\testShadows\previous_result_pdfs\test_shadows.mcf.20261024S.pdf" />
+    <Content Include="tests\testShadows\previous_result_pdfs\test_shadows.mcf.20261122S.pdf" />
+    <Content Include="tests\testShadows\README.md" />
     <Content Include="tests\testShadows\test_shadows.mcf" />
     <Content Include="tests\testShadows\test_shadows_mcf-Dateien\folderid.xml" />
     <Content Include="tests\testShadows\test_shadows_mcf-Dateien\z31qhpgx_1_greysquareblueborder.jpg" />
@@ -429,8 +436,11 @@
     <Compile Include="cewe2pdf.py" />
     <Compile Include="colorUtils.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\pdf_structure_comparator.py" />
+    <Compile Include="tests\testClipartColorReplacement\test_transparentColours.py" />
     <Compile Include="tests\testColourBackgrounds\test_colourBackgrounds.py" />
     <Compile Include="tests\testImages\test_images.py" />
+    <Compile Include="tests\testPageSelection\test_pageSelection.py" />
+    <Compile Include="tests\testShadows\test_passepartoutShadow.py" />
     <Compile Include="tests\testUnsupportedChars\test_UnsupportedChars.py" />
     <Compile Include="utilities\clp2svg\clp2svg.py" />
     <Compile Include="utilities\clp2svg\__init__.py" />
@@ -655,7 +665,9 @@
     <Folder Include="tests\testNoCewe\testNoCewe_mcf-Dateien\" />
     <Folder Include="tests\testPageNumbers\" />
     <Folder Include="tests\testPageNumbers\test_pagenumbers_mcf-Dateien\" />
+    <Folder Include="tests\testPageSelection\" />
     <Folder Include="tests\testShadows\" />
+    <Folder Include="tests\testShadows\previous_result_pdfs\" />
     <Folder Include="tests\testShadows\test_shadows_mcf-Dateien\" />
     <Folder Include="tests\testTabs\" />
     <Folder Include="tests\testTabs\previous_result_pdfs\" />
