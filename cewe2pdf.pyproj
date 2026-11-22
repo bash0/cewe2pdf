@@ -208,6 +208,10 @@
     <Content Include="tests\testClipartColorReplacement\previous_result_pdfs\test_clipart_colorreplacement.mcf.20250412S.pdf" />
     <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250326S.pdf" />
     <Content Include="tests\testClipart\previous_result_pdfs\testClipart.mcf.20250412S.pdf" />
+    <Content Include="tests\testColourBackgrounds\cewe2pdf.ini" />
+    <Content Include="tests\testColourBackgrounds\CEWE_BACKGROUND_RECOLOURING.md" />
+    <Content Include="tests\testColourBackgrounds\README.md" />
+    <Content Include="tests\testColourBackgrounds\testColourBackgrounds.mcf" />
     <Content Include="tests\testCorners\cewe2pdf.ini" />
     <Content Include="tests\testCorners\testCorners.mcf" />
     <Content Include="tests\testDecorations\cewe2pdf.ini" />
@@ -425,8 +429,11 @@
     <Compile Include="cewe2pdf.py" />
     <Compile Include="colorUtils.py" />
     <Compile Include="tests\compare-pdf\compare_pdf\pdf_structure_comparator.py" />
+    <Compile Include="tests\testColourBackgrounds\test_colourBackgrounds.py" />
     <Compile Include="tests\testImages\test_images.py" />
     <Compile Include="tests\testUnsupportedChars\test_UnsupportedChars.py" />
+    <Compile Include="utilities\clp2svg\clp2svg.py" />
+    <Compile Include="utilities\clp2svg\__init__.py" />
     <Compile Include="utilities\fontcheck\fontcheck.py" />
     <Compile Include="fonts\character_support.py" />
     <Compile Include="fonts\font_suggestions.py" />
@@ -602,6 +609,7 @@
     <Folder Include="tests\testCewePageResolver\" />
     <Folder Include="tests\testClipartColorReplacement\previous_result_pdfs\" />
     <Folder Include="tests\testClipart\previous_result_pdfs\" />
+    <Folder Include="tests\testColourBackgrounds\" />
     <Folder Include="tests\testConversionSetup\" />
     <Folder Include="tests\testCorners\" />
     <Folder Include="tests\testCorners\previous_result_pdfs\" />
@@ -703,6 +711,7 @@
     <Folder Include="utilities\" />
     <Folder Include="utilities\contenttocenter\" />
     <Folder Include="utilities\fontcheck\" />
+    <Folder Include="utilities\clp2svg\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf312" />

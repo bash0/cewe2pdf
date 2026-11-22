@@ -10,6 +10,7 @@ import logging
 import PIL
 from reportlab.lib.utils import ImageReader
 
+from backgroundColouring import getBackgroundRecolouring, recolourBackground
 from ceweInfo import ProductInfo
 from infrastructure.configUtils import getConfigurationBool
 from infrastructure.extraLoggers import page_rendering
@@ -68,6 +69,9 @@ def processBackground(backgroundTags, state: ConversionState, backgroundLocation
                     facingBackgroundTags)
 
 
+# Keep the page geometry explicit at this rendering boundary. The source-image
+# context manager and validated recolouring settings also need local ownership.
+# pylint: disable-next=too-many-locals
 def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
                     productstyle, pagetype, pdf, areaHeight, areaWidth,
                     areaXOffset, pageNumber, oddPage, lastPage,
@@ -78,8 +82,11 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
     if backgroundTag is None or backgroundTag.get('designElementId') is None:
         return
 
-    isSpreadBackground = (pagetype == PageProcessingType.RegularPage
-                          and ProductInfo.isAlbumDoubleSide(productstyle)
+    spreadAlignment = None
+    if (pagetype == PageProcessingType.RegularPage
+            and ProductInfo.isAlbumDoubleSide(productstyle)):
+        spreadAlignment = _spreadBackgroundAlignment(backgroundTag, facingBackgroundTags, oddPage)
+    isSpreadBackground = (spreadAlignment is not None
                           and _sameBackground(backgroundTag, facingBackgroundTags))
     if isSpreadBackground and oddPage:
         # The even-page operation has already painted this one CEWE spread
@@ -101,14 +108,24 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
 
     bg = backgroundTag.get('designElementId')
     _reportUnsupportedBackgroundAttributes(backgroundTag)
+    recolouring = getBackgroundRecolouring(backgroundTag)
     try:
         bgPath = findFileInDirs([bg + '.bmp', bg + '.webp', bg + '.jpg'],
                                 backgroundLocations)
         logging.debug(f"Reading background file: {bgPath}")
-        image = PIL.Image.open(bgPath).convert('RGB')
-        if pagetype == PageProcessingType.RegularPage and not isSpreadBackground:
-            image = _cropBackgroundToArea(
-                image, areaWidth, areaHeight, backgroundTag.get('alignment'))
+        with PIL.Image.open(bgPath) as sourceImage:
+            image = sourceImage.convert('RGB')
+        if pagetype == PageProcessingType.RegularPage:
+            if spreadAlignment is not None and not isSpreadBackground:
+                # Different colours still use the same source window across
+                # the spread. Fit the image first, then take this page's half.
+                image = _cropSpreadBackgroundToHalf(
+                    image, areaWidth * 2, areaHeight, spreadAlignment, oddPage)
+            else:
+                image = _cropBackgroundToArea(
+                    image, areaWidth, areaHeight, backgroundTag.get('alignment'))
+        if recolouring is not None:
+            image = recolourBackground(image, *recolouring)
         memFileHandle = BytesIO()
         image.save(memFileHandle, 'jpeg')
         memFileHandle.seek(0)
@@ -125,12 +142,38 @@ def _drawBackground(backgroundTags, state: ConversionState, backgroundLocations,
 
 
 def _sameBackground(backgroundTag, facingBackgroundTags):
-    """Return whether two regular album pages use one CEWE spread background."""
+    """Return whether one identically coloured image can paint the whole spread."""
     facingBackgroundTag = next((tag for tag in facingBackgroundTags or []
                                 if tag.get('alignment') is not None), None)
+    # One design can have different colours on facing pages. Only matching
+    # colour settings may share the single image painted across a spread.
     return (facingBackgroundTag is not None
-            and backgroundTag.get('designElementId') ==
-            facingBackgroundTag.get('designElementId'))
+            and all(backgroundTag.get(attribute) == facingBackgroundTag.get(attribute)
+                for attribute in ('designElementId', 'hue', 'fading')))
+
+
+def _spreadBackgroundAlignment(backgroundTag, facingBackgroundTags, oddPage):
+    """Return the left page's alignment for a shared image, regardless of colour."""
+    facingBackgroundTag = next((tag for tag in facingBackgroundTags or []
+        if tag.get('alignment') is not None), None)
+    if (facingBackgroundTag is None
+            or backgroundTag.get('designElementId') != facingBackgroundTag.get('designElementId')):
+        return None
+    # Both passes must use the left record's crop, including when the source
+    # is wide enough to need horizontal cropping within the complete spread.
+    return facingBackgroundTag.get('alignment') if oddPage else backgroundTag.get('alignment')
+
+
+def _cropSpreadBackgroundToHalf(image, spreadWidth, areaHeight, alignment, oddPage):
+    """Fit one source to the spread before selecting an independently coloured half."""
+    image = _cropBackgroundToArea(image, spreadWidth, areaHeight, alignment)
+    middle = image.width // 2
+    if middle == 0:
+        # A one-column texture has no horizontal detail to split.
+        return image
+    if oddPage:
+        return image.crop((middle, 0, image.width, image.height))
+    return image.crop((0, 0, middle, image.height))
 
 
 def _cropBackgroundToArea(image, areaWidth, areaHeight, alignment):
@@ -158,7 +201,7 @@ def _cropBackgroundToArea(image, areaWidth, areaHeight, alignment):
 
 def _reportUnsupportedBackgroundAttributes(backgroundTag):
     """Warn for background effects which the PDF renderer cannot reproduce."""
-    for attribute, expected in [('fading', 0.0), ('hue', 0.0), ('rotation', 0.0)]:
+    for attribute, expected in [('rotation', 0.0)]:
         if attribute in backgroundTag.attrib and float(backgroundTag.get(attribute)) != expected:
             logging.warning(
                 f"value of background attribute not supported: {attribute} = "

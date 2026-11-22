@@ -48,11 +48,41 @@ for a continuous PDF presentation. `insideCoverWhite` exists for readers wanting
 printed product's white endpapers. These are deliberate alternative presentations.
 
 A visual background and an editor layout-template reference are different meanings of
-"background"; only the former is a paint layer. Matching left/right records can
-describe one continuous spread, while distinct records require independent rendering.
+"background"; only the former is a paint layer. On regular double-page album
+spreads, matching design IDs share an aspect-preserving source crop. Identical
+colour settings allow that crop to be painted once; differing settings paint
+its corresponding halves separately. The geometry is selected by the image ID,
+so a colour change cannot switch between stretched and cropped source windows.
+Different design IDs retain independent physical-page fitting. Single-page,
+cover and inside-cover interpretation remains separate.
 Image-background offsets must be applied once, not once for the spread and again for
 its right-hand page. Aspect-preserving crops are preferred to copying the editor's
 slightly softer or distorted resampling.
+
+`backgroundColouring.py` isolates the provisional HSV transform calibrated with
+background 485 and a controlled synthetic JPEG substituted for downloaded
+background 6480. The 485 template marks it `multicolor="1"` with
+`multicolor_id="9008"`; adding the same attributes to 6480 exposed colour variants
+through the editor's resource-ID search. The full meaning of that ID remains
+unconfirmed. Explicit MCF hue and fading values select the transform for any
+image-background design.
+
+Missing hue/fading attributes preserve the original JPEG. Explicit zero values
+instead select red with a saturation multiplier of one. The controlled 6480
+pages 16-17 establish that these cases must remain distinct; treating zero as
+an absent effect leaves the original rainbow strips in place of CEWE's red.
+
+The initial 485 comparison suggested uniform saturation. The synthetic test
+superseded that interpretation: grey stays grey, and colour strips with source
+saturations 100% and 40% retain that ratio after recolouring. Replace hue, scale
+each pixel's source saturation, and preserve its HSV value. The fading presets
+are not numerically ordered by strength. Their empirical factors and the
+reproducible sampling method belong in the
+[background recolouring notes](../tests/testColourBackgrounds/CEWE_BACKGROUND_RECOLOURING.md). Do not extrapolate to
+other values or apply a brightness correction from the shaded mockup.
+Unsupported settings retain the original image with a warning. Facing pages
+with different colour settings must be drawn independently even when their
+design IDs match.
 
 ## Text layout and fonts
 
