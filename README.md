@@ -25,13 +25,13 @@ more detail for users, contributors, and coding assistants.
 | Understand supported features and products | [Feature implementations](#feature-implementations) and [acceptable products](#acceptable-products) |
 | Start development or understand the architecture | [Developer guide](documents/DEVELOPER_GUIDE.md) |
 | Understand implementation decisions and CEWE conventions | [Project context](documents/PROJECT_CONTEXT.md) |
+| Investigate unused MCF data and possible missing features | [MCF data audit](documents/CodexAnalysis/MCF_DATA_AUDIT.md), and [field inventory](documents/CodexAnalysis/MCF_FIELD_INVENTORY.md) |
 | Give a coding assistant the project programming conventions | [Programming guidance](AGENTS.md) |
 | Set up and test Linux using WSL | [Linux/WSL guide](documents/TestingOnWSL.md) |
 | Build or install a standalone executable | [Build and Windows integration guide](documents/build_a_compiled_version.md) |
 | Work with tests and approved PDFs | [Test workflow and cleanup](tests/README.md), and [compare-pdf interface](tests/compare-pdf/README.md) |
-| Center selected album page content | [MCF/MCFX content centering utility](utilities/contenttocenter/README.md) |
+| Use supporting utilities | [Utilities: clp2svg, fontcheck, and content centering](utilities/README.md) |
 | Understand or author clip art and passepartout resources | [CLP file format and authoring notes](clipart/CLP_FILE_FORMAT.md) |
-| Check the contents of fonts, to find particular characters | [fontcheck utility](utilities/fontcheck/README.md) |
 | Learn tricks in using the CEWE album editor | [CEWE editor tips](documents/CeweEditorTips.md) |
 | Consult superseded setups and investigations | [Historical documentation](documents/history/README.md) |
 
@@ -353,6 +353,8 @@ If your CEWE software uses `.xmcf` files for your projects, you can simply still
 
 ## Feature implementations
 
+CEWE's branding logo on the spine is deliberately omitted from PDF output.
+
 ### Background fitting
 
 Regular album backgrounds preserve proportions by fitting the source to the
@@ -437,6 +439,10 @@ is generally only useful on large text, for example banner headings.
 
 `textFormat.hasOutline` is only an editor flag; an outline is visible only when
 the MCF also supplies a positive width and a non-transparent colour.
+
+Outlines on automatic page numbers are not implemented. CEWE offers this
+capability, but support is deliberately deferred until a concrete need is
+demonstrated. Page-number backgrounds are already supported.
 
 #### Letter spacing
 
@@ -558,6 +564,10 @@ padding for its individual cells are defined by the installation's
 `Resources/calendar_layout.xml`.  The MCF's `fontsize_percentage` and
 `fontsize_percentage_holiddays` values are adjustments to those fixed point
 sizes, not sizes derived from the edited calendar rectangle.
+
+Custom borders in an album's embedded calendar colour scheme and regional
+holiday selection are not implemented. These extensions are deferred until
+a practical user need is demonstrated.
 
 Without a CEWE installation, unsupported calendar layouts fall back to the
 built-in defaults where possible.  A project can also provide compatible local

@@ -6,6 +6,8 @@ The converter is a careful interpretation of an undocumented CEWE format. A smal
 
 For working conventions, see [AGENTS.md](../AGENTS.md). For the reasons behind
 important implementation choices, see [project context](PROJECT_CONTEXT.md).
+The [unused MCF data audit](CodexAnalysis/MCF_DATA_AUDIT.md) distinguishes possible missing
+features from editor metadata, duplicate records and print-production settings.
 
 ## First steps
 
@@ -92,7 +94,12 @@ The top level retains the conversion spine and cross-cutting modules. Specialist
 
 Package `__init__.py` files deliberately contain no public façade. Import the specific module which provides the operation you need.
 
-`pageElements.py` paints areas in CEWE z-order and delegates to the specialist modules. Keep it a coordinator: put feature-specific interpretation and drawing in the appropriate package whenever possible.
+`pageElements.py` paints areas in saved XML order and delegates to the specialist
+modules. A diagnostic warns if known numeric `zposition` values decrease, but
+does not reorder the areas. The audited fixtures use nondecreasing z-values.
+See the [drawing-order audit](CodexAnalysis/MCF_DATA_AUDIT.md#drawing-order) before changing
+this assumption. Keep it a coordinator: put feature-specific
+interpretation and drawing in the appropriate package whenever possible.
 
 `fonts/character_support.py` checks whether the actual registered font face
 supports each character in a text span. It handles configured character
