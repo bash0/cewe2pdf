@@ -47,6 +47,15 @@ The double-page default extends facing content-page backgrounds onto the endpape
 for a continuous PDF presentation. `insideCoverWhite` exists for readers wanting the
 printed product's white endpapers. These are deliberate alternative presentations.
 
+CEWE's branding logo on the spine is deliberately omitted from PDF output.
+The ignored `useSpineLogo` switch and `spinelogoarea` placeholder are intentional,
+not an outstanding feature request.
+
+Area painting preserves saved XML order. Numeric `zposition` agrees with that
+order in the audited fixtures, but is not established as an independent source
+of drawing order. Warn if known z-values decrease, without sorting or rewriting
+the input, so a changed CEWE saving convention can be investigated first.
+
 A visual background and an editor layout-template reference are different meanings of
 "background"; only the former is a paint layer. Regular album backgrounds first
 fit to the complete spread, then use their MCF left/centre/right alignment to
@@ -138,6 +147,11 @@ Missing-font substitution is shared by calendars and albums. An active repositor
 example has a distinct filename. See [font configuration](../README.md#additional_fontstxt).
 
 ## Calendars
+
+Calendar support began as an exploratory implementation. Further extensions
+have no identified user demand and remain low priority. Embedded custom-scheme
+borders and regional holiday selection are deliberately deferred until a real
+use case needs them.
 
 The MCF often stores a layout name without its semantics. Calendar resources provide
 the base point sizes, alignment, padding, colours, language names, and event definitions;

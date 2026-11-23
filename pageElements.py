@@ -6,7 +6,8 @@
 # parameter object solely to satisfy pylint.
 # pylint: disable=too-many-arguments,too-many-locals
 
-from math import floor
+import logging
+from math import floor, isfinite
 
 from indexing.albumindex import AlbumIndex
 from decorations.borders import processDecorationBorders
@@ -25,6 +26,31 @@ from pageTypes import PageProcessingType
 from renderContext import RenderContext
 from decorations.shadows import processDecorationShadow
 from texts.areas import processAreaTextTag
+
+
+def _warnIfAreaOrderDiffers(page, pageNumber):
+    """Report decreasing numeric z-values without changing the saved XML order."""
+    previousZposition = None
+    for areaNumber, area in enumerate(page.findall('area'), start=1):
+        position = area.find('position')
+        if position is None or position.get('zposition') is None:
+            continue
+        try:
+            zposition = float(position.get('zposition').replace(',', '.'))
+        except ValueError:
+            # This optional diagnostic must not reject previously renderable MCFs.
+            continue
+        if not isfinite(zposition):
+            continue
+        # Equal values are common. Saved area order agrees with nondecreasing
+        # zposition in the fixtures, but that is an observed CEWE convention.
+        if previousZposition is not None and zposition < previousZposition:
+            logging.warning(
+                f'Page {pageNumber} (MCF pagenr {page.get("pagenr")}): '
+                f'XML area order has decreasing zposition at area {areaNumber} '
+                f'({zposition:g} after {previousZposition:g}); keeping XML drawing order.')
+            return
+        previousZposition = zposition
 
 
 def processElements(additional_fonts, fotobook, imagedir,
@@ -53,6 +79,8 @@ def processElements(additional_fonts, fotobook, imagedir,
     if (ProductInfo.isAlbumProduct(productstyle)
             and pagetype == PageProcessingType.RegularPage and oddpage):
         page = getPageElementForPageNumber(fotobook, 2 * floor(pageNumber / 2))
+
+    _warnIfAreaOrderDiffers(page, pageNumber)
 
     if pagetype == PageProcessingType.OpeningContentPage:
         page_rendering.debug('Page %d: drawing opening content from CEWE pagenr %s.',
