@@ -71,6 +71,29 @@ aspect ratio implied by 'fotoarea', not the full frame.  If these canvases are
 made square by default, CEWE may display the frame but cewe2pdf will not
 interpret the mask and frame consistently.
 
+### Passepartout mirroring
+
+MCF `ClipartConfiguration` on the image selects the reflection: `mirror="x"`
+reflects across the x axis (top to bottom), `mirror="y"` across the y axis
+(left to right), and `mirror="both"` does both. An absent mirror setting keeps
+the resource's original orientation. These are reflections in the area's local
+coordinates, before its page rotation.
+
+Reflect the frame artwork and the mask within its photograph opening, then
+move that opening within the full frame. For a normalised opening `(x, y, w, h)`,
+horizontal reflection changes `x` to `1 - x - w`; vertical reflection changes
+`y` to `1 - y - h`. The photograph's pixels and saved cutout keep their
+orientation. Reflecting the entire photo/frame composite would incorrectly
+mirror the photograph. Combined shadows use the same reflected geometry.
+
+The portable [colour-replacement fixture](../tests/testClipartColorReplacement/README.md)
+includes editor-created examples for all four orientations using frame 127517.
+No explicit mirroring-permission flag has been identified in the inspected
+resource XML or JSON; editor control availability is not used by the converter
+to override a saved MCF mirror setting.
+
+### Encoding and installing a custom passepartout
+
 The helper in this repository writes the simple CLP encoding:
 
     ClpFile.convertSVGtoCLP('example-mask.svg')

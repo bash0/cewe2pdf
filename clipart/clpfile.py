@@ -136,7 +136,7 @@ class ClpFile():
     #     self.pngMemFile.seek(0)
     #     return self
 
-    def applyAsAlphaMaskToFoto(self, photo:PIL.Image):
+    def applyAsAlphaMaskToFoto(self, photo:PIL.Image, flipX=False, flipY=False):
         """" Use the currently loaded mask clipart to create a alpha mask on the input image."""
         # create the PNG as RBGA in internal buffer
         # create a byte buffer that can be used like a file and use it as the output of svg2png.
@@ -163,6 +163,12 @@ class ClpFile():
             # normally the whole image is a black rectangle
             alphaChannel = maskImgPng.convert('L')
             alphaChannel = PIL.ImageOps.invert(alphaChannel)
+
+        # CEWE mirrors the passepartout, not the photograph inside its opening.
+        if flipX:
+            alphaChannel = alphaChannel.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+        if flipY:
+            alphaChannel = alphaChannel.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
         # apply it the input photo. They must have the same dimensions. But that is ensured by rasterSvgData
         if (photo.mode != "RGB") or (photo.mode != "RGBA"):

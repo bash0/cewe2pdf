@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="7abe38d8-c974-4403-8a44-cd33c61a9c91" imagedir="test_clipart_colorreplacement_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
+<fotobook art_id="7250" article_name="CEWE%20FOTOBOK%20Stor%20p%C3%A5%20premium%20matt%20fotopapir" externalProjectId="" folderID="3f7b254f-8121-45de-9ad4-f27b383a41ce" imagedir="test_clipart_colorreplacement_mcf-Dateien" isDataMcf="0" productname="ALB98" startdatecalendarium="" useSpineLogo="0" version="4.0">
     <project createdWithHPSVersion="7.4.3" createdWithHPSVersionBuild="20240328" multiPurposeText="" projectID="44455f16-6ca7-4a45-a3a9-3ed7e8f966eb" projectIDCreatedEpoch="1752248919"/>
-    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="8.1.3" programversionBuild="20260410" savetime="2026-11-22 17:14"/>
+    <savingVersion compatibilityVersion="6.4.2" downCastedByVersion="6.4.7" programversion="8.1.3" programversionBuild="20260410" savetime="2026-11-23 07:31"/>
     <articleConfig normalpages="26" pagenaming="1" totalpages="31"/>
     <addOns>
         <addOn ordertxt="FLF11" priceClass="FLF11" variant="flyleafcolor:white"/>
@@ -11,7 +11,7 @@
     </pagenumbering>
     <ruler/>
     <extra>
-        <lastTextFormat Alignment="ALIGNLEFT" IndentMargin="4" VerticalIndentMargin="4" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+        <lastTextFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="5" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
         <imageQuality version="1.3.56"/>
     </extra>
     <page designStyleID="1158347" designStyleTemplateName="collage_cover_back" pagenr="0" rotation="0" type="fullcover">
@@ -30,7 +30,7 @@ li.unchecked::marker { content: "\2610"; }
 li.checked::marker { content: "\2612"; }
 </style></head><body style=" font-family:'CEWE Head'; font-size:12pt; font-weight:400; font-style:normal;">
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="0" VerticalIndentMargin="0" backgroundColor="#00000000" font="CEWE Head,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -132,21 +132,21 @@ li.checked::marker { content: "\2612"; }
             <position height="158" left="2213.79" rotation="0" top="452.627" width="831" zposition="7000"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'CEWE Head'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Image in a unmodified frame</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="20" VerticalIndentMargin="50" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="20" VerticalIndentMargin="50" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea" backgroundcolor="2164260863">
             <position height="158" left="3087.79" rotation="0" top="452.627" width="832" zposition="7001"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'CEWE Head'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Frame with modified color</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="20" VerticalIndentMargin="50" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="20" VerticalIndentMargin="50" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
         <area areatype="textarea" backgroundcolor="2164260863">
             <position height="198" left="2681.79" rotation="0" top="1584.63" width="831" zposition="7002"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'CEWE Head'; font-size:16pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Same with different rotations of image and frame (flipped)</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNVCENTER,ALIGNLEFT" IndentMargin="20" VerticalIndentMargin="50" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEADING,ALIGNVCENTER" IndentMargin="20" VerticalIndentMargin="50" backgroundColor="#80ffffff" font="CEWE Head,16,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -177,7 +177,6 @@ li.checked::marker { content: "\2612"; }
             <decoration/>
             <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="125186" useABK="1">
                 <cutout left="-87" scale="0.169986" top="0"/>
-                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
                 <ClipartConfiguration applySpotColor="0"/>
             </image>
         </area>
@@ -189,7 +188,6 @@ li.checked::marker { content: "\2612"; }
             </decoration>
             <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="46537" useABK="1">
                 <cutout left="-0.968354" scale="0.318878" top="0"/>
-                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
                 <ClipartConfiguration applySpotColor="0"/>
             </image>
         </area>
@@ -212,7 +210,6 @@ li.checked::marker { content: "\2612"; }
             </decoration>
             <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" useABK="1">
                 <cutout left="-0.968996" scale="0.318878" top="0"/>
-                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
             </image>
         </area>
         <area areatype="imagearea">
@@ -222,8 +219,7 @@ li.checked::marker { content: "\2612"; }
                 <border applySpotColor="0" color="#ff000000" enabled="1" gap="10" position="outside" width="2"/>
             </decoration>
             <image filename="safecontainer:/fc6vj6ns_1_20200320_124632.jpg" passepartoutDesignElementId="127517" useABK="1">
-                <cutout left="-0.427482" scale="0.154659" top="0"/>
-                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+                <cutout left="-0.42754" scale="0.154659" top="0"/>
                 <ClipartConfiguration applySpotColor="0"/>
             </image>
         </area>
@@ -280,7 +276,7 @@ li.checked::marker { content: "\2612"; }
             <designElementIDs clipart="104304"/>
             <decoration/>
             <clipart designElementId="104304">
-                <ClipartConfiguration applySpotColor="1">
+                <ClipartConfiguration applySpotColor="0">
                     <colors>
                         <color source="#80add1" target="#80add1"/>
                         <color source="#8ab026" target="#8ab026"/>
@@ -296,7 +292,7 @@ li.checked::marker { content: "\2612"; }
             <position height="196" left="2617.03" rotation="0" top="1080.34" width="915.945" zposition="7000"/>
             <decoration/>
             <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Test for transparent replacement colour, issue https://github.com/bash0/cewe2pdf/issues/362. The yellow balloons should be transparent here, not yellow.</span></p></body></html>]]><outline width="0"/>
-                <textFormat Alignment="ALIGNLEFT" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="4" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
             </text>
         </area>
     </page>
@@ -311,6 +307,92 @@ li.checked::marker { content: "\2612"; }
         <designElementIDs background="201" layout="125061" styles_v2="1158347"/>
         <background alignment="1" designElementId="201" rotation="0" type="1"/>
         <background designElementId="125061" layout="1" templatename="schema_portrait_010"/>
+        <area areatype="imagearea">
+            <position height="647.343" left="209.117" rotation="0" top="288.392" width="622.445" zposition="100"/>
+            <designElementIDs passepartout="127517"/>
+            <decoration/>
+            <image filename="safecontainer:/20200320_124633_5l40ruok_1.jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="-247.647" scale="0.210774" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+                <ClipartConfiguration applySpotColor="1"/>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="648" left="1116.94" rotation="0" top="1078.83" width="623.077" zposition="101"/>
+            <designElementIDs passepartout="127517"/>
+            <decoration/>
+            <image filename="safecontainer:/20200320_124633_5l40ruok_1.jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="-247.354" scale="0.210987" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+                <ClipartConfiguration applySpotColor="1" mirror="both">
+                    <colors>
+                        <color source="#000000" target="#000000"/>
+                        <color source="#757575" target="#757575"/>
+                        <color source="#7f7f7f" target="#7f7f7f"/>
+                        <color source="#818181" target="#818181"/>
+                        <color source="#b5b5b5" target="#b5b5b5"/>
+                        <color source="#c4c4c4" target="#c4c4c4"/>
+                        <color source="#e3e3e3" target="#e3e3e3"/>
+                        <color source="#ececec" target="#ececec"/>
+                        <color source="#f8f8f8" target="#f8f8f8"/>
+                        <color source="#ffffff" target="#ffffff"/>
+                    </colors>
+                </ClipartConfiguration>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="648" left="208.522" rotation="0" top="1080.36" width="623.077" zposition="102"/>
+            <designElementIDs passepartout="127517"/>
+            <decoration/>
+            <image filename="safecontainer:/20200320_124633_5l40ruok_1.jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="-247.354" scale="0.210987" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+                <ClipartConfiguration applySpotColor="1" mirror="y">
+                    <colors>
+                        <color source="#000000" target="#000000"/>
+                        <color source="#757575" target="#757575"/>
+                        <color source="#7f7f7f" target="#7f7f7f"/>
+                        <color source="#818181" target="#818181"/>
+                        <color source="#b5b5b5" target="#b5b5b5"/>
+                        <color source="#c4c4c4" target="#c4c4c4"/>
+                        <color source="#e3e3e3" target="#e3e3e3"/>
+                        <color source="#ececec" target="#ececec"/>
+                        <color source="#f8f8f8" target="#f8f8f8"/>
+                        <color source="#ffffff" target="#ffffff"/>
+                    </colors>
+                </ClipartConfiguration>
+            </image>
+        </area>
+        <area areatype="imagearea">
+            <position height="648" left="1116.94" rotation="0" top="288.392" width="623.077" zposition="103"/>
+            <designElementIDs passepartout="127517"/>
+            <decoration/>
+            <image filename="safecontainer:/20200320_124633_5l40ruok_1.jpg" passepartoutDesignElementId="127517" useABK="1">
+                <cutout left="-247.354" scale="0.210987" top="0"/>
+                <quality jpeg="1" noise="1" resolution="1" sharpness="1" summarized="1" texture="1"/>
+                <ClipartConfiguration applySpotColor="1" mirror="x">
+                    <colors>
+                        <color source="#000000" target="#000000"/>
+                        <color source="#757575" target="#757575"/>
+                        <color source="#7f7f7f" target="#7f7f7f"/>
+                        <color source="#818181" target="#818181"/>
+                        <color source="#b5b5b5" target="#b5b5b5"/>
+                        <color source="#c4c4c4" target="#c4c4c4"/>
+                        <color source="#e3e3e3" target="#e3e3e3"/>
+                        <color source="#ececec" target="#ececec"/>
+                        <color source="#f8f8f8" target="#f8f8f8"/>
+                        <color source="#ffffff" target="#ffffff"/>
+                    </colors>
+                </ClipartConfiguration>
+            </image>
+        </area>
+        <area areatype="textarea">
+            <position height="75.2489" left="720.95" rotation="0" top="135.133" width="568.355" zposition="7000"/>
+            <decoration/>
+            <text applySpotColor="0" areaTextType="content"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"><html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">p, li { white-space: pre-wrap; }hr { height: 1px; border-width: 0; }li.unchecked::marker { content: "\2610"; }li.checked::marker { content: "\2612"; }</style></head><body style=" font-family:'Liberation Sans'; font-size:12pt; font-weight:400; font-style:normal; letter-spacing:0px;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:100%;"><span style=" color:#000000; -qt-stroke-color:transparent; -qt-stroke-width:0px; -qt-stroke-linecap:squarecap; -qt-stroke-linejoin:beveljoin;">Testing mirroring of the frame</span></p></body></html>]]><outline width="0"/>
+                <textFormat Alignment="ALIGNLEADING" IndentMargin="5" VerticalIndentMargin="50" backgroundColor="#00000000" font="Liberation Sans,12,-1,5,400,0,0,0,0,0,0,1,0,0,0,1" foregroundColor="#ff000000" hasOutline="0" hyphenation="0" letterSpacing="0" lineHeight="100"/>
+            </text>
+        </area>
     </page>
     <page designStyleID="1158347" designStyleTemplateName="default_page" pagenr="5" rotation="0" type="normalpage">
         <bundlesize height="2700" width="4100"/>
@@ -451,9 +533,12 @@ li.checked::marker { content: "\2612"; }
     </page>
     <userfeedback></userfeedback>
     <fotoRelationships>
-        <foto id="safecontainer:/abx6bvk1_6_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg"/>
-        <foto id="safecontainer:/fc6vj6ns_1_20200320_124632.jpg"/>
         <foto id="safecontainer:/abx6bvk1_7_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg"/>
+        <foto id="safecontainer:/fc6vj6ns_1_20200320_124632.jpg"/>
+        <foto id="safecontainer:/abx6bvk1_6_mandarin_duck,_kellogg_biological_station,_kalamazoo,_mi_(25137605482).jpg"/>
+        <foto id="file:///C:/Temp/junk_mcf-Dateien/5l40ruok_1_20200320_124632.jpg">
+            <foto id="safecontainer:/20200320_124633_5l40ruok_1.jpg" nature="RELATIONSHIP_ONE_TO_ONE_COPY"/>
+        </foto>
     </fotoRelationships>
-    <statistics assistantUsed="1" countPauses="85" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="508855" fotosAdded="95" fotosRemoved="38" pauseTime="411218" sessionsUsed="58"/>
+    <statistics assistantUsed="1" countPauses="85" elapsedTimeGross="2020-04-26T19:39:51" elapsedTimeNet="509733" fotosAdded="111" fotosRemoved="42" pauseTime="411218" sessionsUsed="60"/>
 </fotobook>
