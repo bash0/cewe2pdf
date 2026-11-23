@@ -158,11 +158,27 @@ class Passepartout():
         return Passepartout.getPassepartoutFileFullName(xmlInfo, xmlInfo.maskFile)
 
     @staticmethod
-    def createShadowImage(photo, xmlInfo, areaWidth, areaHeight, alpha,
-                          colorReplacements, context):
+    def getFotoarea(xmlInfo, flipX=False, flipY=False):
+        """Return the photo opening in the optionally mirrored frame's coordinates."""
+        if xmlInfo.fotoarea_x is None:
+            return 0, 0, 1, 1
+        left, top = xmlInfo.fotoarea_x, xmlInfo.fotoarea_y
+        width, height = xmlInfo.fotoarea_width, xmlInfo.fotoarea_height
+        # Reflect the opening as well as the artwork. The photograph's pixels
+        # keep their orientation, so reflecting the complete composite is wrong.
+        if flipX:
+            left = 1 - left - width
+        if flipY:
+            top = 1 - top - height
+        return left, top, width, height
+
+    # Keep dimensions, paint and mirror flags explicit, as in the clip-art rasteriser.
+    @staticmethod
+    def createShadowImage(photo, xmlInfo, areaWidth, areaHeight, alpha,  # pylint: disable=too-many-arguments
+        colorReplacements, context, flipX=False, flipY=False):
         """Composite photo and frame alpha in the complete passepartout's coordinates."""
         frame = rasteriseClipart(Passepartout.getClipartFullName(xmlInfo),
-            colorReplacements, areaWidth, areaHeight, alpha, context)
+            colorReplacements, areaWidth, areaHeight, alpha, context, flipX, flipY)
         if frame is None:
             return None
         with Image.open(frame.pngMemFile) as raster:
@@ -171,15 +187,10 @@ class Passepartout():
         # The frame canvas covers the whole area; the mask/photo canvas covers
         # only fotoarea. Paste without a mask: using the photo's alpha as a
         # paste mask would multiply it twice and weaken transparent shadows.
-        if xmlInfo.fotoarea_x is None:
-            photoRectangle = (0, 0, frameImage.width, frameImage.height)
-        else:
-            photoRectangle = (
-                round(xmlInfo.fotoarea_x * frameImage.width),
-                round(xmlInfo.fotoarea_y * frameImage.height),
-                round(xmlInfo.fotoarea_width * frameImage.width),
-                round(xmlInfo.fotoarea_height * frameImage.height))
-        left, top, width, height = photoRectangle
+        left, top, width, height = Passepartout.getFotoarea(xmlInfo, flipX, flipY)
+        left, top, width, height = (
+            round(left * frameImage.width), round(top * frameImage.height),
+            round(width * frameImage.width), round(height * frameImage.height))
         photo = photo.convert('RGBA').resize((width, height), context.image_resampling_filter)
         silhouette = Image.new('RGBA', frameImage.size, (0, 0, 0, 0))
         silhouette.paste(photo, (left, top))

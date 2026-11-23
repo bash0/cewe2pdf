@@ -90,9 +90,9 @@ def _drawPassepartoutShadow(photo, imageTag, area, xmlInfo, pdf, context, state,
     areaWidth = float(position.get('width').replace(',', '.'))
     areaHeight = float(position.get('height').replace(',', '.'))
     areaRotation = float(position.get('rotation'))
-    colorReplacements, _flipX, _flipY = getClipConfig(imageTag)
+    colorReplacements, flipX, flipY = getClipConfig(imageTag)
     shadowImage = Passepartout.createShadowImage(photo, xmlInfo, areaWidth, areaHeight,
-        int(_getDecorationOpacity(area) * 255), colorReplacements, context)
+        int(_getDecorationOpacity(area) * 255), colorReplacements, context, flipX, flipY)
     if shadowImage is None:
         return False
     for decorationTag in area.findall('decoration'):
@@ -156,6 +156,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     passepartoutInfo = None
     frameClipartFileName = None
     maskClipartFileName = None
+    colorReplacements, flipX, flipY = [], False, False
     frameDeltaX_mcfunit = 0
     frameDeltaY_mcfunit = 0
     # A passepartout has a separately drawn frame as well as the masked photo.
@@ -176,14 +177,16 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
             logging.warning(f"Could not find passepartout {passepartoutId}; rendering the unframed image.")
         else:
             passepartoutInfo = Passepartout.extractInfoFromXml(passepartoutXmlFileName, passepartoutId)
+            colorReplacements, flipX, flipY = getClipConfig(imageTag)
             frameClipartFileName = Passepartout.getClipartFullName(passepartoutInfo)
             maskClipartFileName = Passepartout.getMaskFullName(passepartoutInfo)
             logging.debug(f"Using mask file: {maskClipartFileName}")
-            if passepartoutInfo.fotoarea_x is not None:
-                frameDeltaX_mcfunit = passepartoutInfo.fotoarea_x * areaWidth
-                frameDeltaY_mcfunit = passepartoutInfo.fotoarea_y * areaHeight
-                imageCropWidth_mcfunit = passepartoutInfo.fotoarea_width * areaWidth
-                imageCropHeight_mcfunit = passepartoutInfo.fotoarea_height * areaHeight
+            fotoareaX, fotoareaY, fotoareaWidth, fotoareaHeight = Passepartout.getFotoarea(
+                passepartoutInfo, flipX, flipY)
+            frameDeltaX_mcfunit = fotoareaX * areaWidth
+            frameDeltaY_mcfunit = fotoareaY * areaHeight
+            imageCropWidth_mcfunit = fotoareaWidth * areaWidth
+            imageCropHeight_mcfunit = fotoareaHeight * areaHeight
 
     # Crop co-ordinates can lie outside the image. Pillow fills that area with
     # black, which is acceptable for the exceptional passepartout case.
@@ -210,7 +213,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
 
     if maskClipartFileName is not None:
         maskClipart = loadClipart(maskClipartFileName, context.clipart_paths)
-        image = maskClipart.applyAsAlphaMaskToFoto(image)
+        image = maskClipart.applyAsAlphaMaskToFoto(image, flipX, flipY)
 
     cornersInfo = getCornersInfo(area)
     image = applyCornerMask(image, cornersInfo, imageCropWidth_mcfunit)
@@ -268,9 +271,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     pdf.translate(frameShiftX_mcf * mcf2rl, frameShiftY_mcf * mcf2rl)
 
     if frameClipartFileName is not None:
-        colorReplacements, _flipX, _flipY = getClipConfig(imageTag)
         insertClipartFile(frameClipartFileName, colorReplacements, 0, areaWidth,
-                          areaHeight, frameAlpha, pdf, 0, 0, False, False,
+                          areaHeight, frameAlpha, pdf, 0, 0, flipX, flipY,
                           None, context)
 
     for decorationTag in area.findall('decoration'):

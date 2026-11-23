@@ -163,6 +163,12 @@ processing. Replacing alpha would discard transparency already in the image.
 A passepartout's frame shares the photograph's opacity rather than becoming a
 separately opaque overlay.
 
+Passepartout mirroring reflects the frame, mask and photo-opening position in
+local area coordinates before rotation, while the photograph retains its
+orientation. Its combined shadow must follow the same geometry. See the
+[format notes](../clipart/CLP_FILE_FORMAT.md#passepartout-mirroring) for the
+MCF axis convention and opening-coordinate transform.
+
 Passepartout shadows combine the masked photo and the decorative frame in the
 full frame canvas, positioning the photo using the resource XML's `fotoarea`.
 The frame uses the same clip-art rasterisation and colour/opacity handling as
