@@ -391,6 +391,16 @@ on objects with supported image corners instead use the same shaped
 path as the image, so that the border follows the corner rather than the
 original rectangle.
 
+### Empty photo frames
+
+An empty passepartout with separate decorative artwork is printed even without
+a photograph, matching CEWE's print preview. Its photograph opening stays
+transparent; the frame retains its rotation, mirroring, colour replacements and
+opacity. Photo border/shadow settings and editor placeholders are omitted while
+the frame is empty. A plain empty photo area or a mask without visible artwork
+remains blank. A missing referenced photo still produces the usual diagnostic;
+it is not treated as an intentionally empty frame.
+
 ### Shadow decorations
 
 The CEWE angle, distance, intensity, expansion (`shadowWidthInMM`) and blur

@@ -23,6 +23,7 @@ Focused examples:
 python -m pytest tests/testCewePageResolver/test_cewePageResolver.py -q
 python -m pytest tests/testCalendar -q
 python -m pytest tests/testMcfxExtraction -q
+python -m pytest tests/testEmptyFrames -q
 python -m pytest -rs --ignore=tests/testCalendar
 ```
 
