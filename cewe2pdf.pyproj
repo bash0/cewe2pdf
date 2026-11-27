@@ -405,6 +405,7 @@
     <Content Include="tests\unittest_fotobook\unittest_fotobook_mcf-Dateien\img6.png" />
     <Content Include="utilities\contenttocenter\README.md" />
     <Content Include="utilities\fontcheck\README.md" />
+    <Content Include="utilities\mcfxextract\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="albumConversionSession.py" />
@@ -469,6 +470,9 @@
     <Compile Include="infrastructure\windowsIntegration.py" />
     <Compile Include="infrastructure\__init__.py" />
     <Compile Include="mcfx.py" />
+    <Compile Include="infrastructure\mcfx_archive.py" />
+    <Compile Include="utilities\mcfxextract\__init__.py" />
+    <Compile Include="utilities\mcfxextract\mcfxextract.py" />
     <Compile Include="pageElements.py" />
     <Compile Include="pageNumbering.py" />
     <Compile Include="pages.py" />
@@ -506,6 +510,7 @@
     <Compile Include="tests\testLineHeight\test_lineHeight.py" />
     <Compile Include="tests\testLists\test_lists.py" />
     <Compile Include="tests\testMcfxExtraction\test_McfxExtraction.py" />
+    <Compile Include="tests\testMcfxExtraction\test_mcfxextract.py" />
     <Compile Include="tests\testMemoryCards\test_memoryCards.py" />
     <Compile Include="tests\testNoCewe\test_noCewe.py" />
     <Compile Include="tests\testPageNumbers\test_pagenumbers.py" />
@@ -724,6 +729,7 @@
     <Folder Include="utilities\contenttocenter\" />
     <Folder Include="utilities\fontcheck\" />
     <Folder Include="utilities\clp2svg\" />
+    <Folder Include="utilities\mcfxextract\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|cewe2pdf312" />
