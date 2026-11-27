@@ -4,20 +4,18 @@ import logging
 import os
 import re
 import tempfile
+from io import BytesIO
 from math import sqrt
 
 import PIL
 from reportlab.lib.utils import ImageReader
 import cairosvg
-from io import BytesIO
-
-from ceweInfo import ProductInfo
 from clipart.catalog import getClipConfig, loadClipart
 from clipart.areas import hasEnabledShadow, insertClipartFile
 from conversionState import ConversionState
 from decorations.corners import applyCornerMask, getCornersInfo
-from imageUtils import autorot, getMapUrlFromExif
 from decorations.passepartout import Passepartout
+from imageUtils import autorot, getMapUrlFromExif
 from infrastructure.configUtils import getConfigurationBool
 from renderContext import RenderContext
 
@@ -101,12 +99,55 @@ def _drawPassepartoutShadow(photo, imageTag, area, xmlInfo, pdf, context, state,
     return True
 
 
+def _getPassepartoutInfo(imageTag, context, state):
+    """Resolve a frame/mask through the conversion's shared resource catalogue."""
+    passepartoutId = imageTag.get('passepartoutDesignElementId')
+    if passepartoutId is None:
+        return None
+    passepartoutId = int(passepartoutId)
+    if state.passepartout_files is None:
+        logging.info('Regenerating passepartout index from .XML files.')
+        state.passepartout_files = Passepartout.buildElementIdIndex(context.passepartout_folders)
+    filename = state.passepartout_files.get(passepartoutId)
+    if filename is None:
+        logging.warning(f'Could not find passepartout {passepartoutId}; rendering the unframed image.')
+        return None
+    return Passepartout.extractInfoFromXml(filename, passepartoutId)
+
+
+def _drawEmptyImageFrame(imageTag, area, pdf, centre, context, state):
+    """CEWE prints an empty passepartout's artwork, leaving its photo opening clear."""
+    info = _getPassepartoutInfo(imageTag, context, state)
+    if info is None or info.clipartFile is None:
+        return
+    position = area.find('position')
+    width, height, rotation = (float(position.get(name, '0').replace(',', '.'))
+        for name in ('width', 'height', 'rotation'))
+    replacements, flipX, flipY = getClipConfig(imageTag)
+    pdf.saveState()
+    try:
+        pdf.translate(*centre)
+        pdf.rotate(-rotation)
+        # Empty frames in CEWE's print preview show the artwork itself, without
+        # the photo's border/shadow or a grey editor placeholder. A mask without
+        # separate artwork has nothing visible to draw until a photo is supplied.
+        insertClipartFile(Passepartout.getClipartFullName(info), replacements, 0,
+            width, height, int(_getDecorationOpacity(area) * 255), pdf, 0, 0,
+            flipX, flipY, None, context)
+    finally:
+        pdf.restoreState()
+
+
+# Keep the shared page-renderer signature and legacy crop pipeline together;
+# productStyle/pageWidth remain accepted for caller compatibility.
+# pylint: disable-next=too-many-arguments,too-many-locals,too-many-statements
 def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDirectory,
-                        productStyle, mcfBaseFolder, pageType, pdf, pageWidth,
+                        productStyle, mcfBaseFolder, pageType, pdf, pageWidth,  # pylint: disable=unused-argument
                         transx, transy, context: RenderContext, state: ConversionState,
                         drawShadow, drawBorders):
     """Crop, decorate and draw one CEWE image area."""
-    if imageTag.get('filename') is None:
+    if not imageTag.get('filename'):
+        _drawEmptyImageFrame(imageTag, area, pdf, (transx, transy), context, state)
         return
 
     mcf2rl = context.mcf_to_reportlab
@@ -132,7 +173,7 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
         image.load()
     else:
         image = PIL.Image.open(imagePath)
-    
+
     geoLinkUrl = (getMapUrlFromExif(image, context.geo_link_url_template)
                   if context.geo_links_enabled else None)
 
@@ -165,18 +206,8 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     imageCropWidth_mcfunit = areaWidth
     imageCropHeight_mcfunit = areaHeight
     if passepartoutId is not None:
-        passepartoutId = int(passepartoutId)
-        if state.passepartout_files is None:
-            logging.info("Regenerating passepartout index from .XML files.")
-            state.passepartout_files = Passepartout.buildElementIdIndex(context.passepartout_folders)
-        try:
-            passepartoutXmlFileName = state.passepartout_files[passepartoutId]
-        except KeyError:
-            passepartoutXmlFileName = None
-        if passepartoutXmlFileName is None:
-            logging.warning(f"Could not find passepartout {passepartoutId}; rendering the unframed image.")
-        else:
-            passepartoutInfo = Passepartout.extractInfoFromXml(passepartoutXmlFileName, passepartoutId)
+        passepartoutInfo = _getPassepartoutInfo(imageTag, context, state)
+        if passepartoutInfo is not None:
             colorReplacements, flipX, flipY = getClipConfig(imageTag)
             frameClipartFileName = Passepartout.getClipartFullName(passepartoutInfo)
             maskClipartFileName = Passepartout.getMaskFullName(passepartoutInfo)
@@ -219,8 +250,9 @@ def processAreaImageTag(imageTag, area, areaHeight, areaRot, areaWidth, imageDir
     image = applyCornerMask(image, cornersInfo, imageCropWidth_mcfunit)
     image = _applyDecorationAlpha(image, area)
 
-    temporaryImage = tempfile.NamedTemporaryFile()
-    # The file must be closed before PIL can reopen it on Windows.
+    # ConversionState owns the file lifetime; close the handle before PIL can
+    # reopen it on Windows rather than limiting its lifetime to a with block.
+    temporaryImage = tempfile.NamedTemporaryFile()  # pylint: disable=consider-using-with
     temporaryImage.close()
     if image.mode in ('RGBA', 'P'):
         image.save(temporaryImage.name, "PNG")

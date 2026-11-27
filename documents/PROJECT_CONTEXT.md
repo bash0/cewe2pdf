@@ -218,6 +218,18 @@ paths use the same in-memory PDF rasteriser and configured image resolution.
 Minor accepted softness/darkness differences are specific visual judgments, not a
 blanket permission to replace approved output.
 
+### Empty frame artwork
+
+CEWE's album print preview includes passepartout clip art when the native image
+element has no photograph filename. This differs from the editor's grey empty
+photo placeholder: the printed opening remains clear. Render the frame through
+the shared clip-art path, retaining its paint, alpha and transforms, without
+inventing a sample photograph or casting the absent photo's border/shadow.
+A pure mask and a plain empty photo area have no visible artwork. Keep a missing
+referenced photograph distinct from deliberate emptiness so broken resources
+still receive their established diagnostic. Tests use portable generated artwork;
+the observed CEWE print behaviour remains the source of the rule.
+
 ## PDF additions without visual changes
 
 Bookmarks, contents links, page labels, and web links should add navigation without

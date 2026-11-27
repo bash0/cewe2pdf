@@ -440,6 +440,8 @@
     <Compile Include="tests\testClipartColorReplacement\test_transparentColours.py" />
     <Compile Include="tests\testColourBackgrounds\test_colourBackgrounds.py" />
     <Compile Include="tests\testImages\test_images.py" />
+    <Compile Include="tests\testEmptyFrames\test_emptyFrames.py" />
+    <Content Include="tests\testEmptyFrames\README.md" />
     <Compile Include="tests\testPageSelection\test_pageSelection.py" />
     <Compile Include="tests\testShadows\test_passepartoutShadow.py" />
     <Compile Include="tests\testUnsupportedChars\test_UnsupportedChars.py" />
@@ -631,6 +633,7 @@
     <Folder Include="tests\testDecorations\" />
     <Folder Include="tests\TestDecorations\previous_result_pdfs\" />
     <Folder Include="tests\TestDecorations\test_decorations_mcf-Dateien\" />
+    <Folder Include="tests\testEmptyFrames\" />
     <Folder Include="tests\testEmptyPageOne\previous_result_pdfs\" />
     <Folder Include="tests\testfontsubstitution\" />
     <Folder Include="tests\testFontSubstitution\previous_result_pdfs\" />
