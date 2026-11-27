@@ -42,6 +42,15 @@ flowchart TD
 
 `AlbumConversionSession` is the lifetime boundary. It prepares the album, creates and saves the ReportLab canvas, owns temporary files and diagnostic counters, and cleans those resources up even when rendering fails. Do not add conversion-time mutable globals: one Python process may convert several albums.
 
+MCFX extraction is shared by conversion and the standalone
+[mcfxextract utility](../utilities/mcfxextract/README.md).
+`infrastructure.mcfx_archive.extract_mcfx` opens SQLite read-only, validates member
+paths and the single main document, strips only that document's trailing binary
+padding and reads one resource BLOB at a time. It raises ordinary exceptions and
+does not change cwd. The `mcfx.unpackMcfx` compatibility wrapper retains the
+converter's timestamp cache, temporary-directory ownership and exit-on-error API.
+The utility requires a new output directory and has no PDF/rendering dependencies.
+
 ### Data ownership
 
 | Object | Owns |
